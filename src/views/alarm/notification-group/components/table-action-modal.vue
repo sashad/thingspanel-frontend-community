@@ -144,7 +144,7 @@ async function handleSubmit() {
   //   add: $t('generate.add'),
   //   edit: $t('common.edit')
   // };
-  // window.$message?.success(`${titles[props.type]}成功!`);
+  // window.$message?.success(`${titles[props.type]}success!`);
   emit('getTableData')
   closeModal()
 }

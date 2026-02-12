@@ -1,74 +1,74 @@
 /**
- * 配置事件总线
- * 用于解耦配置变更与执行器调用，实现松散耦合的事件驱动架构
+ * Configure event bus
+ * Used to decouple configuration changes and executor calls，Implement a loosely coupled event-driven architecture
  *
- * 核心功能：
- * 1. 配置变更事件的统一分发
- * 2. 条件性事件过滤和处理
- * 3. 事件优先级和执行顺序控制
- * 4. 执行器调用的解耦和可控性
+ * Core functions：
+ * 1. Unified distribution of configuration change events
+ * 2. Conditional event filtering and processing
+ * 3. Event priority and execution sequence control
+ * 4. Decoupling and controllability of executor calls
  *
- * Created for Task 1.2: 解耦配置事件与执行器调用
+ * Created for Task 1.2: Decoupling configuration events and executor calls
  */
 
 export interface ConfigChangeEvent {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 变更的配置层级 */
+  /** Changed configuration level */
   section: 'base' | 'component' | 'dataSource' | 'interaction'
-  /** 变更前的配置 */
+  /** Configuration before change */
   oldConfig: any
-  /** 变更后的配置 */
+  /** Configuration after change */
   newConfig: any
-  /** 变更时间戳 */
+  /** Change timestamp */
   timestamp: number
-  /** 变更来源 */
+  /** Change source */
   source: 'user' | 'system' | 'api' | 'import'
-  /** 额外的上下文信息 */
+  /** additional contextual information */
   context?: {
-    /** 触发变更的UI组件 */
+    /** triggering changesUIcomponents */
     triggerComponent?: string
-    /** 是否需要触发数据执行 */
+    /** Do you need to trigger data execution? */
     shouldTriggerExecution?: boolean
-    /** 变更的具体字段路径 */
+    /** Changed specific field path */
     changedFields?: string[]
   }
 }
 
 export type ConfigEventType =
-  | 'config-changed' // 任意配置变更
-  | 'data-source-changed' // 数据源配置变更
-  | 'component-props-changed' // 组件属性变更
-  | 'base-config-changed' // 基础配置变更
-  | 'interaction-changed' // 交互配置变更
-  | 'before-config-change' // 配置变更前（可用于验证）
-  | 'after-config-change' // 配置变更后（用于清理工作）
+  | 'config-changed' // Any configuration changes
+  | 'data-source-changed' // Data source configuration changes
+  | 'component-props-changed' // Component property changes
+  | 'base-config-changed' // Basic configuration changes
+  | 'interaction-changed' // Interactive configuration changes
+  | 'before-config-change' // Before configuration changes（available for verification）
+  | 'after-config-change' // After configuration changes（for cleaning work）
 
 export type ConfigEventHandler = (event: ConfigChangeEvent) => void | Promise<void>
 
 export interface ConfigEventFilter {
-  /** 过滤器名称 */
+  /** filter name */
   name: string
-  /** 过滤条件函数 */
+  /** filter function */
   condition: (event: ConfigChangeEvent) => boolean
-  /** 过滤器优先级（数字越大优先级越高） */
+  /** filter priority（The larger the number, the higher the priority.） */
   priority?: number
 }
 
 /**
- * 配置事件总线类
- * 实现配置变更的事件驱动处理，解耦配置管理与业务逻辑
+ * Configure event bus class
+ * Implement event-driven processing of configuration changes，Decoupling configuration management and business logic
  */
 export class ConfigEventBus {
-  /** 事件处理器映射 */
+  /** event handler mapping */
   private eventHandlers = new Map<ConfigEventType, Set<ConfigEventHandler>>()
 
-  /** 全局事件过滤器列表 */
+  /** Global event filter list */
   private globalFilters: ConfigEventFilter[] = []
 
-  /** 事件处理统计（用于调试和性能分析） */
+  /** Event processing statistics（for debugging and performance analysis） */
   private statistics = {
     eventsEmitted: 0,
     eventsFiltered: 0,
@@ -77,10 +77,10 @@ export class ConfigEventBus {
   }
 
   /**
-   * 注册配置变更事件处理器
-   * @param eventType 事件类型
-   * @param handler 事件处理函数
-   * @returns 取消注册的函数
+   * Register configuration change event handler
+   * @param eventType event type
+   * @param handler event handler
+   * @returns Unregister function
    */
   onConfigChange(eventType: ConfigEventType, handler: ConfigEventHandler): () => void {
     if (!this.eventHandlers.has(eventType)) {
@@ -89,7 +89,7 @@ export class ConfigEventBus {
 
     const handlers = this.eventHandlers.get(eventType)!
     handlers.add(handler)
-    // 返回取消注册的函数
+    // Returns the unregistered function
     return () => {
       handlers.delete(handler)
       if (handlers.size === 0) {
@@ -99,27 +99,27 @@ export class ConfigEventBus {
   }
 
   /**
-   * 发出配置变更事件
-   * @param event 配置变更事件
+   * Emit configuration change events
+   * @param event Configuration change event
    */
   async emitConfigChange(event: ConfigChangeEvent): Promise<void> {
-    // 🔄[DeviceID-HTTP-Debug] 配置变更事件发出开始
+    // 🔄[DeviceID-HTTP-Debug] Configuration change event emission starts
 
 
     this.statistics.eventsEmitted++
 
-    // 应用全局过滤器
+    // Apply global filter
     if (!this.passesGlobalFilters(event)) {
       this.statistics.eventsFiltered++
-      // 🔄[DeviceID-HTTP-Debug] 事件被全局过滤器过滤
+      // 🔄[DeviceID-HTTP-Debug] Events are filtered by global filters
       return
     }
 
-    // 确定要触发的事件类型
+    // Determine the type of event to trigger
     const eventTypesToTrigger = this.determineEventTypes(event)
 
 
-    // 并行执行所有相关事件类型的处理器
+    // Processors that execute all relevant event types in parallel
     const handlerPromises: Promise<void>[] = []
 
     for (const eventType of eventTypesToTrigger) {
@@ -131,23 +131,23 @@ export class ConfigEventBus {
       }
     }
 
-    // 等待所有处理器执行完成
+    // Wait for all processors to complete
     if (handlerPromises.length > 0) {
       try {
         await Promise.allSettled(handlerPromises)
-        // 🔄[DeviceID-HTTP-Debug] 所有处理器执行完成
+        // 🔄[DeviceID-HTTP-Debug] All processors execute
       } catch (error) {
-        // 🔄[DeviceID-HTTP-Debug] 处理器执行出错
+        // 🔄[DeviceID-HTTP-Debug] Processor execution error
       }
     }
   }
 
   /**
-   * 添加全局事件过滤器
-   * @param filter 事件过滤器
+   * Add global event filter
+   * @param filter event filter
    */
   addEventFilter(filter: ConfigEventFilter): void {
-    // 按优先级插入（优先级高的在前）
+    // Insert by priority（Highest priority first）
     const insertIndex = this.globalFilters.findIndex(f => (f.priority || 0) < (filter.priority || 0))
     if (insertIndex === -1) {
       this.globalFilters.push(filter)
@@ -157,8 +157,8 @@ export class ConfigEventBus {
   }
 
   /**
-   * 移除全局事件过滤器
-   * @param filterName 过滤器名称
+   * Remove global event filter
+   * @param filterName filter name
    */
   removeEventFilter(filterName: string): void {
     const index = this.globalFilters.findIndex(f => f.name === filterName)
@@ -168,14 +168,14 @@ export class ConfigEventBus {
   }
 
   /**
-   * 获取事件总线统计信息
+   * Get event bus statistics
    */
   getStatistics() {
     return { ...this.statistics }
   }
 
   /**
-   * 清除所有事件处理器和过滤器（用于测试和清理）
+   * Clear all event handlers and filters（for testing and cleaning）
    */
   clear(): void {
     this.eventHandlers.clear()
@@ -188,10 +188,10 @@ export class ConfigEventBus {
     }
   }
 
-  // ===== 私有方法 =====
+  // ===== private method =====
 
   /**
-   * 检查事件是否通过全局过滤器
+   * Check if event passes global filter
    */
   private passesGlobalFilters(event: ConfigChangeEvent): boolean {
     for (const filter of this.globalFilters) {
@@ -200,19 +200,19 @@ export class ConfigEventBus {
           return false
         }
       } catch (error) {
-        // 过滤器执行失败时，默认让事件通过
+        // When filter execution fails，Let events pass by default
       }
     }
     return true
   }
 
   /**
-   * 根据事件内容确定要触发的事件类型
+   * Determine the event type to trigger based on event content
    */
   private determineEventTypes(event: ConfigChangeEvent): ConfigEventType[] {
-    const eventTypes: ConfigEventType[] = ['config-changed'] // 总是触发通用事件
+    const eventTypes: ConfigEventType[] = ['config-changed'] // Always trigger generic events
 
-    // 根据配置层级添加特定事件类型
+    // Add specific event types based on configuration hierarchy
     switch (event.section) {
       case 'dataSource':
         eventTypes.push('data-source-changed')
@@ -231,7 +231,7 @@ export class ConfigEventBus {
   }
 
   /**
-   * 安全地执行事件处理器
+   * Safely execute event handlers
    */
   private async executeHandler(
     handler: ConfigEventHandler,
@@ -243,46 +243,46 @@ export class ConfigEventBus {
 
       const result = handler(event)
 
-      // 如果处理器返回Promise，等待执行完成
+      // If the processor returnsPromise，Wait for execution to complete
       if (result instanceof Promise) {
         await result
       }
     } catch (error) {
       this.statistics.errors++
 
-      // 不重新抛出错误，避免影响其他处理器的执行
+      // Do not rethrow errors，Avoid affecting the execution of other processors
     }
   }
 }
 
-// 创建全局配置事件总线实例
+// Create a global configuration event bus instance
 export const configEventBus = new ConfigEventBus()
 
-// ✅ 简化：移除过度复杂的事件去重系统
-// 事件去重由调用方自行处理，保持事件系统简单直接
+// ✅ simplify：Remove overly complex event deduplication system
+// Event deduplication is handled by the caller himself，Keep the event system simple and straightforward
 
-// 添加一些默认的过滤器
+// Add some default filters
 configEventBus.addEventFilter({
   name: 'ignore-system-updates',
   condition: event => {
-    // 忽略某些系统级别的配置更新，避免无限循环
+    // Ignore certain system-level configuration updates，Avoid infinite loops
     return event.source !== 'system' || event.context?.shouldTriggerExecution !== false
   },
   priority: 100
 })
 
-// ✅ 简化：移除事件去重过滤器，保持事件系统简单直接
-// 事件去重逻辑由调用方自行处理
+// ✅ simplify：Remove event deduplication filter，Keep the event system simple and straightforward
+// The event deduplication logic is handled by the caller himself
 
-// ✅ 简化：移除智能事件增强过滤器
-// 事件处理逻辑保持简单直接，不过度分析配置内容
+// ✅ simplify：Remove smart event enhancement filter
+// Keep event handling logic simple and straightforward，Do not over-analyze configuration content
 
-// 🔥 新增：监听基础配置变更事件，自动触发数据源重新执行
+// 🔥 New：Listen to basic configuration change events，Automatically trigger data source re-execution
 let dataExecutionTriggerCallback: ((event: ConfigChangeEvent) => void) | null = null
 
 /**
- * 🔥 注册数据执行触发器
- * 允许外部系统注册一个回调函数，在配置变更时触发数据重新执行
+ * 🔥 Register data execution trigger
+ * Allow external systems to register a callback function，Trigger data re-execution when configuration changes
  */
 export function registerDataExecutionTrigger(callback: (event: ConfigChangeEvent) => void): () => void {
   dataExecutionTriggerCallback = callback
@@ -295,9 +295,9 @@ export function registerDataExecutionTrigger(callback: (event: ConfigChangeEvent
   }
 }
 
-// 🔥 监听所有配置变更事件，特别关注基础配置和数据源配置变更
+// 🔥 Listen to all configuration change events，Pay special attention to basic configuration and data source configuration changes
 configEventBus.onConfigChange('config-changed', async event => {
-  // 对于需要触发数据执行的事件，调用注册的触发器
+  // For events that need to trigger data execution，Call registered trigger
   if (event.context?.shouldTriggerExecution && dataExecutionTriggerCallback) {
     try {
       if (process.env.NODE_ENV === 'development') {
@@ -313,7 +313,7 @@ configEventBus.onConfigChange('config-changed', async event => {
         }
       }
     } catch (error) {
-      console.error(`❌ [ConfigEventBus] 数据执行触发失败`, {
+      console.error(`❌ [ConfigEventBus] Data execution trigger failed`, {
         componentId: event.componentId,
         error: error instanceof Error ? error.message : error
       })
@@ -321,21 +321,21 @@ configEventBus.onConfigChange('config-changed', async event => {
   }
 })
 
-// 🔥 专门监听基础配置变更事件
+// 🔥 Specially monitor basic configuration change events
 configEventBus.onConfigChange('base-config-changed', async event => {
   if (process.env.NODE_ENV === 'development') {
   }
-  // 基础配置变更通常都需要触发数据重新执行
+  // Basic configuration changes usually require triggering data re-execution
   if (!event.context) {
     event.context = {}
   }
   event.context.shouldTriggerExecution = true
-  // 调用数据执行触发器
+  // Call data execution trigger
   if (dataExecutionTriggerCallback) {
     try {
       dataExecutionTriggerCallback(event)
     } catch (error) {
-      console.error(`❌ [ConfigEventBus] 基础配置数据执行触发失败`, {
+      console.error(`❌ [ConfigEventBus] Basic configuration data execution trigger failed`, {
         componentId: event.componentId,
         error: error instanceof Error ? error.message : error
       })
@@ -343,20 +343,20 @@ configEventBus.onConfigChange('base-config-changed', async event => {
   }
 })
 
-// 🔥 专门监听数据源配置变更事件
+// 🔥 Specifically monitor data source configuration change events
 configEventBus.onConfigChange('data-source-changed', async event => {
 
-  // 数据源配置变更通常都需要触发数据重新执行
+  // Data source configuration changes usually require triggering data re-execution
   if (!event.context) {
     event.context = {}
   }
   event.context.shouldTriggerExecution = true
-  // 调用数据执行触发器
+  // Call data execution trigger
   if (dataExecutionTriggerCallback) {
     try {
       dataExecutionTriggerCallback(event)
     } catch (error) {
-      console.error(`❌ [ConfigEventBus] 数据源配置数据执行触发失败`, {
+      console.error(`❌ [ConfigEventBus] Data source configuration data execution trigger failed`, {
         componentId: event.componentId,
         error: error instanceof Error ? error.message : error
       })
@@ -364,7 +364,7 @@ configEventBus.onConfigChange('data-source-changed', async event => {
   }
 })
 
-// 🔧 调试支持：将事件总线暴露到全局作用域，便于控制台调试
+// 🔧 Debugging support：Expose event bus to global scope，Convenient for console debugging
 if (typeof window !== 'undefined') {
   ;(window as any).configEventBus = configEventBus
   ;(window as any).registerDataExecutionTrigger = registerDataExecutionTrigger

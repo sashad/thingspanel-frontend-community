@@ -22,7 +22,7 @@ const props = defineProps({
   }
 })
 
-// 提交表单
+// Submit form
 const formRef: any = ref(null)
 const deviceTemplateId = ref<string>(props.deviceTemplateId)
 
@@ -66,7 +66,7 @@ const fromRules: Rules = {
 
 const objItem = reactive<any>(props.objItem)
 
-// 监听一下父组件传递过来的编辑数据
+// Listen to the editing data passed by the parent component
 watch(
   objItem,
   newVal => {
@@ -98,13 +98,13 @@ const generalOptions: any = reactive(
 )
 
 const readAndWriteOptions: any = reactive(
-  ['R-只读', 'RW-读/写'].map(v => ({
+  ['R-只read', 'RW-read/Write'].map(v => ({
     label: v,
     value: v
   }))
 )
 
-// 确定按钮
+// OK button
 const submit: () => void = async () => {
   await formRef.value?.validate()
   const updateForm = { ...addFrom }
@@ -113,7 +113,7 @@ const submit: () => void = async () => {
   } else {
     updateForm.additional_info = '[]'
   }
-  if (updateForm.read_write_flag === 'R-只读') {
+  if (updateForm.read_write_flag === 'R-read only') {
     updateForm.read_write_flag = 'R'
   } else {
     updateForm.read_write_flag = 'RW'
@@ -135,7 +135,7 @@ const submit: () => void = async () => {
   }
 }
 
-// 取消按钮
+// Cancel button
 const clear: () => void = () => {
   emit('update:objItem', {})
   emit('update:addAndEditModalVisible', false)

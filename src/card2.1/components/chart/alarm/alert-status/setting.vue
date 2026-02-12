@@ -1,27 +1,27 @@
 <template>
   <div class="alert-status-setting">
     <n-form :model="config" label-placement="left" label-width="80" size="small">
-      <!-- 基本配置 -->
+      <!-- Basic configuration -->
       <n-divider title-placement="left">
-        <span style="font-size: 12px; color: var(--text-color-2)">基本配置</span>
+        <span style="font-size: 12px; color: var(--text-color-2)">Basic configuration</span>
       </n-divider>
       
-      <n-form-item label="标题">
-        <n-input v-model:value="config.title" placeholder="请输入标题" />
+      <n-form-item label="title">
+        <n-input v-model:value="config.title" placeholder="Please enter a title" />
       </n-form-item>
       
-      <n-form-item label="金额">
+      <n-form-item label="Amount">
         <n-input-number 
           v-model:value="config.amount" 
-          placeholder="请输入金额"
+          placeholder="Please enter the amount"
         />
       </n-form-item>
       
-      <n-form-item label="简介">
+      <n-form-item label="Introduction">
         <n-input 
           v-model:value="config.description" 
           type="textarea" 
-          placeholder="请输入简介信息"
+          placeholder="Please enter profile information"
           :autosize="{ minRows: 2, maxRows: 4 }"
         />
       </n-form-item>
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 /**
- * 告警状态组件配置表单 - 简化版
+ * Alarm status component configuration form - Simplified version
  */
 
 import { ref, watch, nextTick } from 'vue'
@@ -44,7 +44,7 @@ import {
 } from 'naive-ui'
 import type { AlertStatusCustomize } from './settingConfig'
 
-// Props - 配置表单接收的是扁平的自定义配置对象
+// Props - The configuration form receives a flat custom configuration object
 interface Props {
   modelValue?: AlertStatusCustomize
   widget?: any
@@ -54,14 +54,14 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({
-    title: '告警状态',
+    title: 'Alarm status',
     amount: 0,
-    description: '系统运行正常'
+    description: 'The system is running normally'
   }),
   readonly: false
 })
 
-// Emits - 发射扁平的配置对象
+// Emits - Emit flat configuration objects
 interface Emits {
   (e: 'update:modelValue', value: AlertStatusCustomize): void
   (e: 'change', value: AlertStatusCustomize): void
@@ -69,13 +69,13 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 配置数据
+// Configuration data
 const config = ref<AlertStatusCustomize>({ ...props.modelValue })
 
-// 防止循环更新的标记
+// Tags that prevent cyclic updates
 const isUpdatingFromProps = ref(false)
 
-// 监听配置变化并向上传递
+// Listen for configuration changes and pass them up
 watch(
   config,
   (newConfig) => {
@@ -87,7 +87,7 @@ watch(
   { deep: true }
 )
 
-// 监听外部配置变化
+// Monitor external configuration changes
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -96,7 +96,7 @@ watch(
       try {
         config.value = { ...newValue }
       } finally {
-        // 使用 nextTick 确保更新完成后再重置标记
+        // use nextTick Make sure the update is complete before resetting the flag
         nextTick(() => {
           isUpdatingFromProps.value = false
         })

@@ -1,29 +1,29 @@
 /**
- * 渲染器统一导出
- * 所有渲染器都应该遵循相同的接口规范
+ * Renderer unified export
+ * All renderers should follow the same interface specification
  */
 
-// Canvas渲染器 (当前主要渲染器)
+// CanvasRenderer (Current primary renderer)
 export { CanvasRenderer } from '@/components/visual-editor/renderers/canvas'
-// TODO: FabricCanvasRenderer 已被删除，需要重新实现或移除相关引用
+// TODO: FabricCanvasRenderer has been deleted，Need to reimplement or remove relevant references
 // export { FabricCanvasRenderer } from '@/components/visual-editor/renderers/canvas'
 
-// GridStack渲染器
+// GridStackRenderer
 export { GridstackRenderer } from '@/components/visual-editor/renderers/gridstack'
 
-// 待实现的渲染器
-// export { KanbanRenderer } from '@/components/visual-editor/renderers/kanban'  // 看板渲染器 (二期功能)
+// Renderer to be implemented
+// export { KanbanRenderer } from '@/components/visual-editor/renderers/kanban'  // Kanban renderer (Second phase function)
 // export { DashboardRenderer } from '@/components/visual-editor/renderers/dashboard'
 // export { ReportRenderer } from '@/components/visual-editor/renderers/report'
 // export { ThreeDRenderer } from '@/components/visual-editor/renderers/three-d'
 
 /**
- * 渲染器接口规范
- * 所有渲染器必须遵循以下接口：
+ * Renderer interface specification
+ * All renderers must follow the following interface：
  *
  * Props:
  * - readonly?: boolean
- * - config?: object (渲染器特定配置)
+ * - config?: object (Renderer specific configuration)
  *
  * Emits:
  * - ready: () => void

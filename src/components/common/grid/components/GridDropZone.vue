@@ -1,6 +1,6 @@
 <!--
-  Grid 拖拽区域组件
-  处理外部元素拖拽到网格的逻辑
+  Grid Drag area component
+  Handle the logic of dragging external elements to the grid
 -->
 <template>
   <div
@@ -16,15 +16,15 @@
       <n-icon :size="24">
         <AddOutline />
       </n-icon>
-      <span>{{ $t('grid.dropHint', '拖拽组件到此处添加') }}</span>
+      <span>{{ $t('grid.dropHint', 'Drag and drop components here to add') }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * Grid 拖拽区域组件
- * 专门处理拖拽操作和外部元素添加
+ * Grid Drag area component
+ * Specifically handles drag and drop operations and external element additions
  */
 
 import { ref } from 'vue'
@@ -32,20 +32,20 @@ import { NIcon } from 'naive-ui'
 import { AddOutline } from '@vicons/ionicons5'
 
 interface Props {
-  /** 是否只读模式 */
+  /** Whether to read-only mode */
   readonly?: boolean
-  /** 是否显示拖拽区域 */
+  /** Whether to display the drag area */
   showDropZone?: boolean
 }
 
 interface Emits {
-  /** 拖拽进入事件 */
+  /** Drag and drop event */
   'drag-enter': [event: DragEvent]
-  /** 拖拽悬停事件 */
+  /** drag hover event */
   'drag-over': [event: DragEvent]
-  /** 拖拽离开事件 */
+  /** Drag and drop event */
   'drag-leave': [event: DragEvent]
-  /** 拖拽释放事件 */
+  /** drag release event */
   drop: [event: DragEvent]
 }
 
@@ -56,13 +56,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 拖拽状态管理
+// Drag and drop state management
 const isDragging = ref(false)
 const dragCounter = ref(0)
 
 /**
- * 处理拖拽进入
- * 使用计数器防止子元素触发的虚假离开事件
+ * Handling drag-and-drop entry
+ * Use counter to prevent spurious leave events triggered by child elements
  */
 const handleDragEnter = (event: DragEvent) => {
   event.preventDefault()
@@ -74,8 +74,8 @@ const handleDragEnter = (event: DragEvent) => {
 }
 
 /**
- * 处理拖拽悬停
- * 必须阻止默认行为以允许拖放
+ * Handling drag-hover
+ * Default behavior must be blocked to allow drag and drop
  */
 const handleDragOver = (event: DragEvent) => {
   event.preventDefault()
@@ -83,8 +83,8 @@ const handleDragOver = (event: DragEvent) => {
 }
 
 /**
- * 处理拖拽离开
- * 使用计数器确保真正离开拖拽区域
+ * Handle drag and leave
+ * Use a counter to ensure you actually leave the drag area
  */
 const handleDragLeave = (event: DragEvent) => {
   event.preventDefault()
@@ -96,8 +96,8 @@ const handleDragLeave = (event: DragEvent) => {
 }
 
 /**
- * 处理拖拽释放
- * 重置状态并触发释放事件
+ * Handling drag and release
+ * Reset state and trigger release event
  */
 const handleDrop = (event: DragEvent) => {
   event.preventDefault()
@@ -106,7 +106,7 @@ const handleDrop = (event: DragEvent) => {
   emit('drop', event)
 }
 
-// 暴露给父组件的方法
+// Methods exposed to the parent component
 defineExpose({
   isDragging: isDragging.value
 })
@@ -151,12 +151,12 @@ defineExpose({
   white-space: nowrap;
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .drop-zone {
   background: rgba(var(--primary-color-rgb), 0.15);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .drop-hint {
     font-size: 14px;

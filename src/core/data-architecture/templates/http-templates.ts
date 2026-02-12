@@ -1,19 +1,19 @@
 /**
- * HTTP配置模板
- * 专门维护HTTP数据源的预设配置模板
+ * HTTPConfiguration template
+ * dedicated maintenanceHTTPPreset configuration templates for data sources
  */
 
 import type { HttpConfig } from '@/core/data-architecture/types/http-config'
 
 /**
- * HTTP配置模板定义
+ * HTTPConfiguration template definition
  */
 export const HTTP_CONFIG_TEMPLATES: Array<{
   name: string
   config: HttpConfig
 }> = [
   {
-    name: 'GET接口',
+    name: 'GETinterface',
     config: {
       url: 'https://api.example.com/data',
       method: 'GET',
@@ -26,7 +26,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [],
@@ -36,7 +36,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
     }
   },
   {
-    name: 'POST接口',
+    name: 'POSTinterface',
     config: {
       url: 'https://api.example.com/submit',
       method: 'POST',
@@ -49,7 +49,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: '内容类型'
+          description: 'Content type'
         },
         {
           key: 'Authorization',
@@ -58,7 +58,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_authorization',
-          description: '认证令牌'
+          description: 'Authentication token'
         }
       ],
       params: [],
@@ -69,7 +69,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
     }
   },
   {
-    name: '设备遥测数据（修复版）',
+    name: 'Device telemetry data（Repaired version）',
     config: {
       url: '/telemetry/datas/statistic',
       method: 'GET',
@@ -82,7 +82,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [
@@ -93,7 +93,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_device_id',
-          description: '设备ID'
+          description: 'equipmentID'
         },
         {
           key: 'key',
@@ -102,7 +102,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_key',
-          description: '指标键名'
+          description: 'Indicator key name'
         },
         {
           key: 'start_time',
@@ -111,7 +111,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_start_time',
-          description: '开始时间戳（字符串格式）'
+          description: 'start timestamp（String format）'
         },
         {
           key: 'end_time',
@@ -120,7 +120,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_end_time',
-          description: '结束时间戳（字符串格式）'
+          description: 'end timestamp（String format）'
         },
         {
           key: 'aggregate_window',
@@ -129,7 +129,7 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: '聚合窗口：1h,1d,no_aggregate'
+          description: 'aggregation window：1h,1d,no_aggregate'
         },
         {
           key: 'time_range',
@@ -138,29 +138,29 @@ export const HTTP_CONFIG_TEMPLATES: Array<{
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: '时间范围类型'
+          description: 'time range type'
         }
       ],
       body: '',
-      preRequestScript: `// 修复版：动态时间戳生成和参数验证
+      preRequestScript: `// Repaired version：Dynamic timestamp generation and parameter validation
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 
-// 🔧 修复：动态生成时间戳（如果用户没有设置）
+// 🔧 repair：Dynamically generate timestamps（If the user does not set）
 if (config.params) {
   const startTimeParam = config.params.find(p => p.key === 'start_time')
   const endTimeParam = config.params.find(p => p.key === 'end_time')
 
-  // 如果时间参数是示例值，则自动更新为当前时间
+  // If the time parameter is a sample value，will automatically update to the current time
   if (startTimeParam && startTimeParam.value === '1640995200000') {
-    startTimeParam.value = (Date.now() - 3600000).toString() // 1小时前
+    startTimeParam.value = (Date.now() - 3600000).toString() // 1hours ago
   }
   if (endTimeParam && endTimeParam.value === '1640998800000') {
-    endTimeParam.value = Date.now().toString() // 当前时间
+    endTimeParam.value = Date.now().toString() // current time
   }
 }
 
-// 验证必要参数
+// Verify necessary parameters
 const requiredParams = ['device_id', 'key']
 const missingParams = []
 if (config.params) {
@@ -172,36 +172,36 @@ if (config.params) {
   }
 }
 if (missingParams.length > 0) {
-  console.error('⚠️ 缺少必要参数:', missingParams)
+  console.error('⚠️ Missing required parameters:', missingParams)
 }
 
 return config`,
-      postResponseScript: `// 修复版：更稳健的响应数据处理
+      postResponseScript: `// Repaired version：More robust response data handling
 if (process.env.NODE_ENV === 'development') {
 }
 
 try {
   let data = null
 
-  // 处理响应数据的多种格式
+  // Handle multiple formats of response data
   if (response && typeof response === 'object') {
-    // 标准格式: response.data 包含数组
+    // standard format: response.data contains array
     if (Array.isArray(response.data)) {
       data = response.data
     }
-    // 备用格式: response.result
+    // Alternate format: response.result
     else if (Array.isArray(response.result)) {
       data = response.result
     }
-    // 直接数组格式
+    // direct array format
     else if (Array.isArray(response)) {
       data = response
     }
-    // 列表格式: response.list
+    // list format: response.list
     else if (response.list && Array.isArray(response.list)) {
       data = response.list
     }
-    // 单条数据格式
+    // Single data format
     else if (response.data && typeof response.data === 'object') {
       data = [response.data]
     }
@@ -211,13 +211,13 @@ try {
   }
 
   if (data && Array.isArray(data)) {
-    // 🔧 修复：更稳健的数据转换
+    // 🔧 repair：More robust data transformation
     const result = data.map(item => {
       if (!item || typeof item !== 'object') return [0, 0]
 
-      // 多种时间字段兼容
+      // Compatible with multiple time fields
       const timeValue = item.x || item.timestamp || item.time || item.ts || Date.now()
-      // 多种数值字段兼容
+      // Compatible with multiple numeric fields
       const dataValue = item.y || item.value || item.val || item.data || 0
 
       return [timeValue, dataValue]
@@ -234,13 +234,13 @@ try {
   return response
 
 } catch (error) {
-  console.error('❌ [遥测数据] 处理失败:', error)
+  console.error('❌ [telemetry data] Processing failed:', error)
   return response
 }`
     }
   },
   {
-    name: '设备当前遥测数据',
+    name: 'Device current telemetry data',
     config: {
       url: '/telemetry/datas/current/',
       method: 'GET',
@@ -250,7 +250,7 @@ try {
         isDynamic: true,
         dataType: 'string',
         variableName: 'var_path_param',
-        description: '设备ID'
+        description: 'equipmentID'
       },
       headers: [
         {
@@ -260,25 +260,25 @@ try {
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [],
       body: '',
-      preRequestScript: `// 路径参数会自动拼接到URL后
+      preRequestScript: `// The path parameters are automatically spliced ​​toURLback
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 return config`,
-      postResponseScript: `// 设备当前遥测数据响应处理
+      postResponseScript: `// Device current telemetry data response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
 if (response && typeof response === 'object') {
-  // 如果是单个设备的遥测数据
+  // If it is telemetry data from a single device
   if (response.data && typeof response.data === 'object') {
     return response.data
   }
-  // 如果直接是遥测数据
+  // If it is directly telemetry data
   if (response.telemetry_data) {
     return response.telemetry_data
   }
@@ -288,7 +288,7 @@ return response`
     }
   },
   {
-    name: '设备属性数据',
+    name: 'Device attribute data',
     config: {
       url: '/attribute/datas/',
       method: 'GET',
@@ -298,7 +298,7 @@ return response`
         isDynamic: true,
         dataType: 'string',
         variableName: 'var_path_param',
-        description: '设备ID'
+        description: 'equipmentID'
       },
       headers: [
         {
@@ -308,16 +308,16 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [],
       body: '',
-      preRequestScript: `// 路径参数会自动拼接到URL后
+      preRequestScript: `// The path parameters are automatically spliced ​​toURLback
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 return config`,
-      postResponseScript: `// 设备属性数据响应处理
+      postResponseScript: `// Device attribute data response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
@@ -331,7 +331,7 @@ return response`
     }
   },
   {
-    name: '设备命令下发',
+    name: 'Device command issuance',
     config: {
       url: '/command/datas/pub',
       method: 'POST',
@@ -344,7 +344,7 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: '内容类型'
+          description: 'Content type'
         },
         {
           key: 'Authorization',
@@ -353,7 +353,7 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_authorization',
-          description: '认证令牌'
+          description: 'Authentication token'
         }
       ],
       params: [],
@@ -367,23 +367,23 @@ return response`
         null,
         2
       ),
-      preRequestScript: `// 命令下发前处理
+      preRequestScript: `// Processing before command issuance
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 
-// 验证命令数据格式
+// Verify command data format
 let commandData
 try {
   commandData = JSON.parse(config.body)
   if (!commandData.device_id || !commandData.command_identifier) {
-    console.error('缺少必要的命令参数: device_id, command_identifier')
+    console.error('Missing required command parameters: device_id, command_identifier')
   }
 } catch (e) {
-  console.error('命令数据格式错误:', e)
+  console.error('Command data format error:', e)
 }
 
 return config`,
-      postResponseScript: `// 命令下发响应处理
+      postResponseScript: `// Command issuing response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
@@ -391,7 +391,7 @@ if (response && typeof response === 'object') {
   if (response.success !== undefined) {
     return {
       success: response.success,
-      message: response.message || '命令已发送',
+      message: response.message || 'command sent',
       timestamp: Date.now()
     }
   }
@@ -401,7 +401,7 @@ return response`
     }
   },
   {
-    name: '设备告警历史',
+    name: 'Equipment alarm history',
     config: {
       url: '/alarm/info/history',
       method: 'GET',
@@ -414,7 +414,7 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [
@@ -425,7 +425,7 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_device_id',
-          description: '设备ID'
+          description: 'equipmentID'
         },
         {
           key: 'page',
@@ -434,7 +434,7 @@ return response`
           isDynamic: false,
           dataType: 'number',
           variableName: '',
-          description: '页码'
+          description: 'page number'
         },
         {
           key: 'page_size',
@@ -443,16 +443,16 @@ return response`
           isDynamic: false,
           dataType: 'number',
           variableName: '',
-          description: '每页数量'
+          description: 'Quantity per page'
         }
       ],
       pathParams: [],
       body: '',
-      preRequestScript: `// 告警历史查询前处理
+      preRequestScript: `// Alarm history query pre-processing
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 return config`,
-      postResponseScript: `// 告警历史响应处理
+      postResponseScript: `// Alarm history response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
@@ -477,7 +477,7 @@ return response`
     }
   },
   {
-    name: '设备在线状态',
+    name: 'Device online status',
     config: {
       url: '/device',
       method: 'GET',
@@ -490,7 +490,7 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [
@@ -501,7 +501,7 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_device_id',
-          description: '设备ID'
+          description: 'equipmentID'
         },
         {
           key: 'online_status',
@@ -510,16 +510,16 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: '在线状态筛选'
+          description: 'Online status filter'
         }
       ],
       pathParams: [],
       body: '',
-      preRequestScript: `// 设备状态查询前处理
+      preRequestScript: `// Pre-processing of equipment status query
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 return config`,
-      postResponseScript: `// 设备状态响应处理
+      postResponseScript: `// Device status response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
@@ -530,11 +530,11 @@ if (response && typeof response === 'object') {
       device_name: device.name,
       is_online: device.is_online,
       last_push_time: device.last_push_time,
-      status_text: device.is_online ? '在线' : '离线'
+      status_text: device.is_online ? 'online' : 'Offline'
     }))
   }
 
-  // 单个设备详情
+  // Individual device details
   if (response.data && response.data.id) {
     const device = response.data
     return {
@@ -542,7 +542,7 @@ if (response && typeof response === 'object') {
       device_name: device.name,
       is_online: device.is_online,
       last_push_time: device.last_push_time,
-      status_text: device.is_online ? '在线' : '离线'
+      status_text: device.is_online ? 'online' : 'Offline'
     }
   }
 }
@@ -551,7 +551,7 @@ return response`
     }
   },
   {
-    name: '设备列表查询',
+    name: 'Device list query',
     config: {
       url: '/device',
       method: 'GET',
@@ -564,7 +564,7 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [
@@ -575,7 +575,7 @@ return response`
           isDynamic: true,
           dataType: 'number',
           variableName: 'var_page',
-          description: '页码'
+          description: 'page number'
         },
         {
           key: 'page_size',
@@ -584,7 +584,7 @@ return response`
           isDynamic: true,
           dataType: 'number',
           variableName: 'var_page_size',
-          description: '每页数量'
+          description: 'Quantity per page'
         },
         {
           key: 'name',
@@ -593,16 +593,16 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_device_name',
-          description: '设备名称搜索'
+          description: 'Device name search'
         }
       ],
       pathParams: [],
       body: '',
-      preRequestScript: `// 设备列表查询前处理
+      preRequestScript: `// Device list query pre-processing
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 
-// 清理空参数
+// Clean up empty parameters
 if (config.params) {
   config.params = config.params.filter(param =>
     param.enabled && param.value !== '' && param.value != null
@@ -610,7 +610,7 @@ if (config.params) {
 }
 
 return config`,
-      postResponseScript: `// 设备列表响应处理
+      postResponseScript: `// Device list response processing
 if (process.env.NODE_ENV === 'development') {
 }
 
@@ -638,7 +638,7 @@ return response`
     }
   },
   {
-    name: '事件数据查询',
+    name: 'Event data query',
     config: {
       url: '/event/datas',
       method: 'GET',
@@ -651,7 +651,7 @@ return response`
           isDynamic: false,
           dataType: 'string',
           variableName: '',
-          description: 'HTTP Accept头'
+          description: 'HTTP Accepthead'
         }
       ],
       params: [
@@ -662,7 +662,7 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_device_id',
-          description: '设备ID'
+          description: 'equipmentID'
         },
         {
           key: 'event_type',
@@ -671,16 +671,16 @@ return response`
           isDynamic: true,
           dataType: 'string',
           variableName: 'var_event_type',
-          description: '事件类型'
+          description: 'event type'
         },
         {
           key: 'start_time',
-          value: Date.now() - 86400000, // 24小时前
+          value: Date.now() - 86400000, // 24hours ago
           enabled: true,
           isDynamic: true,
           dataType: 'number',
           variableName: 'var_start_time',
-          description: '开始时间戳'
+          description: 'start timestamp'
         },
         {
           key: 'end_time',
@@ -689,16 +689,16 @@ return response`
           isDynamic: true,
           dataType: 'number',
           variableName: 'var_end_time',
-          description: '结束时间戳'
+          description: 'end timestamp'
         }
       ],
       pathParams: [],
       body: '',
-      preRequestScript: `// 事件数据查询前处理
+      preRequestScript: `// Pre-processing of event data query
 config.headers = config.headers || {}
 config.headers['X-Request-Time'] = Date.now().toString()
 return config`,
-      postResponseScript: `// 事件数据响应处理
+      postResponseScript: `// Event data response processing
 if (process.env.NODE_ENV === 'development') {
 }
 

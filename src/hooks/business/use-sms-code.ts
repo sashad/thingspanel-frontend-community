@@ -21,7 +21,7 @@ export default function useSmsCode() {
     return text
   })
 
-  /** 判断手机号码格式是否正确 */
+  /** Determine whether the mobile phone number format is correct */
   function isPhoneValid(phone: string) {
     let valid = true
     if (phone.trim() === '') {
@@ -33,9 +33,9 @@ export default function useSmsCode() {
     }
     return valid
   }
-  /** 判断邮箱格式是否正确 */
+  /** Determine whether the email format is correct */
   async function isValidEmail(email) {
-    // 正则表达式来匹配邮箱格式
+    // Regular expression to match email format
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
     const valid = emailRegex.test(email)
     if (!valid) {
@@ -47,9 +47,9 @@ export default function useSmsCode() {
   }
 
   /**
-   * 获取短信验证码
+   * Get SMS verification code
    *
-   * @param phone - 手机号
+   * @param phone - Phone number
    */
   async function getSmsCode(phone: string) {
     const valid = isPhoneValid(phone)
@@ -61,14 +61,14 @@ export default function useSmsCode() {
       if (process.env.NODE_ENV === 'development') {
       }
       if (!error && data) {
-        start() // 只有在发送成功时才启动倒计时
+        start() // Only start countdown when sending successfully
         window.$message?.success($t('page.login.common.codeSent'))
       } else {
-        // 接口返回错误时不显示成功提示
+        // No success prompt is displayed when the interface returns an error
         window.$message?.error($t('page.login.common.codeError'))
       }
     } catch (err) {
-      // 接口调用失败时不显示成功提示
+      // No success prompt is displayed when the interface call fails
       window.$message?.error($t('page.login.common.codeError'))
     } finally {
       endLoading()
@@ -76,9 +76,9 @@ export default function useSmsCode() {
   }
 
   /**
-   * 根据邮箱获取短信验证码
+   * Get SMS verification code based on email
    *
-   * @param email - 邮箱
+   * @param email - Mail
    */
   async function getSmsCodeByEmail(email: string) {
     const valid = await isValidEmail(email)

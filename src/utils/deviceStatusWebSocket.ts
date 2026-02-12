@@ -5,7 +5,7 @@ import { getWebsocketServerUrl } from '@/utils/common/tool'
 
 interface DeviceStatusMessage {
   device_id: string
-  is_online: number // 1: 在线, 0: 离线
+  is_online: number // 1: online, 0: Offline
 }
 
 interface SubscriptionParams {
@@ -14,8 +14,8 @@ interface SubscriptionParams {
 }
 
 /**
- * 设备状态 WebSocket 管理器
- * 用于订阅和接收设备在线/离线状态通知
+ * Device status WebSocket Manager
+ * Devices for subscribing and receiving online/Offline status notification
  */
 export class DeviceStatusWebSocket {
   private ws: any = null
@@ -25,65 +25,65 @@ export class DeviceStatusWebSocket {
   private readonly MAX_RECONNECT_ATTEMPTS = 5
   private wsUrl: string
   private onStatusChangeCallback?: (deviceId: string, isOnline: boolean) => void
-  private isConnecting = false // 新增：标记正在连接中
+  private isConnecting = false // New：Tag is connecting
   
   constructor() {
-    // 动态获取 WebSocket 服务器地址
+    // Dynamic acquisition WebSocket Server address
     this.wsUrl = `${getWebsocketServerUrl()}/device/online/status/ws/batch`
   }
   
   /**
-   * 连接 WebSocket 并订阅设备状态
-   * @param deviceIds 设备ID列表
-   * @param onStatusChange 状态变化回调函数
+   * connect WebSocket and subscribe to device status
+   * @param deviceIds equipmentIDlist
+   * @param onStatusChange State change callback function
    */
   connect(deviceIds: string[], onStatusChange?: (deviceId: string, isOnline: boolean) => void) {
-    // 保存回调函数
+    // Save callback function
     if (onStatusChange) {
       this.onStatusChangeCallback = onStatusChange
     }
 
-    // 如果设备列表为空，不建立连接
+    // If the device list is empty，No connection established
     if (!deviceIds || deviceIds.length === 0) {
       this.disconnect()
       return
     }
 
-    // 获取 token
+    // Get token
     const token = localStg.get('token')
     if (!token) {
       return
     }
 
-    // 如果正在连接中，不重复连接
+    // If connecting，No duplicate connections
     if (this.isConnecting) {
       return
     }
 
-    // 如果已连接且设备列表未变化，不需要重新连接
+    // If connected and the device list has not changed，No need to reconnect
     if (this.ws && this.wsStatus.value === 'OPEN' && 
         this.arraysEqual(this.currentDeviceIds, deviceIds)) {
       return
     }
 
-    // 如果已连接但设备列表变化了（分页切换），关闭旧连接重新建立
+    // If you are connected but the device list has changed（Paging switch），Close the old connection and re-establish it
     if (this.ws && this.wsStatus.value === 'OPEN' && 
         !this.arraysEqual(this.currentDeviceIds, deviceIds)) {
       this.disconnect()
     }
 
-    // 标记为连接中
+    // Mark as connecting
     this.isConnecting = true
 
-    // 如果还有旧连接，先断开
+    // If there are still old connections，Disconnect first
     if (this.ws) {
       this.disconnect()
     }
 
-    // 保存当前设备列表
+    // Save current device list
     this.currentDeviceIds = [...deviceIds]
 
-    // 建立新连接
+    // Establish new connection
     const { status, data, send, close } = useWebSocket(this.wsUrl, {
       immediate: true,
       autoReconnect: {
@@ -97,9 +97,9 @@ export class DeviceStatusWebSocket {
       },
       onConnected: (ws: WebSocket) => {
         this.reconnectAttempts = 0
-        this.isConnecting = false // 连接成功，清除连接中标记
+        this.isConnecting = false // Connection successful，Clear connection flag
         
-        // 发送订阅消息
+        // Send subscription message
         const subscriptionMessage: SubscriptionParams = {
           device_ids: deviceIds,
           token
@@ -110,7 +110,7 @@ export class DeviceStatusWebSocket {
         try {
           const data = JSON.parse(event.data)
           
-          // 支持批量消息格式（数组）
+          // Support batch message format（array）
           if (Array.isArray(data)) {
             data.forEach((item: any) => {
               if (item.device_id && typeof item.is_online === 'number') {
@@ -120,23 +120,23 @@ export class DeviceStatusWebSocket {
               }
             })
           } 
-          // 支持单条消息格式（对象）
+          // Support single message format（object）
           else if (data.device_id && typeof data.is_online === 'number') {
             if (this.onStatusChangeCallback) {
               this.onStatusChangeCallback(data.device_id, data.is_online === 1)
             }
           }
-          // 其他格式静默忽略，不报错
+          // Other formats are silently ignored，No error reported
         } catch (error) {
-          // 解析失败静默忽略
+          // Parse failures are silently ignored.
         }
       },
       onError: (ws: WebSocket, event: Event) => {
         this.reconnectAttempts++
-        this.isConnecting = false // 连接错误，清除连接中标记
+        this.isConnecting = false // Connection error，Clear connection flag
       },
       onDisconnected: (ws: WebSocket, event: CloseEvent) => {
-        this.isConnecting = false // 断开连接，清除连接中标记
+        this.isConnecting = false // Disconnect，Clear connection flag
       }
     })
 
@@ -145,8 +145,8 @@ export class DeviceStatusWebSocket {
   }
 
   /**
-   * 更新订阅的设备列表
-   * @param deviceIds 新的设备ID列表
+   * Update subscribed device list
+   * @param deviceIds new equipmentIDlist
    */
   updateSubscription(deviceIds: string[]) {
     if (!deviceIds || deviceIds.length === 0) {
@@ -159,7 +159,7 @@ export class DeviceStatusWebSocket {
       return
     }
 
-    // 如果 WebSocket 已连接，直接发送新的订阅消息
+    // if WebSocket Connected，Send new subscription messages directly
     if (this.ws && this.wsStatus.value === 'OPEN') {
       this.currentDeviceIds = [...deviceIds]
       const subscriptionMessage: SubscriptionParams = {
@@ -168,16 +168,16 @@ export class DeviceStatusWebSocket {
       }
       this.ws.send(JSON.stringify(subscriptionMessage))
     } else {
-      // 否则重新连接
+      // Otherwise reconnect
       this.connect(deviceIds, this.onStatusChangeCallback)
     }
   }
 
   /**
-   * 断开 WebSocket 连接
+   * disconnect WebSocket connect
    */
   disconnect() {
-    this.isConnecting = false // 清除连接中标记
+    this.isConnecting = false // Clear connection flag
     if (this.ws && this.ws.close) {
       this.ws.close()
       this.ws = null
@@ -187,14 +187,14 @@ export class DeviceStatusWebSocket {
   }
 
   /**
-   * 获取当前连接状态
+   * Get current connection status
    */
   getStatus(): string {
     return this.wsStatus.value
   }
 
   /**
-   * 比较两个数组是否相等
+   * Compare two arrays for equality
    */
   private arraysEqual(arr1: string[], arr2: string[]): boolean {
     if (arr1.length !== arr2.length) return false
@@ -205,8 +205,8 @@ export class DeviceStatusWebSocket {
 }
 
 /**
- * 创建设备状态 WebSocket 实例的组合式函数
- * @returns WebSocket 管理器实例
+ * Create device status WebSocket Instance composed functions
+ * @returns WebSocket Manager instance
  */
 export function useDeviceStatusWebSocket() {
   const wsManager = new DeviceStatusWebSocket()

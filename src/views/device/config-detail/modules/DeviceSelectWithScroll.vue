@@ -3,12 +3,12 @@ import { computed, ref, watch } from 'vue'
 import { NCheckbox, NEmpty, NFlex, NInfiniteScroll, NPopover, NSelect, NSpin } from 'naive-ui'
 import { $t } from '@/locales'
 
-// --- 类型定义 ---
+// --- type definition ---
 interface DeviceOption {
   device_id: string
   device_name: string
-  // 可以根据需要添加其他属性
-  [key: string]: any // 允许其他属性
+  // Other attributes can be added as needed
+  [key: string]: any // Allow other attributes
 }
 
 // --- Props (Type-based) ---
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
   loading: false,
   hasMore: true,
-  placeholder: () => $t('common.selectPlaceholder') || '请选择',
+  placeholder: () => $t('common.selectPlaceholder') || 'Please select',
   disabled: false,
   clearable: false
 })
@@ -39,28 +39,28 @@ interface Emits {
 }
 const emit = defineEmits<Emits>()
 
-// --- 内部状态 ---
-/** 控制 Popover 是否显示 */
+// --- internal state ---
+/** control Popover Whether to display */
 const showPopover = ref(false)
-/** 内部维护的选中 ID 列表，与 modelValue 同步 */
+/** Internal maintenance options ID list，and modelValue synchronous */
 const selectedDeviceIds = ref<string[]>([])
-/** 搜索关键词 */
+/** Search keywords */
 const searchKeyword = ref('')
 
-// --- 计算属性 ---
-/** 将选中的 ID 映射回完整的设备对象，用于 NSelect 的 render-tag */
+// --- Computed properties ---
+/** will be selected ID Map back to full device object，used for NSelect of render-tag */
 const selectedOptions = computed(() => {
   if (!selectedDeviceIds.value || selectedDeviceIds.value.length === 0) {
     return []
   }
-  // 优化：创建一个 ID 到选项的映射，避免每次都遍历 options
+  // optimization：Create a ID Mapping to options，Avoid traversing every time options
   const optionsMap = new Map(props.options.map(opt => [opt.device_id, opt]))
-  // 注意：这里可能只包含当前 options 列表中的已选项，如果 modelValue 包含尚未加载的项，它们不会显示
-  // 如果需要显示所有（包括未加载）的已选项标签，需要更复杂的逻辑，可能需要父组件传入已选对象
-  return selectedDeviceIds.value.map(id => optionsMap.get(id)).filter((opt): opt is DeviceOption => Boolean(opt)) // 过滤掉未找到的选项
+  // Notice：This may only contain the current options selected in list，if modelValue Contains items that have not yet been loaded，they won't show
+  // If needed show all（including not loaded）selected tags，Requires more complex logic，The parent component may need to pass in the selected object
+  return selectedDeviceIds.value.map(id => optionsMap.get(id)).filter((opt): opt is DeviceOption => Boolean(opt)) // Filter out options not found
 })
 
-/** 根据搜索关键词过滤后的选项列表 */
+/** List of options filtered by search keywords */
 const filteredOptions = computed(() => {
   if (!searchKeyword.value.trim()) {
     return props.options
@@ -71,83 +71,83 @@ const filteredOptions = computed(() => {
   )
 })
 
-// --- 方法 ---
-/** 处理无限滚动加载事件 */
+// --- method ---
+/** Handling infinite scroll loading events */
 const handleLoadMore = () => {
   if (!props.loading && props.hasMore) {
     if (process.env.NODE_ENV === 'development') {
-    } // 调试日志
+    } // debug log
     emit('loadMore')
   }
 }
 
 /**
- * 处理选项点击事件
+ * Handling option click events
  *
- * @param deviceId 被点击选项的设备 ID
+ * @param deviceId The device on which the option was clicked ID
  */
 const handleOptionClick = (deviceId: string) => {
   const index = selectedDeviceIds.value.indexOf(deviceId)
   if (index > -1) {
-    // 如果已选中，则取消选中
+    // if selected，then uncheck
     selectedDeviceIds.value.splice(index, 1)
   } else {
-    // 如果未选中，则添加选中
+    // if not selected，then add selected
     selectedDeviceIds.value.push(deviceId)
   }
-  // 触发 v-model 更新
-  emit('update:modelValue', [...selectedDeviceIds.value]) // 确保发出新数组
+  // trigger v-model renew
+  emit('update:modelValue', [...selectedDeviceIds.value]) // Make sure to emit the new array
 }
 
 /**
- * 当 Popover 显示状态改变时触发
+ * when Popover Triggered when display status changes
  *
- * @param show 是否显示
+ * @param show Whether to display
  */
 const handlePopoverUpdateShow = (show: boolean) => {
   showPopover.value = show
   if (show && (!props.options || props.options.length === 0)) {
-    // 当首次展开且没有选项时，触发初始加载
+    // When first expanded with no options，Trigger initial load
     if (process.env.NODE_ENV === 'development') {
-    } // 调试日志
+    } // debug log
     emit('initialLoad')
   }
 }
 
 /**
- * 处理搜索事件
+ * Handling search events
  *
- * @param searchValue 搜索关键词
+ * @param searchValue Search keywords
  */
 const handleSearch = (searchValue: string) => {
-  // 更新搜索关键词，触发过滤
+  // Update search keywords，Trigger filtering
   searchKeyword.value = searchValue
 }
 
 /**
- * 检查某个选项是否被选中
+ * Check if an option is selected
  *
- * @param deviceId 设备 ID
+ * @param deviceId equipment ID
  */
 const isSelected = (deviceId: string): boolean => {
   return selectedDeviceIds.value.includes(deviceId)
 }
 
 // --- Watchers ---
-/** 监听外部 modelValue 的变化，同步到内部 selectedDeviceIds */
+/** Listen to external modelValue changes，Sync to internal selectedDeviceIds */
 watch(
   () => props.modelValue,
   newVal => {
     if (newVal === null) {
       selectedDeviceIds.value = []
     } else if (Array.isArray(newVal)) {
-      // 避免不必要的更新，比较数组内容
+      // Avoid unnecessary updates，Compare array contents
       if (JSON.stringify(newVal) !== JSON.stringify(selectedDeviceIds.value)) {
         selectedDeviceIds.value = [...newVal]
       }
     }
   },
-  { immediate: true, deep: true } // 立即执行，深度监听（虽然通常不需要深度监听 ID 数组）
+  { immediate: true, deep: true } // Execute immediately，Deep monitoring（虽然通常不需要Deep monitoring ID array）
 )
 </script>
 
@@ -161,7 +161,7 @@ watch(
     :disabled="props.disabled"
     @update:show="handlePopoverUpdateShow"
   >
-    <!-- 触发器 -->
+    <!-- trigger -->
     <template #trigger>
       <div class="select-trigger-wrapper" :class="{ 'is-disabled': props.disabled }">
         <NSelect
@@ -183,7 +183,7 @@ watch(
       </div>
     </template>
 
-    <!-- Popover 内容 -->
+    <!-- Popover content -->
     <div class="device-select-popover-content">
       <NInfiniteScroll class="options-scroll-container" :distance="10" @load="handleLoadMore">
         <div v-if="filteredOptions && filteredOptions.length > 0" class="options-list">
@@ -200,23 +200,23 @@ watch(
         </div>
         <NEmpty
           v-else-if="!props.loading"
-          :description="searchKeyword ? '未找到匹配的设备' : $t('common.noData') || '暂无数据'"
+          :description="searchKeyword ? 'No matching device found' : $t('common.noData') || 'No data yet'"
           class="empty-placeholder"
         />
 
-        <!-- 加载中提示：放在 NInfiniteScroll 内容的末尾 -->
+        <!-- Loading prompt：put on NInfiniteScroll end of content -->
         <NFlex v-if="props.loading" justify="center" class="loading-indicator">
           <NSpin size="small" />
           <span class="loading-text">{{ $t('card.loading') }}</span>
         </NFlex>
 
-        <!-- 没有更多提示 -->
+        <!-- no more prompts -->
         <NFlex
           v-if="!props.loading && !props.hasMore && filteredOptions && filteredOptions.length > 0"
           justify="center"
           class="no-more-indicator"
         >
-          {{ $t('common.noMoreData') || '没有更多了' }}
+          {{ $t('common.noMoreData') || 'no more' }}
         </NFlex>
       </NInfiniteScroll>
     </div>
@@ -226,7 +226,7 @@ watch(
 <style scoped lang="scss">
 .device-select-popover {
   padding: 0 !important; // Override default popover padding
-  // 移除固定的宽度限制，交给 width="trigger"
+  // Remove fixed width limit，hand over width="trigger"
   // width: 100%;
   // max-width: 400px;
 }
@@ -243,13 +243,13 @@ watch(
 }
 
 .device-select-popover-content {
-  // 恢复外部容器的高度限制和滚动
+  // Restore height limit and scrolling for outer containers
   max-height: 300px;
   overflow-y: auto;
 }
 
 .options-scroll-container {
-  // 移除内部 NInfiniteScroll 的高度限制
+  // remove interior NInfiniteScroll height limit
   // max-height: 300px;
 }
 

@@ -1,58 +1,58 @@
-# Chart Curve 组件 Card 2.1 迁移配置文档
+# Chart Curve components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-**组件ID**: `chart-curve`  
-**组件类型**: `chart`  
-**组件名称**: 曲线图表  
-**功能描述**: 基于 ECharts 的时序数据曲线图表组件，支持多数据源、时间范围选择、数据聚合等功能
+**componentsID**: `chart-curve`  
+**Component type**: `chart`  
+**Component name**: Curve chart  
+**Function description**: based on ECharts Time series data curve chart component，Support multiple data sources、Time range selection、Data aggregation and other functions
 
-## 当前实现分析
+## Current implementation analysis
 
-### 1. 组件结构
+### 1. Component structure
 ```
 curve/
-├── index.ts              # 组件定义配置
-├── component.vue         # 主组件入口
-├── card-config.vue       # 配置表单
-├── poster.png           # 组件预览图
-├── theme.ts             # 主题配置
+├── index.ts              # Component definition configuration
+├── component.vue         # Main component entry
+├── card-config.vue       # Configuration form
+├── poster.png           # Component preview
+├── theme.ts             # Theme configuration
 └── modules/
-    └── line-chart.vue   # 核心图表实现
+    └── line-chart.vue   # Core chart implementation
 ```
 
-### 2. 核心特性
-- **多数据源支持**: 最多支持 9 个数据源
-- **时间范围**: 支持时间范围选择和数据聚合
-- **交互功能**: 数据缩放、图例控制、工具箱
-- **主题系统**: 18 种预设颜色主题
-- **实时更新**: 支持设备遥测数据实时更新
+### 2. Core features
+- **Multiple data sources support**: Most supported 9 data sources
+- **time range**: 支持time range选择和数据聚合
+- **Interactive functions**: Data scaling、Legend control、toolbox
+- **theme system**: 18 preset color themes
+- **real time updates**: 支持设备遥测数据real time updates
 
-### 3. 技术实现
-- **图表库**: ECharts + vue-echarts
-- **数据处理**: 支持历史数据和实时数据
-- **响应式**: 自适应容器大小变化
-- **性能优化**: 防抖处理、数据缓存
+### 3. Technical implementation
+- **Chart library**: ECharts + vue-echarts
+- **Data processing**: Support historical data and real-time data
+- **Responsive**: Adaptive container size changes
+- **Performance optimization**: Anti-shake processing、Data cache
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 1. 组件定义 (ComponentDefinition)
+### 1. Component definition (ComponentDefinition)
 
 ```typescript
 import { ComponentDefinition } from '@/card2.1/types'
 
 export const chartCurveDefinition: ComponentDefinition = {
-  // 基础信息
+  // Basic information
   id: 'chart-curve',
   name: 'chart.curve',
   type: 'chart',
   category: 'visualization',
   
-  // 组件配置
+  // Component configuration
   component: () => import('./component.vue'),
   configComponent: () => import('./config.vue'),
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 6, height: 5 },
     minSize: { width: 3, height: 3 },
@@ -60,7 +60,7 @@ export const chartCurveDefinition: ComponentDefinition = {
     resizable: true
   },
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     multiple: true,
@@ -74,11 +74,11 @@ export const chartCurveDefinition: ComponentDefinition = {
     }
   },
   
-  // 配置模式
+  // configuration mode
   configSchema: {
     type: 'object',
     properties: {
-      // 图表配置
+      // Chart configuration
       chart: {
         type: 'object',
         properties: {
@@ -89,7 +89,7 @@ export const chartCurveDefinition: ComponentDefinition = {
         }
       },
       
-      // 样式配置
+      // Style configuration
       style: {
         type: 'object',
         properties: {
@@ -109,7 +109,7 @@ export const chartCurveDefinition: ComponentDefinition = {
         }
       },
       
-      // 坐标轴配置
+      // Axis configuration
       axis: {
         type: 'object',
         properties: {
@@ -133,7 +133,7 @@ export const chartCurveDefinition: ComponentDefinition = {
         }
       },
       
-      // 数据配置
+      // Data configuration
       data: {
         type: 'object',
         properties: {
@@ -163,48 +163,48 @@ export const chartCurveDefinition: ComponentDefinition = {
 }
 ```
 
-### 2. 数据源映射
+### 2. Data source mapping
 
 ```typescript
-// 原始数据源结构 -> Card 2.1 数据源结构
+// Original data source structure -> Card 2.1 Data source structure
 const dataSourceMapping = {
-  // 设备数据源
+  // Device data source
   deviceSource: {
     type: 'device',
     config: {
-      deviceId: 'string',      // 设备ID
-      metricKey: 'string',     // 指标键名
-      metricName: 'string',    // 指标显示名称
-      unit: 'string',          // 单位
-      color: 'string'          // 曲线颜色
+      deviceId: 'string',      // equipmentID
+      metricKey: 'string',     // Indicator key name
+      metricName: 'string',    // Indicator display name
+      unit: 'string',          // unit
+      color: 'string'          // Curve color
     }
   },
   
-  // 时间范围配置
+  // Time range configuration
   timeRange: {
-    enabled: 'boolean',        // 是否启用时间范围
-    start: 'number',          // 开始时间戳
-    end: 'number',            // 结束时间戳
-    relative: 'string'        // 相对时间 (如: '1h', '1d', '1w')
+    enabled: 'boolean',        // Whether to enable time range
+    start: 'number',          // start timestamp
+    end: 'number',            // end timestamp
+    relative: 'string'        // relative time (like: '1h', '1d', '1w')
   },
   
-  // 聚合配置
+  // Aggregation configuration
   aggregate: {
-    enabled: 'boolean',       // 是否启用聚合
-    method: 'string',         // 聚合方法
-    interval: 'string'        // 聚合间隔
+    enabled: 'boolean',       // Whether to enable aggregation
+    method: 'string',         // aggregation method
+    interval: 'string'        // aggregation interval
   }
 }
 ```
 
-### 3. 实现要点
+### 3. Implementation points
 
-#### 数据处理流程
+#### Data processing flow
 ```typescript
-// 1. 数据获取
+// 1. data acquisition
 const fetchData = async (dataSource: DataSourceConfig) => {
   if (dataSource.timeRange?.enabled) {
-    // 获取历史数据
+    // Get historical data
     return await telemetryDataHistoryList({
       deviceId: dataSource.deviceId,
       keys: [dataSource.metricKey],
@@ -213,7 +213,7 @@ const fetchData = async (dataSource: DataSourceConfig) => {
       aggregate: dataSource.aggregate
     })
   } else {
-    // 获取实时数据
+    // Get real-time data
     return await telemetryDataCurrentKeys({
       deviceId: dataSource.deviceId,
       keys: [dataSource.metricKey]
@@ -221,7 +221,7 @@ const fetchData = async (dataSource: DataSourceConfig) => {
   }
 }
 
-// 2. 数据转换
+// 2. data conversion
 const transformData = (rawData: any[], config: ChartConfig) => {
   return rawData.map(item => [
     item.timestamp,
@@ -229,7 +229,7 @@ const transformData = (rawData: any[], config: ChartConfig) => {
   ])
 }
 
-// 3. 图表配置生成
+// 3. Chart configuration generation
 const generateChartOption = (data: any[], config: ChartConfig) => {
   return {
     series: data.map((seriesData, index) => ({
@@ -247,15 +247,15 @@ const generateChartOption = (data: any[], config: ChartConfig) => {
 }
 ```
 
-#### 主题系统迁移
+#### Theme system migration
 ```typescript
-// 主题配置映射
+// Topic configuration mapping
 const themeMapping = {
-  theme1: colorGroups,    // 原 colorGroups
-  theme2: colorGroups2    // 原 colorGroups2
+  theme1: colorGroups,    // Original colorGroups
+  theme2: colorGroups2    // Original colorGroups2
 }
 
-// 动态主题应用
+// Dynamic theme application
 const applyTheme = (themeName: string, seriesCount: number) => {
   const theme = themeMapping[themeName]
   return theme.slice(0, seriesCount).map(color => ({
@@ -268,85 +268,85 @@ const applyTheme = (themeName: string, seriesCount: number) => {
 }
 ```
 
-## 迁移检查清单
+## Migration checklist
 
-### 功能迁移
-- [ ] 多数据源支持 (最多9个)
-- [ ] 时间范围选择功能
-- [ ] 数据聚合功能
-- [ ] 实时数据更新
-- [ ] 图表交互功能 (缩放、图例)
-- [ ] 主题切换功能
-- [ ] 响应式布局
+### Function migration
+- [ ] Multiple data sources support (most9indivual)
+- [ ] Time range selection function
+- [ ] Data aggregation function
+- [ ] Real-time data updates
+- [ ] Chart interactive function (Zoom、legend)
+- [ ] Theme switching function
+- [ ] Responsive layout
 
-### 配置迁移
-- [ ] 图表标题配置
-- [ ] 图例显示控制
-- [ ] 坐标轴配置
-- [ ] 曲线样式配置
-- [ ] 颜色主题配置
-- [ ] 数据缩放配置
+### Configuration migration
+- [ ] Chart title configuration
+- [ ] Legend display control
+- [ ] Axis configuration
+- [ ] Curve style configuration
+- [ ] Color theme configuration
+- [ ] Data scaling configuration
 
-### 性能优化
-- [ ] 数据防抖处理
-- [ ] 图表重绘优化
-- [ ] 内存泄漏防护
-- [ ] 大数据量处理
+### Performance optimization
+- [ ] Data anti-shake processing
+- [ ] Chart redraw optimization
+- [ ] Memory leak prevention
+- [ ] Large data volume processing
 
-## 迁移步骤
+## Migration steps
 
-### 1. 创建组件定义
+### 1. Create component definition
 ```bash
-# 创建组件目录
+# Create component directory
 mkdir -p src/card2.1/components/chart/curve
 
-# 创建必要文件
+# Create necessary files
 touch src/card2.1/components/chart/curve/definition.ts
 touch src/card2.1/components/chart/curve/component.vue
 touch src/card2.1/components/chart/curve/config.vue
 ```
 
-### 2. 实现核心组件
-- 迁移 `component.vue` 主组件逻辑
-- 迁移 `line-chart.vue` 图表实现
-- 适配 Card 2.1 数据源接口
-- 实现配置表单组件
+### 2. Implement core components
+- migrate `component.vue` main component logic
+- migrate `line-chart.vue` Chart implementation
+- adaptation Card 2.1 Data source interface
+- Implement configuration form components
 
-### 3. 配置验证
-- 测试多数据源配置
-- 验证时间范围功能
-- 测试数据聚合功能
-- 检查主题切换效果
+### 3. Configuration verification
+- Test multiple data source configurations
+- Validate time range functionality
+- Test data aggregation functionality
+- Check the theme switching effect
 
-### 4. 性能测试
-- 大数据量渲染测试
-- 实时数据更新性能
-- 内存使用情况监控
+### 4. Performance testing
+- Large data volume rendering test
+- Real-time data update performance
+- Memory usage monitoring
 
-## 数据处理流程
+## Data processing flow
 
-### 1. 数据获取流程
+### 1. Data acquisition process
 ```
-用户配置 → 数据源验证 → API调用 → 数据预处理 → 图表渲染
-```
-
-### 2. 实时更新流程
-```
-WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 图表重绘
+User configuration → Data source validation → APIcall → Data preprocessing → Chart rendering
 ```
 
-### 3. 聚合处理流程
+### 2. Real-time update process
 ```
-原始数据 → 时间分组 → 聚合计算 → 结果缓存 → 图表显示
+WebSocketconnect → Data reception → Data validation → incremental update → Chart redraw
 ```
 
-## 配置示例
+### 3. Aggregation processing flow
+```
+raw data → time grouping → aggregate calculation → Result caching → Chart display
+```
 
-### 基础配置
+## Configuration example
+
+### Basic configuration
 ```json
 {
   "chart": {
-    "title": "设备温度趋势",
+    "title": "Equipment temperature trends",
     "showLegend": true,
     "showDataZoom": true
   },
@@ -360,18 +360,18 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 图表重
     {
       "deviceId": "device_001",
       "metricKey": "temperature",
-      "metricName": "温度",
+      "metricName": "temperature",
       "unit": "°C"
     }
   ]
 }
 ```
 
-### 高级配置
+### Advanced configuration
 ```json
 {
   "chart": {
-    "title": "多设备监控",
+    "title": "Multiple device monitoring",
     "showLegend": true,
     "showDataZoom": true,
     "showToolbox": true
@@ -384,7 +384,7 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 图表重
   },
   "axis": {
     "yAxis": {
-      "name": "数值",
+      "name": "numerical value",
       "min": 0,
       "max": 100
     }
@@ -403,10 +403,10 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 图表重
 }
 ```
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture.md)
-- [数据源配置指南](../data-source-guide.md)
-- [组件开发规范](../component-development.md)
-- [ECharts 集成指南](../echarts-integration.md)
-- [主题系统文档](../theme-system.md)
+- [Card 2.1 Architecture documentation](../architecture.md)
+- [Data source configuration guide](../data-source-guide.md)
+- [Component Development Specifications](../component-development.md)
+- [ECharts Integration Guide](../echarts-integration.md)
+- [Theme system documentation](../theme-system.md)

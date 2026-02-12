@@ -7,10 +7,10 @@ import { isValidCoordinate, getCoordinateValidationError } from '@/utils/common/
 const { load } = useScriptTag(TENCENT_MAP_SDK_URL)
 const emit = defineEmits(['position-selected'])
 
-// 添加组件名称
+// Add component name
 defineOptions({ name: 'TencentMap' })
 
-// 定义props类型
+// definitionpropstype
 interface Props {
   longitude?: string | number
   latitude?: string | number
@@ -22,13 +22,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const domRef = ref<HTMLDivElement | null>(null)
 let map
-let currentMarker // 当前位置标记
+let currentMarker // Current location marker
 
 async function renderMap() {
   await load(true)
   if (!domRef.value) return
 
-  // 使用传入的经纬度或默认坐标作为地图中心点
+  // Use the passed latitude and longitude or default coordinates as the map center point
   const lat = Number(props.latitude) || 39.98412
   const lng = Number(props.longitude) || 116.307484
   const hasValidCoords = props.latitude && props.longitude && props.latitude !== '' && props.longitude !== '' && isValidCoordinate(lat, lng)
@@ -37,12 +37,12 @@ async function renderMap() {
 
   map = new TMap.Map(domRef.value, {
     center,
-    zoom: hasValidCoords ? 15 : 9, // 如果有坐标则放大显示，否则使用默认缩放
+    zoom: hasValidCoords ? 15 : 9, // If there are coordinates, enlarge the display，Otherwise use default scaling
     maxZoom: 18,
     minZoom: 6
   })
 
-  // 如果有有效的经纬度参数，在地图上显示当前位置标记
+  // If there are valid latitude and longitude parameters，Show current location marker on map
   if (hasValidCoords) {
     addCurrentLocationMarker(lat, lng)
   }
@@ -51,47 +51,47 @@ async function renderMap() {
     const lat = event.latLng.getLat()
     const lng = event.latLng.getLng()
 
-    // 验证经纬度是否在有效范围内
+    // Verify whether the latitude and longitude is within the valid range
     if (!isValidCoordinate(lat, lng)) {
       const error = getCoordinateValidationError(lat, lng)
-      console.error('地图点击事件获取到无效的经纬度:', { lat, lng, error })
+      console.error('Map click event obtained invalid latitude and longitude:', { lat, lng, error })
       return
     }
 
-    // 移除之前的标记
+    // Remove previous markup
     if (currentMarker) {
       currentMarker.setMap(null)
     }
 
-    // 添加新的标记
+    // Add new tag
     addCurrentLocationMarker(lat, lng)
 
     emit('position-selected', { lat, lng })
   })
 }
 
-// 添加当前位置标记
+// Add current location marker
 function addCurrentLocationMarker(lat: number, lng: number) {
-  // 验证经纬度参数是否在有效范围内
+  // Verify whether the latitude and longitude parameters are within the valid range
   if (!isValidCoordinate(lat, lng)) {
     const error = getCoordinateValidationError(lat, lng)
-    console.error('addCurrentLocationMarker接收到无效的经纬度参数:', { lat, lng, error })
+    console.error('addCurrentLocationMarkerInvalid latitude and longitude parameters received:', { lat, lng, error })
     return
   }
 
-  // 如果已存在标记，先移除
+  // if tag already exists，Remove first
   if (currentMarker) {
     currentMarker.setMap(null)
   }
 
   const position = new TMap.LatLng(lat, lng)
 
-  // 创建标记样式
+  // Create markup styles
   const markerStyle = new TMap.MarkerStyle({
     width: 30,
     height: 40,
     anchor: { x: 15, y: 40 },
-    // 使用红色标记图标
+    // Use red marker icon
     src: 'data:image/svg+xml;base64,' + btoa(`
       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
         <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 25 15 25s15-16.716 15-25C30 6.716 23.284 0 15 0z" fill="#ff4444"/>
@@ -101,7 +101,7 @@ function addCurrentLocationMarker(lat: number, lng: number) {
     `)
   })
 
-  // 创建多标记实例
+  // Create a multi-marker instance
   currentMarker = new TMap.MultiMarker({
     map,
     styles: {
@@ -119,7 +119,7 @@ onMounted(() => {
   renderMap()
 })
 
-// 监听props变化，当经纬度更新时重新添加标记
+// monitorpropschange，Re-add markers when latitude and longitude are updated
 watch(
   () => [props.latitude, props.longitude],
   ([newLat, newLng]) => {
@@ -127,14 +127,14 @@ watch(
       const lat = Number(newLat)
       const lng = Number(newLng)
       if (isValidCoordinate(lat, lng)) {
-        // 更新地图中心点
+        // Update map center point
         const center = new TMap.LatLng(lat, lng)
         map.setCenter(center)
-        // 添加或更新标记
+        // Add or update tags
         addCurrentLocationMarker(lat, lng)
       } else {
         const error = getCoordinateValidationError(lat, lng)
-        console.warn('监听到无效的经纬度更新:', { lat, lng, error })
+        console.warn('Invalid latitude and longitude update detected:', { lat, lng, error })
       }
     }
   },

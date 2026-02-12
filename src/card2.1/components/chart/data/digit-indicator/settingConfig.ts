@@ -1,56 +1,56 @@
 /**
- * 数字指示器组件配置定义
- * 优化后的配置结构，支持详细的样式自定义
+ * Digital indicator component configuration definition
+ * Optimized configuration structure，Support detailed style customization
  */
 
 import type { SettingConfig } from '@/card2.1/types/setting-config'
 
 /**
- * 数字指示器自定义配置接口
- * 专注于样式配置，业务数据由数据源提供
+ * Digital indicator custom configuration interface
+ * Focus on style configuration，Business data is provided by data sources
  */
 export interface DigitIndicatorCustomize {
-  // 图标样式配置
-  /** 图标名称 */
+  // Icon style configuration
+  /** Icon name */
   iconName: string
-  /** 图标颜色 */
+  /** icon color */
   iconColor: string
-  /** 图标大小 */
+  /** icon size */
   iconSize: number
 
-  // 数值样式配置
-  /** 数值颜色 */
+  // Numeric style configuration
+  /** numerical color */
   valueColor: string
-  /** 数值字体大小 */
+  /** Numeric font size */
   valueSize: number
-  /** 数值字体粗细 */
+  /** Numeric font weight */
   valueFontWeight: number
 
-  // 单位样式配置
-  /** 单位颜色 */
+  // Unit style configuration
+  /** unit color */
   unitColor: string
-  /** 单位字体大小 */
+  /** Unit font size */
   unitSize: number
 
-  // 标题样式配置
-  /** 标题颜色 */
+  // Title style configuration
+  /** title color */
   titleColor: string
-  /** 标题字体大小 */
+  /** Title font size */
   titleSize: number
 
-  // 布局样式配置
-  /** 组件内边距 */
+  // Layout style configuration
+  /** component padding */
   padding: number
-  /** 背景颜色 */
+  /** background color */
   backgroundColor?: string
-  /** 是否显示背景渐变 */
+  /** Whether to display background gradient */
   showGradient: boolean
-  /** 是否启用hover效果 */
+  /** Whether to enablehoverEffect */
   enableHover: boolean
 }
 
 /**
- * 数字指示器完整配置接口
+ * Digital indicator complete configuration interface
  */
 export interface DigitIndicatorConfig {
   type: 'digit-indicator'
@@ -64,28 +64,28 @@ export interface DigitIndicatorConfig {
 }
 
 /**
- * 默认样式配置（不包含业务数据）
+ * Default style configuration（Does not contain business data）
  */
 export const customConfig: DigitIndicatorCustomize = {
-  // 图标样式配置
+  // Icon style configuration
   iconName: 'Water',
   iconColor: '#1890ff',
   iconSize: 48,
 
-  // 数值样式配置
+  // Numeric style configuration
   valueColor: 'var(--text-color)',
   valueSize: 32,
   valueFontWeight: 700,
 
-  // 单位样式配置
+  // Unit style configuration
   unitColor: 'var(--text-color-2)',
   unitSize: 16,
 
-  // 标题样式配置
+  // Title style configuration
   titleColor: 'var(--text-color-2)',
   titleSize: 14,
 
-  // 布局样式配置
+  // Layout style configuration
   padding: 16,
   backgroundColor: '',
   showGradient: true,
@@ -93,153 +93,153 @@ export const customConfig: DigitIndicatorCustomize = {
 }
 
 /**
- * 数字指示器设置配置
+ * Digital indicator settings configuration
  */
 export const digitIndicatorSettingConfig: SettingConfig<DigitIndicatorCustomize> = [
   {
-    group: '图标样式',
+    group: 'icon style',
     items: [
       {
         key: 'iconName',
-        label: '图标名称',
+        label: 'Icon name',
         type: 'input',
         defaultValue: 'Water',
-        placeholder: '输入图标名称（如：Water、Fire等）',
-        help: '图标名称来自图标库，可在组件设置面板中选择'
+        placeholder: 'Enter icon name（like：Water、Firewait）',
+        help: 'Icon name comes from icon library，Can be selected in the component settings panel'
       },
       {
         key: 'iconColor',
-        label: '图标颜色',
+        label: 'icon color',
         type: 'color',
         defaultValue: '#1890ff',
-        help: '设置图标的颜色'
+        help: 'Set icon color'
       },
       {
         key: 'iconSize',
-        label: '图标大小',
+        label: 'icon size',
         type: 'number',
         defaultValue: 48,
         min: 24,
         max: 96,
         step: 4,
-        help: '图标的像素大小'
+        help: 'The pixel size of the icon'
       }
     ]
   },
   {
-    group: '数值样式',
+    group: 'Numeric style',
     items: [
       {
         key: 'valueColor',
-        label: '数值颜色',
+        label: 'numerical color',
         type: 'color',
         defaultValue: 'var(--text-color)',
-        help: '设置数值的颜色'
+        help: 'Set the color of a numerical value'
       },
       {
         key: 'valueSize',
-        label: '数值字体大小',
+        label: 'Numeric font size',
         type: 'number',
         defaultValue: 32,
         min: 16,
         max: 64,
         step: 2,
-        help: '数值文字的像素大小'
+        help: 'Pixel size of numeric text'
       },
       {
         key: 'valueFontWeight',
-        label: '数值字体粗细',
+        label: 'Numeric font weight',
         type: 'select',
         defaultValue: 700,
         options: [
-          { label: '细体', value: 300 },
-          { label: '正常', value: 400 },
-          { label: '中等', value: 500 },
-          { label: '半粗', value: 600 },
-          { label: '粗体', value: 700 },
-          { label: '特粗', value: 800 }
+          { label: 'fine body', value: 300 },
+          { label: 'normal', value: 400 },
+          { label: 'medium', value: 500 },
+          { label: 'semi-thick', value: 600 },
+          { label: 'Bold', value: 700 },
+          { label: 'Extra thick', value: 800 }
         ],
-        help: '数值文字的粗细程度'
+        help: 'The thickness of numerical text'
       }
     ]
   },
   {
-    group: '单位样式',
+    group: 'unit style',
     items: [
       {
         key: 'unitColor',
-        label: '单位颜色',
+        label: 'unit color',
         type: 'color',
         defaultValue: 'var(--text-color-2)',
-        help: '设置单位的颜色'
+        help: 'Set the color of the unit'
       },
       {
         key: 'unitSize',
-        label: '单位字体大小',
+        label: 'Unit font size',
         type: 'number',
         defaultValue: 16,
         min: 10,
         max: 32,
         step: 1,
-        help: '单位文字的像素大小'
+        help: 'Pixel size of unit text'
       }
     ]
   },
   {
-    group: '标题样式',
+    group: 'Title style',
     items: [
       {
         key: 'titleColor',
-        label: '标题颜色',
+        label: 'title color',
         type: 'color',
         defaultValue: 'var(--text-color-2)',
-        help: '设置标题的颜色'
+        help: 'Set title color'
       },
       {
         key: 'titleSize',
-        label: '标题字体大小',
+        label: 'Title font size',
         type: 'number',
         defaultValue: 14,
         min: 10,
         max: 24,
         step: 1,
-        help: '标题文字的像素大小'
+        help: 'Title text pixel size'
       }
     ]
   },
   {
-    group: '布局样式',
+    group: 'layout style',
     items: [
       {
         key: 'padding',
-        label: '内边距',
+        label: 'padding',
         type: 'number',
         defaultValue: 16,
         min: 8,
         max: 32,
         step: 2,
-        help: '组件内容的边距'
+        help: 'Component content margins'
       },
       {
         key: 'backgroundColor',
-        label: '背景颜色',
+        label: 'background color',
         type: 'color',
         defaultValue: '',
-        help: '留空则使用默认背景，填写则覆盖默认背景'
+        help: 'Leave blank to use default background，Fill in to overwrite the default background'
       },
       {
         key: 'showGradient',
-        label: '渐变背景',
+        label: 'gradient background',
         type: 'switch',
         defaultValue: true,
-        help: '是否显示轻微的渐变背景效果'
+        help: 'Whether to display a slight gradient background effect'
       },
       {
         key: 'enableHover',
-        label: 'Hover效果',
+        label: 'HoverEffect',
         type: 'switch',
         defaultValue: true,
-        help: '是否启用鼠标悬停时的交互效果'
+        help: 'Whether to enable interactive effects on mouse hover'
       }
     ]
   }

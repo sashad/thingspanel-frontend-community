@@ -1,6 +1,6 @@
 <template>
   <div class="h-full flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
-    <!-- 标题栏 -->
+    <!-- title bar -->
     <div class="w-full flex items-center justify-between mb-6">
       <div class="flex items-center">
         <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg mr-3">
@@ -9,7 +9,7 @@
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('card.versionInfo.title') }}</span>
       </div>
 
-      <!-- GitHub 链接 -->
+      <!-- GitHub Link -->
       <a
         href="https://github.com/ThingsPanel/thingspanel-frontend-community"
         target="_blank"
@@ -21,24 +21,24 @@
       </a>
     </div>
 
-    <!-- 版本信息展示区域 -->
+    <!-- Version information display area -->
     <div class="flex-1 flex flex-col items-center justify-center text-center space-y-4">
-      <!-- 当前版本标签 -->
+      <!-- Current version label -->
       <div class="text-sm text-gray-600 dark:text-gray-400">
         {{ $t('card.versionInfo.currentVersion') }}
       </div>
 
-      <!-- 版本号 -->
+      <!-- version number -->
       <div class="text-4xl font-bold text-gray-900 dark:text-white tracking-wider">
         {{ currentVersion }}
       </div>
 
-      <!-- 版本描述 -->
+      <!-- Version description -->
       <div class="text-sm text-gray-600 dark:text-gray-400 text-center max-w-xs">
         {{ $t('card.versionInfo.description') }}
       </div>
 
-      <!-- 版本状态标签 -->
+      <!-- version status label -->
       <div class="mt-4">
         <n-tag
           type="info"
@@ -58,17 +58,17 @@
 
 <script setup lang="ts">
 /**
- * 版本信息组件 - 系统交互组件
- * 纯静态展示组件，显示当前系统版本信息，不需要API数据源
+ * Version information component - system interactive components
+ * Pure static display component，Display current system version information，unnecessaryAPIdata source
  */
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { NTag } from 'naive-ui'
 import { $t } from '@/locales'
 
-// 静态版本配置（应该从配置文件或环境变量获取）
+// Static version configuration（Should be obtained from configuration files or environment variables）
 const currentVersion = computed(() => {
-  // 可以从 package.json 或环境变量获取版本号
+  // Can be obtained from package.json Or environment variable to get the version number
   return import.meta.env.VITE_APP_VERSION || 'v2.1.0'
 })
 
@@ -78,7 +78,7 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 脉冲动画效果 */
+/* Pulse animation effect */
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

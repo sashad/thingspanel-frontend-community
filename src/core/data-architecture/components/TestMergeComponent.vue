@@ -1,14 +1,14 @@
 <template>
   <div class="test-merge-component">
-    <n-card title="测试合并策略组件">
-      <p>这是一个测试组件，用于验证组件是否能正常加载</p>
-      <n-button type="primary">测试按钮</n-button>
+    <n-card title="Test merge strategy components">
+      <p>This is a test component，Used to verify whether the component can be loaded normally</p>
+      <n-button type="primary">test button</n-button>
     </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-// 简单的测试组件
+// Simple test component
 </script>
 
 <style scoped>

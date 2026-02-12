@@ -1,144 +1,144 @@
-# ThingsPanel Visual Editor 开发者详细指南
+# ThingsPanel Visual Editor Detailed guide for developers
 
-**版本**: v2.0.0  
-**更新时间**: 2025-08-31  
-**目标读者**: 前端开发者、系统架构师、维护人员
-
----
-
-## 📖 目录
-
-- [1. 系统架构深入解析](#1-系统架构深入解析)
-- [2. 核心API参考](#2-核心api参考)
-- [3. 开发工作流程](#3-开发工作流程)
-- [4. 组件开发指南](#4-组件开发指南)
-- [5. 渲染器开发](#5-渲染器开发)
-- [6. 数据流与状态管理](#6-数据流与状态管理)
-- [7. 配置系统深入](#7-配置系统深入)
-- [8. 性能优化策略](#8-性能优化策略)
-- [9. 故障排除指南](#9-故障排除指南)
-- [10. 最佳实践](#10-最佳实践)
+**Version**: v2.0.0  
+**Update time**: 2025-08-31  
+**target audience**: front-end developer、system architect、maintenance personnel
 
 ---
 
-## 1. 系统架构深入解析
+## 📖 Table of contents
 
-### 1.1 整体架构图
+- [1. In-depth analysis of system architecture](#1-In-depth analysis of system architecture)
+- [2. coreAPIrefer to](#2-coreapirefer to)
+- [3. Development workflow](#3-Development workflow)
+- [4. Component Development Guide](#4-Component Development Guide)
+- [5. Renderer development](#5-Renderer development)
+- [6. Data flow and state management](#6-Data flow and state management)
+- [7. Configuration system in depth](#7-Configuration system in depth)
+- [8. Performance optimization strategies](#8-Performance optimization strategies)
+- [9. Troubleshooting Guide](#9-Troubleshooting Guide)
+- [10. best practices](#10-best practices)
+
+---
+
+## 1. In-depth analysis of system architecture
+
+### 1.1 Overall architecture diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    PanelEditor.vue                          │
-│                 (主入口组件 - 统一协调层)                     │
+│                 (Main entrance component - unified coordination layer)                     │
 └─────┬──────────────┬─────────────────┬─────────────────────┘
       │              │                 │
       ▼              ▼                 ▼
 ┌─────────────┐ ┌──────────────┐ ┌─────────────────────┐
-│  工具栏系统  │ │   抽屉面板    │ │   轮询控制系统       │
+│  toolbar system  │ │   drawer front    │ │   Polling control system       │
 │ Toolbar     │ │ WidgetLibrary│ │ PollingController   │
 │             │ │ PropertyPanel│ │ GlobalPollingManager│
 └─────────────┘ └──────────────┘ └─────────────────────┘
       │              │                 │
       ▼              ▼                 ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   核心渲染层                                 │
+│                   core rendering layer                                 │
 │ ┌─────────────────┐    ┌─────────────────┐                │
-│ │  Canvas渲染器    │    │ Gridstack渲染器  │                │
-│ │  自由布局        │    │  网格布局        │                │
+│ │  CanvasRenderer    │    │ GridstackRenderer  │                │
+│ │  Free layout        │    │  grid layout        │                │
 │ └─────────────────┘    └─────────────────┘                │
 └─────┬─────────────────────────────────────┬─────────────────┘
       │                                     │
       ▼                                     ▼
 ┌─────────────────────┐              ┌─────────────────────┐
-│   状态管理系统       │◄────────────►│   组件生态系统       │
-│ • EditorStore      │              │ • Card2.1集成        │
-│ • WidgetStore      │              │ • Widget注册表       │
-│ • 响应式状态        │              │ • 组件定义           │
+│   status management system       │◄────────────►│   Component Ecosystem       │
+│ • EditorStore      │              │ • Card2.1integrated        │
+│ • WidgetStore      │              │ • WidgetRegistry       │
+│ • Responsive state        │              │ • Component definition           │
 └─────────────────────┘              └─────────────────────┘
       │                                     │
       ▼                                     ▼
 ┌─────────────────────┐              ┌─────────────────────┐
-│   配置管理系统       │              │   数据源管理系统     │
+│   configuration management system       │              │   Data source management system     │
 │ • ConfigManager    │              │ • EditorDataSource  │
-│ • 分层配置架构      │◄────────────►│ • 多数据源支持       │
-│ • 持久化存储        │              │ • 实时轮询调度       │
-│ • 配置验证迁移      │              │ • WebSocket支持     │
+│ • Hierarchical configuration architecture      │◄────────────►│ • Multiple data sources support       │
+│ • Persistent storage        │              │ • Real-time polling scheduling       │
+│ • Configuration verification migration      │              │ • WebSocketsupport     │
 └─────────────────────┘              └─────────────────────┘
       │                                     │
       ▼                                     ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                 底层基础设施                                 │
-│ • 事件总线 (ConfigEventBus)                                │
-│ • 缓存系统 (SimpleDataBridge)                              │
-│ • 主题系统 (ThemeStore)                                    │
-│ • 国际化系统 (I18n)                                        │
-│ • 工具函数库 (Utils)                                       │
+│                 underlying infrastructure                                 │
+│ • event bus (ConfigEventBus)                                │
+│ • caching system (SimpleDataBridge)                              │
+│ • theme system (ThemeStore)                                    │
+│ • International system (I18n)                                        │
+│ • Tool function library (Utils)                                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 1.2 核心模块详解
+### 1.2 Detailed explanation of core modules
 
-#### A. 状态管理层 (`store/`)
+#### A. state management (`store/`)
 
 **EditorStore** (`editor.ts`)
 ```typescript
 interface EditorState {
-  nodes: GraphData[]          // 画布上的所有组件节点
-  viewport: Viewport          // 视口状态（缩放、平移）
-  mode: EditorMode           // 编辑模式（design/preview）
+  nodes: GraphData[]          // All component nodes on the canvas
+  viewport: Viewport          // viewport state（Zoom、Pan）
+  mode: EditorMode           // edit mode（design/preview）
 }
 
-// 核心方法
-- addNode(...nodes: GraphData[])      // 添加节点
-- removeNode(id: string)              // 删除节点  
-- updateNode(id, updates)             // 更新节点
-- setMode(mode: EditorMode)           // 设置模式
-- reset()                             // 重置状态
+// core methods
+- addNode(...nodes: GraphData[])      // Add node
+- removeNode(id: string)              // Delete node  
+- updateNode(id, updates)             // Update node
+- setMode(mode: EditorMode)           // Setup mode
+- reset()                             // reset state
 ```
 
 **WidgetStore** (`store/widget.ts`)
-- 管理组件定义注册表
-- 处理组件选择状态
-- 提供组件查询接口
+- Manage component definition registry
+- Handle component selection state
+- Provide component query interface
 
-#### B. 配置管理系统 (`configuration/`)
+#### B. configuration management system (`configuration/`)
 
-**ConfigurationManager** - 核心配置管理器
+**ConfigurationManager** - core configuration manager
 ```typescript
 class ConfigurationManager {
-  // 配置存储结构
+  // Configure storage structure
   private configurations: Map<string, WidgetConfiguration>
   
-  // 核心方法
+  // core methods
   getConfiguration(widgetId: string): WidgetConfiguration | null
   setConfiguration(widgetId: string, config: WidgetConfiguration): void
   updateConfiguration<K>(widgetId: string, section: K, config: any): void
   
-  // 高级功能
+  // Advanced features
   validateConfiguration(config: WidgetConfiguration): ValidationResult
   exportConfiguration(widgetId: string): string
   importConfiguration(widgetId: string, configData: string): boolean
   
-  // 事件系统
+  // event system
   onConfigurationChange(widgetId: string, callback: Function): () => void
 }
 ```
 
-**配置结构设计**
+**Configuration structure design**
 ```typescript
 interface WidgetConfiguration {
-  base: BaseConfiguration        // 基础配置（标题、样式等）
-  component: ComponentConfiguration  // 组件特定配置
-  dataSource: DataSourceConfiguration  // 数据源配置
-  interaction: InteractionConfiguration  // 交互配置
-  metadata: ConfigurationMetadata     // 元数据
+  base: BaseConfiguration        // Basic configuration（title、style etc.）
+  component: ComponentConfiguration  // Component specific configuration
+  dataSource: DataSourceConfiguration  // Data source configuration
+  interaction: InteractionConfiguration  // Interactive configuration
+  metadata: ConfigurationMetadata     // metadata
 }
 ```
 
-#### C. 渲染器系统 (`renderers/`)
+#### C. renderer system (`renderers/`)
 
-**渲染器架构模式**
+**Renderer architectural patterns**
 ```typescript
-// 基础渲染器接口
+// Basic renderer interface
 interface IRenderer {
   render(data: GraphData[]): void
   destroy(): void
@@ -146,7 +146,7 @@ interface IRenderer {
   selectNode(id: string): void
 }
 
-// 渲染器注册模式
+// Renderer registration mode
 export const RendererManager = {
   register(type: string, renderer: IRenderer): void
   get(type: string): IRenderer | undefined
@@ -154,68 +154,68 @@ export const RendererManager = {
 }
 ```
 
-### 1.3 数据流分析
+### 1.3 data flow analysis
 
 ```
-用户操作
+User action
     ↓
-工具栏事件处理
+Toolbar event handling
     ↓
-EditorStore 状态更新
+EditorStore status update
     ↓
-配置管理器同步
+Configuration manager synchronization
     ↓
-渲染器重新渲染
+Renderer re-renders
     ↓
-组件更新显示
+Component update display
 ```
 
-### 1.4 Card 2.1 集成架构
+### 1.4 Card 2.1 integrated architecture
 
 ```typescript
-// Card 2.1 集成桥接
+// Card 2.1 Integrated bridging
 useVisualEditorIntegration({
-  autoInit: true,        // 自动初始化
-  enableI18n: true      // 启用国际化
+  autoInit: true,        // automatic initialization
+  enableI18n: true      // enable internationalization
 })
 
-// 组件定义转换流程
+// Component definition conversion process
 Card2ComponentDefinition → WidgetDefinition → GraphData
 ```
 
 ---
 
-## 2. 核心API参考
+## 2. coreAPIrefer to
 
-### 2.1 主要Composables
+### 2.1 mainComposables
 
-#### `useEditor()` - 编辑器核心Hook
+#### `useEditor()` - Editor coreHook
 
 ```typescript
 interface EditorContext {
   editorStore: EditorStore
   widgetStore: WidgetStore
-  stateManager: EditorStore    // 别名
+  stateManager: EditorStore    // Alias
   
-  // 核心操作方法
+  // Core operating methods
   addWidget(type: string, position?: {x: number, y: number}): Promise<void>
   selectNode(id: string): void
   updateNode(id: string, updates: Partial<GraphData>): void
   removeNode(id: string): void
   getNodeById(id: string): GraphData | undefined
   
-  // Card 2.1 集成
+  // Card 2.1 integrated
   card2Integration: Card2Integration
   isCard2Component(type: string): boolean
 }
 
-// 使用示例
+// Usage example
 const editor = createEditor()
 await editor.addWidget('comprehensive-data-test', { x: 100, y: 100 })
 editor.selectNode('comprehensive-data-test_1234567890')
 ```
 
-#### `useVisualEditorIntegration()` - Card 2.1 集成
+#### `useVisualEditorIntegration()` - Card 2.1 integrated
 
 ```typescript
 interface Card2Integration {
@@ -229,40 +229,40 @@ interface Card2Integration {
 }
 ```
 
-### 2.2 配置管理API
+### 2.2 Configuration managementAPI
 
-#### ConfigurationManager 核心方法
+#### ConfigurationManager core methods
 
 ```typescript
-// 基础操作
+// Basic operations
 const config = configurationManager.getConfiguration(widgetId)
 configurationManager.setConfiguration(widgetId, newConfig)
 configurationManager.updateConfiguration(widgetId, 'component', componentConfig)
 
-// 监听配置变化
+// Listen for configuration changes
 const unsubscribe = configurationManager.onConfigurationChange(widgetId, (config) => {
-  console.log('配置已更新:', config)
+  console.log('Configuration has been updated:', config)
 })
 
-// 配置验证
+// Configuration verification
 const result = configurationManager.validateConfiguration(config)
 if (!result.valid) {
-  console.error('配置验证失败:', result.errors)
+  console.error('Configuration verification failed:', result.errors)
 }
 
-// 批量操作
+// Batch operations
 configurationManager.batchUpdateConfigurations([
-  { widgetId: 'widget-1', config: { component: { title: '新标题' } } },
+  { widgetId: 'widget-1', config: { component: { title: 'new title' } } },
   { widgetId: 'widget-2', config: { dataSource: { type: 'api' } } }
 ])
 ```
 
-### 2.3 数据源管理API
+### 2.3 Data source managementAPI
 
 #### EditorDataSourceManager
 
 ```typescript
-// 注册组件数据源
+// Register component data source
 editorDataSourceManager.registerComponentDataSource(
   componentId,
   componentType,
@@ -270,67 +270,67 @@ editorDataSourceManager.registerComponentDataSource(
   trigger
 )
 
-// 启动/停止数据源
+// start up/Stop data source
 editorDataSourceManager.startComponentDataSource(componentId)
 editorDataSourceManager.stopComponentDataSource(componentId)
 
-// 事件监听
+// event listening
 editorDataSourceManager.on('data-updated', (eventData) => {
   const { componentId, result } = eventData
-  // 处理数据更新
+  // Handle data updates
 })
 ```
 
-### 2.4 全局轮询管理API
+### 2.4 Global polling managementAPI
 
 #### GlobalPollingManager
 
 ```typescript
-// 添加轮询任务
+// Add polling task
 const taskId = pollingManager.addTask({
   componentId: 'widget-123',
-  componentName: '温度传感器',
+  componentName: 'temperature sensor',
   interval: 30000,
   callback: async () => {
-    // 轮询回调逻辑
+    // Polling callback logic
   }
 })
 
-// 控制轮询
+// Control polling
 pollingManager.startTask(taskId)
 pollingManager.stopTask(taskId)
 pollingManager.enableGlobalPolling()
 pollingManager.disableGlobalPolling()
 
-// 获取统计信息
+// Get statistics
 const stats = pollingManager.getStatistics()
 // { totalTasks: 5, activeTasks: 3, errors: 0 }
 
-// 组件级轮询控制
+// Component-level polling control
 pollingManager.isComponentPollingActive(componentId)
 pollingManager.startComponentTasks(componentId)
 pollingManager.stopComponentTasks(componentId)
 ```
 
-### 2.5 轮询控制器组件API
+### 2.5 Polling controller componentAPI
 
-#### PollingController 组件
+#### PollingController components
 
 ```typescript
 interface PollingControllerProps {
-  /** 控制模式：global-全局控制, card-卡片控制 */
+  /** control mode：global-global control, card-card control */
   mode?: 'global' | 'card'
-  /** 卡片模式下的组件ID */
+  /** Components in card modeID */
   componentId?: string
-  /** 控制器位置 */
+  /** Controller location */
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-  /** 是否显示统计信息 */
+  /** Whether to display statistics */
   showStats?: boolean
-  /** 低调模式：仅显示小图标，悬停显示完整按钮 */
+  /** low profile mode：Show only small icons，Show full button on hover */
   lowProfile?: boolean
 }
 
-// 使用示例 - 全局轮询控制
+// Usage example - Global polling control
 <PollingController
   mode="global"
   position="bottom-right"
@@ -341,7 +341,7 @@ interface PollingControllerProps {
   @polling-disabled="handlePollingDisabled"
 />
 
-// 使用示例 - 单组件轮询控制
+// Usage example - Single component polling control
 <PollingController
   mode="card"
   :component-id="widgetId"
@@ -354,27 +354,27 @@ interface PollingControllerProps {
 
 ---
 
-## 3. 开发工作流程
+## 3. Development workflow
 
-### 3.1 项目启动流程
+### 3.1 Project start process
 
 ```bash
-# 1. 安装依赖
+# 1. Install dependencies
 pnpm install
 
-# 2. 启动开发服务器
+# 2. Start the development server
 pnpm dev
 
-# 3. 访问测试页面
+# 3. Visit the test page
 # http://localhost:5002/test/editor-integration
 
-# 4. 质量检查
+# 4. Quality check
 pnpm quality-check
 ```
 
-### 3.2 开发环境配置
+### 3.2 Development environment configuration
 
-#### 必要的开发工具
+#### Necessary development tools
 
 ```json
 {
@@ -394,37 +394,37 @@ pnpm quality-check
 }
 ```
 
-#### 关键配置文件
+#### Key configuration files
 
-- `vite.config.ts` - 构建配置，内存优化设置
-- `eslint.config.js` - 代码质量规则
-- `tsconfig.json` - TypeScript 配置
-- `package.json` - 依赖和脚本定义
+- `vite.config.ts` - Build configuration，Memory optimization settings
+- `eslint.config.js` - Code quality rules
+- `tsconfig.json` - TypeScript Configuration
+- `package.json` - Dependencies and script definitions
 
-### 3.3 调试配置
+### 3.3 Debug configuration
 
-#### 控制台调试标识符
+#### Console debug identifier
 
 ```typescript
-// 在控制台中查找这些标识符进行调试
-console.log('🎯 [Editor]')        // 编辑器核心
-console.log('🔍 [DEBUG-配置仓库]')  // 配置系统调试
-console.log('🔄 [PanelEditor]')   // 面板编辑器
-console.log('📊 [轮询管理器]')      // 轮询系统
-console.log('🚀 [数据源管理器]')    // 数据源系统
+// Find these identifiers in the console for debugging
+console.log('🎯 [Editor]')        // Editor core
+console.log('🔍 [DEBUG-Configure warehouse]')  // Configure system debugging
+console.log('🔄 [PanelEditor]')   // Panel editor
+console.log('📊 [poll manager]')      // polling system
+console.log('🚀 [Data source manager]')    // Data source system
 ```
 
-#### 开发者工具集成
+#### Developer tools integration
 
 ```typescript
-// 在浏览器控制台中可用的调试方法
+// Debugging methods available in browser console
 window.__VISUAL_EDITOR_DEBUG__ = {
   getEditorState: () => editorStore.$state,
   getConfigurations: () => configurationManager.getAllConfigurations(),
   getPollingStats: () => pollingManager.getStatistics(),
   clearCache: () => simpleDataBridge.clearAllCache(),
   
-  // 新增实际可用的调试方法
+  // Added actually available debugging methods
   getComponentTree: () => stateManager.nodes,
   getCurrentRenderer: () => currentRenderer.value,
   getPollingManager: () => pollingManager,
@@ -434,11 +434,11 @@ window.__VISUAL_EDITOR_DEBUG__ = {
 
 ---
 
-## 4. 组件开发指南
+## 4. Component Development Guide
 
-### 4.1 创建新的Widget组件
+### 4.1 create newWidgetcomponents
 
-#### Step 1: 定义组件接口
+#### Step 1: Define component interface
 
 ```typescript
 // types/my-widget.ts
@@ -455,7 +455,7 @@ export interface MyWidgetProps {
 }
 ```
 
-#### Step 2: 实现组件
+#### Step 2: Implement components
 
 ```vue
 <!-- MyWidget.vue -->
@@ -464,19 +464,19 @@ import type { MyWidgetProps } from './types'
 import { useThemeStore } from '@/store/modules/theme'
 import { useI18n } from 'vue-i18n'
 
-// Props 和基础设置
+// Props and basic settings
 const props = withDefaults(defineProps<MyWidgetProps>(), {
   readonly: false
 })
 
-// 主题和国际化集成（强制要求）
+// Themes and internationalization integration（Mandatory requirements）
 const themeStore = useThemeStore()
 const { t } = useI18n()
 
-// 组件逻辑
+// Component logic
 const handleClick = () => {
   if (!props.readonly) {
-    // 处理点击逻辑
+    // Handle click logic
   }
 }
 </script>
@@ -488,7 +488,7 @@ const handleClick = () => {
     </template>
     
     <div class="widget-content" :style="{ backgroundColor: config.backgroundColor }">
-      <!-- 组件内容 -->
+      <!-- Component content -->
       <span>{{ t('widgets.myWidget.dataValue') }}: {{ data?.value || 'N/A' }}</span>
     </div>
   </n-card>
@@ -501,7 +501,7 @@ const handleClick = () => {
 }
 
 .widget-content {
-  /* 使用主题变量，自动适配明暗主题 */
+  /* Use theme variables，Automatically adapt to light and dark themes */
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -510,7 +510,7 @@ const handleClick = () => {
 </style>
 ```
 
-#### Step 3: 创建属性编辑器
+#### Step 3: Create a property editor
 
 ```vue
 <!-- MyWidgetPropertyEditor.vue -->
@@ -550,7 +550,7 @@ const handleConfigChange = (key: keyof MyWidgetConfig, value: any) => {
 </template>
 ```
 
-#### Step 4: 注册组件
+#### Step 4: Register component
 
 ```typescript
 // widgets/my-widget/index.ts
@@ -582,27 +582,27 @@ export const myWidgetDefinition: WidgetDefinition = {
   }
 }
 
-// 注册到 widget store
+// Register to widget store
 import { useWidgetStore } from '@/components/visual-editor/store/widget'
 const widgetStore = useWidgetStore()
 widgetStore.register(myWidgetDefinition)
 ```
 
-### 4.2 Card 2.1 组件集成
+### 4.2 Card 2.1 Component integration
 
-#### 组件定义结构
+#### Component definition structure
 
 ```typescript
-// Card 2.1 组件定义
+// Card 2.1 Component definition
 export const card2ComponentDefinition: ComponentDefinition = {
   type: 'dual-data-display',
-  name: '双数据显示组件',
-  description: '显示两个数据源的数据',
+  name: 'Dual data display component',
+  description: 'Display data from two data sources',
   icon: 'i-mdi:chart-line',
   category: 'data-display',
   version: '2.1.0',
   
-  // 数据需求声明
+  // Data Requirements Statement
   dataRequirements: {
     dataSource1: {
       type: 'object',
@@ -621,31 +621,31 @@ export const card2ComponentDefinition: ComponentDefinition = {
     }
   },
   
-  // 属性定义
+  // Property definition
   properties: {
     title: {
       type: 'string',
-      default: '数据显示',
-      description: '组件标题'
+      default: 'Data display',
+      description: 'Component title'
     },
     showBorder: {
       type: 'boolean',
       default: true,
-      description: '显示边框'
+      description: 'Show borders'
     }
   },
   
-  // 渲染组件
+  // render component
   component: DualDataDisplayWidget,
   
-  // 配置组件
+  // Configure components
   configComponent: DualDataDisplayConfig
 }
 ```
 
-### 4.3 数据绑定最佳实践
+### 4.3 Data binding best practices
 
-#### 响应式数据处理
+#### Responsive data processing
 
 ```vue
 <script setup lang="ts">
@@ -656,7 +656,7 @@ const props = defineProps<{
   config: WidgetConfig
 }>()
 
-// 计算属性处理数据转换
+// Computed properties handle data transformations
 const displayValue = computed(() => {
   if (!props.data) return 'N/A'
   
@@ -666,10 +666,10 @@ const displayValue = computed(() => {
   return `${value}${unit}`
 })
 
-// 监听数据变化，执行副作用
+// Monitor data changes，Perform side effects
 watch(() => props.data, (newData) => {
   if (newData?.alert && props.config.enableAlerts) {
-    // 处理告警逻辑
+    // Alarm processing logic
   }
 }, { deep: true })
 </script>
@@ -677,11 +677,11 @@ watch(() => props.data, (newData) => {
 
 ---
 
-## 5. 渲染器开发
+## 5. Renderer development
 
-### 5.1 渲染器架构
+### 5.1 Renderer architecture
 
-#### 基础渲染器类
+#### Basic renderer class
 
 ```typescript
 // BaseRenderer.ts
@@ -699,7 +699,7 @@ export abstract class BaseRenderer implements IRenderer {
   abstract updateNode(id: string, updates: Partial<GraphData>): void
   abstract destroy(): void
   
-  // 通用方法
+  // general method
   protected findNode(id: string): GraphData | undefined {
     return this.nodes.find(node => node.id === id)
   }
@@ -710,9 +710,9 @@ export abstract class BaseRenderer implements IRenderer {
 }
 ```
 
-### 5.2 创建自定义渲染器
+### 5.2 Create a custom renderer
 
-#### Step 1: 实现渲染器类
+#### Step 1: Implement renderer class
 
 ```typescript
 // CustomRenderer.ts
@@ -727,7 +727,7 @@ export class CustomRenderer extends BaseRenderer {
     this.renderContext = canvas.getContext('2d')
     this.container.appendChild(canvas)
     
-    // 监听容器尺寸变化
+    // Monitor container size changes
     this.setupResizeObserver()
   }
   
@@ -744,7 +744,7 @@ export class CustomRenderer extends BaseRenderer {
     const node = this.findNode(id)
     if (node) {
       Object.assign(node, updates)
-      this.render(this.nodes) // 重新渲染
+      this.render(this.nodes) // Re-render
     }
   }
   
@@ -753,15 +753,15 @@ export class CustomRenderer extends BaseRenderer {
     
     const { x, y, width, height } = node.layout?.canvas || node
     
-    // 绘制节点背景
+    // Draw node background
     this.renderContext.fillStyle = '#ffffff'
     this.renderContext.fillRect(x, y, width, height)
     
-    // 绘制边框
+    // draw border
     this.renderContext.strokeStyle = '#cccccc'
     this.renderContext.strokeRect(x, y, width, height)
     
-    // 绘制标签
+    // draw labels
     if (node.showLabel && node.label) {
       this.renderContext.fillStyle = '#333333'
       this.renderContext.font = '14px Arial'
@@ -776,13 +776,13 @@ export class CustomRenderer extends BaseRenderer {
   }
   
   destroy(): void {
-    // 清理资源
+    // Clean up resources
     this.container.innerHTML = ''
   }
 }
 ```
 
-#### Step 2: 注册渲染器
+#### Step 2: Register renderer
 
 ```typescript
 // renderers/index.ts
@@ -790,10 +790,10 @@ import { CustomRenderer } from './CustomRenderer'
 
 export const rendererRegistry = new Map<string, typeof BaseRenderer>()
 
-// 注册渲染器
+// Register renderer
 rendererRegistry.set('custom', CustomRenderer)
 
-// 工厂方法
+// factory method
 export function createRenderer(type: string, container: HTMLElement): BaseRenderer | null {
   const RendererClass = rendererRegistry.get(type)
   if (RendererClass) {
@@ -803,7 +803,7 @@ export function createRenderer(type: string, container: HTMLElement): BaseRender
 }
 ```
 
-### 5.3 渲染器Vue组件包装
+### 5.3 RendererVueComponent packaging
 
 ```vue
 <!-- CustomRenderer.vue -->
@@ -828,12 +828,12 @@ onMounted(() => {
   if (containerRef.value) {
     renderer = new CustomRenderer(containerRef.value)
     
-    // 监听渲染器事件
+    // Listening to renderer events
     containerRef.value.addEventListener('node-select', (event: CustomEvent) => {
       emit('node-select', event.detail.nodeId)
     })
     
-    // 初始渲染
+    // initial rendering
     renderer.render(props.nodes)
   }
 })
@@ -842,7 +842,7 @@ onUnmounted(() => {
   renderer?.destroy()
 })
 
-// 监听props变化
+// monitorpropschange
 watch(() => props.nodes, (newNodes) => {
   renderer?.render(newNodes)
 }, { deep: true })
@@ -850,7 +850,7 @@ watch(() => props.nodes, (newNodes) => {
 
 <template>
   <div ref="containerRef" class="custom-renderer">
-    <!-- 渲染器容器 -->
+    <!-- renderer container -->
   </div>
 </template>
 
@@ -866,88 +866,88 @@ watch(() => props.nodes, (newNodes) => {
 
 ---
 
-## 6. 数据流与状态管理
+## 6. Data flow and state management
 
-### 6.1 状态管理架构
+### 6.1 State management architecture
 
-#### Pinia Store 设计模式
+#### Pinia Store design pattern
 
 ```typescript
-// 状态定义模式
+// state definition pattern
 interface StoreState {
-  // 基础数据
+  // Basic data
   entities: Entity[]
   
-  // UI状态
+  // UIstate
   loading: boolean
   error: string | null
   
-  // 选择状态
+  // Select status
   selectedIds: string[]
   
-  // 配置状态
+  // configuration status
   preferences: UserPreferences
 }
 
-// Actions 模式
+// Actions model
 interface StoreActions {
-  // 异步操作
+  // Asynchronous operations
   fetchData(): Promise<void>
   saveData(data: Entity): Promise<void>
   
-  // 同步操作
+  // Synchronous operation
   setLoading(loading: boolean): void
   setError(error: string | null): void
   
-  // 批量操作
+  // Batch operations
   batchUpdate(updates: EntityUpdate[]): void
 }
 ```
 
-#### 响应式数据同步
+#### Responsive data synchronization
 
 ```typescript
-// 自动同步模式
+// Auto sync mode
 export const useDataSync = (storeKey: string) => {
   const store = useStore(storeKey)
   
-  // 监听本地变化，同步到远程
+  // Monitor local changes，Sync to remote
   watchEffect(() => {
     const localData = store.$state
     syncToRemote(storeKey, localData)
   })
   
-  // 监听远程变化，同步到本地
+  // Listen for remote changes，Sync to local
   onRemoteChange(storeKey, (remoteData) => {
     store.$patch(remoteData)
   })
 }
 ```
 
-### 6.2 配置数据流
+### 6.2 Configure data flow
 
-#### 配置更新流程
+#### Configure update process
 
 ```
-用户输入
+user input
     ↓
-属性编辑器
+Property Editor
     ↓
 ConfigurationManager.updateConfiguration()
     ↓
-配置验证
+Configuration verification
     ↓
-持久化存储（localStorage）
+Persistent storage（localStorage）
     ↓
-事件通知系统
+event notification system
     ↓
-组件重新渲染
+Component re-render
 ```
 
-#### 配置监听模式
+#### Configure listening mode
 
 ```typescript
-// 组件级配置监听
+// Component-level configuration monitoring
 const useWidgetConfig = (widgetId: string) => {
   const config = ref<WidgetConfiguration>()
   
@@ -968,12 +968,12 @@ const useWidgetConfig = (widgetId: string) => {
 }
 ```
 
-### 6.3 数据源管理
+### 6.3 Data source management
 
-#### 数据源注册和管理
+#### Data source registration and management
 
 ```typescript
-// 数据源配置类型
+// Data source configuration type
 interface DataSourceConfig {
   type: 'static' | 'api' | 'websocket' | 'multi-source'
   config: Record<string, any>
@@ -981,7 +981,7 @@ interface DataSourceConfig {
   triggers: DataSourceTrigger[]
 }
 
-// 数据源管理器
+// Data source manager
 class DataSourceManager {
   private sources = new Map<string, DataSource>()
   private eventBus = new EventEmitter()
@@ -990,7 +990,7 @@ class DataSourceManager {
     const dataSource = this.createDataSource(config)
     this.sources.set(componentId, dataSource)
     
-    // 设置数据更新监听
+    // Set up data update listening
     dataSource.on('data-updated', (data) => {
       this.eventBus.emit('component-data-updated', {
         componentId,
@@ -1009,7 +1009,7 @@ class DataSourceManager {
       case 'static':
         return new StaticDataSource(config.config)
       default:
-        throw new Error(`不支持的数据源类型: ${config.type}`)
+        throw new Error(`Unsupported data source type: ${config.type}`)
     }
   }
 }
@@ -1017,13 +1017,13 @@ class DataSourceManager {
 
 ---
 
-## 7. 配置系统深入
+## 7. Configuration system in depth
 
-### 7.1 配置层次结构
+### 7.1 Configuration hierarchy
 
 ```typescript
 interface WidgetConfiguration {
-  // 基础层 - 通用属性（标题、样式、可见性等）
+  // base layer - Common properties（title、style、Visibility etc.）
   base: {
     title?: string
     showTitle?: boolean
@@ -1035,21 +1035,21 @@ interface WidgetConfiguration {
     borderWidth?: number
   }
   
-  // 组件层 - 组件特定配置
+  // component layer - Component specific configuration
   component: {
-    properties: Record<string, any>  // 组件属性
-    validation?: {                   // 验证规则
+    properties: Record<string, any>  // Component properties
+    validation?: {                   // Validation rules
       required: string[]
       constraints: Record<string, any>
     }
-    polling?: {                      // 轮询配置
+    polling?: {                      // Polling configuration
       enabled: boolean
       interval: number
       retryCount: number
     }
   }
   
-  // 数据源层 - 数据绑定配置
+  // data source layer - Data binding configuration
   dataSource: {
     type: 'static' | 'api' | 'websocket' | 'multi-source' | 'data-mapping'
     enabled: boolean
@@ -1060,7 +1060,7 @@ interface WidgetConfiguration {
     }
   }
   
-  // 交互层 - 用户交互配置
+  // interaction layer - User interaction configuration
   interaction: {
     onClick?: InteractionConfig
     onHover?: InteractionConfig
@@ -1068,7 +1068,7 @@ interface WidgetConfiguration {
     [key: string]: InteractionConfig | undefined
   }
   
-  // 元数据 - 配置版本和审计信息
+  // metadata - Configuration version and audit information
   metadata: {
     version: string
     createdAt: number
@@ -1080,9 +1080,9 @@ interface WidgetConfiguration {
 }
 ```
 
-### 7.2 配置验证系统
+### 7.2 Configure verification system
 
-#### 验证规则定义
+#### Validation rule definition
 
 ```typescript
 interface ValidationRule {
@@ -1096,7 +1096,7 @@ interface ValidationRule {
   customValidator?: (value: any) => boolean | string
 }
 
-// 配置验证器
+// Configure validator
 class ConfigurationValidator {
   private rules: Map<string, ValidationRule[]> = new Map()
   
@@ -1128,27 +1128,27 @@ class ConfigurationValidator {
   private validateField(config: any, rule: ValidationRule): ValidationError | ValidationWarning | null {
     const value = this.getNestedValue(config, rule.field)
     
-    // Required 检查
+    // Required examine
     if (rule.required && (value === undefined || value === null)) {
       return {
         type: 'error',
         field: rule.field,
-        message: `字段 ${rule.field} 是必需的`,
+        message: `Field ${rule.field} is required`,
         value
       }
     }
     
-    // Type 检查
+    // Type examine
     if (value !== undefined && rule.type && typeof value !== rule.type) {
       return {
         type: 'error',
         field: rule.field,
-        message: `字段 ${rule.field} 类型应为 ${rule.type}，实际为 ${typeof value}`,
+        message: `Field ${rule.field} Type should be ${rule.type}，Actually ${typeof value}`,
         value
       }
     }
     
-    // 自定义验证器
+    // Custom validator
     if (rule.customValidator && value !== undefined) {
       const result = rule.customValidator(value)
       if (typeof result === 'string') {
@@ -1162,7 +1162,7 @@ class ConfigurationValidator {
         return {
           type: 'error',
           field: rule.field,
-          message: `字段 ${rule.field} 验证失败`,
+          message: `Field ${rule.field} Authentication failed`,
           value
         }
       }
@@ -1177,7 +1177,7 @@ class ConfigurationValidator {
 }
 ```
 
-### 7.3 配置迁移系统
+### 7.3 Configure migration system
 
 ```typescript
 interface ConfigurationMigrator {
@@ -1187,18 +1187,18 @@ interface ConfigurationMigrator {
   description?: string
 }
 
-// 配置迁移示例
+// Configuration migration example
 const migrationV1ToV2: ConfigurationMigrator = {
   fromVersion: '1.0.0',
   toVersion: '2.0.0',
-  description: '迁移到新的数据源配置格式',
+  description: 'Migrate to new data source configuration format',
   
   migrate(config: WidgetConfiguration): WidgetConfiguration {
     const newConfig = { ...config }
     
-    // 迁移旧的dataSource格式到新格式
+    // Migrate olddataSourceformat to new format
     if (newConfig.dataSource && typeof newConfig.dataSource.sources === 'object') {
-      // 转换逻辑
+      // conversion logic
       newConfig.dataSource = {
         type: 'multi-source',
         enabled: true,
@@ -1211,7 +1211,7 @@ const migrationV1ToV2: ConfigurationMigrator = {
       }
     }
     
-    // 更新版本信息
+    // Update version information
     newConfig.metadata.version = '2.0.0'
     newConfig.metadata.migratedAt = Date.now()
     
@@ -1222,11 +1222,11 @@ const migrationV1ToV2: ConfigurationMigrator = {
 
 ---
 
-## 8. 性能优化策略
+## 8. Performance optimization strategies
 
-### 8.1 渲染性能优化
+### 8.1 Rendering performance optimization
 
-#### 虚拟滚动实现
+#### Virtual scrolling implementation
 
 ```typescript
 class VirtualRenderer {
@@ -1236,12 +1236,12 @@ class VirtualRenderer {
   updateVisibleNodes(allNodes: GraphData[], viewport: Viewport): void {
     this.viewport = viewport
     
-    // 只渲染可见区域内的节点
+    // Only render nodes within the visible area
     this.visibleNodes = allNodes.filter(node => 
       this.isNodeVisible(node, viewport)
     )
     
-    // 添加缓冲区，提前渲染即将进入视口的节点
+    // add buffer，Render nodes that are about to enter the viewport in advance
     const buffer = 100
     const extendedViewport = {
       x: viewport.x - buffer,
@@ -1271,7 +1271,7 @@ class VirtualRenderer {
 }
 ```
 
-#### 批量更新优化
+#### Batch update optimization
 
 ```typescript
 class BatchUpdateManager {
@@ -1289,7 +1289,7 @@ class BatchUpdateManager {
   }
   
   private flushUpdates(): void {
-    // 合并相同节点的更新
+    // Merge updates from the same node
     const mergedUpdates = new Map<string, Partial<GraphData>>()
     
     for (const task of this.updateQueue) {
@@ -1300,21 +1300,21 @@ class BatchUpdateManager {
       }
     }
     
-    // 批量应用更新
+    // Apply updates in batches
     for (const [nodeId, updates] of mergedUpdates) {
       this.applyUpdate(nodeId, updates)
     }
     
-    // 清理
+    // clean up
     this.updateQueue = []
     this.updateTimer = null
   }
 }
 ```
 
-### 8.2 内存管理
+### 8.2 Memory management
 
-#### 组件清理模式
+#### Component cleanup mode
 
 ```typescript
 export const useComponentCleanup = (componentId: string) => {
@@ -1329,7 +1329,7 @@ export const useComponentCleanup = (componentId: string) => {
       try {
         task()
       } catch (error) {
-        console.error(`清理任务失败:`, error)
+        console.error(`Cleanup task failed:`, error)
       }
     })
     cleanupTasks.length = 0
@@ -1341,16 +1341,16 @@ export const useComponentCleanup = (componentId: string) => {
 }
 ```
 
-#### 数据缓存策略
+#### Data caching strategy
 
 ```typescript
 class DataCache {
   private cache = new Map<string, CacheItem>()
   private maxSize = 100
-  private ttl = 5 * 60 * 1000 // 5分钟
+  private ttl = 5 * 60 * 1000 // 5minute
   
   set(key: string, value: any): void {
-    // LRU 缓存实现
+    // LRU Cache implementation
     if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value
       this.cache.delete(firstKey)
@@ -1368,16 +1368,16 @@ class DataCache {
     
     if (!item) return null
     
-    // 检查TTL
+    // examineTTL
     if (Date.now() - item.timestamp > this.ttl) {
       this.cache.delete(key)
       return null
     }
     
-    // 更新访问统计
+    // Update access statistics
     item.hits++
     
-    // 移动到最后（LRU）
+    // move to end（LRU）
     this.cache.delete(key)
     this.cache.set(key, item)
     
@@ -1406,12 +1406,12 @@ class DataCache {
 }
 ```
 
-### 8.3 异步加载优化
+### 8.3 Asynchronous loading optimization
 
-#### 组件懒加载
+#### Lazy loading of components
 
 ```typescript
-// 动态组件加载器
+// Dynamic component loader
 const ComponentLoader = {
   cache: new Map<string, Promise<Component>>(),
   
@@ -1431,7 +1431,7 @@ const ComponentLoader = {
       try {
         let component: Component
         
-        // 根据类型动态导入组件
+        // Dynamically import components based on type
         switch (type) {
           case 'chart-widget':
             component = (await import('@/components/visual-editor/widgets/chart/ChartWidget.vue')).default
@@ -1440,7 +1440,7 @@ const ComponentLoader = {
             component = (await import('@/components/visual-editor/widgets/text/TextWidget.vue')).default
             break
           default:
-            // Card 2.1 组件懒加载
+            // Card 2.1 Lazy loading of components
             const card2Integration = useCard2Integration()
             component = await card2Integration.loadComponent(type)
         }
@@ -1456,115 +1456,115 @@ const ComponentLoader = {
 
 ---
 
-## 9. 故障排除指南
+## 9. Troubleshooting Guide
 
-### 9.1 常见问题诊断
+### 9.1 Diagnosis of common problems
 
-#### 组件不显示问题
+#### Component not showing problem
 
-**症状**: 组件添加到画布后不显示或显示为空白
+**symptom**: The component does not appear or appears blank after being added to the canvas
 
-**诊断步骤**:
+**Diagnostic steps**:
 ```javascript
-// 1. 检查组件是否正确注册
+// 1. Check whether the component is registered correctly
 const widgetStore = useWidgetStore()
-console.log('已注册的组件:', widgetStore.getAllWidgets().map(w => w.type))
+console.log('Registered components:', widgetStore.getAllWidgets().map(w => w.type))
 
-// 2. 检查节点数据
+// 2. Check node data
 const editorStore = useEditorStore()
-console.log('画布节点:', editorStore.nodes)
+console.log('canvas node:', editorStore.nodes)
 
-// 3. 检查组件定义
+// 3. Check component definition
 const widget = widgetStore.getWidget('your-widget-type')
-console.log('组件定义:', widget)
+console.log('Component definition:', widget)
 
-// 4. 检查Card2.1集成状态
+// 4. examineCard2.1Integration status
 const card2Integration = useCard2Integration()
-console.log('Card2.1状态:', {
+console.log('Card2.1state:', {
   isLoading: card2Integration.isLoading.value,
   availableComponents: card2Integration.availableComponents.value.length
 })
 
-// 5. 检查渲染器状态
-console.log('当前渲染器:', currentRenderer.value)
-console.log('渲染器数据源状态:', multiDataSourceStore.value)
+// 5. Check renderer status
+console.log('Current renderer:', currentRenderer.value)
+console.log('Renderer data source status:', multiDataSourceStore.value)
 
-// 6. 检查组件是否在可见区域
+// 6. Check if the component is in the visible area
 const node = editorStore.nodes.find(n => n.type === 'your-widget-type')
-console.log('组件位置和尺寸:', node && {
+console.log('Component location and size:', node && {
   x: node.x, y: node.y, width: node.width, height: node.height
 })
 ```
 
-**解决方案**:
-- 确保组件已正确注册到 WidgetStore
-- 检查 Card2.1 组件是否正确初始化  
-- 验证组件的 defaultLayout 配置
-- 检查组件的属性定义和默认值
-- 确认组件在当前视口内可见
-- 验证组件依赖的数据源是否正常
+**solution**:
+- Make sure the component is properly registered to WidgetStore
+- examine Card2.1 Whether the component is initialized correctly  
+- Verify the component defaultLayout Configuration
+- Check the component's property definitions and default values
+- Confirm that the component is visible within the current viewport
+- Verify whether the data source the component depends on is normal
 
-#### 配置不保存问题
+#### Configuration not saving problem
 
-**症状**: 组件配置修改后不保存或页面刷新后丢失
+**symptom**: Component configuration is not saved after modification or lost after page refresh
 
-**诊断步骤**:
+**Diagnostic steps**:
 ```javascript
-// 1. 检查配置管理器状态
-console.log('配置管理器:', configurationManager.getAllConfigurations())
+// 1. Check configuration manager status
+console.log('configuration manager:', configurationManager.getAllConfigurations())
 
-// 2. 检查localStorage
-console.log('本地存储:', localStorage.getItem('visual-editor-configurations'))
+// 2. examinelocalStorage
+console.log('local storage:', localStorage.getItem('visual-editor-configurations'))
 
-// 3. 检查面板保存状态
-console.log('面板数据:', panelData.value)
-console.log('编辑器配置:', editorConfig.value)
+// 3. Check panel save status
+console.log('panel data:', panelData.value)
+console.log('Editor configuration:', editorConfig.value)
 ```
 
-**解决方案**:
-- 确保 ConfigurationManager 正确初始化
-- 检查 localStorage 权限和空间
-- 验证面板保存接口调用
-- 检查配置验证是否通过
-- 确认 `configurationIntegrationBridge` 正确设置
-- 验证 `getState()` 和 `setState()` 方法正常工作
+**solution**:
+- make sure ConfigurationManager Correct initialization
+- examine localStorage permissions and space
+- Verify panel save interface call
+- Check whether the configuration verification passes
+- confirm `configurationIntegrationBridge` Correct settings
+- verify `getState()` and `setState()` method works fine
 
-#### 轮询系统问题
+#### Polling system issues
 
-**症状**: 组件数据不更新或轮询未启动
+**symptom**: Component data is not updated or polling is not started
 
-**诊断步骤**:
+**Diagnostic steps**:
 ```javascript
-// 1. 检查全局轮询状态
-console.log('全局轮询状态:', pollingManager.isGlobalPollingEnabled())
-console.log('轮询统计:', pollingManager.getStatistics())
+// 1. Check global polling status
+console.log('Global polling status:', pollingManager.isGlobalPollingEnabled())
+console.log('Polling statistics:', pollingManager.getStatistics())
 
-// 2. 检查组件轮询配置
+// 2. Check component polling configuration
 const componentConfig = configurationManager.getConfiguration(componentId)
-console.log('组件轮询配置:', componentConfig?.component?.polling)
+console.log('Component polling configuration:', componentConfig?.component?.polling)
 
-// 3. 检查轮询任务
-console.log('所有任务:', pollingManager.getAllTasks())
-console.log('组件任务:', pollingManager.getComponentTasks(componentId))
+// 3. Check polling tasks
+console.log('All tasks:', pollingManager.getAllTasks())
+console.log('Component tasks:', pollingManager.getComponentTasks(componentId))
 
-// 4. 检查数据源管理器
-console.log('数据源管理器状态:', editorDataSourceManager.getStatistics())
+// 4. Check the data source manager
+console.log('Data source manager status:', editorDataSourceManager.getStatistics())
 ```
 
-**解决方案**:
-- 确保在预览模式下启用全局轮询
-- 检查组件是否配置了正确的数据源
-- 验证 `initializePollingTasksAndEnable()` 被正确调用
-- 检查轮询回调函数是否正确执行
-- 确认 PollingController 组件事件绑定正确
+**solution**:
+- Make sure global polling is enabled in preview mode
+- Check if the component is configured with the correct data source
+- verify `initializePollingTasksAndEnable()` is called correctly
+- Check whether the polling callback function is executed correctly
+- confirm PollingController Component event binding is correct
 
-#### 性能问题诊断
+#### Diagnosing performance issues
 
-**症状**: 界面卡顿、响应缓慢
+**symptom**: Interface stuck、Slow response
 
-**诊断工具**:
+**diagnostic tools**:
 ```javascript
-// 性能监控
+// Performance monitoring
 const performanceMonitor = {
   startTime: 0,
   
@@ -1576,13 +1576,13 @@ const performanceMonitor = {
   end(operation: string) {
     const duration = performance.now() - this.startTime
     console.timeEnd(operation)
-    console.log(`${operation} 耗时: ${duration.toFixed(2)}ms`)
+    console.log(`${operation} time consuming: ${duration.toFixed(2)}ms`)
   },
   
   memory() {
     if ('memory' in performance) {
       const memory = (performance as any).memory
-      console.log('内存使用:', {
+      console.log('memory usage:', {
         used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
         total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
         limit: `${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB`
@@ -1591,42 +1591,42 @@ const performanceMonitor = {
   }
 }
 
-// 使用示例
-performanceMonitor.start('组件渲染')
-// ... 执行操作
-performanceMonitor.end('组件渲染')
+// Usage example
+performanceMonitor.start('Component rendering')
+// ... perform operations
+performanceMonitor.end('Component rendering')
 performanceMonitor.memory()
 ```
 
-### 9.2 调试工具集
+### 9.2 Debugging toolset
 
-#### 开发者控制台扩展
+#### Developer console extension
 
 ```typescript
-// 开发环境下可用的调试工具
+// Debugging tools available in development environment
 if (process.env.NODE_ENV === 'development') {
   (window as any).__VISUAL_EDITOR_DEBUG__ = {
-    // 状态检查
+    // status check
     getEditorState: () => ({
       nodes: editorStore.nodes,
       selectedIds: widgetStore.selectedNodeIds,
       configurations: Object.fromEntries(configurationManager.getAllConfigurations())
     }),
     
-    // 性能分析
+    // Performance analysis
     getPerformanceStats: () => ({
       nodeCount: editorStore.nodes.length,
       configurationCount: configurationManager.getAllConfigurations().size,
       memoryUsage: (performance as any).memory
     }),
     
-    // 调试操作
+    // Debugging operations
     clearAllConfigurations: () => {
       configurationManager.getAllConfigurations().clear()
     },
     
     forceRerender: () => {
-      // 强制重新渲染
+      // force rerender
       const nodes = [...editorStore.nodes]
       editorStore.setNodes([])
       nextTick(() => {
@@ -1634,7 +1634,7 @@ if (process.env.NODE_ENV === 'development') {
       })
     },
     
-    // 导出调试数据
+    // Export debugging data
     exportDebugData: () => {
       const debugData = {
         timestamp: Date.now(),
@@ -1661,10 +1661,10 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-#### 日志系统
+#### Logging system
 
 ```typescript
-// 分级日志系统
+// hierarchical logging system
 enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -1710,146 +1710,146 @@ export const logger = new Logger()
 
 ---
 
-## 10. 最佳实践
+## 10. best practices
 
-### 10.1 代码组织规范
+### 10.1 Code organization specifications
 
-#### 目录结构规范
+#### Directory structure specification
 
 ```
 components/visual-editor/
-├── components/           # UI组件
-│   ├── common/          # 通用组件
-│   ├── toolbar/         # 工具栏相关
-│   ├── PropertyPanel/   # 属性面板
-│   └── WidgetLibrary/   # 组件库面板
-├── renderers/           # 渲染器实现
-│   ├── base/           # 基础类和接口
-│   ├── canvas/         # Canvas渲染器
-│   └── gridstack/      # Gridstack渲染器
-├── widgets/             # 组件实现
-│   ├── base/           # 基础组件
-│   ├── chart/          # 图表组件
-│   └── custom/         # 自定义组件
-├── configuration/       # 配置管理
-│   ├── components/     # 配置UI组件
-│   └── types.ts        # 配置类型定义
-├── core/               # 核心逻辑
-├── hooks/              # 组合式函数
-├── store/              # 状态管理
-├── types/              # TypeScript类型
-└── utils/              # 工具函数
+├── components/           # UIcomponents
+│   ├── common/          # Common components
+│   ├── toolbar/         # Toolbar related
+│   ├── PropertyPanel/   # Properties panel
+│   └── WidgetLibrary/   # Component library panel
+├── renderers/           # Renderer implementation
+│   ├── base/           # Basic classes and interfaces
+│   ├── canvas/         # CanvasRenderer
+│   └── gridstack/      # GridstackRenderer
+├── widgets/             # Component implementation
+│   ├── base/           # Basic components
+│   ├── chart/          # chart component
+│   └── custom/         # Custom component
+├── configuration/       # Configuration management
+│   ├── components/     # ConfigurationUIcomponents
+│   └── types.ts        # Configuration type definition
+├── core/               # core logic
+├── hooks/              # Combined functions
+├── store/              # Status management
+├── types/              # TypeScripttype
+└── utils/              # Utility function
 ```
 
-#### 命名规范
+#### Naming convention
 
 ```typescript
-// 文件命名：kebab-case
+// File naming：kebab-case
 // my-widget-component.vue
 // configuration-manager.ts
 
-// 组件命名：PascalCase
+// Component naming：PascalCase
 export default defineComponent({
   name: 'MyWidgetComponent'
 })
 
-// 接口命名：PascalCase，I前缀
+// Interface naming：PascalCase，Iprefix
 interface IWidgetRenderer {
   render(): void
 }
 
-// 类型命名：PascalCase
+// Type naming：PascalCase
 type WidgetConfiguration = {
   // ...
 }
 
-// 常量命名：SCREAMING_SNAKE_CASE
+// Constant naming：SCREAMING_SNAKE_CASE
 const DEFAULT_WIDGET_SIZE = { width: 300, height: 200 }
 
-// 函数命名：camelCase
+// Function naming：camelCase
 function createWidgetInstance(): Widget {
   // ...
 }
 ```
 
-### 10.2 开发工作流程
+### 10.2 Development workflow
 
-#### Git工作流程
+#### GitWorkflow
 
 ```bash
-# 1. 创建功能分支
+# 1. Create feature branch
 git checkout -b feature/new-widget-type
 
-# 2. 开发和提交
+# 2. Develop and submit
 git add .
-git commit -m "feat: 添加新的数据显示组件
+git commit -m "feat: Add new data display component
 
-- 实现基础数据绑定功能
-- 添加配置面板支持
-- 集成主题系统
-- 添加单元测试
+- Implement basic data binding functions
+- Add configuration panel support
+- Integrated theme system
+- Add unit tests
 
 🤝 Co-authored-by: Claude <noreply@anthropic.com>"
 
-# 3. 代码质量检查
+# 3. Code quality check
 pnpm quality-check
 pnpm typecheck
 pnpm lint
 
-# 4. 合并到主分支
+# 4. Merge into master branch
 git checkout master
 git merge feature/new-widget-type
 ```
 
-#### 代码审查清单
+#### code review checklist
 
 ```markdown
-## 代码审查清单
+## code review checklist
 
-### 🎯 功能性
-- [ ] 功能按需求正常工作
-- [ ] 错误情况处理得当
-- [ ] 边界条件考虑充分
+### 🎯 Functional
+- [ ] Functionality works as required
+- [ ] Error situations are handled appropriately
+- [ ] Boundary conditions are fully considered
 
-### 🏗️ 架构性
-- [ ] 符合现有架构模式
-- [ ] 组件职责单一明确
-- [ ] 依赖关系合理
+### 🏗️ Architectural
+- [ ] Comply with existing architectural patterns
+- [ ] Component responsibilities are single and clear
+- [ ] Dependencies are reasonable
 
-### 🎨 代码质量
-- [ ] 代码清晰易读
-- [ ] 命名规范一致
-- [ ] 注释充分有效
-- [ ] 无重复代码
+### 🎨 Code quality
+- [ ] Code is clear and easy to read
+- [ ] Consistent naming conventions
+- [ ] Comments are fully valid
+- [ ] No duplicate code
 
-### 🚀 性能
-- [ ] 无明显性能问题
-- [ ] 适当使用缓存
-- [ ] 避免不必要的重渲染
+### 🚀 performance
+- [ ] No obvious performance issues
+- [ ] Use caching appropriately
+- [ ] Avoid unnecessary re-rendering
 
-### 🧪 测试
-- [ ] 单元测试覆盖充分
-- [ ] 集成测试通过
-- [ ] 手动测试验证
+### 🧪 test
+- [ ] Adequate unit test coverage
+- [ ] Integration test passed
+- [ ] Manual test verification
 
-### 📱 兼容性
-- [ ] 支持明暗主题
-- [ ] 响应式设计适配
-- [ ] 浏览器兼容性
+### 📱 compatibility
+- [ ] Support light and dark themes
+- [ ] Responsive design adaptation
+- [ ] Browser compatibility
 
-### 🌐 国际化
-- [ ] 所有用户可见文本使用i18n
-- [ ] 中文注释完整
-- [ ] 文档更新及时
+### 🌐 internationalization
+- [ ] All user-visible text usesi18n
+- [ ] Complete Chinese annotations
+- [ ] Documents are updated in a timely manner
 ```
 
-### 10.3 性能最佳实践
+### 10.3 Performance best practices
 
-#### 组件性能优化
+#### Component performance optimization
 
 ```vue
 <script setup lang="ts">
-// ✅ 使用 defineProps 和 defineEmits
+// ✅ use defineProps and defineEmits
 const props = defineProps<{
   data: WidgetData
   config: WidgetConfig
@@ -1859,29 +1859,29 @@ const emit = defineEmits<{
   update: [data: WidgetData]
 }>()
 
-// ✅ 使用 computed 进行数据转换
+// ✅ use computed Perform data conversion
 const displayValue = computed(() => {
   return props.data?.value?.toString() || 'N/A'
 })
 
-// ✅ 使用 watch 监听特定属性
+// ✅ use watch Listen for specific properties
 watch(() => props.config.refreshRate, (newRate) => {
   setupRefreshInterval(newRate)
 })
 
-// ❌ 避免在模板中进行复杂计算
+// ❌ Avoid complex calculations in templates
 // <span>{{ formatComplexData(props.data) }}</span>
 
-// ✅ 使用计算属性
+// ✅ Use computed properties
 const formattedData = computed(() => formatComplexData(props.data))
 </script>
 
 <template>
   <div class="widget">
-    <!-- ✅ 使用计算属性 -->
+    <!-- ✅ Use computed properties -->
     <span>{{ formattedData }}</span>
     
-    <!-- ✅ 条件渲染优化 -->
+    <!-- ✅ Conditional rendering optimization -->
     <div v-if="props.config.showDetails" class="details">
       <ExpensiveComponent :data="props.data" />
     </div>
@@ -1889,10 +1889,10 @@ const formattedData = computed(() => formatComplexData(props.data))
 </template>
 ```
 
-#### 数据处理优化
+#### Data processing optimization
 
 ```typescript
-// ✅ 使用对象冻结提升性能
+// ✅ Using object freezing to improve performance
 const frozenConfig = Object.freeze({
   defaultOptions: {
     animation: true,
@@ -1900,13 +1900,13 @@ const frozenConfig = Object.freeze({
   }
 })
 
-// ✅ 使用 Map 而不是 Object 进行频繁查找
+// ✅ use Map instead of Object Make frequent searches
 const componentMap = new Map<string, ComponentDefinition>()
 componentMap.set('widget-type', definition)
 
-// ✅ 批量处理数据更新
+// ✅ Batch data updates
 const batchUpdateNodes = (updates: NodeUpdate[]) => {
-  // 收集所有更新
+  // Collect all updates
   const nodeUpdates = new Map<string, Partial<GraphData>>()
   
   updates.forEach(update => {
@@ -1914,19 +1914,19 @@ const batchUpdateNodes = (updates: NodeUpdate[]) => {
     nodeUpdates.set(update.nodeId, { ...existing, ...update.changes })
   })
   
-  // 批量应用
+  // Batch application
   nodeUpdates.forEach((changes, nodeId) => {
     updateNode(nodeId, changes)
   })
 }
 
-// ✅ 使用 WeakMap 避免内存泄漏
+// ✅ use WeakMap Avoid memory leaks
 const componentInstances = new WeakMap<Element, ComponentInstance>()
 ```
 
-### 10.4 错误处理最佳实践
+### 10.4 Error handling best practices
 
-#### 错误边界实现
+#### Error boundary implementation
 
 ```vue
 <!-- ErrorBoundary.vue -->
@@ -1936,29 +1936,29 @@ import { ref, provide, onErrorCaptured } from 'vue'
 const error = ref<Error | null>(null)
 const errorInfo = ref<string>('')
 
-// 错误捕获
+// Error catching
 onErrorCaptured((err, instance, info) => {
   error.value = err
   errorInfo.value = info
   
-  // 记录错误日志
-  logger.error('组件错误捕获', err, {
+  // Record error log
+  logger.error('Component error catching', err, {
     componentName: instance?.$options.name,
     errorInfo: info,
     timestamp: Date.now()
   })
   
-  // 阻止错误继续传播
+  // Stop errors from spreading
   return false
 })
 
-// 重试机制
+// Retry mechanism
 const retry = () => {
   error.value = null
   errorInfo.value = ''
 }
 
-// 提供错误状态给子组件
+// Provide error status to child components
 provide('error-boundary', {
   hasError: computed(() => !!error.value),
   retry
@@ -1967,7 +1967,7 @@ provide('error-boundary', {
 
 <template>
   <div class="error-boundary">
-    <!-- 错误状态显示 -->
+    <!-- Error status display -->
     <div v-if="error" class="error-display">
       <n-result status="error" :title="$t('common.componentError')">
         <template #extra>
@@ -1981,16 +1981,16 @@ provide('error-boundary', {
       </n-result>
     </div>
     
-    <!-- 正常内容 -->
+    <!-- normal content -->
     <slot v-else />
   </div>
 </template>
 ```
 
-#### 异步错误处理
+#### Asynchronous error handling
 
 ```typescript
-// 统一异步错误处理
+// Unified asynchronous error handling
 export const withErrorHandling = <T extends (...args: any[]) => Promise<any>>(
   fn: T,
   errorHandler?: (error: Error) => void
@@ -2001,53 +2001,53 @@ export const withErrorHandling = <T extends (...args: any[]) => Promise<any>>(
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))
       
-      // 记录错误
-      logger.error('异步操作失败', err, { args })
+      // Log errors
+      logger.error('Asynchronous operation failed', err, { args })
       
-      // 自定义错误处理
+      // Custom error handling
       if (errorHandler) {
         errorHandler(err)
       } else {
-        // 默认错误处理
-        message.error(err.message || '操作失败')
+        // Default error handling
+        message.error(err.message || 'Operation failed')
       }
       
-      // 重新抛出错误，让调用者决定如何处理
+      // rethrow error，Let the caller decide what to do with
       throw err
     }
   }) as T
 }
 
-// 使用示例
+// Usage example
 const saveConfiguration = withErrorHandling(
   async (config: WidgetConfiguration) => {
     await configurationManager.setConfiguration(widgetId, config)
-    message.success('配置保存成功')
+    message.success('Configuration saved successfully')
   },
   (error) => {
-    // 自定义错误处理
-    message.error(`配置保存失败: ${error.message}`)
+    // Custom error handling
+    message.error(`Configuration save failed: ${error.message}`)
   }
 )
 ```
 
 ---
 
-## 🚀 快速开始指南
+## 🚀 Quick start guide
 
-### 新手入门 5 分钟
+### Getting Started 5 minute
 
-#### 1. 启动开发环境
+#### 1. Start the development environment
 ```bash
-# 克隆项目并安装依赖
+# Clone the project and install dependencies
 pnpm install
-# 启动开发服务器
+# Start the development server
 pnpm dev
-# 访问测试页面
+# Visit the test page
 # http://localhost:5002/test/editor-integration
 ```
 
-#### 2. 创建第一个组件
+#### 2. Create the first component
 ```vue
 <!-- MyFirstWidget.vue -->
 <script setup lang="ts">
@@ -2072,103 +2072,103 @@ const { t } = useI18n()
 </template>
 ```
 
-#### 3. 注册和测试组件
+#### 3. Register and test components
 ```typescript
-// 在 Card 2.1 系统中注册
+// exist Card 2.1 Register in the system
 const temperatureWidget: ComponentDefinition = {
   type: 'temperature-sensor',
-  name: '温度传感器',
+  name: 'temperature sensor',
   component: MyFirstWidget,
   properties: {
-    title: { type: 'string', default: '温度' },
+    title: { type: 'string', default: 'temperature' },
     unit: { type: 'string', default: '°C' }
   }
 }
 
-// 在编辑器中添加
+// Add in editor
 const editor = createEditor()
 await editor.addWidget('temperature-sensor')
 ```
 
-#### 4. 配置数据源
+#### 4. Configure data source
 ```typescript
-// 在组件配置面板中设置
+// Set in the component configuration panel
 {
   dataSource: {
     type: 'api',
     config: {
       url: '/api/sensors/temperature',
       method: 'GET',
-      interval: 30000 // 30秒轮询
+      interval: 30000 // 30Second polling
     }
   }
 }
 ```
 
-### 🎯 常用开发场景
+### 🎯 Common development scenarios
 
-#### 场景1：添加新的数据可视化组件
-1. 创建组件 Vue 文件
-2. 定义 Card 2.1 组件定义
-3. 创建属性编辑器（可选）
-4. 配置数据需求声明
-5. 注册到组件注册表
-6. 在测试页面验证功能
+#### scene1：Add new data visualization component
+1. Create component Vue document
+2. definition Card 2.1 组件definition
+3. Create a property editor（Optional）
+4. Configuration data requirement statement
+5. Register to the component registry
+6. Verify functionality on test page
 
-#### 场景2：扩展现有组件功能
-1. 修改组件的 properties 定义
-2. 更新组件渲染逻辑
-3. 添加或修改属性编辑器
-4. 运行质量检查确保兼容性
-5. 测试新功能是否正常工作
+#### scene2：Extend existing component functionality
+1. Modify components properties definition
+2. Update component rendering logic
+3. Add or modify property editor
+4. Run QA to ensure compatibility
+5. Test whether new features work properly
 
-#### 场景3：自定义渲染器开发
-1. 继承 `BaseRenderer` 类
-2. 实现必要的渲染方法
-3. 创建 Vue 组件包装器
-4. 注册到渲染器注册表
-5. 在工具栏中添加切换选项
+#### scene3：Custom renderer development
+1. inherit `BaseRenderer` kind
+2. Implement the necessary rendering methods
+3. create Vue component wrapper
+4. Register to the renderer registry
+5. Add toggle option to toolbar
 
-#### 场景4：轮询数据源集成
-1. 在组件配置中声明轮询需求
-2. 配置数据源（API/WebSocket/静态）
-3. 使用 PollingController 控制轮询
-4. 处理数据更新和错误情况
-5. 在预览模式下测试轮询功能
+#### scene4：Polling data source integration
+1. Declare polling requirements in component configuration
+2. Configure data source（API/WebSocket/static）
+3. use PollingController Control polling
+4. Handle data updates and error conditions
+5. Test polling functionality in preview mode
 
-### 🔧 开发技巧
+### 🔧 Development skills
 
-#### 实时调试
+#### real-time debugging
 ```javascript
-// 控制台快速调试
+// Console quick debugging
 window.__VISUAL_EDITOR_DEBUG__.getEditorState()
 window.__VISUAL_EDITOR_DEBUG__.getPollingStats()
 
-// 手动触发轮询
+// Manually trigger polling
 pollingManager.enableGlobalPolling()
 
-// 检查组件状态
+// Check component status
 const config = configurationManager.getConfiguration(componentId)
-console.log('组件配置:', config)
+console.log('Component configuration:', config)
 ```
 
-#### 性能监控
+#### Performance monitoring
 ```javascript
-// 监控渲染性能
+// Monitor rendering performance
 performance.mark('render-start')
-// ... 执行渲染操作
+// ... Perform rendering operations
 performance.mark('render-end')
 performance.measure('render-duration', 'render-start', 'render-end')
 ```
 
-#### 错误恢复
+#### error recovery
 ```typescript
-// 组件级错误恢复
+// Component-level error recovery
 const safeRenderComponent = (component: Component) => {
   try {
     return renderComponent(component)
   } catch (error) {
-    console.error('组件渲染失败:', error)
+    console.error('Component rendering failed:', error)
     return renderErrorFallback(error)
   }
 }
@@ -2176,27 +2176,27 @@ const safeRenderComponent = (component: Component) => {
 
 ---
 
-## 📄 总结
+## 📄 Summarize
 
-Visual Editor系统是一个复杂的可视化编辑平台，本文档详细介绍了：
+Visual EditorThe system is a complex visual editing platform，This document details：
 
-1. **系统架构** - 深入解析多层架构设计和数据流
-2. **API参考** - 完整的接口文档和使用示例
-3. **开发指南** - 组件和渲染器开发的最佳实践
-4. **配置系统** - 分层配置管理和验证机制
-5. **性能优化** - 渲染优化、内存管理和异步加载策略
-6. **故障排除** - 常见问题诊断和调试工具
-7. **最佳实践** - 代码规范、工作流程和错误处理
+1. **System architecture** - In-depth analysis of multi-layer architecture design and data flow
+2. **APIrefer to** - Complete interface documentation and usage examples
+3. **Development Guide** - Best practices for component and renderer development
+4. **Configure the system** - Hierarchical configuration management and verification mechanism
+5. **Performance optimization** - Rendering optimization、Memory management and asynchronous loading strategies
+6. **troubleshooting** - FAQ Diagnostic and Debugging Tools
+7. **best practices** - Code specifications、Workflow and error handling
 
-遵循本文档的指导原则，开发者可以：
-- 🚀 快速上手系统开发
-- 🎯 创建高质量的组件和渲染器
-- 🔧 有效诊断和解决问题
-- 📈 优化系统性能和用户体验
-- 🤝 维护代码质量和团队协作效率
+Follow the guidelines of this document，Developers can：
+- 🚀 Get started quickly with system development
+- 🎯 Create high-quality components and renderers
+- 🔧 Diagnose and resolve problems effectively
+- 📈 Optimize system performance and user experience
+- 🤝 Maintain code quality and team collaboration efficiency
 
 ---
 
-**文档维护**: 请在系统重大更新时及时更新本文档  
-**反馈渠道**: 如有问题或建议，请在项目仓库中提交Issue  
-**版本历史**: 查看Git提交记录了解详细变更历史
+**Document maintenance**: Please update this document promptly when there are major system updates  
+**feedback channel**: If you have any questions or suggestions，Please submit it in the project repositoryIssue  
+**Version history**: CheckGitSubmit records for detailed change history

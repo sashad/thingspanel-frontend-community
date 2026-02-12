@@ -1,20 +1,20 @@
 /**
- * 告警状态组件配置 - 简化版，只保留基本的3个配置项
+ * Alarm status component configuration - Simplified version，Keep only the basics3configuration items
  */
 
 import type { SettingConfig } from '@/card2.1/types/setting-config'
 
 /**
- * 告警状态自定义配置接口 - 简化版
+ * Alarm status custom configuration interface - Simplified version
  */
 export interface AlertStatusCustomize {
-  title: string     // 标题
-  amount: number    // 金额
-  description: string // 简介
+  title: string     // title
+  amount: number    // Amount
+  description: string // Introduction
 }
 
 /**
- * 告警状态完整配置接口
+ * Alarm status complete configuration interface
  */
 export interface AlertStatusConfig {
   type: 'alert-status'
@@ -28,41 +28,41 @@ export interface AlertStatusConfig {
 }
 
 /**
- * 默认自定义配置
+ * Default custom configuration
  */
 export const customConfig: AlertStatusCustomize = {
-  title: '告警状态',
+  title: 'Alarm status',
   amount: 0,
-  description: '系统运行正常'
+  description: 'The system is running normally'
 }
 
 /**
- * 告警状态设置配置 - 简化版
+ * Alarm status setting configuration - Simplified version
  */
 export const alertStatusSettingConfig: SettingConfig<AlertStatusCustomize> = [
   {
-    group: '基本配置',
+    group: 'Basic configuration',
     items: [
       {
         key: 'title',
-        label: '标题',
+        label: 'title',
         type: 'input',
-        defaultValue: '告警状态',
-        placeholder: '请输入标题'
+        defaultValue: 'Alarm status',
+        placeholder: 'Please enter a title'
       },
       {
         key: 'amount',
-        label: '金额',
+        label: 'Amount',
         type: 'number',
         defaultValue: 0,
-        placeholder: '请输入金额'
+        placeholder: 'Please enter the amount'
       },
       {
         key: 'description',
-        label: '简介',
+        label: 'Introduction',
         type: 'textarea',
-        defaultValue: '系统运行正常',
-        placeholder: '请输入简介信息'
+        defaultValue: 'The system is running normally',
+        placeholder: 'Please enter profile information'
       }
     ]
   }

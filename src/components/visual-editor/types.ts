@@ -1,23 +1,23 @@
 /**
  * @file types.ts
- * @description Visual Editor 类型定义
+ * @description Visual Editor type definition
  */
 
 import type { GraphData } from '@antv/x6'
 import type { DataSource } from '@/components/visual-editor/types/data-source'
 
-// 1. 定义我们自己的渲染器类型
+// 1. Define our own renderer type
 export type RendererType = 'canvas' | 'gridstack' | 'vue' | 'react' | 'angular' | 'svelte' | 'webgl'
 
-// 2. 定义组件类型
+// 2. Define component type
 export type WidgetType = string
 
-// 3. 定义 VisualEditorWidget 类型，扩展 GraphData
+// 3. definition VisualEditorWidget type，Expand GraphData
 export interface VisualEditorWidget extends Omit<GraphData, 'dataSource'> {
-  dataSource?: DataSource | null // 添加数据源支持
+  dataSource?: DataSource | null // Add data source support
 }
 
-// 组件元信息
+// Component meta information
 export interface WidgetMeta {
   type: WidgetType
   name: string
@@ -28,7 +28,7 @@ export interface WidgetMeta {
   source: 'builtin' | 'card2' | 'plugin'
 }
 
-// 组件定义
+// Component definition
 export interface WidgetDefinition extends WidgetMeta {
   defaultLayout: {
     canvas: {

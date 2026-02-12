@@ -1,24 +1,24 @@
 /**
- * @file Card 2.1 系统入口（切换到 Core2 版本）
- * 使用新的 Core2 系统，保持向后兼容性
+ * @file Card 2.1 System entrance（switch to Core2 Version）
+ * use new Core2 system，Maintain backward compatibility
  */
 
 import { core2Bridge, initializeCore2System } from '@/card2.1/core2-adapter'
 
-// 向后兼容：保留旧系统的导入（不删除原有 core 系统）
+// backwards compatible：保留旧system的导入（Do not delete the original core system）
 import { componentRegistry } from '@/card2.1/core2/registry'
 import { AutoRegistry } from '@/card2.1/core2/registry'
 import { setupStorageListener } from '@/card2.1/core2/utils'
 
-// ========== 切换到 Core2 系统的初始化 ==========
+// ========== switch to Core2 System initialization ==========
 
-// 初始化状态
+// initialization state
 let isInitialized = false
 let initializationPromise: Promise<void> | null = null
 
 /**
- * 初始化 Card 2.1 系统（切换到 Core2 版本）
- * 使用新的 Core2 系统，保持向后兼容性
+ * initialization Card 2.1 system（switch to Core2 Version）
+ * use new Core2 system，Maintain backward compatibility
  */
 export async function initializeCard2System() {
   if (isInitialized) return
@@ -43,14 +43,14 @@ export async function initializeCard2System() {
 }
 
 /**
- * 获取组件注册表
+ * Get component registry
  */
 export function getComponentRegistry() {
   return core2Bridge.getComponentRegistry()
 }
 
 /**
- * 获取组件树形结构（使用 Core2 系统）
+ * Get component tree structure（use Core2 system）
  */
 export function getComponentTree() {
   if (!isInitialized) {
@@ -60,7 +60,7 @@ export function getComponentTree() {
 }
 
 /**
- * 按分类获取组件（使用 Core2 系统）
+ * Get components by category（use Core2 system）
  */
 export async function getComponentsByCategory(mainCategory?: string, subCategory?: string) {
   if (!isInitialized) {
@@ -70,7 +70,7 @@ export async function getComponentsByCategory(mainCategory?: string, subCategory
 }
 
 /**
- * 获取所有分类（使用 Core2 系统）
+ * Get all categories（use Core2 system）
  */
 export function getCategories() {
   if (!isInitialized) {
@@ -80,17 +80,17 @@ export function getCategories() {
 }
 
 /**
- * 重新应用权限过滤（简化版本）
- * 当用户权限发生变化时调用此函数
+ * Reapply permission filtering（Simplified version）
+ * This function is called when user permissions change
  */
 export async function reapplyPermissionFilter() {
-  // 简化实现：直接重新初始化
+  // Simplify implementation：Directly reinitialize
   isInitialized = false
   await initializeCard2System()
 }
 
 /**
- * 获取所有组件（包括无权限的，用于调试）
+ * Get all components（including unauthorized，for debugging）
  */
 export function getAllComponents() {
   if (!isInitialized) {
@@ -99,24 +99,24 @@ export function getAllComponents() {
   return core2Bridge.getComponentRegistry().getAll()
 }
 
-// ========== 核心模块导出 ==========
+// ========== Core module export ==========
 
-// 传统模块导出（向后兼容）
+// Traditional module export（backwards compatible）
 export { componentRegistry }
 export { AutoRegistry }
 export type { ComponentTree, ComponentCategory } from '@/card2.1/core2/registry'
 
-// 导出权限相关工具
+// Export permission related tools
 export * from '@/card2.1/core2/utils'
 export type { ComponentPermission } from '@/card2.1/types'
 
-// 导出 Hooks
+// Export Hooks
 export * from '@/card2.1/hooks'
 
-// ========== 简化的工具方法导出 ==========
+// ========== Simplified tool method export ==========
 
 /**
- * 获取系统初始化状态
+ * Get system initialization status
  */
 export function getInitializationState() {
   if (!isInitialized) {
@@ -130,7 +130,7 @@ export function getInitializationState() {
 }
 
 /**
- * 清除缓存（强制重新初始化）
+ * clear cache（force reinitialization）
  */
 export function clearInitializationCache() {
   isInitialized = false
@@ -139,12 +139,12 @@ export function clearInitializationCache() {
 }
 
 /**
- * 检查组件更新（简化版）
+ * Check for component updates（Simplified version）
  */
 export async function checkForComponentUpdates() {
-  // 简化实现：总是返回true，让调用方决定是否重新初始化
+  // Simplify implementation：always returnstrue，Let the caller decide whether to reinitialize
   return !isInitialized
 }
 
-// 默认导出注册表（保持向后兼容）
+// Export registry by default（Stay backwards compatible）
 export default core2Bridge.getComponentRegistry()

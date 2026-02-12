@@ -1,73 +1,73 @@
 /**
- * 安全配置类型定义
+ * Security configuration type definition
  * Security Configuration Type Definitions
  */
 
 /**
- * RSA 安全配置接口
+ * RSA Security configuration interface
  * RSA Security Configuration Interface
  */
 export interface RSASecurityConfig {
-  /** RSA 公钥 */
+  /** RSA public key */
   publicKey: string
-  /** 密钥大小 */
+  /** Key size */
   keySize: number
-  /** 加密算法 */
+  /** encryption algorithm */
   algorithm: string
-  /** 哈希算法 */
+  /** Hash algorithm */
   hashAlgorithm: string
-  /** 是否启用环境变量覆盖 */
+  /** Whether to enable environment variable override */
   enableEnvOverride: boolean
 }
 
 /**
- * 安全配置接口
+ * Security configuration interface
  * Security Configuration Interface
  */
 export interface SecurityConfig {
-  /** RSA 配置 */
+  /** RSA Configuration */
   rsa: RSASecurityConfig
 }
 
 /**
- * RSA 加密选项
+ * RSA Encryption options
  * RSA Encryption Options
  */
 export interface RSAEncryptionOptions {
-  /** 要加密的数据 */
+  /** Data to be encrypted */
   data: string
-  /** 公钥（可选，默认使用配置中的公钥） */
+  /** public key（Optional，默认使用配置中的public key） */
   publicKey?: string
-  /** 编码格式 */
+  /** encoding format */
   encoding?: 'base64' | 'hex'
 }
 
 /**
- * RSA 解密选项
+ * RSA Decryption options
  * RSA Decryption Options
  */
 export interface RSADecryptionOptions {
-  /** 要解密的数据 */
+  /** Data to be decrypted */
   encryptedData: string
-  /** 私钥 */
+  /** private key */
   privateKey: string
-  /** 编码格式 */
+  /** encoding format */
   encoding?: 'base64' | 'hex'
 }
 
 /**
- * RSA 密钥对
+ * RSA key pair
  * RSA Key Pair
  */
 export interface RSAKeyPair {
-  /** 公钥 */
+  /** public key */
   publicKey: string
-  /** 私钥 */
+  /** private key */
   privateKey: string
 }
 
 /**
- * 安全配置常量类型
+ * Security configuration constant type
  * Security Configuration Constants Type
  */
 export type SecurityConfigConstants = {

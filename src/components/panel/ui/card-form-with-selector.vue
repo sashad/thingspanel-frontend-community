@@ -4,7 +4,7 @@
       <NTabPane v-if="state.selectCard.type === 'chart'" name="dataSource" :tab="$t('card.dataSource')">
         <div :class="`${mobile ? '' : 'h-[calc(100vh_-_150px)] '} overflow-y-auto py-5`">
           <NForm>
-            <!-- 时间范围和聚合范围选择 -->
+            <!-- Time range and aggregation range selection -->
             <NSelect
               v-if="state.data.dataSource.isSupportTimeRange"
               v-model:value="state.data.dataSource.dataTimeRange"
@@ -22,7 +22,7 @@
               :placeholder="$t('card.selectDataAggregationRange')"
             />
 
-            <!-- 设备数量选择 -->
+            <!-- Equipment quantity selection -->
             <div v-if="state.data.dataSource?.origin === 'device' || state.data.dataSource?.origin === 'system'">
               <n-input-number
                 v-model:value="deviceCount"
@@ -37,7 +37,7 @@
                 </template>
               </n-input-number>
 
-              <!-- 使用新的DeviceMetricsSelector组件 -->
+              <!-- use newDeviceMetricsSelectorcomponents -->
               <div class="device-selectors-container">
                 <div
                   v-for="(item, i) in state.data.dataSource.deviceSource"
@@ -45,7 +45,7 @@
                   :key="i"
                   class="device-selector-item mb-4 p-4 border rounded-lg"
                 >
-                  <h4 class="text-lg font-medium mb-3">设备 {{ i + 1 }}</h4>
+                  <h4 class="text-lg font-medium mb-3">equipment {{ i + 1 }}</h4>
                   <DeviceMetricsSelector
                     v-model="item"
                     :device-options="deviceOption"
@@ -154,7 +154,7 @@ const dataAggregateRangeOptions = [
   { label: $t('common.hours6'), value: '6h', disabled: false },
   { label: $t('common.days1'), value: '1d', disabled: false },
   { label: $t('common.days7'), value: '7d', disabled: false },
-  { label: '1月', value: '1mo', disabled: false }
+  { label: '1moon', value: '1mo', disabled: false }
 ]
 
 const state = reactive({
@@ -174,28 +174,28 @@ const findCard = (id: string) => {
 
 const updateDisabledOptions = (timeFrame: string) => {
   const disableBeforeIndex: { [key: string]: number } = {
-    最近3小时: 1,
-    最近6小时: 2,
-    最近12小时: 3,
-    最近24小时: 4,
-    最近3天: 5,
-    最近7天: 6,
-    最近15天: 7,
-    最近30天: 7,
-    最近60天: 8,
-    最近90天: 9,
-    最近6个月: 9,
-    最近1年: 12,
-    今天: 4,
-    昨天: 4,
-    前天: 4,
-    上周今日: 4,
-    本周: 6,
-    上周: 6,
-    本月: 7,
-    上个月: 7,
-    今年: 12,
-    去年: 12
+    recent3Hour: 1,
+    recent6Hour: 2,
+    recent12Hour: 3,
+    recent24Hour: 4,
+    recent3sky: 5,
+    recent7sky: 6,
+    recent15sky: 7,
+    recent30sky: 7,
+    recent60sky: 8,
+    recent90sky: 9,
+    recent6months: 9,
+    recent1Year: 12,
+    today: 4,
+    yesterday: 4,
+    theDayBeforeYesterday: 4,
+    lastWeekToday: 4,
+    thisWeek: 6,
+    lastWeek: 6,
+    thisMonth: 7,
+    lastMonth: 7,
+    thisYear: 12,
+    lastYear: 12
   }
 
   dataAggregateRangeOptions.forEach((item, index, array) => {

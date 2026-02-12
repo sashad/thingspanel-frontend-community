@@ -1,12 +1,12 @@
 /**
- * 数据架构类型系统导出索引
- * 统一导出现有类型和增强版类型
+ * Data Schema Type System Export Index
+ * Unified export of existing types and enhanced types
  */
 
-// ==================== 现有类型系统导出 ====================
-// 保持现有导出不变，确保向后兼容性
+// ==================== Existing type system export ====================
+// Keep existing exports unchanged，Ensure backward compatibility
 export type {
-  // 执行器链类型
+  // Actuator chain type
   DataItem,
   JsonDataItemConfig,
   HttpDataItemConfig,
@@ -18,61 +18,61 @@ export type {
   ExecutionState,
   ExecutionResult,
 
-  // 执行器接口
+  // Actuator interface
   IDataItemFetcher,
   IDataItemProcessor,
   IDataSourceMerger,
   IMultiSourceIntegrator,
   IMultiLayerExecutorChain,
 
-  // 数据类型
+  // data type
   ComponentData,
   DataSourceResult,
   AllDataItemTypes,
   AllMergeStrategyTypes
 } from '../executors'
 
-// ==================== 增强版类型系统导出 ====================
+// ==================== Enhanced type system export ====================
 export type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 export type {
-  // 泛型配置类型
+  // Generic configuration type
   DataItemConfig,
   DataItemMetadata,
 
-  // 具体数据项类型
+  // Specific data item type
   EnhancedJsonDataItemConfig,
   EnhancedHttpDataItemConfig,
   HttpHeader,
   HttpParam,
   HttpBody,
 
-  // 动态参数系统
+  // dynamic parameter system
   DynamicParam,
 
-  // 增强配置系统
+  // Enhanced configuration system
   EnhancedDataSourceConfiguration,
   EnhancedFeatureFlags,
   ConfigurationMetadata,
 
-  // 适配器系统
+  // adapter system
   ConfigurationAdapter
 } from './enhanced-types'
 
-// ==================== 简化数据源系统类型导出 ====================
+// ==================== Simplified data source system type export ====================
 export type {
-  // 组件数据需求
+  // Component data requirements
   ComponentDataRequirement,
   StaticParamRequirement,
   DataSourceRequirement,
   FieldRequirement,
 
-  // 数据源配置
+  // Data source configuration
   SimpleDataSourceConfig,
   DataSourceDefinition,
   TriggerConfig,
   TriggerConfigData,
 
-  // 用户输入类型
+  // User input type
   UserDataSourceInput,
   DataSourceUserConfig,
   StaticDataSourceConfig,
@@ -80,20 +80,20 @@ export type {
   WebSocketDataSourceConfig,
   ScriptDataSourceConfig,
 
-  // 执行结果
+  // Execution result
   ExecutionResult as SimpleExecutionResult,
   MappingPreviewResult,
   ValidationResult,
 
-  // 组件数据
+  // component data
   ComponentData as SimpleComponentData,
   StandardComponentProps,
 
-  // 兼容性类型
+  // Compatibility type
   VisualEditorCompatibleProps,
   Card21CompatibleProps,
 
-  // 工具类型
+  // Tool type
   DataSourceType,
   FieldType,
   FieldValueType,
@@ -101,16 +101,16 @@ export type {
   ComponentType
 } from './simple-types'
 
-// ==================== 类型守卫和工具导出 ====================
+// ==================== Type guards and tool exports ====================
 export { isEnhancedConfiguration, isGenericDataItemConfig, isEnhancedHttpConfig } from '@/core/data-architecture/types/enhanced-types'
 
-// ==================== 默认配置导出 ====================
+// ==================== Default configuration export ====================
 export { DEFAULT_ENHANCED_FEATURES, ConfigurationVersionEnum } from '@/core/data-architecture/types/enhanced-types'
 
-// 简化数据源系统常量
+// Simplified data source system constants
 export { SIMPLE_DATA_SOURCE_CONSTANTS, FIELD_TYPE_MAPPING } from '@/core/data-architecture/types/simple-types'
 
-// ==================== 类型系统版本信息 ====================
+// ==================== Type system version information ====================
 export const TYPE_SYSTEM_VERSION = {
   LEGACY: '1.0.0',
   ENHANCED: '2.0.0',
@@ -118,12 +118,12 @@ export const TYPE_SYSTEM_VERSION = {
 } as const
 
 /**
- * 支持的配置版本列表
+ * List of supported configuration versions
  */
 export const SUPPORTED_CONFIG_VERSIONS = ['1.0.0', '2.0.0'] as const
 
 /**
- * 类型系统特性标志
+ * Type system feature flags
  */
 export const TYPE_SYSTEM_FEATURES = {
   GENERIC_DATA_ITEMS: true,

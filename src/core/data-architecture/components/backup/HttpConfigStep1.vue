@@ -1,11 +1,11 @@
 <!--
-  HTTP配置第1步 - 基础配置组件
-  配置URL、请求方法、超时时间和请求体
+  HTTPConfiguration section1step - Basic configuration components
+  ConfigurationURL、Request method、Timeout and request body
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep1 - HTTP基础配置步骤
- * 包含URL、请求方法、超时时间、请求体配置
+ * HttpConfigStep1 - HTTPBasic configuration steps
+ * IncludeURL、Request method、timeout、Request body configuration
  */
 
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
@@ -17,27 +17,27 @@ import type { InternalApiItem } from '@/core/data-architecture/types/internal-ap
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
 interface Emits {
   (e: 'update:modelValue', value: Props['modelValue']): void
   (e: 'urlChange'): void
-  (e: 'apiInfoUpdate', apiInfo: any): void // 新增：接口信息更新事件
+  (e: 'apiInfoUpdate', apiInfo: any): void // New：Interface information update event
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const { t } = useI18n()
 
-// 🔥 新增：防止循环更新的标记
+// 🔥 New：Tags that prevent cyclic updates
 const isUpdatingFromChild = ref(false)
 
 /**
- * 地址类型选择：直接从modelValue获取和设置
+ * Address type selection：directly frommodelValueGet and set
  */
 const addressType = computed({
   get: () => (props.modelValue.addressType !== undefined ? props.modelValue.addressType : 'external'),
@@ -47,7 +47,7 @@ const addressType = computed({
 })
 
 /**
- * 获取选中的API信息
+ * Get selectedAPIinformation
  */
 const selectedApiInfo = computed(() => {
   if (!selectedInternalAddress.value) return null
@@ -55,7 +55,7 @@ const selectedApiInfo = computed(() => {
 })
 
 /**
- * 选中的内部地址：直接从modelValue获取和设置
+ * selected internal address：directly frommodelValueGet and set
  */
 const selectedInternalAddress = computed({
   get: () => (props.modelValue.selectedInternalAddress !== undefined ? props.modelValue.selectedInternalAddress : ''),
@@ -65,17 +65,17 @@ const selectedInternalAddress = computed({
 })
 
 /**
- * 是否启用传参
+ * Whether to enable parameter passing
  */
 const enableParams = ref(false)
 
 /**
- * 传参配置
+ * Parameter configuration
  */
 const urlParams = ref<EnhancedParameter[]>([])
 
 /**
- * HTTP方法选项
+ * HTTPMethod options
  */
 const httpMethods = [
   { label: 'GET', value: 'GET' },
@@ -86,14 +86,14 @@ const httpMethods = [
 ]
 
 /**
- * 是否显示请求体配置
+ * Whether to display the request body configuration
  */
 const showBody = computed(() => {
   return ['POST', 'PUT', 'PATCH'].includes(props.modelValue.method || '')
 })
 
 /**
- * 更新配置数据
+ * Update configuration data
  */
 const updateConfig = (field: keyof HttpConfig, value: any) => {
   const newConfig = {
@@ -101,7 +101,7 @@ const updateConfig = (field: keyof HttpConfig, value: any) => {
     [field]: value
   }
 
-  // 🔥 调试：监听所有配置更新
+  // 🔥 debug：Listen for all configuration updates
   if (process.env.NODE_ENV === 'development') {
   }
   if (field === 'pathParameter') {
@@ -111,18 +111,18 @@ const updateConfig = (field: keyof HttpConfig, value: any) => {
 }
 
 /**
- * 地址类型变化处理
+ * Address type change processing
  */
 const onAddressTypeChange = (type: 'internal' | 'external') => {
   addressType.value = type
 
   if (type === 'external') {
-    // 切换到外部地址时，清空内部地址相关配置
+    // When switching to an external address，Clear internal address related configurations
     selectedInternalAddress.value = ''
     enableParams.value = false
     urlParams.value = []
   } else {
-    // 切换到内部地址时，清空URL和所有相关状态
+    // When switching to internal address，ClearURLand all related status
     selectedInternalAddress.value = ''
     enableParams.value = false
     urlParams.value = []
@@ -131,64 +131,64 @@ const onAddressTypeChange = (type: 'internal' | 'external') => {
 }
 
 /**
- * 内部地址选择处理
+ * Internal address selection processing
  */
 const onInternalAddressSelect = (value: string, option: any) => {
   selectedInternalAddress.value = value
 
-  // 获取API详情信息
+  // GetAPIDetailed information
   const apiInfo = getApiByValue(value)
   if (apiInfo) {
-    // 同时设置请求方法
+    // Also set the request method
     updateConfig('method', apiInfo.method)
 
-    // 🔥 关键修复：保存选择的内部地址到父组件
+    // 🔥 critical fix：Save the selected internal address to the parent component
     updateConfig('selectedInternalAddress', value)
 
-    // 立即设置初始URL（无参数替换的版本）
+    // Set initial nowURL（Version without parameter substitution）
     updateConfig('url', apiInfo.url)
 
-    // 🔥 发射接口信息更新事件，让父组件知道当前选择的接口
+    // 🔥 Emit interface information update event，Let the parent component know the currently selected interface
     emit('apiInfoUpdate', apiInfo)
 
-    // 🔥 修复：选择内部地址时不自动填充参数，只记录是否有参数
+    // 🔥 repair：Parameters are not automatically filled in when selecting an internal address，Only record whether there are parameters
     if (apiInfo.hasPathParams && apiInfo.pathParamNames) {
-      // 只清空现有参数，不自动生成新的
+      // Only clear existing parameters，Do not automatically generate new
       urlParams.value = []
       enableParams.value = false
       updateConfig('pathParams', [])
       updateConfig('enableParams', false)
     } else {
-      // 没有路径参数时，清空参数配置
+      // When there is no path parameter，Clear parameter configuration
       urlParams.value = []
       enableParams.value = false
       updateConfig('pathParams', [])
       updateConfig('enableParams', false)
     }
   } else {
-    // 如果没有找到API信息，直接使用选择的值
+    // if not foundAPIinformation，Use the selected value directly
     updateConfig('url', value)
   }
 }
 
 /**
- * 传参启用状态变化
+ * Pass parameter enable status change
  */
 const onEnableParamsChange = (enabled: boolean) => {
   enableParams.value = enabled
 
-  // 🔥 关键修复：同步启用状态到父组件
+  // 🔥 critical fix：Synchronize enabled status to parent component
   updateConfig('enableParams', enabled)
 
   if (!enabled) {
-    // 禁用传参时，清空参数配置
+    // When parameter passing is disabled，Clear parameter configuration
     urlParams.value = []
     updateConfig('pathParams', [])
     updateConfig('pathParameter', undefined)
   }
   if (!enabled) {
     urlParams.value = []
-    // 禁用参数时，恢复到原始URL（不进行参数替换）
+    // When disabling parameters，Revert to originalURL（No parameter substitution）
     const apiInfo = selectedApiInfo.value
     if (apiInfo) {
       updateConfig('url', apiInfo.url)
@@ -197,21 +197,21 @@ const onEnableParamsChange = (enabled: boolean) => {
 }
 
 /**
- * 🔥 修复：传参配置更新 - 批量更新避免频繁重渲染
+ * 🔥 repair：Parameter configuration update - Batch updates avoid frequent re-rendering
  */
 const onUrlParamsUpdate = (params: EnhancedParameter[]) => {
 
-  // 🔥 设置标记，避免watch监听器再次触发初始化
+  // 🔥 set mark，avoidwatchListener triggers initialization again
   isUpdatingFromChild.value = true
 
   urlParams.value = params
 
-  // 🔥 关键修复：批量更新配置，避免多次emit导致的重渲染
+  // 🔥 critical fix：Batch update configuration，avoid multipleemitResulting in re-rendering
   const batchUpdates: Partial<HttpConfig> = {
     pathParams: params
   }
 
-  // 如果还有旧格式的pathParameter，也要更新（兼容性）
+  // If there are still old formatspathParameter，Also update（compatibility）
   if (params.length > 0) {
     const firstParam = params[0]
     batchUpdates.pathParameter = {
@@ -227,13 +227,13 @@ const onUrlParamsUpdate = (params: EnhancedParameter[]) => {
     }
   }
 
-  // 如果有API信息，确保URL保持原始模板格式
+  // if there isAPIinformation，make sureURLKeep original template format
   const apiInfo = selectedApiInfo.value
   if (apiInfo) {
-    batchUpdates.url = apiInfo.url // 保持原始模板如 /device/detail/{id}
+    batchUpdates.url = apiInfo.url // Keep the original template as /device/detail/{id}
   }
 
-  // 🔥 一次性批量更新，避免多次emit
+  // 🔥 One-time batch update，avoid multipleemit
   const newConfig = {
     ...props.modelValue,
     ...batchUpdates
@@ -243,14 +243,14 @@ const onUrlParamsUpdate = (params: EnhancedParameter[]) => {
   }
   emit('update:modelValue', newConfig)
 
-  // 🔥 重置标记，延迟执行避免立即触发watch
+  // 🔥 reset mark，Delay execution to avoid immediate triggeringwatch
   nextTick(() => {
     isUpdatingFromChild.value = false
   })
 }
 
 /**
- * URL变化时触发事件
+ * URLTrigger event on change
  */
 const onUrlChange = (value: string) => {
   updateConfig('url', value)
@@ -258,14 +258,14 @@ const onUrlChange = (value: string) => {
 }
 
 /**
- * 格式化地址显示文本
+ * Format address display text
  */
 const formatAddressDisplayText = (apiInfo: InternalApiItem) => {
   return `${apiInfo.label} (${apiInfo.method} ${apiInfo.url})`
 }
 
 /**
- * 当前地址的显示文本（包含路径参数替换）
+ * Display text of current address（Contains path parameter substitution）
  */
 const currentAddressDisplay = computed(() => {
   if (addressType.value === 'external') {
@@ -276,19 +276,19 @@ const currentAddressDisplay = computed(() => {
   if (apiInfo) {
     let url = apiInfo.url
 
-    // 如果启用了参数配置，用实际参数值替换URL中的占位符 - 正确解析属性绑定和默认值
+    // If parameter configuration is enabled，Replace with actual parameter valueURLplaceholder in - Correctly resolve property bindings and default values
     if (enableParams.value && urlParams.value.length > 0) {
       urlParams.value.forEach(param => {
         if (param.enabled && param.key) {
           let resolvedValue = param.value
 
-          // 如果是属性绑定，显示默认值用于预览（实际请求时会解析属性值）
+          // If it is property binding，Show default values ​​for preview（The attribute value will be parsed during the actual request）
           if (param.selectedTemplate === 'component-property-binding' && typeof param.value === 'string') {
-            // URL预览时：如果是属性绑定，优先显示默认值，否则显示绑定路径
+            // URLWhen previewing：If it is property binding，Show default value first，Otherwise show the binding path
             resolvedValue = param.defaultValue || `[${param.value}]`
           }
 
-          // 检查值是否为"空"
+          // Check if the value is"null"
           const isEmpty =
             resolvedValue === null ||
             resolvedValue === undefined ||
@@ -298,7 +298,7 @@ const currentAddressDisplay = computed(() => {
           if (!isEmpty) {
             url = url.replace(`{${param.key}}`, resolvedValue)
           } else if (param.defaultValue) {
-            // 使用默认值
+            // Use default value
             url = url.replace(`{${param.key}}`, param.defaultValue)
           }
         }
@@ -312,7 +312,7 @@ const currentAddressDisplay = computed(() => {
 })
 
 /**
- * 获取处理过路径参数的最终URL
+ * Get the final result of processed path parametersURL
  */
 const getFinalUrl = computed(() => {
   if (addressType.value === 'external') {
@@ -323,19 +323,19 @@ const getFinalUrl = computed(() => {
   if (apiInfo) {
     let url = apiInfo.url
 
-    // 替换路径参数 - 正确解析属性绑定和默认值
+    // Replace path parameters - Correctly resolve property bindings and default values
     if (enableParams.value && urlParams.value.length > 0) {
       urlParams.value.forEach(param => {
         if (param.enabled && param.key) {
           let resolvedValue = param.value
 
-          // 如果是属性绑定，显示默认值用于预览（实际请求时会解析属性值）
+          // If it is property binding，Show default values ​​for preview（The attribute value will be parsed during the actual request）
           if (param.selectedTemplate === 'component-property-binding' && typeof param.value === 'string') {
-            // URL预览时：如果是属性绑定，优先显示默认值，否则显示绑定路径
+            // URLWhen previewing：If it is property binding，Show default value first，Otherwise show the binding path
             resolvedValue = param.defaultValue || `[${param.value}]`
           }
 
-          // 检查值是否为"空"
+          // Check if the value is"null"
           const isEmpty =
             resolvedValue === null ||
             resolvedValue === undefined ||
@@ -345,7 +345,7 @@ const getFinalUrl = computed(() => {
           if (!isEmpty) {
             url = url.replace(`{${param.key}}`, resolvedValue)
           } else if (param.defaultValue) {
-            // 使用默认值
+            // Use default value
             url = url.replace(`{${param.key}}`, param.defaultValue)
           }
         }
@@ -359,17 +359,17 @@ const getFinalUrl = computed(() => {
 })
 
 /**
- * 初始化URL参数状态 - 从props中恢复配置
+ * initializationURLParameter status - frompropsrestore configuration
  */
 const initializeUrlParamsState = () => {
-  // 如果当前是内部地址模式且有选中的内部地址
+  // If the current mode is internal address mode and there is an internal address selected
   if (addressType.value === 'internal' && selectedInternalAddress.value) {
     const apiInfo = getApiByValue(selectedInternalAddress.value)
 
     if (apiInfo && apiInfo.hasPathParams) {
-      // 检查是否有已保存的路径参数配置
+      // Check if there is a saved path parameter configuration
       if (props.modelValue.pathParams && props.modelValue.pathParams.length > 0) {
-        // 从保存的路径参数恢复状态
+        // Restore state from saved path parameters
         urlParams.value = props.modelValue.pathParams.map(param => ({
           key: param.key || 'pathParam',
           value: param.value || '',
@@ -384,7 +384,7 @@ const initializeUrlParamsState = () => {
         }))
         enableParams.value = true
       } else if (props.modelValue.pathParameter) {
-        // 兼容旧格式的路径参数
+        // Compatible with old format path parameters
         urlParams.value = [
           {
             key: 'pathParam',
@@ -406,7 +406,7 @@ const initializeUrlParamsState = () => {
 }
 
 /**
- * 🔥 修复：监听 props 变化，同步URL参数状态 - 避免循环更新
+ * 🔥 repair：monitor props change，synchronousURLParameter status - Avoid cyclic updates
  */
 watch(
   () => [
@@ -417,14 +417,14 @@ watch(
     props.modelValue.enableParams || false
   ],
   () => {
-    // 🔥 如果正在从子组件更新，跳过此次同步，避免循环
+    // 🔥 If you are updating from a child component，Skip this sync，avoid loops
     if (isUpdatingFromChild.value) {
       if (process.env.NODE_ENV === 'development') {
       }
       return
     }
 
-    // 🔥 延迟初始化，确保所有数据完全加载后再同步状态
+    // 🔥 Lazy initialization，Make sure all data is fully loaded before synchronizing status
     nextTick(() => {
       initializeUrlParamsState()
     })
@@ -433,24 +433,24 @@ watch(
 )
 
 /**
- * 🔥 修复：监听关键字段变化，强制重新初始化 - 避免循环更新
+ * 🔥 repair：Monitor key field changes，force reinitialization - Avoid cyclic updates
  */
 watch(
   () => props.modelValue,
   newValue => {
-    // 🔥 如果正在从子组件更新，跳过此次同步
+    // 🔥 If you are updating from a child component，Skip this sync
     if (isUpdatingFromChild.value) {
       return
     }
 
-    // 当modelValue完全变化时（比如从编辑数据加载），重新初始化
+    // whenmodelValuecompletely changed（For example, loading from edit data），Reinitialize
     if (newValue && (newValue.addressType === 'internal' || newValue.selectedInternalAddress)) {
       nextTick(() => {
-        // 如果是内部地址且有选中地址，确保状态正确同步
+        // If it is an internal address and there is an address selected，Make sure status is synchronized correctly
         if (newValue.addressType === 'internal' && newValue.selectedInternalAddress) {
           const apiInfo = getApiByValue(newValue.selectedInternalAddress)
           if (apiInfo) {
-            // 🔥 强制发射接口信息更新事件
+            // 🔥 Forced emission of interface information update events
             emit('apiInfoUpdate', apiInfo)
           }
         }
@@ -462,7 +462,7 @@ watch(
 )
 
 /**
- * 组件挂载时初始化状态
+ * Initialization state when component is mounted
  */
 onMounted(() => {
   initializeUrlParamsState()
@@ -472,79 +472,79 @@ onMounted(() => {
 <template>
   <div class="http-config-step1">
     <n-form size="small" :show-feedback="false">
-      <!-- 地址类型选择 -->
-      <n-form-item label="地址类型" required>
+      <!-- Address type selection -->
+      <n-form-item label="Address type" required>
         <n-radio-group :value="addressType" @update:value="onAddressTypeChange">
-          <n-radio value="external">外部地址</n-radio>
-          <n-radio value="internal">内部地址</n-radio>
+          <n-radio value="external">external address</n-radio>
+          <n-radio value="internal">internal address</n-radio>
         </n-radio-group>
       </n-form-item>
 
-      <!-- 外部地址输入 -->
-      <n-form-item v-if="addressType === 'external'" label="请求URL" required>
+      <!-- External address input -->
+      <n-form-item v-if="addressType === 'external'" label="askURL" required>
         <n-input :value="modelValue.url" placeholder="https://api.example.com/data" @update:value="onUrlChange" />
       </n-form-item>
 
-      <!-- 内部地址选择 -->
-      <n-form-item v-if="addressType === 'internal'" label="选择内部接口" required>
+      <!-- Internal address selection -->
+      <n-form-item v-if="addressType === 'internal'" label="Select internal interface" required>
         <n-select
           :value="selectedInternalAddress"
           :options="internalAddressOptions"
-          placeholder="请选择内部接口"
+          placeholder="Please select an internal interface"
           @update:value="onInternalAddressSelect"
         />
       </n-form-item>
 
-      <!-- 地址显示 -->
-      <n-form-item v-if="modelValue.url" label="当前地址">
-        <n-input :value="currentAddressDisplay" readonly placeholder="将显示选中的地址">
+      <!-- Address display -->
+      <n-form-item v-if="modelValue.url" label="current address">
+        <n-input :value="currentAddressDisplay" readonly placeholder="The selected address will be displayed">
           <template #prefix>
             <span class="address-type-indicator">
               {{ addressType === 'internal' ? '💻' : '🌐' }}
             </span>
           </template>
           <template #suffix>
-            <n-button text size="small" @click="() => navigator.clipboard?.writeText(getFinalUrl)">复制</n-button>
+            <n-button text size="small" @click="() => navigator.clipboard?.writeText(getFinalUrl)">copy</n-button>
           </template>
         </n-input>
       </n-form-item>
 
-      <!-- 是否启用传参 -->
-      <n-form-item v-if="addressType === 'internal' && selectedApiInfo?.hasPathParams" label="URL传参">
+      <!-- Whether to enable parameter passing -->
+      <n-form-item v-if="addressType === 'internal' && selectedApiInfo?.hasPathParams" label="URLPassing on parameters">
         <n-space align="center">
           <n-switch :value="enableParams" @update:value="onEnableParamsChange" />
           <n-text depth="3" style="font-size: 12px">
-            配置URL路径参数值
+            ConfigurationURLpath parameter value
             <n-text v-if="selectedApiInfo?.pathParamNames" type="info" style="margin-left: 8px">
-              (需要配置: {{ selectedApiInfo.pathParamNames.join(', ') }})
+              (Requires configuration: {{ selectedApiInfo.pathParamNames.join(', ') }})
             </n-text>
           </n-text>
         </n-space>
       </n-form-item>
 
-      <!-- 传参配置 -->
-      <n-form-item v-if="addressType === 'internal' && enableParams && selectedApiInfo?.hasPathParams" label="参数配置">
+      <!-- Parameter configuration -->
+      <n-form-item v-if="addressType === 'internal' && enableParams && selectedApiInfo?.hasPathParams" label="Parameter configuration">
         <DynamicParameterEditor
           :model-value="urlParams"
           parameter-type="path"
           title=""
-          add-button-text="添加URL参数"
-          key-placeholder="参数名（如：id）"
-          value-placeholder="参数值"
+          add-button-text="Add toURLparameter"
+          key-placeholder="Parameter name（like：id）"
+          value-placeholder="Parameter value"
           :max-parameters="1"
           :current-api-info="selectedApiInfo"
           :current-component-id="componentId"
           @update:model-value="onUrlParamsUpdate"
         />
         <n-text v-if="urlParams.length === 0" depth="3" style="font-size: 12px; margin-top: 8px">
-          💡 提示：配置参数值后将自动替换到上方地址的占位符中
+          💡 hint：After configuring the parameter value, it will be automatically replaced in the placeholder of the address above.
         </n-text>
         <n-text v-else-if="urlParams.length > 0" depth="3" style="font-size: 12px; margin-top: 8px">
-          ✅ 参数已配置，地址中的 {{ '{' + urlParams[0].key + '}' }} 将被替换为 "{{ urlParams[0].value }}"
+          ✅ Parameters configured，in address {{ '{' + urlParams[0].key + '}' }} will be replaced by "{{ urlParams[0].value }}"
         </n-text>
       </n-form-item>
 
-      <n-form-item label="请求方法" required>
+      <n-form-item label="Request method" required>
         <n-select
           :value="modelValue.method"
           :options="httpMethods"
@@ -552,7 +552,7 @@ onMounted(() => {
         />
       </n-form-item>
 
-      <n-form-item label="超时时间 (ms)">
+      <n-form-item label="timeout (ms)">
         <n-input-number
           :value="modelValue.timeout"
           :min="1000"
@@ -562,7 +562,7 @@ onMounted(() => {
         />
       </n-form-item>
 
-      <n-form-item v-if="showBody" label="请求体">
+      <n-form-item v-if="showBody" label="Request body">
         <n-input
           :value="modelValue.body"
           type="textarea"
@@ -582,7 +582,7 @@ onMounted(() => {
   padding: 12px;
 }
 
-/* 地址显示区域样式 */
+/* Address display area style */
 .http-config-step1 :deep(.n-input--readonly) {
   background-color: var(--code-color);
   border: 1px solid var(--border-color);

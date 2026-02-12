@@ -1,7 +1,7 @@
 <!--
-  Grid Layout Plus 包装组件
-  基于 grid-layout-plus 的企业级网格布局组件
-  重构版本：模块化架构，提升可维护性和性能
+  Grid Layout Plus Packaging components
+  based on grid-layout-plus Enterprise Grid Layout Component
+  Refactored version：Modular architecture，Improve maintainability and performance
 -->
 <template>
   <div
@@ -12,7 +12,7 @@
       'show-grid': showGrid && !readonly
     }"
   >
-    <!-- 网格核心组件 -->
+    <!-- Grid Core Components -->
     <GridCore
       ref="gridCoreRef"
       :layout="normalizedLayout"
@@ -35,12 +35,12 @@
     >
       <template #default="{ item }">
         <slot :item="item">
-          <!-- 默认内容会由 GridItemContent 处理 -->
+          <!-- The default content will be GridItemContent deal with -->
         </slot>
       </template>
     </GridCore>
 
-    <!-- 拖拽区域组件 -->
+    <!-- Drag area component -->
     <GridDropZone
       :readonly="readonly"
       :show-drop-zone="showDropZone"
@@ -54,8 +54,8 @@
 
 <script setup lang="ts">
 /**
- * Grid Layout Plus 主组件 - 重构版本
- * 采用模块化架构，提升可维护性和性能
+ * Grid Layout Plus main component - Refactored version
+ * Adopt modular architecture，Improve maintainability and performance
  */
 
 import { ref, computed } from 'vue'
@@ -72,9 +72,9 @@ import { validateExtendedGridConfig, validateLargeGridPerformance, optimizeItemF
 
 // Props
 interface Props extends GridLayoutPlusProps {
-  /** 网格尺寸预设 */
+  /** Grid size presets */
   gridSize?: 'mini' | 'standard' | 'large' | 'mega' | 'extended' | 'custom'
-  /** 自定义列数（当 gridSize 为 'custom' 时使用） */
+  /** Custom number of columns（when gridSize for 'custom' used when） */
   customColumns?: number
 }
 
@@ -83,11 +83,11 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
   showGrid: true,
   showDropZone: false,
-  showTitle: false, // 默认不显示标题
+  showTitle: false, // Title is not displayed by default
   config: () => ({}),
-  gridSize: 'standard', // 默认使用标准网格 (24列)
+  gridSize: 'standard', // Use standard grid by default (24List)
   customColumns: 50,
-  /** 唯一键字段名，默认使用 'i'。允许外部数据结构重命名主键（如 'id'） */
+  /** Unique key field name，Used by default 'i'。Allow external data structures to rename primary keys（like 'id'） */
   idKey: 'i'
 })
 
@@ -99,17 +99,17 @@ const emit = defineEmits<Emits>()
 // Store
 const themeStore = useThemeStore()
 
-// 组件引用
+// component reference
 const gridCoreRef = ref<InstanceType<typeof GridCore> | null>(null)
 
-// 计算属性：根据 idKey 规范化布局，确保每个项都有 item.i
+// Computed properties：according to idKey Standardized layout，Make sure each item has item.i
 const normalizedLayout = computed<GridLayoutPlusItem[]>(() => {
   const key = props.idKey || 'i'
   return (props.layout || []).map(item => {
-    // 如果外部使用了自定义键名（如 'id'），则将其映射到内部字段 i
+    // like果外部使用了自定义键名（like 'id'），then map it to an internal field i
     const currentId = (item as any)[key] ?? (item as any).i
     const withI: GridLayoutPlusItem = { ...item, i: currentId as string }
-    // 同步写回自定义键，保证双字段一致（不改变原始协议，只补充字段）
+    // Synchronously write back custom keys，Ensure double fields are consistent（Do not change the original agreement，Only add fields）
     if (key !== 'i') {
       ;(withI as any)[key] = withI.i
     }
@@ -121,7 +121,7 @@ const normalizedLayout = computed<GridLayoutPlusItem[]>(() => {
 const isDarkTheme = computed(() => themeStore.darkMode)
 
 const config = computed<GridLayoutPlusConfig>(() => {
-  // 根据 gridSize 选择基础配置
+  // according to gridSize Select basic configuration
   let baseConfig: GridLayoutPlusConfig
 
   switch (props.gridSize) {
@@ -162,24 +162,24 @@ const config = computed<GridLayoutPlusConfig>(() => {
       baseConfig = { ...DEFAULT_GRID_LAYOUT_PLUS_CONFIG }
   }
 
-  // 合并用户自定义配置
+  // Merge user-defined configuration
   return {
     ...baseConfig,
     ...props.config
   }
 })
 
-// 网格验证和性能监控
+// Grid validation and performance monitoring
 const gridValidation = computed(() => {
   const colNum = config.value.colNum
 
-  // 验证扩展网格配置
+  // Verify extended grid configuration
   const configValidation = validateExtendedGridConfig(colNum)
   if (!configValidation.success) {
     console.error('Grid configuration validation failed:', configValidation.message)
   }
 
-  // 大网格性能验证
+  // Large grid performance verification
   const performanceCheck = validateLargeGridPerformance(props.layout, colNum)
   if (performanceCheck.success && (performanceCheck.data?.warning || performanceCheck.data?.recommendation)) {
     console.error('Grid performance warning:', performanceCheck.data.warning)
@@ -193,13 +193,13 @@ const gridValidation = computed(() => {
   }
 })
 
-// 业务方法
+// business methods
 const handleItemEdit = (item: GridLayoutPlusItem) => {
   emit('item-edit', withIdKey([item])[0])
 }
 
 const handleItemDelete = (item: GridLayoutPlusItem) => {
-  // 通过 GridCore 组件处理删除逻辑
+  // pass GridCore Component handles deletion logic
   const coreLayout = gridCoreRef.value?.internalLayout
   if (coreLayout) {
     const index = coreLayout.findIndex(i => i.i === item.i)
@@ -211,7 +211,7 @@ const handleItemDelete = (item: GridLayoutPlusItem) => {
 }
 
 const handleItemDataUpdate = (itemId: string, data: any) => {
-  // 通过 GridCore 组件处理数据更新
+  // pass GridCore Component handles data updates
   const coreLayout = gridCoreRef.value?.internalLayout
   if (coreLayout) {
     const item = coreLayout.find(i => i.i === itemId)
@@ -222,9 +222,9 @@ const handleItemDataUpdate = (itemId: string, data: any) => {
   }
 }
 
-// Grid Layout Plus 事件处理
+// Grid Layout Plus event handling
 const handleLayoutCreated = (newLayout: GridLayoutPlusItem[]) => {
-  // 统一对外布局协议：补齐 idKey 别名字段
+  // Unified external layout agreement：complete idKey Alias ​​field
   emit('layout-created', withIdKey(newLayout))
 }
 
@@ -241,7 +241,7 @@ const handleLayoutUpdated = (newLayout: GridLayoutPlusItem[]) => {
 }
 
 const withIdKey = (items: GridLayoutPlusItem[]): GridLayoutPlusItem[] => {
-  // 在对外派发布局相关事件前，补充 idKey 字段，保证任意主键协议兼容
+  // Before announcing bureau-related events abroad，Replenish idKey Field，Guaranteed compatibility with any primary key protocol
   const key = props.idKey || 'i'
   if (key === 'i') return items
   return items.map(it => ({ ...(it as any), [key]: it.i })) as GridLayoutPlusItem[]
@@ -252,7 +252,7 @@ const handleLayoutReady = (newLayout: GridLayoutPlusItem[]) => {
 }
 
 const handleLayoutChange = (newLayout: GridLayoutPlusItem[]) => {
-  // 由 GridCore 组件处理布局变化，主组件只负责转发事件
+  // Depend on GridCore Component handles layout changes，The main component is only responsible for forwarding events
   const patched = withIdKey(newLayout)
   emit('layout-change', patched)
   emit('update:layout', patched)
@@ -286,7 +286,7 @@ const handleItemContainerResized = (i: string, newH: number, newW: number, newHP
   emit('item-container-resized', i, newH, newW, newHPx, newWPx)
 }
 
-// 拖拽事件处理 - 委托给 GridDropZone 组件
+// Drag event handling - entrusted to GridDropZone components
 const handleDragEnter = (e: DragEvent) => {
   emit('drag-enter', e)
 }
@@ -307,7 +307,7 @@ const handleDrop = (e: DragEvent) => {
   emit('drop', e)
 }
 
-// API 方法 - 通过 GridCore 组件实现
+// API method - pass GridCore Component implementation
 const addItem = (type: string, options?: Partial<GridLayoutPlusItem>) => {
   const coreLayout = gridCoreRef.value?.internalLayout
   if (!coreLayout) return null
@@ -322,13 +322,13 @@ const addItem = (type: string, options?: Partial<GridLayoutPlusItem>) => {
     ...options
   }
 
-  // 若外部定义了自定义键名，则写回该字段，保证双字段一致
+  // If a custom key name is defined externally，then write back this field，Ensure double fields are consistent
   const key = props.idKey || 'i'
   if (key !== 'i') {
     ;(newItem as any)[key] = newItem.i
   }
 
-  // 寻找合适的位置
+  // Find the right location
   const position = findAvailablePosition(newItem.w, newItem.h)
   newItem.x = position.x
   newItem.y = position.y
@@ -381,7 +381,7 @@ const getAllItems = () => {
   return gridCoreRef.value?.internalLayout ? [...gridCoreRef.value.internalLayout] : []
 }
 
-// 工具函数
+// Utility function
 const generateId = (): string => {
   return `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
@@ -390,12 +390,12 @@ const findAvailablePosition = (w: number, h: number): { x: number; y: number } =
   const colNum = config.value.colNum
   const layout = gridCoreRef.value?.internalLayout || []
 
-  // 简化的位置查找算法
+  // Simplified location finding algorithm
   for (let y = 0; y < 100; y++) {
     for (let x = 0; x <= colNum - w; x++) {
       const proposed = { x, y, w, h }
 
-      // 检查是否与现有项目冲突
+      // Check for conflicts with existing projects
       const hasCollision = layout.some(item => {
         return !(
           proposed.x + proposed.w <= item.x ||
@@ -414,15 +414,15 @@ const findAvailablePosition = (w: number, h: number): { x: number; y: number } =
   return { x: 0, y: 0 }
 }
 
-// 🔥 新增：网格优化方法
+// 🔥 New：Grid Optimization Method
 const optimizeLayoutForGridSize = (targetCols?: number, sourceCols?: number) => {
   const coreLayout = gridCoreRef.value?.internalLayout
   if (!coreLayout) return
 
   const targetColumns = targetCols || config.value.colNum
-  const sourceColumns = sourceCols || 12 // 默认从12列优化
+  const sourceColumns = sourceCols || 12 // Default from12column optimization
 
-  // 优化每个网格项
+  // Optimize every grid item
   coreLayout.forEach(item => {
     const optimized = optimizeItemForLargeGrid(item, targetColumns, sourceColumns)
     Object.assign(item, optimized)
@@ -432,9 +432,9 @@ const optimizeLayoutForGridSize = (targetCols?: number, sourceCols?: number) => 
   emit('update:layout', withIdKey([...coreLayout]))
 }
 
-// 布局数据监听已移至 GridCore 组件处理
+// Layout data listeners have been moved to GridCore Component handling
 
-// 暴露 API 方法给父组件
+// exposed API Method to parent component
 defineExpose({
   addItem,
   removeItem,
@@ -443,7 +443,7 @@ defineExpose({
   getItem,
   getAllItems,
   getLayout: () => gridCoreRef.value?.internalLayout || [],
-  // 🔥 新增：网格扩展相关API
+  // 🔥 New：Grid expansion relatedAPI
   getGridInfo: () => ({
     colNum: config.value.colNum,
     gridSize: props.gridSize,
@@ -451,7 +451,7 @@ defineExpose({
   }),
   optimizeLayoutForGridSize,
   getGridValidation: () => gridValidation.value,
-  // 暴露子组件引用以便高级操作
+  // Expose subcomponent references for advanced manipulation
   gridCore: gridCoreRef
 })
 </script>
@@ -460,37 +460,37 @@ defineExpose({
 .grid-layout-plus-wrapper {
   position: relative;
   width: 100%;
-  height: 100%; /* 🔧 恢复高度100%以支持栅格容器中的高度自适应 */
+  height: 100%; /* 🔧 restore altitude100%To support adaptive height in grid containers */
 }
 
-/* 网格项内容 */
+/* Grid item content */
 .grid-item-content {
   height: 100%;
-  /* 🔧 移除默认样式，避免与NodeWrapper base配置冲突 */
+  /* 🔧 Remove default style，avoid withNodeWrapper baseConfiguration conflict */
   background: transparent;
   border: none;
   border-radius: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* 🔧 移除默认阴影和过渡，由内部组件控制 */
+  /* 🔧 Remove default shadows and transitions，controlled by internal components */
   transition: none;
 }
 
 .dark-theme .grid-item-content {
-  /* 🔧 移除暗主题默认样式，避免与NodeWrapper配置冲突 */
+  /* 🔧 Remove dark theme default style，avoid withNodeWrapperConfiguration conflict */
   background: transparent;
   border-color: transparent;
   color: inherit;
 }
 
 .grid-item-content:hover {
-  /* 🔧 移除hover效果，避免与NodeWrapper配置冲突 */
+  /* 🔧 RemovehoverEffect，avoid withNodeWrapperConfiguration conflict */
   /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); */
   /* transform: translateY(-1px); */
 }
 
-/* 项目头部 */
+/* Project header */
 .grid-item-header {
   display: flex;
   justify-content: space-between;
@@ -548,14 +548,14 @@ defineExpose({
   color: white;
 }
 
-/* 项目内容 */
+/* Project content */
 .grid-item-body {
   flex: 1;
-  padding: 0; /* 🔧 移除默认内边距，由内部组件控制 */
-  overflow: visible; /* 移除 overflow: auto，让内容自然溢出 */
-  /* 🔧 移除默认背景，避免与NodeWrapper配置冲突 */
+  padding: 0; /* 🔧 Remove default padding，controlled by internal components */
+  overflow: visible; /* Remove overflow: auto，Let content overflow naturally */
+  /* 🔧 Remove default background，avoid withNodeWrapperConfiguration conflict */
   background: transparent;
-  /* 🔧 确保内部组件样式能够正常显示 */
+  /* 🔧 Ensure that internal component styles can be displayed properly */
   border: none;
   border-radius: inherit;
 }
@@ -581,7 +581,7 @@ defineExpose({
   opacity: 0.7;
 }
 
-/* 拖拽区域 */
+/* drag area */
 .drop-zone {
   position: absolute;
   top: 0;
@@ -631,7 +631,7 @@ defineExpose({
   color: #4dabf7;
 }
 
-/* 只读模式 */
+/* read-only mode */
 .readonly .grid-item-header {
   display: none;
 }
@@ -640,7 +640,7 @@ defineExpose({
   padding: 0;
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 768px) {
   .grid-item-header {
     padding: 6px 8px;

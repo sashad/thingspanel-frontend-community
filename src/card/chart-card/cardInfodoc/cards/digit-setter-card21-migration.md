@@ -1,49 +1,49 @@
-# Digit Setter 组件 Card 2.1 迁移配置文档
+# Digit Setter components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-Digit Setter 组件是一个数值控制器卡片，提供滑块控制功能。用户可以通过滑块调整设备的数值参数，支持属性和遥测数据的读取与设置。
+Digit Setter The component is a numerical controller card，Provides slider control function。Users can adjust the numerical parameters of the device through sliders，Supports reading and setting properties and telemetry data。
 
-## 当前实现分析
+## Current implementation analysis
 
-### 组件配置 (index.ts)
-- **组件ID**: `chart-digitsetter`
-- **组件类型**: `chart`
-- **标题**: `$t('card.numControl')` (数值控制)
-- **数据源**: 设备来源，支持1个数据源
-- **默认布局**: 2x2 (最小1x1)
+### Component configuration (index.ts)
+- **componentsID**: `chart-digitsetter`
+- **Component type**: `chart`
+- **title**: `$t('card.numControl')` (numerical control)
+- **data source**: Equipment source，support1data sources
+- **default layout**: 2x2 (smallest1x1)
 
-### 组件实现 (component.vue)
-- **数据获取**: 支持从设备属性或遥测数据中获取当前值
-- **数值控制**: 通过滑块组件调整数值，支持 API 发布
-- **配置选项**: 支持最小值、最大值、步长、小数位数配置
-- **单位显示**: 自动获取并显示数据单位
-- **响应式**: 使用 ResizeObserver 动态调整字体大小
-- **实时更新**: 支持 WebSocket 数据更新
+### Component implementation (component.vue)
+- **data acquisition**: Supports getting current value from device properties or telemetry data
+- **numerical control**: Adjust the value via the slider component，support API release
+- **Configuration options**: Support minimum value、maximum value、step size、Decimal digit configuration
+- **unit display**: Automatically obtain and display data units
+- **Responsive**: use ResizeObserver Dynamically adjust font size
+- **real time updates**: support WebSocket Data update
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 组件定义
+### Component definition
 ```typescript
 export const digitSetterCard: CardDefinition = {
   id: 'digit-setter',
-  name: '数值设置器',
+  name: 'value setter',
   category: 'control',
-  description: '数值控制器，支持滑块调整设备参数值',
+  description: 'numerical controller，Support slider to adjust device parameter values',
   version: '2.1.0',
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     required: true,
     maxSources: 1,
     supportedMetrics: ['attributes', 'telemetry'],
-    description: '设备属性或遥测数据源',
+    description: 'Device properties or telemetry data source',
     capabilities: ['read', 'write'],
     dataTypes: ['number']
   },
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 2, height: 2 },
     minSize: { width: 1, height: 1 },
@@ -51,20 +51,20 @@ export const digitSetterCard: CardDefinition = {
     resizable: true
   },
   
-  // 配置选项
+  // Configuration options
   configSchema: {
     min: {
       type: 'number',
       default: 0,
-      title: '最小值',
-      description: '滑块的最小值',
+      title: 'minimum value',
+      description: 'slider minimum value',
       required: true
     },
     max: {
       type: 'number',
       default: 100,
-      title: '最大值',
-      description: '滑块的最大值',
+      title: 'maximum value',
+      description: 'The maximum value of the slider',
       required: true,
       validation: {
         min: 'min'
@@ -73,22 +73,22 @@ export const digitSetterCard: CardDefinition = {
     step: {
       type: 'number',
       default: 0.1,
-      title: '步长',
-      description: '滑块调整的步长',
+      title: 'step size',
+      description: 'The step size of the slider adjustment',
       min: 0.001,
       max: 100
     },
     decimals: {
       type: 'integer',
       default: 1,
-      title: '小数位数',
-      description: '显示的小数位数',
+      title: 'Decimal places',
+      description: 'Number of decimal places to display',
       min: 0,
       max: 6
     }
   },
   
-  // 权限要求
+  // Permission requirements
   permissions: {
     read: true,
     write: true,
@@ -97,9 +97,9 @@ export const digitSetterCard: CardDefinition = {
 }
 ```
 
-### 数据源映射
+### Data source mapping
 ```typescript
-// 原始数据源结构
+// Original data source structure
 interface OriginalDataSource {
   deviceSource: [{
     deviceId: string;
@@ -110,7 +110,7 @@ interface OriginalDataSource {
   }];
 }
 
-// Card 2.1 数据源结构
+// Card 2.1 Data source structure
 interface Card21DataSource {
   device: {
     id: string;
@@ -129,7 +129,7 @@ interface Card21DataSource {
   };
 }
 
-// 映射函数
+// mapping function
 function mapDataSource(original: OriginalDataSource): Card21DataSource {
   const deviceSource = original.deviceSource[0];
   return {
@@ -147,99 +147,99 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
 }
 ```
 
-### 实现要点
+### Implementation points
 
-1. **数值控制逻辑**
-   - 支持滑块实时调整数值
-   - 配置最小值、最大值、步长
-   - 支持小数位数控制
+1. **Numerical control logic**
+   - Support slider to adjust value in real time
+   - Configure minimum value、maximum value、step size
+   - Support decimal place control
 
-2. **数据获取与发布**
-   - 属性数据：getAttributeDataSet / attributeDataPub
-   - 遥测数据：telemetryDataCurrentKeys / telemetryDataPub
-   - 自动获取数据单位信息
+2. **Data acquisition and release**
+   - attribute data：getAttributeDataSet / attributeDataPub
+   - telemetry data：telemetryDataCurrentKeys / telemetryDataPub
+   - Automatically obtain data unit information
 
-3. **用户界面**
-   - 数值显示：当前值 + 单位
-   - 滑块控制：NSlider 组件
-   - 指标名称：显示数据源名称
+3. **user interface**
+   - Numerical display：current value + unit
+   - Slider control：NSlider components
+   - Indicator name：Show data source name
 
-4. **响应式设计**
-   - 使用 ResizeObserver 监听容器大小
-   - 动态调整字体大小
-   - 保持良好的视觉比例
+4. **Responsive design**
+   - use ResizeObserver Listening container size
+   - Dynamically adjust font size
+   - Maintain good visual proportions
 
-5. **数据验证**
-   - 配置变化时验证数值范围
-   - 确保数值在有效范围内
-   - 支持实时数据更新
+5. **Data validation**
+   - Validate value range when configuration changes
+   - Make sure the value is within the valid range
+   - Support real-time data updates
 
-## 迁移检查清单
+## Migration checklist
 
-- [ ] 验证数据源映射正确性
-- [ ] 确认数值控制逻辑
-- [ ] 测试滑块功能
-- [ ] 验证配置选项
-- [ ] 检查权限控制
-- [ ] 测试单位显示
-- [ ] 验证响应式布局
-- [ ] 测试实时数据更新
-- [ ] 确认数值验证机制
+- [ ] Verify data source mapping correctness
+- [ ] Confirm numerical control logic
+- [ ] Test slider functionality
+- [ ] Verify configuration options
+- [ ] Check access control
+- [ ] Test unit display
+- [ ] Validate responsive layout
+- [ ] Test real-time data updates
+- [ ] Confirm numerical verification mechanism
 
-## 迁移步骤
+## Migration steps
 
-1. **创建 Card 2.1 组件定义**
-   - 定义组件元数据和配置架构
-   - 设置数据源要求和权限控制
-   - 配置布局约束和数值验证
+1. **create Card 2.1 Component definition**
+   - Define component metadata and configuration schema
+   - Set data source requirements and permission controls
+   - Configure layout constraints and numerical validation
 
-2. **实现数据源适配器**
-   - 创建数据源映射函数
-   - 处理数值类型验证
-   - 适配单位信息获取
+2. **Implement data source adapter**
+   - Create data source mapping function
+   - Handling numeric type validation
+   - Acquisition of adaptation unit information
 
-3. **迁移控制逻辑**
-   - 保持滑块控制逻辑
-   - 适配新的数据发布接口
-   - 维护数值范围验证
+3. **Migration control logic**
+   - Keep slider control logic
+   - Adapt to new data publishing interface
+   - Maintain value range validation
 
-4. **更新配置表单**
-   - 适配 Card 2.1 配置架构
-   - 添加数值范围验证
-   - 优化配置界面
+4. **Update configuration form**
+   - adaptation Card 2.1 Configuration architecture
+   - Add numeric range validation
+   - Optimize configuration interface
 
-5. **增强用户体验**
-   - 改进数值显示格式
-   - 优化滑块交互体验
-   - 添加操作反馈
+5. **Enhance user experience**
+   - Improve numerical display format
+   - Optimize slider interaction experience
+   - Add action feedback
 
-6. **测试验证**
-   - 功能测试：数值控制、滑块操作
-   - 配置测试：范围设置、步长调整
-   - 权限测试：读写权限验证
-   - 兼容性测试：不同设备类型
-   - 性能测试：响应式调整、数据更新
+6. **Test verification**
+   - Functional testing：numerical control、Slider operation
+   - Configuration test：Scope setting、step size adjustment
+   - Permission test：Read and write permission verification
+   - Compatibility testing：Different device types
+   - Performance testing：Responsive adjustments、Data update
 
-## 配置验证规则
+## Configure validation rules
 
-1. **数值范围验证**
-   - 最大值必须大于最小值
-   - 步长必须为正数且合理
-   - 小数位数在有效范围内
+1. **Numeric range validation**
+   - The maximum value must be greater than the minimum value
+   - Step size must be positive and reasonable
+   - The number of decimal places is within the valid range
 
-2. **数据类型验证**
-   - 确保数据源为数值类型
-   - 验证当前值在配置范围内
-   - 检查单位信息有效性
+2. **Data type validation**
+   - Make sure the data source is of numeric type
+   - Verify that the current value is within the configured range
+   - Check the validity of unit information
 
-3. **权限验证**
-   - 验证用户控制权限
-   - 检查设备写入权限
-   - 确认操作安全性
+3. **Permission verification**
+   - Verify user control permissions
+   - Check device write permissions
+   - Confirm operational safety
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture/card21-architecture.md)
-- [数据源映射指南](../guides/data-source-mapping.md)
-- [数值控制安全指南](../guides/numeric-control-security.md)
-- [配置验证规范](../guides/config-validation.md)
+- [Card 2.1 Architecture documentation](../architecture/card21-architecture.md)
+- [Data Source Mapping Guide](../guides/data-source-mapping.md)
+- [Numerical Control Safety Guide](../guides/numeric-control-security.md)
+- [Configuration verification specifications](../guides/config-validation.md)

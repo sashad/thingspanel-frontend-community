@@ -1,12 +1,12 @@
 /**
- * Grid 性能优化工具函数
- * 专门处理防抖、节流、虚拟化等性能相关功能
+ * Grid Performance optimization tool functions
+ * Specialized in image stabilization、Throttle、Performance-related features such as virtualization
  */
 
 import type { GridLayoutPlusItem, PerformanceConfig } from '../gridLayoutPlusTypes'
 
 /**
- * 防抖函数
+ * Anti-shake function
  */
 export function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout | null = null
@@ -24,7 +24,7 @@ export function debounce<T extends (...args: any[]) => any>(func: T, delay: numb
 }
 
 /**
- * 节流函数
+ * Throttle function
  */
 export function throttle<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
   let lastTime = 0
@@ -50,7 +50,7 @@ export function throttle<T extends (...args: any[]) => any>(func: T, delay: numb
 }
 
 /**
- * 性能优化的布局处理
+ * Performance-optimized layout handling
  */
 export function optimizeLayoutPerformance(
   layout: GridLayoutPlusItem[],
@@ -59,7 +59,7 @@ export function optimizeLayoutPerformance(
   try {
     let optimizedLayout = [...layout]
 
-    // 懒加载处理
+    // Lazy loading processing
     if (config.enableLazyLoading) {
       optimizedLayout = applyLazyLoading(optimizedLayout, config)
     }
@@ -74,13 +74,13 @@ export function optimizeLayoutPerformance(
 
 
 /**
- * 应用懒加载
+ * Application lazy loading
  */
 function applyLazyLoading(layout: GridLayoutPlusItem[], config: PerformanceConfig): GridLayoutPlusItem[] {
   try {
     const buffer = config.lazyLoadingBuffer || 5
 
-    // 标记需要懒加载的项目
+    // Mark items that require lazy loading
     return layout.map((item, index) => ({
       ...item,
       metadata: {
@@ -96,14 +96,14 @@ function applyLazyLoading(layout: GridLayoutPlusItem[], config: PerformanceConfi
 }
 
 /**
- * 性能监控器
+ * performance monitor
  */
 export class PerformanceMonitor {
   private metrics: Map<string, number[]> = new Map()
   private isEnabled = true
 
   /**
-   * 开始监控操作
+   * Start monitoring operation
    */
   start(operation: string): string {
     if (!this.isEnabled) return ''
@@ -115,7 +115,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * 结束监控并记录
+   * End monitoring and record
    */
   end(id: string, operation: string): number | null {
     if (!this.isEnabled || !id) return null
@@ -128,19 +128,19 @@ export class PerformanceMonitor {
       if (measures.length > 0) {
         const duration = measures[0].duration
 
-        // 记录到指标中
+        // recorded in the indicator
         if (!this.metrics.has(operation)) {
           this.metrics.set(operation, [])
         }
         const operationMetrics = this.metrics.get(operation)!
         operationMetrics.push(duration)
 
-        // 限制记录数量
+        // Limit the number of records
         if (operationMetrics.length > 100) {
           operationMetrics.shift()
         }
 
-        // 清理性能条目
+        // Clean up performance entries
         performance.clearMarks(`${id}_start`)
         performance.clearMarks(`${id}_end`)
         performance.clearMeasures(id)
@@ -155,7 +155,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * 获取操作的统计信息
+   * Get statistics for an operation
    */
   getStats(operation: string): {
     count: number
@@ -178,7 +178,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * 获取所有统计信息
+   * Get all statistics
    */
   getAllStats(): Record<string, ReturnType<PerformanceMonitor['getStats']>> {
     const stats: Record<string, ReturnType<PerformanceMonitor['getStats']>> = {}
@@ -191,7 +191,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * 清理监控数据
+   * Clean monitoring data
    */
   clear(operation?: string): void {
     if (operation) {
@@ -202,7 +202,7 @@ export class PerformanceMonitor {
   }
 
   /**
-   * 启用/禁用监控
+   * enable/Disable monitoring
    */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled
@@ -210,12 +210,12 @@ export class PerformanceMonitor {
 }
 
 /**
- * 全局性能监控实例
+ * Global performance monitoring example
  */
 export const performanceMonitor = new PerformanceMonitor()
 
 /**
- * 内存使用监控
+ * Memory usage monitoring
  */
 export function getMemoryUsage(): {
   used: number
@@ -223,7 +223,7 @@ export function getMemoryUsage(): {
   percentage: number
 } | null {
   try {
-    // 现代浏览器的内存API
+    // Modern browser memoryAPI
     if ('memory' in performance) {
       const memory = (performance as any).memory
       return {
@@ -240,42 +240,42 @@ export function getMemoryUsage(): {
 }
 
 /**
- * 缓存管理器
+ * cache manager
  */
 export class CacheManager<K, V> {
   private cache = new Map<K, { value: V; timestamp: number; hits: number }>()
   private maxSize: number
-  private ttl: number // 生存时间(ms)
+  private ttl: number // survival time(ms)
 
   constructor(maxSize = 100, ttl = 5 * 60 * 1000) {
-    // 默认5分钟
+    // default5minute
     this.maxSize = maxSize
     this.ttl = ttl
   }
 
   /**
-   * 获取缓存值
+   * Get cached value
    */
   get(key: K): V | null {
     const item = this.cache.get(key)
     if (!item) return null
 
-    // 检查是否过期
+    // Check if expired
     if (Date.now() - item.timestamp > this.ttl) {
       this.cache.delete(key)
       return null
     }
 
-    // 更新访问计数
+    // Update access count
     item.hits++
     return item.value
   }
 
   /**
-   * 设置缓存值
+   * Set cache value
    */
   set(key: K, value: V): void {
-    // 如果缓存已满，移除最少使用的项
+    // if cache is full，Remove least used items
     if (this.cache.size >= this.maxSize) {
       this.evictLeastUsed()
     }
@@ -288,21 +288,21 @@ export class CacheManager<K, V> {
   }
 
   /**
-   * 删除缓存项
+   * Delete cached items
    */
   delete(key: K): boolean {
     return this.cache.delete(key)
   }
 
   /**
-   * 清空缓存
+   * Clear cache
    */
   clear(): void {
     this.cache.clear()
   }
 
   /**
-   * 获取缓存统计
+   * Get cache statistics
    */
   getStats(): {
     size: number
@@ -327,7 +327,7 @@ export class CacheManager<K, V> {
   }
 
   /**
-   * 移除最少使用的项
+   * Remove least used items
    */
   private evictLeastUsed(): void {
     let leastUsedKey: K | null = null
@@ -349,7 +349,7 @@ export class CacheManager<K, V> {
 }
 
 /**
- * 异步队列处理器
+ * asynchronous queue handler
  */
 export class AsyncQueue<T> {
   private queue: Array<() => Promise<T>> = []
@@ -361,7 +361,7 @@ export class AsyncQueue<T> {
   }
 
   /**
-   * 添加任务到队列
+   * Add task to queue
    */
   add<R>(task: () => Promise<R>): Promise<R> {
     return new Promise((resolve, reject) => {
@@ -381,7 +381,7 @@ export class AsyncQueue<T> {
   }
 
   /**
-   * 处理队列
+   * processing queue
    */
   private async process(): Promise<void> {
     if (this.running) return
@@ -399,14 +399,14 @@ export class AsyncQueue<T> {
   }
 
   /**
-   * 清空队列
+   * Clear the queue
    */
   clear(): void {
     this.queue = []
   }
 
   /**
-   * 获取队列长度
+   * Get queue length
    */
   size(): number {
     return this.queue.length

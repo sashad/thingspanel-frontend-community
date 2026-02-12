@@ -1,38 +1,38 @@
 /**
- * Card2.1 Core2 核心功能导出
- * 简化架构，专注于5个核心功能
+ * Card2.1 Core2 Core function export
+ * Simplify the architecture，focus on5core functions
  */
 
-// ============ 类型导出 ============
+// ============ Type export ============
 export * from './types'
 
-// ============ 注册系统导出 ============
+// ============ Registration system export ============
 export * from './registry'
 
-// ============ 数据源系统导出 ============
+// ============ Data source system export ============
 export * from './data-source'
 
-// ============ 属性系统导出 ============
+// ============ Attribute system export ============
 export * from './property'
 
-// ============ 表单系统导出 ============
+// ============ Form system export ============
 export * from './form'
 
-// ============ 交互系统导出 ============
+// ============ Interactive system export ============
 export * from './interaction'
 
-// ============ 工具函数导出 ============
+// ============ Tool function export ============
 export * from './utils'
 
-// ============ 向后兼容系统导出 ============
+// ============ Backwards compatible system export ============
 export * from './compatibility'
 
-// ============ 系统状态和验证 ============
+// ============ System status and verification ============
 
 import { componentRegistry } from './registry'
 
 /**
- * 获取系统状态
+ * Get system status
  */
 export function getCard2CoreStatus(): {
   isInitialized: boolean
@@ -49,7 +49,7 @@ export function getCard2CoreStatus(): {
 }
 
 /**
- * 验证系统完整性
+ * Verify system integrity
  */
 export function validateCard2Core(): {
   isValid: boolean
@@ -59,23 +59,23 @@ export function validateCard2Core(): {
   const errors: string[] = []
   const warnings: string[] = []
 
-  // 检查组件注册情况
+  // Check component registration status
   const stats = componentRegistry.getStats()
   if (stats.totalComponents === 0) {
-    errors.push('没有注册任何组件')
+    errors.push('No components are registered')
   }
 
-  // 检查必要组件
+  // Check necessary components
   const requiredComponents = ['dual-data-display', 'triple-data-display']
   requiredComponents.forEach(componentType => {
     if (!componentRegistry.has(componentType)) {
-      errors.push(`缺少必要组件: ${componentType}`)
+      errors.push(`Missing required components: ${componentType}`)
     }
   })
 
-  // 检查多数据源组件
+  // Check out the multiple data source components
   if (stats.multiDataSourceComponents === 0) {
-    warnings.push('没有多数据源组件')
+    warnings.push('No multiple data source component')
   }
 
   return {
@@ -85,7 +85,7 @@ export function validateCard2Core(): {
   }
 }
 
-// ============ 调试接口（仅在开发环境中启用） ============
+// ============ Debug interface（Only enabled in development environment） ============
 
 import { LegacyAdapter } from './compatibility'
 
@@ -95,17 +95,17 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     getCard2CoreStatus,
     validateCard2Core,
     triggerDataUpdate: () => {
-      // 这里可以添加实际的数据更新逻辑
+      // Here you can add actual data update logic
     }
   }
 
-  // 全局导出主要函数
+  // Export main functions globally
   window.card2System = {
     getComponentTree: () => componentRegistry.getComponentTree(),
     getComponentRegistry: () => componentRegistry,
     isInitialized: () => componentRegistry.getStats().totalComponents > 0
   }
 
-  // 初始化向后兼容性
+  // Initialize backwards compatibility
   LegacyAdapter.initialize()
 }

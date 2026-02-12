@@ -1,46 +1,46 @@
 <!--
-  组件级别轮询配置组件
-  为整个组件配置统一的轮询策略
+  Component level polling configures components
+  Configure a unified polling strategy for the entire component
 -->
 <script setup lang="ts">
 /**
- * ComponentPollingConfig - 组件级别轮询配置
- * 统一管理组件的轮询配置，执行时会触发组件的所有数据源
+ * ComponentPollingConfig - Component level polling configuration
+ * Polling configuration of unified management components，All data sources of the component will be triggered when executed.
  */
 
 import { reactive, computed, watch, onMounted, ref, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/store/modules/theme'
 
-// 轮询配置接口
+// Polling configuration interface
 interface PollingConfig {
-  /** 是否启用轮询 */
+  /** Whether to enable polling */
   enabled: boolean
-  /** 轮询间隔（毫秒） */
+  /** Polling interval（millisecond） */
   interval: number
-  /** 是否立即执行首次轮询 */
+  /** Whether to perform the first poll immediately */
   immediate: boolean
 }
 
-// Props接口
+// Propsinterface
 interface Props {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件名称 */
+  /** Component name */
   componentName?: string
-  /** 是否为预览模式 - 仅用于UI状态显示 */
+  /** Whether it is preview mode - only forUIstatus display */
   previewMode?: boolean
-  /** 初始轮询配置 */
+  /** Initial polling configuration */
   initialConfig?: PollingConfig | null
 }
 
-// Emits接口
+// Emitsinterface
 interface Emits {
   (e: 'configChange', config: PollingConfig): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  componentName: '组件',
+  componentName: 'components',
   previewMode: false,
   initialConfig: null
 })
@@ -50,49 +50,49 @@ const { t } = useI18n()
 const themeStore = useThemeStore()
 
 /**
- * 防止配置循环更新的标志
+ * Flag to prevent configuration cycle updates
  */
 const isInternalUpdate = ref(false)
 
 /**
- * 本地轮询配置状态
+ * Local polling configuration status
  */
 const pollingConfig = reactive<PollingConfig>({
   enabled: props.initialConfig?.enabled || false,
   interval: props.initialConfig?.interval || 30000,
-  // 🔥 修复：正确处理 immediate 属性的默认值
+  // 🔥 repair：Handle it correctly immediate The default value of the property
   immediate: props.initialConfig?.immediate !== undefined ? props.initialConfig.immediate : true
 })
 
 /**
- * 间隔选项
+ * Interval options
  */
 const intervalOptions = [
-  { label: '5秒', value: 5000 },
-  { label: '10秒', value: 10000 },
-  { label: '30秒', value: 30000 },
-  { label: '1分钟', value: 60000 },
-  { label: '5分钟', value: 300000 },
-  { label: '10分钟', value: 600000 }
+  { label: '5Second', value: 5000 },
+  { label: '10Second', value: 10000 },
+  { label: '30Second', value: 30000 },
+  { label: '1minute', value: 60000 },
+  { label: '5minute', value: 300000 },
+  { label: '10minute', value: 600000 }
 ]
 
 /**
- * 轮询状态显示文本
+ * Poll status display text
  */
 const statusText = computed(() => {
   if (!props.previewMode && pollingConfig.enabled) {
-    return '已配置（预览模式执行）'
+    return 'configured（Preview mode execution）'
   }
 
   if (pollingConfig.enabled) {
-    return '已配置'
+    return 'configured'
   }
 
-  return '未配置'
+  return 'Not configured'
 })
 
 /**
- * 状态显示类型
+ * Status display type
  */
 const statusType = computed(() => {
   if (pollingConfig.enabled) {
@@ -102,41 +102,41 @@ const statusType = computed(() => {
 })
 
 /**
- * 处理配置变化
+ * Handle configuration changes
  */
 const handleConfigChange = () => {
-  // 🔥 防止内部更新时触发事件
+  // 🔥 Prevent events from being triggered during internal updates
   if (isInternalUpdate.value) {
     return
   }
 
-  // 发射配置变化事件，由父组件处理保存
+  // Emit configuration change events，Saved by parent component
   emit('configChange', { ...pollingConfig })
 }
 
 /**
- * 监听配置变化
+ * Listen for configuration changes
  */
 watch(() => pollingConfig.enabled, handleConfigChange)
 watch(() => pollingConfig.interval, handleConfigChange)
 watch(() => pollingConfig.immediate, handleConfigChange)
 
 /**
- * 监听初始配置变化（用于恢复已保存的配置）
+ * Listen for initial configuration changes（Used to restore saved configuration）
  */
 watch(
   () => props.initialConfig,
   newConfig => {
     if (newConfig) {
-      // 🔥 设置内部更新标志，防止触发配置变化事件
+      // 🔥 Set internal update flag，Prevent configuration change events from being triggered
       isInternalUpdate.value = true
 
       pollingConfig.enabled = newConfig.enabled || false
       pollingConfig.interval = newConfig.interval || 30000
-      // 🔥 修复：正确处理 immediate 属性，允许为 false
+      // 🔥 repair：Handle it correctly immediate property，allowed as false
       pollingConfig.immediate = newConfig.immediate !== undefined ? newConfig.immediate : true
 
-      // 🔥 延迟重置标志，确保所有响应式更新完成
+      // 🔥 delayed reset flag，Ensure all responsive updates are completed
       nextTick(() => {
         isInternalUpdate.value = false
       })
@@ -146,17 +146,17 @@ watch(
 )
 
 /**
- * 组件挂载时初始化调试
+ * Initialize debugging when component is mounted
  */
 onMounted(() => {})
 </script>
 
 <template>
   <div class="component-polling-config">
-    <!-- 紧凑的轮询配置行 -->
+    <!-- Compact polling configuration line -->
     <div class="polling-row">
       <div class="polling-left">
-        <n-text class="polling-title">组件轮询配置</n-text>
+        <n-text class="polling-title">Component polling configuration</n-text>
         <n-tag :type="statusType" size="small">
           {{ statusText }}
         </n-tag>
@@ -167,20 +167,20 @@ onMounted(() => {})
       </div>
     </div>
 
-    <!-- 轮询详细配置（折叠显示） -->
+    <!-- Polling detailed configuration（Collapse display） -->
     <div v-if="pollingConfig.enabled" class="polling-details">
       <div class="detail-item">
-        <span class="detail-label">轮询间隔</span>
+        <span class="detail-label">Polling interval</span>
         <n-select v-model:value="pollingConfig.interval" :options="intervalOptions" size="small" style="width: 80px" />
       </div>
 
       <div class="detail-item">
-        <span class="detail-label">立即执行</span>
+        <span class="detail-label">Execute immediately</span>
         <n-switch v-model:value="pollingConfig.immediate" size="small" />
       </div>
 
       <div class="detail-note">
-        <n-text depth="3" size="small">轮询仅在预览模式下执行，将刷新组件的所有数据源</n-text>
+        <n-text depth="3" size="small">Polling is only performed in preview mode，All data sources for the component will be refreshed</n-text>
       </div>
     </div>
   </div>
@@ -195,7 +195,7 @@ onMounted(() => {})
   font-size: 13px;
 }
 
-/* 主要配置行 - 水平布局 */
+/* Main configuration line - horizontal layout */
 .polling-row {
   display: flex;
   align-items: center;
@@ -221,7 +221,7 @@ onMounted(() => {})
   flex-shrink: 0;
 }
 
-/* 详细配置区域 */
+/* Detailed configuration area */
 .polling-details {
   border-top: 1px solid var(--border-color);
   padding: 8px 12px 10px;
@@ -250,7 +250,7 @@ onMounted(() => {})
   margin-top: 2px;
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .component-polling-config {
   background: var(--card-color);
   border-color: var(--border-color);

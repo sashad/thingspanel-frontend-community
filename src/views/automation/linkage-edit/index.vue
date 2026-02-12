@@ -60,9 +60,9 @@ const tabStore = useTabStore()
 const editPremise = ref()
 const editAction = ref()
 const submitData = async () => {
-  // 处理条件的数据保存
+  // Data storage of processing conditions
   configForm.value.trigger_condition_groups = handleIfData()
-  // 处理动作数据保存
+  // Processing action data saving
   configForm.value.actions = handleActionData()
 
   const isTimeRangeError = configForm.value.trigger_condition_groups.some((item: any) => {
@@ -141,16 +141,16 @@ const getSceneAutomationsInfo = async () => {
   if (res.data) {
     automationsInfo.value = res.data
     configForm.value = res.data
-    // 条件数据回显
+    // Conditional data echo
     conditionData.value = echoIfData(automationsInfo.value.trigger_condition_groups)
     if (process.env.NODE_ENV === 'development') {
     }
-    // 动作数据回显
+    // Action data echo
     actionData.value = echoActionData(automationsInfo.value.actions)
   }
 }
 
-// 提交时处理条件数据
+// Process conditional data on submit
 const handleIfData = () => {
   if (!editPremise.value) {
     console.error('EditPremise component ref is not available yet.')
@@ -204,13 +204,13 @@ const handleIfData = () => {
   return ifGroupsData
 }
 
-// 提交时处理动作数据
+// Process action data on submit
 const handleActionData = () => {
   if (!editAction.value) {
     console.error('EditAction component ref is not available yet.')
     return [] // Return empty array if the ref is not ready
   }
-  // 处理动作的数据
+  // Processing action data
   const actionGroupsData = JSON.parse(JSON.stringify(editAction.value.actionGroupsReturn()))
   const actionsData = [] as any
   // eslint-disable-next-line array-callback-return
@@ -218,8 +218,8 @@ const handleActionData = () => {
     if (item.actionType === '1') {
       // eslint-disable-next-line array-callback-return
       item.actionInstructList.map((instructItem: any) => {
-        // 如果是c_telemetry/c_attribute,那么action_value示例格式：{"c_telemetry":2}
-        // 如果是c_command,那么action_value示例格式：{"method":"switch1","params":{"false":0}}
+        // in the case ofc_telemetry/c_attribute,Soaction_valueExample format：{"c_telemetry":2}
+        // in the case ofc_command,Soaction_valueExample format：{"method":"switch1","params":{"false":0}}
         if (
           instructItem.action_param_type === 'c_telemetry' ||
           instructItem.action_param_type === 'c_attribute' ||
@@ -227,13 +227,13 @@ const handleActionData = () => {
         ) {
           instructItem.action_value = instructItem.actionValue
         }
-        // 如果是telemetry/attribute，那么 action_value示例格式：{"humidity":2}
+        // in the case oftelemetry/attribute，So action_valueExample format：{"humidity":2}
         if (instructItem.action_param_type === 'telemetry' || instructItem.action_param_type === 'attributes') {
           const action_value = {}
           action_value[instructItem.action_param] = instructItem.actionValue
           instructItem.action_value = JSON.stringify(action_value)
         }
-        // 如果是command/c_command，那么 action_value示例格式:	{"method":"ReSet","params":{"switch":1,"light":"close"}}
+        // in the case ofcommand/c_command，So action_valueExample format:	{"method":"ReSet","params":{"switch":1,"light":"close"}}
         if (instructItem.action_param_type === 'command') {
           const action_value = {
             method: instructItem.action_param,
@@ -251,7 +251,7 @@ const handleActionData = () => {
   return actionsData
 }
 
-// 回显时处理条件数据
+// Process conditional data when echoing
 const echoIfData = (ifData: any) => {
   // eslint-disable-next-line array-callback-return
   ifData.map((item: any) => {
@@ -307,7 +307,7 @@ const echoIfData = (ifData: any) => {
   return ifData
 }
 
-// 回显时处理条件数据
+// Process conditional data when echoing
 const echoActionData = (actionsData: any) => {
   const actionGroupsData = [] as any
   const actionInstructList = [] as any
@@ -323,12 +323,12 @@ const echoActionData = (actionsData: any) => {
       ) {
         item.actionValue = item.action_value
       }
-      // 如果是telemetry/attribute，那么 action_value示例格式：{"humidity":2}
+      // in the case oftelemetry/attribute，So action_valueExample format：{"humidity":2}
       if (item.action_param_type === 'telemetry' || item.action_param_type === 'attributes') {
         // item.action_value = JSON.stringify(action_value);
         item.actionValue = actionValueObj[item.action_param]
       }
-      // 如果是command/c_command，那么 action_value示例格式:	{"method":"ReSet","params":{"switch":1,"light":"close"}}
+      // in the case ofcommand/c_command，So action_valueExample format:	{"method":"ReSet","params":{"switch":1,"light":"close"}}
       if (item.action_param_type === 'command') {
         item.actionValue = actionValueObj.params
       }

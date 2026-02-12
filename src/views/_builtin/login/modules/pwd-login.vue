@@ -33,7 +33,7 @@ const model: FormModel = reactive({
 })
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
-  // 定义邮箱和手机号的正则表达式
+  // Regular expression to define email address and mobile phone number
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const phoneRegex = /^(\+|\d)\d{5,15}$/
 
@@ -42,18 +42,18 @@ const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
       {
         required: true,
         message: () => $t('form.userName.required'),
-        trigger: ['blur'] // required 规则在 blur 时触发
+        trigger: ['blur'] // required The rules are blur triggered when
       },
       {
         validator: (_rule, value) => {
-          // 仅在有值时校验格式
+          // Only check format if there is a value
           if (value && !emailRegex.test(value) && !phoneRegex.test(value)) {
-            return Promise.reject(new Error($t('form.userName.invalidFormat'))) // 使用格式错误提示
+            return Promise.reject(new Error($t('form.userName.invalidFormat'))) // Use format error prompts
           }
-          return Promise.resolve() // 值为空或格式正确时通过
+          return Promise.resolve() // Passed when the value is empty or in the correct format
         },
-        message: () => $t('form.userName.invalidFormat'), // 格式错误时的提示
-        trigger: ['input', 'blur'] // input 时也校验格式，但不提示 required
+        message: () => $t('form.userName.invalidFormat'), // Tips for format errors
+        trigger: ['input', 'blur'] // input Also check the format，but do not prompt required
       }
     ],
     password: [
@@ -66,37 +66,37 @@ const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
   }
 })
 
-// 常用邮箱后缀列表
+// List of commonly used email suffixes
 const commonDomains = ['qq.com', '163.com', 'gmail.com', 'outlook.com', 'sina.com', 'hotmail.com', 'yahoo.com']
 
-// 计算邮箱自动补全选项
+// Calculate email autocomplete options
 const emailOptions = computed(() => {
   const userName = model.userName
   if (!userName || !userName.includes('@')) {
-    return [] // 如果没有输入或不包含 @，则不提示
+    return [] // If there is no input or it does not contain @，no prompt
   }
 
   const parts = userName.split('@')
   const username = parts[0]
-  const domainInput = parts[1] || '' // @ 后面的部分
+  const domainInput = parts[1] || '' // @ the back part
 
   if (username === '') {
-    return [] // 如果 @ 前面为空，则不提示
+    return [] // if @ The front is empty，no prompt
   }
 
-  // 过滤常用域名，基于用户在 @ 后输入的内容
+  // Filter common domain names，Based on the user's @ Content entered after
   const filteredDomains = commonDomains.filter(
-    domain => domain.startsWith(domainInput) && domain !== domainInput // 只有当域名部分匹配且不等于完整域名时才提示
+    domain => domain.startsWith(domainInput) && domain !== domainInput // Prompts only when the domain name partially matches and is not equal to the full domain name
   )
 
-  // 生成完整的邮箱建议
+  // Generate complete email suggestions
   return filteredDomains.map(domain => `${username}@${domain}`)
 })
 
 async function handleSubmit() {
-  // 先判断密码长度
+  // Determine the password length first
   if (model.password.length < 6) {
-    return // 仍然阻止提交
+    return // Still blocking submission
   }
 
   await validate()
@@ -140,26 +140,26 @@ function loadSavedCredentials() {
   }
 }
 
-// 从环境变量加载自动登录凭据
+// Load automatic login credentials from environment variables
 async function loadAutoLoginCredentials() {
-  // 检查路由参数
+  // Check routing parameters
   const urlParams = new URLSearchParams(window.location.search)
   const autoLogin = urlParams.get('auto') === 'true'
   const urlUsername = urlParams.get('username')
   const urlPassword = urlParams.get('password')
 
-  // 只要URL参数中有账号密码且auto=true就允许自动登录
+  // if onlyURLThere is an account password in the parameters andauto=trueAllow automatic login
   if (autoLogin && urlUsername && urlPassword) {
-    // 设置表单数据
+    // Set form data
     model.userName = urlUsername
     model.password = urlPassword
 
-    // 延迟一下确保组件完全挂载
+    // Delay to ensure the component is fully mounted
     setTimeout(async () => {
       try {
         await authStore.login(model.userName.trim(), model.password)
       } catch (error) {
-        window.$message?.error('自动登录失败，请手动输入账号密码')
+        window.$message?.error('Automatic login failed，Please enter the account password manually')
       }
     }, 500)
   }

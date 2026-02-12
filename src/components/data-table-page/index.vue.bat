@@ -9,7 +9,7 @@ import { formatDateTime } from '@/utils/common/datetime';
 import { createLogger } from '@/utils/logger';
 import TencentMap from './modules/tencent-map.vue';
 const logger = createLogger('TablePage');
-// 定义搜索配置项的类型，支持多种输入类型：纯文本、日期选择器、日期范围选择器、下拉选择和树形选择器
+// Define the type of search configuration item，Supports multiple input types：plain text、date picker、date range picker、Dropdown selection and tree selector
 export type theLabel = string | (() => string) | undefined;
 export type SearchConfig =
   | {
@@ -41,61 +41,61 @@ export type SearchConfig =
       loadOptions?: () => Promise<TreeSelectOption[]>;
     };
 
-// 通过props从父组件接收参数
+// passpropsReceive parameters from parent component
 
 const props = defineProps<{
-  fetchData: (data: any) => Promise<any>; // 数据获取函数
-  columnsToShow: // 表格列配置
+  fetchData: (data: any) => Promise<any>; // Data acquisition function
+  columnsToShow: // Table column configuration
   | {
         key: string;
         label: theLabel;
-        render?: (row: any) => VueElement | string | undefined; // 自定义渲染函数
+        render?: (row: any) => VueElement | string | undefined; // Custom rendering function
       }[]
-    | 'all'; // 特殊值'all'表示显示所有列
-  searchConfigs: SearchConfig[]; // 搜索配置数组
+    | 'all'; // special value'all'Show all columns
+  searchConfigs: SearchConfig[]; // Search configuration array
   tableActions: Array<{
-    // 表格行操作
-    theKey?: string; // 操作键
-    label: theLabel; // 按钮文本
-    callback: any; // 点击回调
+    // Table row operations
+    theKey?: string; // Operation keys
+    label: theLabel; // button text
+    callback: any; // Click callback
   }>;
-  topActions: { element: () => JSX.Element }[]; // 顶部操作组件列表
-  rowClick?: (row: any) => void; // 表格行点击回调
+  topActions: { element: () => JSX.Element }[]; // Top operating component list
+  rowClick?: (row: any) => void; // Table row click callback
   initPage?: number;
   initPageSize?: number;
 }>();
 const { loading, startLoading, endLoading } = useLoading();
-// 解构props以简化访问
+// deconstructpropsto simplify access
 const { fetchData, columnsToShow, tableActions, searchConfigs }: any = props;
-const isTableView = ref(true); // 默认显示表格视图
-const dataList = ref([]); // 表格数据列表
-const total = ref(0); // 数据总数
-const currentPage = ref(props.initPage || 1); // 当前页码
-const pageSize = ref(props.initPageSize || 10); // 每页显示数量
-const searchCriteria: any = ref(Object.fromEntries(searchConfigs.map(item => [item.key, item.initValue]))); // 搜索条件
+const isTableView = ref(true); // Table view shown by default
+const dataList = ref([]); // Table data list
+const total = ref(0); // Total data
+const currentPage = ref(props.initPage || 1); // Current page number
+const pageSize = ref(props.initPageSize || 10); // Display quantity per page
+const searchCriteria: any = ref(Object.fromEntries(searchConfigs.map(item => [item.key, item.initValue]))); // Search criteria
 
-// 获取数据的函数，结合搜索条件、分页等
+// function to get data，Combine search criteria、Pagination etc.
 const getData = async () => {
-  // 处理搜索条件，特别是将日期对象转换为字符串
+  // Process search criteria，Specifically converting a date object to a string
   startLoading();
   const processedSearchCriteria = Object.fromEntries(
     Object.entries(searchCriteria.value).map(([key, value]) => {
       if (value && Array.isArray(value)) {
-        // 处理日期范围
+        // Processing date range
         return [key, value.map(v => (v instanceof Date ? v.toISOString() : v))];
       }
-      // 单一日期处理
+      // single date processing
       return [key, value instanceof Date ? value.toISOString() : value];
     })
   );
-  // 调用提供的fetchData函数获取数据
+  // Call the providedfetchDataFunction to get data
 
   const response = await fetchData({
     page: currentPage.value,
     page_size: pageSize.value,
     ...processedSearchCriteria
   });
-  // 处理响应
+  // Handle response
   if (!response.error) {
     dataList.value = response.data.list;
     total.value = response.data.total;
@@ -105,15 +105,15 @@ const getData = async () => {
   endLoading();
 };
 
-// 使用计算属性动态生成表格的列配置
+// Dynamically generate table column configuration using computed properties
 const generatedColumns = computed(() => {
   let columns;
 
   if (dataList.value.length > 0) {
-    // 根据columnsToShow生成列配置
+    // according tocolumnsToShowGenerate column configuration
     columns = (columnsToShow === 'all' ? Object.keys(dataList.value[0]) : columnsToShow).map(item => {
       if (item.render) {
-        // 使用自定义的render函数渲染列
+        // Use customrenderfunction render column
         return {
           ...item,
           title: item.label,
@@ -133,7 +133,7 @@ const generatedColumns = computed(() => {
         }
       };
     });
-    // 添加操作列
+    // Add action column
     columns.push({
       title: $t('custom.groupPage.actions'),
       key: 'actions',
@@ -146,13 +146,13 @@ const generatedColumns = computed(() => {
         >
           <NSpace>
             {tableActions.map(action => {
-              if (action.theKey === $t('custom.devicePage.delete') || action.theKey === '删除') {
+              if (action.theKey === $t('custom.devicePage.delete') || action.theKey === 'delete') {
                 return (
                   <NPopconfirm
                     onPositiveClick={async e => {
                       e.stopPropagation();
                       await action.callback(row);
-                      // 删除后只刷新数据，不重置搜索条件
+                      // Only refresh data after deletion，Do not reset search criteria
                       getData();
                     }}
                   >
@@ -182,31 +182,31 @@ const generatedColumns = computed(() => {
   return columns || [];
 });
 
-// 更新页码或页面大小时重新获取数据
+// Re-fetch data when updating page number or page size
 const onUpdatePage = newPage => {
   currentPage.value = newPage;
-  getData(); // 更新数据
+  getData(); // Update data
 };
 const onUpdatePageSize = newPageSize => {
   pageSize.value = newPageSize;
-  currentPage.value = 1; // 重置为第一页
-  getData(); // 更新数据
+  currentPage.value = 1; // Reset to first page
+  getData(); // Update data
 };
 
-// 添加对 searchCriteria 的监听
+// add pair searchCriteria monitoring
 watch(
   searchCriteria,
   (newVal, oldVal) => {
-    // 检查是否真的发生了变化
+    // Check if changes have actually occurred
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      currentPage.value = 1; // 重置到第一页
-      getData(); // 重新获取数据
+      currentPage.value = 1; // Reset to first page
+      getData(); // Retrieve data
     }
   },
-  { deep: true } // 深度监听对象的变化
+  { deep: true } // Deeply monitor changes in objects
 );
 
-// 观察分页和搜索条件的变化，自动重新获取数据
+// Observe changes in pagination and search conditions，Automatically re-fetch data
 watchEffect(() => {
   searchConfigs.map((item: any) => {
     const vals = searchCriteria.value[item.key];
@@ -223,40 +223,40 @@ watchEffect(() => {
   getData();
 });
 
-// 搜索和重置按钮的逻辑
+// Search and reset button logic
 const handleSearch = () => {
-  currentPage.value = 1; // 搜索时重置到第一页
+  currentPage.value = 1; // Reset to first page when searching
   getData();
 };
 
 const handleReset = () => {
-  // 重置搜索条件为初始值
+  // Reset search conditions to initial values
   Object.keys(searchCriteria.value).forEach(key => {
     const config = searchConfigs.find(item => item.key === key);
     if (config) {
-      // 如果是日期范围选择器，设置为空数组
+      // If it is a date range selector，Set to empty array
       if (config.type === 'date-range') {
         searchCriteria.value[key] = [];
       }
-      // 如果是树形选择器，根据 multiple 属性设置空值
+      // If it is a tree selector，according to multiple Property setting null value
       else if (config.type === 'tree-select') {
         searchCriteria.value[key] = config.multiple ? [] : null;
       }
-      // 如果是下拉选择框，设置为 null 以显示占位符
+      // If it is a drop-down selection box，set to null to show placeholders
       else if (config.type === 'select') {
         searchCriteria.value[key] = null;
       }
-      // 其他类型设置为空字符串
+      // Other types are set to empty strings
       else {
         searchCriteria.value[key] = '';
       }
     }
   });
 
-  handleSearch(); // 重置后重新获取数据
+  handleSearch(); // Retrieve data after reset
 };
 
-// 强制更新指定参数并刷新数据
+// Force update of specified parameters and refresh data
 const forceChangeParamsByKey = (params: Record<string, any>) => {
   Object.entries(params).forEach(([key, value]) => {
     if (key in searchCriteria.value) {
@@ -266,25 +266,25 @@ const forceChangeParamsByKey = (params: Record<string, any>) => {
   getData();
 };
 
-// 暴露方法给父组件
+// Expose methods to parent component
 defineExpose({
   handleSearch,
   handleReset,
   forceChangeParamsByKey
 });
 
-// 更新树形选择器的选项
+// Update tree selector options
 const handleTreeSelectUpdate = (value, key) => {
   currentPage.value = 1;
   searchCriteria.value[key] = value;
 };
 
-// 用于加载动态选项的函数，适用于select和tree-select类型的搜索配置
+// Function for loading dynamic options，Applicable toselectandtree-selectType of search configuration
 const loadOptionsOnMount = async pattern => {
   for (const config of searchConfigs) {
     if (config.type === 'select' && config.loadOptions) {
       // eslint-disable-next-line no-await-in-loop
-      const opts = await config.loadOptions(pattern); // 调用传入的loadOptions函数加载选项数据
+      const opts = await config.loadOptions(pattern); // Call the incomingloadOptionsFunction to load option data
       config.options = [...config.options, ...opts];
     }
   }
@@ -304,7 +304,7 @@ const loadOptionsOnMount2 = async () => {
   for (const config of searchConfigs) {
     if (config.type === 'tree-select' && config.loadOptions) {
       // eslint-disable-next-line no-await-in-loop
-      const opts = await config.loadOptions(); // 调用传入的loadOptions函数加载选项数据
+      const opts = await config.loadOptions(); // Call the incomingloadOptionsFunction to load option data
       config.options = [...config.options, ...opts];
     }
   }
@@ -314,20 +314,20 @@ const getPlatform = computed(() => {
   const { proxy }: any = getCurrentInstance();
   return proxy.getPlatform();
 });
-// 使用throttle减少动态加载选项时的请求频率
+// usethrottleReduce request frequency when dynamically loading options
 // const throttledLoadOptionsOnMount = throttle(loadOptionsOnMount, 300);
 
-// 在组件挂载时加载选项
+// Load options when component is mounted
 loadOptionsOnMount('');
 loadOptionsOnMount2();
 
-// 为 input 类型添加专门的处理函数
+// for input Add specialized processing functions to types
 const handleInputChange = () => {
   currentPage.value = 1;
   getData();
 };
 
-// 修复 NSelect 的 filter 函数类型错误
+// repair NSelect of filter function type error
 const filterSelectOption = (pattern: string, option: any) => {
   const label = typeof option.label === 'string' ? option.label : '';
   return label.includes(pattern);
@@ -337,9 +337,9 @@ const filterSelectOption = (pattern: string, option: any) => {
 <template>
   <n-card>
     <div class="flex flex-col gap-15px rounded-lg">
-      <!-- 搜索区域与操作按钮 -->
+      <!-- Search area and action buttons -->
       <div class="row flex items-end justify-between gap-4">
-        <!-- 搜索输入和选择器 -->
+        <!-- Search inputs and selectors -->
         <div class="flex flex-1 flex-wrap items-end gap-4">
           <div
             v-for="config in searchConfigs"
@@ -408,7 +408,7 @@ const filterSelectOption = (pattern: string, option: any) => {
             <NButton class="btn-style" size="small" @click="handleReset">{{ $t('common.reset') }}</NButton>
           </div>
         </div>
-        <!-- 新建与返回按钮 -->
+        <!-- New and return buttons -->
       </div>
 
       <div class="h-2px w-full bg-[#f6f9f8]"></div>
@@ -416,7 +416,7 @@ const filterSelectOption = (pattern: string, option: any) => {
         <div class="flex gap-2">
           <component :is="action.element" v-for="(action, index) in topActions" :key="index"></component>
         </div>
-        <!-- 组件内部的表操作 -->
+        <!-- Table operations inside components -->
         <div>
           <NButton quaternary @click="isTableView = true">
             <template #icon>
@@ -441,7 +441,7 @@ const filterSelectOption = (pattern: string, option: any) => {
           </NButton>
         </div>
       </div>
-      <!-- 数据表格 -->
+      <!-- data table -->
       <div v-if="isTableView" class="overflow-x-auto">
         <NDataTable
           :row-props="rowProps"
@@ -452,7 +452,7 @@ const filterSelectOption = (pattern: string, option: any) => {
         />
       </div>
       <div v-else class="h-525px">
-        <!-- 地图视图占位 -->
+        <!-- Map view placeholder -->
         <TencentMap :devices="dataList" />
       </div>
 

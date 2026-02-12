@@ -1,32 +1,32 @@
 <!--
-专业级脚本编辑器组件 - 基于 CodeMirror 6 重构
-提供完整的代码编辑功能和优秀的用户体验
+Professional grade script editor component - based on CodeMirror 6 Refactor
+Provides complete code editing functions and excellent user experience
 -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useThemeStore } from '@/store/modules/theme'
 import { useI18n } from 'vue-i18n'
 
-// 导入 CodeMirror 6 Vue 组件
+// import CodeMirror 6 Vue components
 import CodeMirror from 'vue-codemirror6'
 import { javascript } from '@codemirror/lang-javascript'
 
 interface Props {
-  /** 脚本内容 */
+  /** Script content */
   modelValue?: string
-  /** 编辑器占位符 */
+  /** Editor placeholder */
   placeholder?: string
-  /** 是否显示模板选择 */
+  /** Whether to display template selection */
   showTemplates?: boolean
-  /** 模板类别过滤 */
+  /** Template category filtering */
   templateCategory?: string
-  /** 编辑器高度 */
+  /** Editor height */
   height?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  placeholder: '请输入JavaScript脚本...',
+  placeholder: 'Please enterJavaScriptscript...',
   showTemplates: true,
   height: '200px'
 })
@@ -35,17 +35,17 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-// 国际化集成
+// International integration
 const { t } = useI18n()
 
-// 主题系统集成
+// Theme system integration
 const themeStore = useThemeStore()
 
-// 代码示例 - 使用硬编码文本避免国际化循环依赖
+// code example - Use hardcoded text to avoid internationalization circular dependencies
 const codeExamples = {
   'data-generation': [
     {
-      name: '生成随机数据',
+      name: 'Generate random data',
       code: `return {
   value: Math.floor(Math.random() * 100),
   timestamp: Date.now(),
@@ -53,7 +53,7 @@ const codeExamples = {
 }`
     },
     {
-      name: '生成时间序列',
+      name: 'Generate time series',
       code: `return Array.from({ length: 10 }, (_, i) => ({
   time: Date.now() + i * 1000,
   value: Math.random() * 100
@@ -62,11 +62,11 @@ const codeExamples = {
   ],
   'data-processing': [
     {
-      name: '数据过滤',
+      name: 'Data filtering',
       code: `return data.filter(item => item.value > 50)`
     },
     {
-      name: '数据转换',
+      name: 'data conversion',
       code: `return data.map(item => ({
   ...item,
   value: item.value * 2,
@@ -76,20 +76,20 @@ const codeExamples = {
   ],
   'data-merger': [
     {
-      name: '合并为对象',
+      name: 'merge into objects',
       code: `return items.reduce((acc, item, index) => {
   acc[\`data_\${index}\`] = item
   return acc
 }, {})`
     },
     {
-      name: '合并为数组',
+      name: 'merge into array',
       code: `return items.flat()`
     }
   ]
 }
 
-// 获取当前类别的示例
+// Get examples of the current category
 const availableExamples = computed(() => {
   if (props.templateCategory && codeExamples[props.templateCategory]) {
     return codeExamples[props.templateCategory]
@@ -97,7 +97,7 @@ const availableExamples = computed(() => {
   return Object.values(codeExamples).flat()
 })
 
-// 示例选择器选项
+// Example selector options
 const exampleOptions = computed(() =>
   availableExamples.value.map((example, index) => ({
     label: example.name,
@@ -106,7 +106,7 @@ const exampleOptions = computed(() =>
 )
 
 /**
- * 应用选中的模板
+ * Apply selected template
  */
 const applyTemplate = (templateCode: string) => {
   if (templateCode) {
@@ -114,7 +114,7 @@ const applyTemplate = (templateCode: string) => {
   }
 }
 
-// CodeMirror 6 配置
+// CodeMirror 6 Configuration
 const editorValue = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value)
@@ -123,9 +123,9 @@ const editorValue = computed({
 
 <template>
   <div class="simple-script-editor">
-    <!-- 模板选择器 -->
+    <!-- template selector -->
     <div v-if="showTemplates && exampleOptions.length > 0" class="template-selector">
-      <span class="mr-4">JavaScript 处理:</span>
+      <span class="mr-4">JavaScript deal with:</span>
 
       <n-select
         :options="exampleOptions"
@@ -140,23 +140,23 @@ const editorValue = computed({
           <span class="help-icon">❓</span>
         </template>
         <div>
-          <p>对数据进行自定义转换</p>
+          <p>Perform custom transformations on data</p>
           <p>
-            可用变量:
+            Available variables:
             <code>data</code>
-            (输入数据)
+            (Enter data)
           </p>
           <p>
-            必须:
+            must:
             <code>return</code>
-            返回处理后的数据
+            Return processed data
           </p>
-          <p>留空表示不处理</p>
+          <p>Leave blank to not process</p>
         </div>
       </n-popover>
     </div>
 
-    <!-- CodeMirror 6 编辑器 -->
+    <!-- CodeMirror 6 Editor -->
     <div class="editor-container">
       <CodeMirror
         v-model="editorValue"
@@ -203,7 +203,7 @@ const editorValue = computed({
   text-align: center;
 }
 
-/* CodeMirror 6 样式定制 */
+/* CodeMirror 6 Style customization */
 .simple-script-editor :deep(.cm-editor) {
   border: none;
   border-radius: var(--n-border-radius);
@@ -248,7 +248,7 @@ const editorValue = computed({
   background: var(--n-color-hover);
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .simple-script-editor :deep(.cm-scroller::-webkit-scrollbar) {
   width: 6px;
   height: 6px;
@@ -267,18 +267,18 @@ const editorValue = computed({
   background: var(--n-scrollbar-color-hover);
 }
 
-/* 占位符样式 */
+/* placeholder style */
 .simple-script-editor :deep(.cm-placeholder) {
   color: var(--n-text-color-disabled);
   font-style: italic;
 }
 
-/* 语法高亮定制 */
+/* Syntax highlighting customization */
 .simple-script-editor :deep(.cm-editor.cm-focused .cm-selectionBackground) {
   background: rgba(24, 160, 88, 0.2) !important;
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .simple-script-editor .editor-container {
   box-shadow: var(--n-box-shadow-1);
 }

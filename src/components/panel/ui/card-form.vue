@@ -56,7 +56,7 @@ const dataAggregateRangeOptions = [
   { label: $t('common.hours6'), value: '6h', disabled: false },
   { label: $t('common.days1'), value: '1d', disabled: false },
   { label: $t('common.days7'), value: '7d', disabled: false },
-  { label: '1月', value: '1mo', disabled: false }
+  { label: '1moon', value: '1mo', disabled: false }
 ]
 const aggregateFunctionOptions: SelectOption[] = [
   { label: $t('common.average'), value: 'avg' },
@@ -76,31 +76,31 @@ const findCard = (id: string) => {
 }
 const updateDisabledOptions = (timeFrame: string) => {
   const disableBeforeIndex: { [key: string]: number } = {
-    最近3小时: 1, // 30秒
-    最近6小时: 2, // 1分钟
-    最近12小时: 3, // 2分钟
-    最近24小时: 4, // 5分钟
-    最近3天: 5, // 10分钟
-    最近7天: 6, // 30分钟
-    最近15天: 7, // 1小时
-    最近30天: 7, // 1小时
-    最近60天: 8, // 3小时
-    最近90天: 9, // 6小时
-    最近6个月: 9, // 6小时
-    最近1年: 12, // 1月
-    今天: 4, // 5分钟
-    昨天: 4, // 5分钟
-    前天: 4, // 5分钟
-    上周今日: 4, // 5分钟
-    本周: 6, // 30分钟
-    上周: 6, // 30分钟
-    本月: 7, // 1小时
-    上个月: 7, // 1小时
-    今年: 12, // 1月
-    去年: 12 // 1月
+    recent3Hour: 1, // 30Second
+    recent6Hour: 2, // 1minute
+    recent12Hour: 3, // 2minute
+    recent24Hour: 4, // 5minute
+    recent3sky: 5, // 10minute
+    recent7sky: 6, // 30minute
+    recent15sky: 7, // 1Hour
+    recent30sky: 7, // 1Hour
+    recent60sky: 8, // 3Hour
+    recent90sky: 9, // 6Hour
+    recent6months: 9, // 6Hour
+    recent1Year: 12, // 1moon
+    today: 4, // 5minute
+    yesterday: 4, // 5minute
+    theDayBeforeYesterday: 4, // 5minute
+    lastWeekToday: 4, // 5minute
+    thisWeek: 6, // 30minute
+    lastWeek: 6, // 30minute
+    thisMonth: 7, // 1Hour
+    lastMonth: 7, // 1Hour
+    thisYear: 12, // 1moon
+    lastYear: 12 // 1moon
   }
 
-  // 默认不禁用"不聚合"，根据时间范围禁用其余选项
+  // Not disabled by default"No aggregation"，Disable remaining options based on time range
   dataAggregateRangeOptions.forEach((item, index, array) => {
     if (!disableBeforeIndex[timeFrame]) {
       item.disabled = false
@@ -391,7 +391,7 @@ const isNoAggregate = computed(() => state.data.dataSource.dataAggregateRange ==
 <style scoped>
 .custom-select-container .v-binder-follower-container {
   width: 300px !important;
-  /* 只会影响该组件内的 NSelect 下拉宽度 */
+  /* Will only affect the components within this component NSelect Drop down width */
 }
 .metrics-name-input {
   max-width: 140px;

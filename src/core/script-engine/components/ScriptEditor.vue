@@ -1,10 +1,10 @@
 <!--
-  统一脚本编辑器组件
-  集成模板选择、语法高亮、实时验证、安全检查等功能
+  Unified Script Editor Component
+  Integrated template selection、syntax highlighting、Real-time verification、Security check and other functions
 -->
 <template>
   <div class="script-editor-container">
-    <!-- 编辑器头部工具栏 -->
+    <!-- Editor header toolbar -->
     <div class="script-editor-header">
       <div class="editor-header-left">
         <n-space align="center">
@@ -13,7 +13,7 @@
           </n-text>
           <n-divider vertical />
 
-          <!-- 模板选择器 -->
+          <!-- template selector -->
           <n-select
             v-model:value="selectedTemplateId"
             size="small"
@@ -31,12 +31,12 @@
             </template>
           </n-select>
 
-          <!-- 验证状态指示器 -->
+          <!-- Validation status indicator -->
           <n-tag v-if="validationResult" :type="validationResult.valid ? 'success' : 'error'" size="small">
             {{ validationResult.valid ? t('scriptEditor.syntaxValid') : t('scriptEditor.syntaxError') }}
           </n-tag>
 
-          <!-- 安全状态指示器 -->
+          <!-- security status indicator -->
           <n-tag v-if="securityResult" :type="securityResult.safe ? 'success' : 'warning'" size="small">
             {{ securityResult.safe ? t('scriptEditor.securitySafe') : t('scriptEditor.securityWarning') }}
           </n-tag>
@@ -45,7 +45,7 @@
 
       <div class="editor-header-right">
         <n-space>
-          <!-- 运行按钮 -->
+          <!-- run button -->
           <n-button
             v-if="props.allowExecution"
             size="small"
@@ -60,7 +60,7 @@
             {{ t('scriptEditor.run') }}
           </n-button>
 
-          <!-- 格式化按钮 -->
+          <!-- Format button -->
           <n-button size="small" quaternary @click="handleFormat">
             <template #icon>
               <n-icon><CodeOutline /></n-icon>
@@ -68,7 +68,7 @@
             {{ t('scriptEditor.format') }}
           </n-button>
 
-          <!-- 全屏切换 -->
+          <!-- Full screen switch -->
           <n-button size="small" quaternary @click="toggleFullscreen">
             <template #icon>
               <n-icon>
@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <!-- 脚本编辑器主体 -->
+    <!-- Script editor body -->
     <div class="script-editor-body" :class="{ fullscreen: isFullscreen }">
       <n-input
         ref="editorRef"
@@ -96,12 +96,12 @@
       />
     </div>
 
-    <!-- 底部状态栏 -->
+    <!-- bottom status bar -->
     <div class="script-editor-footer">
       <n-space justify="space-between" align="center">
         <div class="footer-left">
           <n-space align="center" size="small">
-            <!-- 上下文参数提示 -->
+            <!-- Contextual parameter hints -->
             <n-text :depth="3" style="font-size: 11px">{{ t('scriptEditor.availableContext') }}:</n-text>
             <n-tag v-for="param in contextParams" :key="param" size="tiny" type="info">
               {{ param }}
@@ -111,26 +111,26 @@
 
         <div class="footer-right">
           <n-space align="center" size="small">
-            <!-- 字符统计 -->
+            <!-- Character statistics -->
             <n-text :depth="3" style="font-size: 11px">
               {{ t('scriptEditor.characters') }}: {{ localCode.length }}
             </n-text>
 
-            <!-- 行数统计 -->
+            <!-- Row count -->
             <n-text :depth="3" style="font-size: 11px">{{ t('scriptEditor.lines') }}: {{ lineCount }}</n-text>
           </n-space>
         </div>
       </n-space>
     </div>
 
-    <!-- 执行结果面板 -->
+    <!-- Execution results panel -->
     <n-collapse v-if="props.showExecutionResult && lastExecutionResult">
-      <n-collapse-item title="执行结果" name="execution-result">
+      <n-collapse-item title="Execution result" name="execution-result">
         <ScriptExecutionResultPanel :result="lastExecutionResult" />
       </n-collapse-item>
     </n-collapse>
 
-    <!-- 错误提示面板 -->
+    <!-- Error prompt panel -->
     <div v-if="errorMessages.length > 0" class="error-panel">
       <n-alert
         v-for="(error, index) in errorMessages"
@@ -148,8 +148,8 @@
 
 <script setup lang="ts">
 /**
- * 统一脚本编辑器组件
- * 集成 script-engine 的所有功能
+ * Unified Script Editor Component
+ * integrated script-engine All functions of
  */
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -159,23 +159,23 @@ import { defaultScriptEngine } from '@/core/script-engine/script-engine'
 import type { ScriptExecutionResult, ScriptTemplate, TemplateCategory } from '@/core/script-engine/types'
 
 interface Props {
-  /** 脚本代码 */
+  /** script code */
   code: string
-  /** 脚本类型，用于选择合适的模板和上下文 */
+  /** Script type，For choosing the right template and context */
   scriptType?: 'data-fetcher' | 'data-processor' | 'data-merger' | 'general'
-  /** 上下文参数名称列表 */
+  /** List of context parameter names */
   contextParams?: string[]
-  /** 编辑器行数 */
+  /** Number of editor lines */
   rows?: number
-  /** 是否允许执行脚本 */
+  /** Whether to allow script execution */
   allowExecution?: boolean
-  /** 是否显示执行结果面板 */
+  /** Whether to display the execution results panel */
   showExecutionResult?: boolean
-  /** 执行上下文数据（用于测试执行） */
+  /** Execution context data（for test execution） */
   executionContext?: Record<string, any>
-  /** 是否只读 */
+  /** Is it read-only? */
   readonly?: boolean
-  /** 模板分类过滤 */
+  /** Template classification filtering */
   templateCategories?: TemplateCategory[]
 }
 
@@ -198,11 +198,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 国际化和主题
+// Internationalization and themes
 const { t } = useI18n()
 const themeStore = useThemeStore()
 
-// 编辑器状态
+// Editor status
 const editorRef = ref()
 const localCode = ref(props.code)
 const selectedTemplateId = ref<string>()
@@ -210,15 +210,15 @@ const isFullscreen = ref(false)
 const executing = ref(false)
 const focused = ref(false)
 
-// 验证结果
+// Verification results
 const validationResult = ref<{ valid: boolean; error?: string }>()
 const securityResult = ref<{ safe: boolean; issues: string[] }>()
 const lastExecutionResult = ref<ScriptExecutionResult>()
 
-// 错误消息
+// error message
 const errorMessages = ref<Array<{ type: 'syntax' | 'security'; message: string }>>([])
 
-// 计算属性
+// Computed properties
 const editorRows = computed(() => {
   if (isFullscreen.value) return 20
   return props.rows
@@ -242,20 +242,20 @@ const editorInputProps = computed(() => ({
   spellcheck: 'false'
 }))
 
-// 模板选项
+// Template options
 const templateOptions = computed(() => {
   const templates = defaultScriptEngine.templateManager.getAllTemplates()
 
   let filteredTemplates = templates
 
-  // 按脚本类型过滤
+  // Filter by script type
   if (props.scriptType !== 'general') {
     filteredTemplates = templates.filter(
       template => template.category === props.scriptType || template.category === 'utility'
     )
   }
 
-  // 按分类过滤
+  // Filter by category
   if (props.templateCategories.length > 0) {
     filteredTemplates = filteredTemplates.filter(template =>
       props.templateCategories.includes(template.category as TemplateCategory)
@@ -270,7 +270,7 @@ const templateOptions = computed(() => {
   }))
 })
 
-// 上下文参数处理
+// Context parameter handling
 const contextParams = computed(() => {
   const baseParams = ['JSON', 'Math', 'Date', 'console']
   const typeParams = getContextParamsByType(props.scriptType)
@@ -280,7 +280,7 @@ const contextParams = computed(() => {
 })
 
 /**
- * 根据脚本类型获取上下文参数
+ * Get context parameters based on script type
  */
 function getContextParamsByType(scriptType: string): string[] {
   switch (scriptType) {
@@ -296,7 +296,7 @@ function getContextParamsByType(scriptType: string): string[] {
 }
 
 /**
- * 获取占位符文本
+ * Get placeholder text
  */
 function getPlaceholder(): string {
   switch (props.scriptType) {
@@ -312,18 +312,18 @@ function getPlaceholder(): string {
 }
 
 /**
- * 处理代码变化
+ * Handle code changes
  */
 function handleCodeChange(value: string) {
   localCode.value = value
   emit('update:code', value)
 
-  // 延迟验证，避免频繁触发
+  // Delayed verification，Avoid frequent triggering
   debounceValidation()
 }
 
 /**
- * 防抖验证
+ * Anti-shake verification
  */
 let validationTimer: NodeJS.Timeout
 function debounceValidation() {
@@ -334,7 +334,7 @@ function debounceValidation() {
 }
 
 /**
- * 执行验证
+ * Perform verification
  */
 function performValidation() {
   errorMessages.value = []
@@ -345,7 +345,7 @@ function performValidation() {
     return
   }
 
-  // 语法验证
+  // Grammar verification
   const syntaxResult = defaultScriptEngine.validateScript(localCode.value)
   validationResult.value = syntaxResult
 
@@ -358,7 +358,7 @@ function performValidation() {
 
   emit('syntax-change', syntaxResult.valid, syntaxResult.error)
 
-  // 安全性检查
+  // Security check
   const safetyResult = defaultScriptEngine.checkScriptSecurity(localCode.value)
   securityResult.value = safetyResult
 
@@ -375,7 +375,7 @@ function performValidation() {
 }
 
 /**
- * 模板选择处理
+ * Template selection process
  */
 async function handleTemplateSelect(templateId: string | null) {
   if (!templateId) {
@@ -385,7 +385,7 @@ async function handleTemplateSelect(templateId: string | null) {
 
   const template = defaultScriptEngine.templateManager.getTemplate(templateId)
   if (template) {
-    // 生成默认参数
+    // Generate default parameters
     const defaultParams: Record<string, any> = {}
     template.parameters.forEach(param => {
       defaultParams[param.name] = param.defaultValue ?? getDefaultValueByType(param.type)
@@ -403,7 +403,7 @@ async function handleTemplateSelect(templateId: string | null) {
 }
 
 /**
- * 根据类型获取默认值
+ * Get default value based on type
  */
 function getDefaultValueByType(type: string): any {
   switch (type) {
@@ -423,7 +423,7 @@ function getDefaultValueByType(type: string): any {
 }
 
 /**
- * 执行脚本
+ * Execute script
  */
 async function handleExecute() {
   if (!canExecute.value) return
@@ -448,10 +448,10 @@ async function handleExecute() {
 }
 
 /**
- * 格式化代码
+ * Format code
  */
 function handleFormat() {
-  // 简单的格式化逻辑
+  // Simple formatting logic
   try {
     const formatted = localCode.value
       .split('\n')
@@ -467,14 +467,14 @@ function handleFormat() {
 }
 
 /**
- * 切换全屏
+ * Toggle full screen
  */
 function toggleFullscreen() {
   isFullscreen.value = !isFullscreen.value
 }
 
 /**
- * 焦点事件
+ * focus event
  */
 function handleFocus() {
   focused.value = true
@@ -485,7 +485,7 @@ function handleBlur() {
   performValidation()
 }
 
-// 监听外部代码变化
+// Monitor external code changes
 watch(
   () => props.code,
   newCode => {
@@ -496,7 +496,7 @@ watch(
   }
 )
 
-// 组件挂载时执行初始验证
+// Perform initial verification when component is mounted
 onMounted(() => {
   if (localCode.value) {
     performValidation()
@@ -584,7 +584,7 @@ onMounted(() => {
   background: var(--error-color-hover);
 }
 
-/* 深色主题适配 */
+/* Dark theme adaptation */
 [data-theme='dark'] .script-editor-container {
   background: var(--card-color);
   border-color: var(--border-color);
@@ -596,7 +596,7 @@ onMounted(() => {
   border-color: var(--border-color);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .script-editor-header {
     flex-direction: column;

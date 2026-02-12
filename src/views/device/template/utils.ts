@@ -13,15 +13,15 @@ export const initTemplateInfoData = {
 export const templateInfoData = ref({ ...initTemplateInfoData })
 
 export const templateInfoRules = {
-  name: createRequiredFormRule('请输入模板名称')
+  name: createRequiredFormRule('Please enter template name')
 }
 
 // device model
 export const deviceModelTabs = [
-  { name: 'telemetry', tab: '遥测' },
-  { name: 'property', tab: '属性' },
-  { name: 'event', tab: '事件' },
-  { name: 'command', tab: '命令' }
+  { name: 'telemetry', tab: 'telemetry' },
+  { name: 'property', tab: 'property' },
+  { name: 'event', tab: 'event' },
+  { name: 'command', tab: 'Order' }
 ]
 
 export const initTelemetryModel = {}

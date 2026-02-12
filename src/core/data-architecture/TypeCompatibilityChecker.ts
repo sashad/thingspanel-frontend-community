@@ -1,6 +1,6 @@
 /**
- * 类型兼容性检查机制
- * 用于验证不同组件和配置之间的类型兼容性，确保系统集成的正确性
+ * Type compatibility checking mechanism
+ * Used to verify type compatibility between different components and configurations，Ensure correctness of system integration
  */
 
 import type {
@@ -19,52 +19,52 @@ import type {
 } from './types/unified-types'
 
 /**
- * 兼容性检查结果
+ * Compatibility check results
  */
 export interface CompatibilityCheckResult extends ValidationResult {
-  /** 兼容性级别 */
+  /** Compatibility level */
   level: 'compatible' | 'warning' | 'incompatible'
-  /** 检查类型 */
+  /** Check type */
   checkType: string
-  /** 影响的组件/字段 */
+  /** Affected components/Field */
   affectedItems: string[]
-  /** 建议的修复方案 */
+  /** Suggested fix */
   suggestions: string[]
-  /** 检查时间戳 */
+  /** Check timestamp */
   timestamp: number
 }
 
 /**
- * 类型映射兼容性
+ * Type map compatibility
  */
 interface TypeMappingCompatibility {
-  /** 源类型 */
+  /** Source type */
   sourceType: string
-  /** 目标类型 */
+  /** target type */
   targetType: string
-  /** 是否兼容 */
+  /** Is it compatible */
   isCompatible: boolean
-  /** 是否需要转换 */
+  /** Do you need to convert */
   needsConversion: boolean
-  /** 转换函数名 */
+  /** Conversion function name */
   conversionFunction?: string
 }
 
 /**
- * 组件接口兼容性
+ * Component interface compatibility
  */
 interface ComponentInterfaceCompatibility {
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 期望的接口签名 */
+  /** Expected interface signature */
   expectedInterface: Record<string, any>
-  /** 实际的接口签名 */
+  /** actual interface signature */
   actualInterface: Record<string, any>
-  /** 缺失的字段 */
+  /** missing fields */
   missingFields: string[]
-  /** 额外的字段 */
+  /** extra fields */
   extraFields: string[]
-  /** 类型不匹配的字段 */
+  /** Fields with mismatched types */
   mismatchedFields: Array<{
     field: string
     expected: string
@@ -73,18 +73,18 @@ interface ComponentInterfaceCompatibility {
 }
 
 /**
- * 类型兼容性检查器
+ * Type Compatibility Checker
  */
 export class TypeCompatibilityChecker {
   private static instance: TypeCompatibilityChecker | null = null
 
-  /** 类型映射表 */
+  /** type mapping table */
   private typeMappingTable = new Map<string, TypeMappingCompatibility[]>()
 
-  /** 组件接口缓存 */
+  /** Component interface cache */
   private componentInterfaceCache = new Map<string, ComponentInterfaceCompatibility>()
 
-  /** 检查历史记录 */
+  /** Check history */
   private checkHistory: CompatibilityCheckResult[] = []
 
   private constructor() {
@@ -99,12 +99,12 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 初始化类型映射表
+   * Initialize type mapping table
    */
   private initializeTypeMappingTable(): void {
-    // 基础类型兼容性映射
+    // Basic type compatibility mapping
     const basicTypeMappings: TypeMappingCompatibility[] = [
-      // string类型映射
+      // stringtype mapping
       { sourceType: 'string', targetType: 'string', isCompatible: true, needsConversion: false },
       {
         sourceType: 'string',
@@ -121,7 +121,7 @@ export class TypeCompatibilityChecker {
         conversionFunction: 'stringToBoolean'
       },
 
-      // number类型映射
+      // numbertype mapping
       { sourceType: 'number', targetType: 'number', isCompatible: true, needsConversion: false },
       {
         sourceType: 'number',
@@ -138,7 +138,7 @@ export class TypeCompatibilityChecker {
         conversionFunction: 'numberToBoolean'
       },
 
-      // boolean类型映射
+      // booleantype mapping
       { sourceType: 'boolean', targetType: 'boolean', isCompatible: true, needsConversion: false },
       {
         sourceType: 'boolean',
@@ -155,12 +155,12 @@ export class TypeCompatibilityChecker {
         conversionFunction: 'booleanToNumber'
       },
 
-      // json类型映射
+      // jsontype mapping
       { sourceType: 'json', targetType: 'json', isCompatible: true, needsConversion: false },
       { sourceType: 'json', targetType: 'object', isCompatible: true, needsConversion: false },
       { sourceType: 'object', targetType: 'json', isCompatible: true, needsConversion: false },
 
-      // any类型映射（兼容所有类型）
+      // anytype mapping（Compatible with all types）
       {
         sourceType: 'any',
         targetType: 'string',
@@ -188,7 +188,7 @@ export class TypeCompatibilityChecker {
 
     this.typeMappingTable.set('basic', basicTypeMappings)
 
-    // HTTP参数类型映射
+    // HTTPParameter type mapping
     const httpParameterMappings: TypeMappingCompatibility[] = [
       { sourceType: 'path', targetType: 'query', isCompatible: false, needsConversion: false },
       {
@@ -211,7 +211,7 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 检查HTTP配置兼容性
+   * examineHTTPConfiguration compatibility
    */
   public checkHttpConfigCompatibility(config: HttpConfig): CompatibilityCheckResult {
     const errors: string[] = []
@@ -220,23 +220,23 @@ export class TypeCompatibilityChecker {
     const affectedItems: string[] = []
 
     try {
-      // 1. 检查URL格式兼容性
+      // 1. examineURLFormat compatibility
       const urlCheck = this.checkUrlFormat(config.url)
       if (!urlCheck.isValid) {
-        errors.push(`URL格式错误: ${urlCheck.error}`)
+        errors.push(`URLFormat error: ${urlCheck.error}`)
         affectedItems.push('url')
-        suggestions.push('请使用标准的HTTP URL格式')
+        suggestions.push('Please use standardHTTP URLFormat')
       }
 
-      // 2. 检查HTTP方法兼容性
+      // 2. examineHTTPMethod compatibility
       const methodCheck = this.checkHttpMethod(config.method)
       if (!methodCheck.isValid) {
-        errors.push(`HTTP方法不支持: ${config.method}`)
+        errors.push(`HTTPMethod not supported: ${config.method}`)
         affectedItems.push('method')
-        suggestions.push('请使用标准的HTTP方法: GET, POST, PUT, DELETE, PATCH')
+        suggestions.push('Please use standardHTTPmethod: GET, POST, PUT, DELETE, PATCH')
       }
 
-      // 3. 检查参数类型兼容性
+      // 3. Check parameter type compatibility
       if (config.params) {
         const paramsCheck = this.checkHttpParametersCompatibility(config.params, 'query')
         errors.push(...paramsCheck.errors)
@@ -245,7 +245,7 @@ export class TypeCompatibilityChecker {
         suggestions.push(...paramsCheck.suggestions)
       }
 
-      // 4. 检查请求头兼容性
+      // 4. Check request header compatibility
       if (config.headers) {
         const headersCheck = this.checkHttpParametersCompatibility(config.headers, 'header')
         errors.push(...headersCheck.errors)
@@ -254,7 +254,7 @@ export class TypeCompatibilityChecker {
         suggestions.push(...headersCheck.suggestions)
       }
 
-      // 5. 检查路径参数兼容性
+      // 5. Check path parameter compatibility
       if (config.pathParameter) {
         const pathParamCheck = this.checkPathParameterCompatibility(config.pathParameter, config.url)
         if (!pathParamCheck.isValid) {
@@ -265,11 +265,11 @@ export class TypeCompatibilityChecker {
         }
       }
 
-      // 6. 检查超时值合理性
+      // 6. Check the reasonableness of the timeout value
       if (config.timeout && (config.timeout < 1000 || config.timeout > 300000)) {
-        warnings.push(`超时时间设置可能不合理: ${config.timeout}ms`)
+        warnings.push(`The timeout setting may be unreasonable: ${config.timeout}ms`)
         affectedItems.push('timeout')
-        suggestions.push('建议超时时间设置在1秒到5分钟之间')
+        suggestions.push('It is recommended that the timeout be set at1Seconds to arrive5between minutes')
       }
 
       const level = errors.length > 0 ? 'incompatible' : warnings.length > 0 ? 'warning' : 'compatible'
@@ -287,19 +287,19 @@ export class TypeCompatibilityChecker {
     } catch (error) {
       return {
         valid: false,
-        errors: [`HTTP配置兼容性检查失败: ${error.message}`],
+        errors: [`HTTPConfiguration compatibility check failed: ${error.message}`],
         warnings: [],
         level: 'incompatible',
         checkType: 'HttpConfig',
         affectedItems: ['entire_config'],
-        suggestions: ['请检查HTTP配置格式是否正确'],
+        suggestions: ['Check, pleaseHTTPIs the configuration format correct?'],
         timestamp: Date.now()
       }
     }
   }
 
   /**
-   * 检查组件数据需求兼容性
+   * Check component data requirements compatibility
    */
   public checkComponentDataRequirementCompatibility(requirement: ComponentDataRequirement): CompatibilityCheckResult {
     const errors: string[] = []
@@ -308,14 +308,14 @@ export class TypeCompatibilityChecker {
     const affectedItems: string[] = []
 
     try {
-      // 1. 检查组件ID格式
+      // 1. Check componentsIDFormat
       if (!requirement.componentId || typeof requirement.componentId !== 'string') {
-        errors.push('组件ID无效或缺失')
+        errors.push('componentsIDInvalid or missing')
         affectedItems.push('componentId')
-        suggestions.push('请提供有效的组件ID字符串')
+        suggestions.push('Please provide a valid componentIDstring')
       }
 
-      // 2. 检查静态参数兼容性
+      // 2. Check static parameter compatibility
       if (requirement.staticParams) {
         for (let i = 0; i < requirement.staticParams.length; i++) {
           const param = requirement.staticParams[i]
@@ -329,7 +329,7 @@ export class TypeCompatibilityChecker {
         }
       }
 
-      // 3. 检查数据源需求兼容性
+      // 3. Check data source requirements compatibility
       if (requirement.dataSources && requirement.dataSources.length > 0) {
         for (let i = 0; i < requirement.dataSources.length; i++) {
           const dataSource = requirement.dataSources[i]
@@ -342,18 +342,18 @@ export class TypeCompatibilityChecker {
           }
         }
       } else {
-        warnings.push('组件没有定义任何数据源需求')
-        suggestions.push('考虑添加数据源需求以支持动态数据')
+        warnings.push('The component does not define any data source requirements')
+        suggestions.push('Consider adding data source requirements to support dynamic data')
       }
 
-      // 4. 检查字段命名冲突
+      // 4. Check for field naming conflicts
       const fieldNames = new Set<string>()
       if (requirement.staticParams) {
         requirement.staticParams.forEach(param => {
           if (fieldNames.has(param.key)) {
-            errors.push(`静态参数字段名重复: ${param.key}`)
+            errors.push(`Duplicate static parameter field names: ${param.key}`)
             affectedItems.push(`staticParams.${param.key}`)
-            suggestions.push(`请为字段 ${param.key} 使用唯一的名称`)
+            suggestions.push(`Please provide the field ${param.key} Use a unique name`)
           }
           fieldNames.add(param.key)
         })
@@ -374,19 +374,19 @@ export class TypeCompatibilityChecker {
     } catch (error) {
       return {
         valid: false,
-        errors: [`组件数据需求兼容性检查失败: ${error.message}`],
+        errors: [`Component data requirement compatibility check failed: ${error.message}`],
         warnings: [],
         level: 'incompatible',
         checkType: 'ComponentDataRequirement',
         affectedItems: ['entire_requirement'],
-        suggestions: ['请检查组件数据需求格式是否正确'],
+        suggestions: ['Please check whether the component data requirement format is correct'],
         timestamp: Date.now()
       }
     }
   }
 
   /**
-   * 检查数据类型兼容性
+   * Check data type compatibility
    */
   public checkDataTypeCompatibility(
     sourceType: DataType | FieldType,
@@ -398,12 +398,12 @@ export class TypeCompatibilityChecker {
     if (!mapping) {
       return {
         valid: false,
-        errors: [`不支持从 ${sourceType} 到 ${targetType} 的类型转换`],
+        errors: [`Not supported from ${sourceType} arrive ${targetType} type conversion`],
         warnings: [],
         level: 'incompatible',
         checkType: 'DataTypeCompatibility',
         affectedItems: [sourceType, targetType],
-        suggestions: [`考虑使用兼容的数据类型或添加类型转换逻辑`],
+        suggestions: [`Consider using compatible data types or adding type conversion logic`],
         timestamp: Date.now()
       }
     }
@@ -412,8 +412,8 @@ export class TypeCompatibilityChecker {
     const suggestions: string[] = []
 
     if (mapping.needsConversion) {
-      warnings.push(`需要进行类型转换: ${sourceType} -> ${targetType}`)
-      suggestions.push(`使用转换函数: ${mapping.conversionFunction}`)
+      warnings.push(`Type conversion required: ${sourceType} -> ${targetType}`)
+      suggestions.push(`Use conversion functions: ${mapping.conversionFunction}`)
     }
 
     return {
@@ -429,7 +429,7 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 批量检查兼容性
+   * Check compatibility in batches
    */
   public batchCompatibilityCheck(
     items: Array<{
@@ -483,33 +483,33 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * URL格式检查
+   * URLFormat check
    */
   private checkUrlFormat(url: string): { isValid: boolean; error?: string } {
     if (!url || typeof url !== 'string') {
-      return { isValid: false, error: 'URL不能为空' }
+      return { isValid: false, error: 'URLcannot be empty' }
     }
 
     try {
-      // 检查是否是相对路径（允许）
+      // Check if it is a relative path（allow）
       if (url.startsWith('/')) {
         return { isValid: true }
       }
 
-      // 检查是否是完整URL
+      // Check if it is completeURL
       const urlObj = new URL(url)
       if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        return { isValid: false, error: '只支持HTTP和HTTPS协议' }
+        return { isValid: false, error: 'Only supportsHTTPandHTTPSprotocol' }
       }
 
       return { isValid: true }
     } catch {
-      return { isValid: false, error: 'URL格式不正确' }
+      return { isValid: false, error: 'URLIncorrect format' }
     }
   }
 
   /**
-   * HTTP方法检查
+   * HTTPmethod check
    */
   private checkHttpMethod(method: string): { isValid: boolean } {
     const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']
@@ -517,7 +517,7 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * HTTP参数兼容性检查
+   * HTTPParameter compatibility check
    */
   private checkHttpParametersCompatibility(
     parameters: HttpParameter[],
@@ -531,39 +531,39 @@ export class TypeCompatibilityChecker {
     for (let i = 0; i < parameters.length; i++) {
       const param = parameters[i]
 
-      // 检查必填字段
+      // Check required fields
       if (!param.key) {
-        errors.push(`参数[${i}]缺少key字段`)
+        errors.push(`parameter[${i}]LackkeyField`)
         affectedItems.push(`params[${i}].key`)
-        suggestions.push(`为参数[${i}]提供有效的key值`)
+        suggestions.push(`as parameters[${i}]provide validkeyvalue`)
       }
 
-      // 检查数据类型
+      // Check data type
       if (!['string', 'number', 'boolean', 'json'].includes(param.dataType)) {
-        errors.push(`参数[${i}]数据类型无效: ${param.dataType}`)
+        errors.push(`parameter[${i}]Invalid data type: ${param.dataType}`)
         affectedItems.push(`params[${i}].dataType`)
-        suggestions.push(`使用有效的数据类型: string, number, boolean, json`)
+        suggestions.push(`Use valid data types: string, number, boolean, json`)
       }
 
-      // 检查参数类型匹配
+      // Check parameter type match
       if (param.paramType && param.paramType !== paramType) {
-        warnings.push(`参数[${i}]类型不匹配，期望: ${paramType}, 实际: ${param.paramType}`)
+        warnings.push(`parameter[${i}]type mismatch，expect: ${paramType}, actual: ${param.paramType}`)
         affectedItems.push(`params[${i}].paramType`)
-        suggestions.push(`统一参数类型为: ${paramType}`)
+        suggestions.push(`The unified parameter type is: ${paramType}`)
       }
 
-      // 检查动态参数的变量名
+      // Check variable names of dynamic parameters
       if (param.isDynamic && !param.variableName) {
-        errors.push(`动态参数[${i}]缺少variableName`)
+        errors.push(`dynamic parameters[${i}]LackvariableName`)
         affectedItems.push(`params[${i}].variableName`)
-        suggestions.push(`为动态参数[${i}]提供变量名`)
+        suggestions.push(`is a dynamic parameter[${i}]Provide variable name`)
       }
 
-      // 检查值模式兼容性
+      // Check value pattern compatibility
       if (param.valueMode && !['manual', 'dropdown', 'property', 'component'].includes(param.valueMode)) {
-        errors.push(`参数[${i}]值模式无效: ${param.valueMode}`)
+        errors.push(`parameter[${i}]Invalid value pattern: ${param.valueMode}`)
         affectedItems.push(`params[${i}].valueMode`)
-        suggestions.push(`使用有效的值模式: manual, dropdown, property, component`)
+        suggestions.push(`Use valid value pattern: manual, dropdown, property, component`)
       }
     }
 
@@ -580,23 +580,23 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 路径参数兼容性检查
+   * Path parameter compatibility check
    */
   private checkPathParameterCompatibility(pathParam: PathParameter, url: string): CompatibilityCheckResult {
     const errors: string[] = []
     const warnings: string[] = []
     const suggestions: string[] = []
 
-    // 检查URL是否包含路径参数占位符
+    // examineURLWhether to include path parameter placeholders
     if (pathParam.isDynamic && !url.includes('{') && !url.includes(':')) {
-      warnings.push('URL中没有找到路径参数占位符，但参数被标记为动态')
-      suggestions.push('请在URL中添加路径参数占位符，如: /api/device/{id}')
+      warnings.push('URLPath parameter placeholder not found in，But the parameter is marked as dynamic')
+      suggestions.push('pleaseURLAdd path parameter placeholders in，like: /api/device/{id}')
     }
 
-    // 检查数据类型
+    // Check data type
     if (!['string', 'number', 'boolean', 'json'].includes(pathParam.dataType)) {
-      errors.push(`路径参数数据类型无效: ${pathParam.dataType}`)
-      suggestions.push('使用有效的数据类型: string, number, boolean, json')
+      errors.push(`Path parameter data type is invalid: ${pathParam.dataType}`)
+      suggestions.push('Use valid data types: string, number, boolean, json')
     }
 
     return {
@@ -612,7 +612,7 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 静态参数兼容性检查
+   * Static parameter compatibility check
    */
   private checkStaticParamCompatibility(param: StaticParamRequirement, index: number): ValidationResult {
     const errors: string[] = []
@@ -620,18 +620,18 @@ export class TypeCompatibilityChecker {
     const suggestions: string[] = []
 
     if (!param.key) {
-      errors.push('静态参数缺少key字段')
-      suggestions.push('提供唯一的参数键名')
+      errors.push('Static parameters are missingkeyField')
+      suggestions.push('Provide unique parameter key names')
     }
 
     if (!param.name) {
-      errors.push('静态参数缺少name字段')
-      suggestions.push('提供参数显示名称')
+      errors.push('Static parameters are missingnameField')
+      suggestions.push('Provide parameter display name')
     }
 
     if (!['string', 'number', 'boolean', 'object', 'array'].includes(param.type)) {
-      errors.push(`静态参数类型无效: ${param.type}`)
-      suggestions.push('使用有效的类型: string, number, boolean, object, array')
+      errors.push(`Invalid static parameter type: ${param.type}`)
+      suggestions.push('Use valid types: string, number, boolean, object, array')
     }
 
     return {
@@ -642,7 +642,7 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 数据源需求兼容性检查
+   * Data source requirement compatibility check
    */
   private checkDataSourceRequirementCompatibility(requirement: DataSourceRequirement, index: number): ValidationResult {
     const errors: string[] = []
@@ -650,13 +650,13 @@ export class TypeCompatibilityChecker {
     const suggestions: string[] = []
 
     if (!requirement.key) {
-      errors.push('数据源需求缺少key字段')
-      suggestions.push('提供唯一的数据源键名')
+      errors.push('Data source requirements are missingkeyField')
+      suggestions.push('Provide a unique data source key name')
     }
 
     if (!requirement.supportedTypes || requirement.supportedTypes.length === 0) {
-      errors.push('数据源需求没有定义支持的类型')
-      suggestions.push('至少定义一种支持的数据源类型')
+      errors.push('Data source requirement does not define supported types')
+      suggestions.push('Define at least one supported data source type')
     }
 
     return {
@@ -667,21 +667,21 @@ export class TypeCompatibilityChecker {
   }
 
   /**
-   * 获取检查历史
+   * Get inspection history
    */
   public getCheckHistory(): CompatibilityCheckResult[] {
     return [...this.checkHistory]
   }
 
   /**
-   * 清除检查历史
+   * Clear inspection history
    */
   public clearCheckHistory(): void {
     this.checkHistory = []
   }
 
   /**
-   * 获取类型映射统计
+   * Get type mapping statistics
    */
   public getTypeMappingStats() {
     const stats = new Map<string, number>()
@@ -699,12 +699,12 @@ export class TypeCompatibilityChecker {
 }
 
 /**
- * 导出单例实例
+ * Export singleton instance
  */
 export const typeCompatibilityChecker = TypeCompatibilityChecker.getInstance()
 
 /**
- * 便捷的兼容性检查方法
+ * Convenient way to check compatibility
  */
 export function checkHttpConfigCompatibility(config: HttpConfig): CompatibilityCheckResult {
   return typeCompatibilityChecker.checkHttpConfigCompatibility(config)
@@ -723,7 +723,7 @@ export function checkDataTypeCompatibility(
   return typeCompatibilityChecker.checkDataTypeCompatibility(sourceType, targetType)
 }
 
-// 开发环境调试接口
+// Development environment debugging interface
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   ;(window as any).__TYPE_COMPATIBILITY_CHECKER__ = {
     checker: typeCompatibilityChecker,

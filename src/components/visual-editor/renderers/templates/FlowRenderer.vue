@@ -1,7 +1,7 @@
 <!--
-  流式布局渲染器模板
-  适用于自动排列的流式布局需求
-  组件会自动从上到下、从左到右排列
+  Fluid Layout Renderer Template
+  Suitable for flow layout needs of automatic arrangement
+  Components will automatically move from top to bottom、Arrange from left to right
 -->
 <template>
   <BaseRendererComponent
@@ -20,7 +20,7 @@
       }"
       @click="handleCanvasClick"
     >
-      <!-- 流式布局容器 -->
+      <!-- Fluid layout container -->
       <div class="flow-container" :style="getContainerStyle()">
         <div
           v-for="(node, index) in layoutNodes"
@@ -33,12 +33,12 @@
           :style="getFlowItemStyle(node, index)"
           @click.stop="handleNodeClick(node.id)"
         >
-          <!-- 节点标题 -->
+          <!-- Node title -->
           <div v-if="showWidgetTitles && !readonly" class="node-title">
             {{ node.label || node.type }}
           </div>
 
-          <!-- 节点内容 -->
+          <!-- Node content -->
           <div class="node-content">
             <Card2Wrapper
               v-if="isCard2Component(node.type)"
@@ -64,7 +64,7 @@ import { globalPreviewMode } from '@/components/visual-editor/hooks/usePreviewMo
 import BaseRendererComponent from '@/components/visual-editor/renderers/base/BaseRendererComponent.vue'
 import { Card2Wrapper } from '@/components/visual-editor/renderers/base'
 
-// 流式布局配置
+// Fluid layout configuration
 interface FlowConfig {
   showGrid?: boolean
   direction?: 'row' | 'column'
@@ -77,7 +77,7 @@ interface FlowConfig {
   itemHeight?: number | 'auto'
 }
 
-// 组件 Props
+// components Props
 interface Props {
   readonly?: boolean
   config?: FlowConfig
@@ -100,7 +100,7 @@ const props = withDefaults(defineProps<Props>(), {
   showWidgetTitles: false
 })
 
-// 组件 Emits
+// components Emits
 interface Emits {
   (e: 'ready'): void
   (e: 'error', error: Error): void
@@ -110,11 +110,11 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 使用原始 store
+// Use original store
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
 
-// 适配旧接口
+// Adapt to old interface
 const selectNode = (nodeId: string) => {
   if (nodeId) {
     widgetStore.selectNodes([nodeId])
@@ -124,25 +124,25 @@ const selectNode = (nodeId: string) => {
 }
 
 const isCard2Component = (type: string) => {
-  // 简单的Card2组件检测
+  // simpleCard2Component detection
   return type.includes('card2') || type.includes('Card2')
 }
 const { isPreviewMode } = globalPreviewMode
 
-// 计算属性
+// Computed properties
 const nodes = computed(() => editorStore.nodes || [])
 const selectedIds = computed(() => widgetStore.selectedNodeIds || [])
 
-// 布局计算
+// layout calculation
 const layoutNodes = computed(() => {
-  // 可以根据需要对节点进行排序或筛选
+  // Nodes can be sorted or filtered as needed
   return nodes.value.sort((a, b) => {
-    // 按创建时间或其他逻辑排序
+    // Sort by creation time or other logic
     return (a.metadata?.createdAt || 0) - (b.metadata?.createdAt || 0)
   })
 })
 
-// 事件处理器
+// event handler
 const onRendererReady = () => {
   emit('ready')
 }
@@ -177,7 +177,7 @@ const handleComponentError = (error: Error) => {
   emit('error', error)
 }
 
-// 样式计算
+// style calculation
 const getContainerStyle = () => {
   const config = props.config!
   return {
@@ -198,7 +198,7 @@ const getFlowItemStyle = (node: any, index: number) => {
     flexShrink: 0
   }
 
-  // 设置项目尺寸
+  // Set project dimensions
   if (config.itemWidth !== 'auto') {
     style.width = typeof config.itemWidth === 'number' ? `${config.itemWidth}px` : config.itemWidth
   }
@@ -207,7 +207,7 @@ const getFlowItemStyle = (node: any, index: number) => {
     style.height = typeof config.itemHeight === 'number' ? `${config.itemHeight}px` : config.itemHeight
   }
 
-  // 如果节点有自定义尺寸，优先使用
+  // If the node has custom dimensions，priority use
   if (node.width && node.width !== config.itemWidth) {
     style.width = `${node.width}px`
   }
@@ -218,10 +218,10 @@ const getFlowItemStyle = (node: any, index: number) => {
   return style
 }
 
-// 组件获取
+// Component acquisition
 const getWidgetComponent = (type: string) => {
   const components: Record<string, any> = {
-    // 在这里添加您的组件映射
+    // Add your component mapping here
   }
   return components[type]
 }
@@ -294,7 +294,7 @@ const getWidgetComponent = (type: string) => {
   flex-direction: column;
 }
 
-/* 预览模式样式 */
+/* Preview mode style */
 .flow-renderer.preview-mode .flow-item {
   cursor: default;
 }
@@ -304,7 +304,7 @@ const getWidgetComponent = (type: string) => {
   transform: none;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 768px) {
   .flow-renderer {
     min-height: 400px;

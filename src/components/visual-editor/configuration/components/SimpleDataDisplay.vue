@@ -5,7 +5,7 @@
         {{ $t('visualEditor.dataDisplayTest') }}
       </n-text>
 
-      <!-- 当前数据源数据 -->
+      <!-- Current data source data -->
       <div class="data-section">
         <n-text depth="2" style="font-size: 11px">{{ $t('visualEditor.currentDataSourceData') }}:</n-text>
         <n-code
@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 /**
- * 简单数据展示测试组件
- * 用于在配置面板中测试双数据源：对象类型和数组类型
+ * Simple data display test component
+ * For testing dual data sources in configuration panel：Object types and array types
  */
 
 import { computed } from 'vue'
@@ -30,8 +30,8 @@ import { NSpace, NText, NCode } from 'naive-ui'
 import { $t } from '@/locales'
 
 interface Props {
-  objectData?: any // 对象类型数据源
-  arrayData?: any // 数组类型数据源
+  objectData?: any // Object type data source
+  arrayData?: any // Array type data source
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,16 +39,16 @@ const props = withDefaults(defineProps<Props>(), {
   arrayData: null
 })
 
-// 格式化对象数据显示
+// Format object data display
 const objectDataDisplay = computed(() => {
   const data = props.objectData || props.arrayData
   if (!data || data === null || data === undefined) {
-    return '暂无数据'
+    return 'No data yet'
   }
 
-  // 检查是否为空对象
+  // Check if it is an empty object
   if (typeof data === 'object' && Object.keys(data).length === 0) {
-    return '暂无数据'
+    return 'No data yet'
   }
   try {
     return JSON.stringify(data, null, 2)
@@ -57,11 +57,11 @@ const objectDataDisplay = computed(() => {
   }
 })
 
-// 格式化数组数据显示
+// Format array data display
 const arrayDataDisplay = computed(() => {
-  // 如果传入的数据是数组类型或者有数据就显示，不区分类型
+  // If the incoming data is an array type or there is data, it will be displayed.，No distinction between types
   const data = props.arrayData || props.objectData
-  if (!data) return '暂无数据'
+  if (!data) return 'No data yet'
   try {
     return JSON.stringify(data, null, 2)
   } catch {

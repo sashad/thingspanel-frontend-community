@@ -1,47 +1,47 @@
-# Chart Switch 组件 Card 2.1 迁移配置文档
+# Chart Switch components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-Chart Switch 组件是一个设备状态控制器卡片，提供开关控制功能。用户可以通过开关组件控制设备的状态，支持属性和遥测数据的读取与发布。
+Chart Switch The component is a device state controller card，Provide switch control function。Users can control the status of the device through the switch component，Supports reading and publishing of attributes and telemetry data。
 
-## 当前实现分析
+## Current implementation analysis
 
-### 组件配置 (index.ts)
-- **组件ID**: `chart-switch`
-- **组件类型**: `chart`
-- **标题**: `$t('card.deviceStateController')` (设备状态控制器)
-- **数据源**: 设备来源，支持1个数据源
-- **默认布局**: 3x2 (最小高度1)
+### Component configuration (index.ts)
+- **componentsID**: `chart-switch`
+- **Component type**: `chart`
+- **title**: `$t('card.deviceStateController')` (Device status controller)
+- **data source**: Equipment source，support1data sources
+- **default layout**: 3x2 (minimum height1)
 
-### 组件实现 (component.vue)
-- **数据获取**: 支持从设备属性或遥测数据中获取开关状态
-- **状态控制**: 通过 API 发布属性或遥测数据来控制设备
-- **状态计算**: 根据配置的激活值判断开关状态
-- **数据类型**: 支持 string、number、boolean 类型的开关值
-- **实时更新**: 支持 WebSocket 数据更新
+### Component implementation (component.vue)
+- **data acquisition**: Supports obtaining switch status from device properties or telemetry data
+- **status control**: pass API Publish properties or telemetry data to control devices
+- **State calculation**: Determine switch status based on configured activation value
+- **data type**: support string、number、boolean switch value of type
+- **real time updates**: support WebSocket Data update
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 组件定义
+### Component definition
 ```typescript
 export const chartSwitchCard: CardDefinition = {
   id: 'chart-switch',
-  name: '开关控制',
+  name: 'switch control',
   category: 'control',
-  description: '设备状态控制器，支持开关控制和状态显示',
+  description: 'Device status controller，Support switch control and status display',
   version: '2.1.0',
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     required: true,
     maxSources: 1,
     supportedMetrics: ['attributes', 'telemetry'],
-    description: '设备属性或遥测数据源',
+    description: 'Device properties or telemetry data source',
     capabilities: ['read', 'write']
   },
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 3, height: 2 },
     minSize: { width: 2, height: 1 },
@@ -49,23 +49,23 @@ export const chartSwitchCard: CardDefinition = {
     resizable: true
   },
   
-  // 配置选项
+  // Configuration options
   configSchema: {
     active0: {
       type: 'string',
-      title: '开启值',
-      description: '开关开启时对应的数据值',
-      placeholder: '例如: 1, true, on'
+      title: 'open value',
+      description: 'The corresponding data value when the switch is turned on',
+      placeholder: 'For example: 1, true, on'
     },
     active1: {
       type: 'string',
-      title: '关闭值',
-      description: '开关关闭时对应的数据值',
-      placeholder: '例如: 0, false, off'
+      title: 'close value',
+      description: 'The corresponding data value when the switch is closed',
+      placeholder: 'For example: 0, false, off'
     }
   },
   
-  // 权限要求
+  // Permission requirements
   permissions: {
     read: true,
     write: true,
@@ -74,9 +74,9 @@ export const chartSwitchCard: CardDefinition = {
 }
 ```
 
-### 数据源映射
+### Data source mapping
 ```typescript
-// 原始数据源结构
+// Original data source structure
 interface OriginalDataSource {
   deviceSource: [{
     deviceId: string;
@@ -87,7 +87,7 @@ interface OriginalDataSource {
   }];
 }
 
-// Card 2.1 数据源结构
+// Card 2.1 Data source structure
 interface Card21DataSource {
   device: {
     id: string;
@@ -101,7 +101,7 @@ interface Card21DataSource {
   };
 }
 
-// 映射函数
+// mapping function
 function mapDataSource(original: OriginalDataSource): Card21DataSource {
   const deviceSource = original.deviceSource[0];
   return {
@@ -119,92 +119,92 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
 }
 ```
 
-### 实现要点
+### Implementation points
 
-1. **开关状态计算**
-   - 支持自定义开启/关闭值配置
-   - 根据数据类型进行值转换
-   - 默认非零值为开启状态
+1. **Switch state calculation**
+   - Support custom opening/Close value configuration
+   - Value conversion based on data type
+   - Default non-zero value is on
 
-2. **设备控制功能**
-   - 支持属性数据发布 (attributeDataPub)
-   - 支持遥测数据发布 (telemetryDataPub)
-   - 根据数据源类型选择发布方式
+2. **Device control functions**
+   - Support attribute data publishing (attributeDataPub)
+   - Support telemetry data publishing (telemetryDataPub)
+   - Choose a publishing method based on data source type
 
-3. **数据类型处理**
-   - string: 支持自定义字符串值
-   - number: 支持数值转换
-   - boolean: 支持布尔值转换
+3. **Data type handling**
+   - string: Support custom string values
+   - number: Support numerical conversion
+   - boolean: Support boolean conversion
 
-4. **实时数据更新**
-   - 监听 WebSocket 数据更新
-   - 自动计算开关状态
-   - 支持配置变化响应
+4. **Real-time data updates**
+   - monitor WebSocket Data update
+   - Automatic calculation of switch states
+   - Support configuration change response
 
-## 迁移检查清单
+## Migration checklist
 
-- [ ] 验证数据源映射正确性
-- [ ] 确认开关状态计算逻辑
-- [ ] 测试设备控制功能
-- [ ] 验证数据类型转换
-- [ ] 检查权限控制
-- [ ] 测试实时数据更新
-- [ ] 验证配置表单功能
-- [ ] 确认错误处理机制
+- [ ] Verify data source mapping correctness
+- [ ] Confirm switch status calculation logic
+- [ ] Test equipment control functions
+- [ ] Verify data type conversion
+- [ ] Check access control
+- [ ] Test real-time data updates
+- [ ] Verify configuration form functionality
+- [ ] Confirm error handling mechanism
 
-## 迁移步骤
+## Migration steps
 
-1. **创建 Card 2.1 组件定义**
-   - 定义组件元数据和配置架构
-   - 设置数据源要求和权限控制
-   - 配置布局约束
+1. **create Card 2.1 Component definition**
+   - Define component metadata and configuration schema
+   - Set data source requirements and permission controls
+   - Configure layout constraints
 
-2. **实现数据源适配器**
-   - 创建数据源映射函数
-   - 处理读写权限验证
-   - 适配不同数据类型
+2. **Implement data source adapter**
+   - Create data source mapping function
+   - Handle read and write permission verification
+   - Adapt to different data types
 
-3. **迁移控制逻辑**
-   - 保持开关状态计算逻辑
-   - 适配新的数据发布接口
-   - 维护数据类型转换
+3. **Migration control logic**
+   - Maintain switch state calculation logic
+   - Adapt to new data publishing interface
+   - Maintain data type conversion
 
-4. **更新配置表单**
-   - 适配 Card 2.1 配置架构
-   - 保持现有配置选项
-   - 添加数据类型提示
+4. **Update configuration form**
+   - adaptation Card 2.1 Configuration architecture
+   - Keep existing configuration options
+   - Add data type hints
 
-5. **安全性增强**
-   - 添加权限验证
-   - 实现操作日志记录
-   - 增强错误处理
+5. **Security enhancements**
+   - Add permission verification
+   - Implement operation logging
+   - Enhanced error handling
 
-6. **测试验证**
-   - 功能测试：开关控制、状态显示
-   - 权限测试：读写权限验证
-   - 兼容性测试：不同数据类型、设备类型
-   - 安全测试：权限控制、异常处理
+6. **Test verification**
+   - Functional testing：switch control、status display
+   - Permission test：Read and write permission verification
+   - Compatibility testing：different data types、Device type
+   - Security testing：Permission control、Exception handling
 
-## 安全考虑
+## security considerations
 
-1. **权限控制**
-   - 验证用户是否有设备控制权限
-   - 检查设备是否支持写入操作
-   - 记录控制操作日志
+1. **Permission control**
+   - Verify that the user has device control permissions
+   - Check if the device supports write operations
+   - Record control operation log
 
-2. **数据验证**
-   - 验证控制值的有效性
-   - 检查数据类型匹配
-   - 防止无效数据发送
+2. **Data validation**
+   - Verify the validity of control values
+   - Check data type match
+   - Prevent invalid data from being sent
 
-3. **错误处理**
-   - 网络异常处理
-   - 设备离线处理
-   - 权限不足提示
+3. **Error handling**
+   - Network exception handling
+   - Device offline processing
+   - Insufficient permission prompt
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture/card21-architecture.md)
-- [数据源映射指南](../guides/data-source-mapping.md)
-- [设备控制安全指南](../guides/device-control-security.md)
-- [权限管理文档](../guides/permission-management.md)
+- [Card 2.1 Architecture documentation](../architecture/card21-architecture.md)
+- [Data Source Mapping Guide](../guides/data-source-mapping.md)
+- [Device Control Security Guide](../guides/device-control-security.md)
+- [Rights management documentation](../guides/permission-management.md)

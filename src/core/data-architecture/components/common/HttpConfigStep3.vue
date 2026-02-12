@@ -1,17 +1,17 @@
 <!--
-  HTTP配置第3步 - 参数配置组件
-  配置查询参数和路径参数
-  ✨ 优化：添加接口模板智能推荐卡片
+  HTTPConfiguration section3step - Parameter configuration component
+  Configure query parameters and path parameters
+  ✨ optimization：Add interface template intelligent recommendation card
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep3 - HTTP参数配置步骤（UI优化版）
- * 包含查询参数和路径参数的配置
+ * HttpConfigStep3 - HTTPParameter configuration steps（UIOptimized version）
+ * Configuration containing query parameters and path parameters
  *
- * 🎯 优化3：接口模板智能推荐
- * - 检测currentApiInfo是否有预制查询参数
- * - 显示智能推荐卡片
- * - 应用模板后高亮提示
+ * 🎯 optimization3：Intelligent recommendation of interface templates
+ * - DetectioncurrentApiInfoAre there pre-made query parameters?
+ * - Show smart recommendation cards
+ * - Highlight after applying template
  */
 
 import { ref, computed, watch } from 'vue'
@@ -19,15 +19,15 @@ import { NText } from 'naive-ui'
 import type { HttpConfig } from '@/core/data-architecture/types/http-config'
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 import DynamicParameterEditor from '@/core/data-architecture/components/common/DynamicParameterEditor.vue'
-// 导入图标
+// import icon
 import { Sparkles as SparkleIcon } from '@vicons/ionicons5'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 当前选择的内部接口信息 */
+  /** Currently selected internal interface information */
   currentApiInfo?: any
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
@@ -39,18 +39,18 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 /**
- * 🎯 优化3：智能推荐卡片显示状态
+ * 🎯 optimization3：Smart recommendation card display status
  */
 const showTemplateRecommend = ref(false)
 const hasAppliedTemplate = ref(false)
 
 /**
- * 🎯 优化3：检测是否有可用的查询参数模板
+ * 🎯 optimization3：Check if a query parameter template is available
  */
 const hasQueryParamTemplate = computed(() => {
   if (!props.currentApiInfo || !props.currentApiInfo.commonParams) return false
 
-  // 排除路径参数，只显示查询参数
+  // Exclude path parameters，Show only query parameters
   const pathParamNames = props.currentApiInfo.pathParamNames || []
   const queryParams = props.currentApiInfo.commonParams.filter(
     (param: any) => !pathParamNames.includes(param.name) && param.type !== 'header'
@@ -60,7 +60,7 @@ const hasQueryParamTemplate = computed(() => {
 })
 
 /**
- * 🎯 优化3：获取查询参数模板
+ * 🎯 optimization3：Get query parameter template
  */
 const queryParamTemplates = computed(() => {
   if (!props.currentApiInfo || !props.currentApiInfo.commonParams) return []
@@ -72,7 +72,7 @@ const queryParamTemplates = computed(() => {
 })
 
 /**
- * 🎯 优化3：监听currentApiInfo变化，自动显示推荐卡片
+ * 🎯 optimization3：monitorcurrentApiInfochange，Automatically display recommendation cards
  */
 watch(
   () => props.currentApiInfo,
@@ -85,12 +85,12 @@ watch(
 )
 
 /**
- * 🎯 优化3：应用接口模板
+ * 🎯 optimization3：Application interface template
  */
 const applyTemplate = () => {
   if (!queryParamTemplates.value || queryParamTemplates.value.length === 0) return
 
-  // 生成模板参数
+  // Generate template parameters
   const templateParams: EnhancedParameter[] = queryParamTemplates.value.map((param: any) => ({
     key: param.name,
     value: param.example || param.defaultValue || '',
@@ -99,13 +99,13 @@ const applyTemplate = () => {
     valueMode: 'manual',
     selectedTemplate: 'manual',
     variableName: '',
-    description: param.description || `${param.name}查询参数`,
+    description: param.description || `${param.name}query parameters`,
     dataType: param.type === 'number' ? 'number' : param.type === 'boolean' ? 'boolean' : 'string',
     defaultValue: param.example || param.defaultValue,
     _id: `param_template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }))
 
-  // 合并到现有参数（避免重复）
+  // Merge into existing parameters（avoid duplication）
   const existingKeys = new Set((props.modelValue.params || []).map(p => p.key))
   const newParams = templateParams.filter(p => !existingKeys.has(p.key))
 
@@ -113,14 +113,14 @@ const applyTemplate = () => {
     const updatedParams = [...(props.modelValue.params || []), ...newParams]
     emit('update:modelValue', { ...props.modelValue, params: updatedParams })
 
-    // 标记已应用模板
+    // Mark template applied
     hasAppliedTemplate.value = true
     showTemplateRecommend.value = false
   }
 }
 
 /**
- * 🎯 优化3：关闭推荐卡片
+ * 🎯 optimization3：Close recommendation card
  */
 const dismissRecommend = () => {
   showTemplateRecommend.value = false
@@ -129,19 +129,19 @@ const dismissRecommend = () => {
 
 <template>
   <div class="http-config-step3">
-    <!-- 🎯 优化3：接口模板智能推荐卡片 -->
+    <!-- 🎯 optimization3：Interface template intelligent recommendation card -->
     <n-alert v-if="showTemplateRecommend" type="success" closable style="margin-bottom: 16px" @close="dismissRecommend">
       <template #header>
         <n-space align="center">
           <n-icon size="18"><sparkle-icon /></n-icon>
-          <span>检测到内部接口模板可用</span>
+          <span>Internal interface template available detected</span>
         </n-space>
       </template>
 
       <n-space vertical size="small">
         <n-text depth="3">
-          接口 "<n-text type="success" strong>{{ currentApiInfo?.label }}</n-text>" 包含
-          <n-text type="success" strong>{{ queryParamTemplates.length }}</n-text> 个预制查询参数
+          interface "<n-text type="success" strong>{{ currentApiInfo?.label }}</n-text>" Include
+          <n-text type="success" strong>{{ queryParamTemplates.length }}</n-text> pre-made query parameters
         </n-text>
 
         <n-space size="small" style="flex-wrap: wrap">
@@ -156,7 +156,7 @@ const dismissRecommend = () => {
             <span v-if="param.required" style="color: var(--error-color); margin-left: 2px">*</span>
           </n-tag>
           <n-text v-if="queryParamTemplates.length > 4" depth="3" style="font-size: 12px">
-            +{{ queryParamTemplates.length - 4 }} 个
+            +{{ queryParamTemplates.length - 4 }} indivual
           </n-text>
         </n-space>
 
@@ -165,21 +165,21 @@ const dismissRecommend = () => {
             <template #icon>
               <n-icon><sparkle-icon /></n-icon>
             </template>
-            应用模板
+            Apply template
           </n-button>
-          <n-button size="small" @click="dismissRecommend">稍后手动配置</n-button>
+          <n-button size="small" @click="dismissRecommend">Configure manually later</n-button>
         </n-space>
       </n-space>
     </n-alert>
 
-    <!-- 查询参数配置 -->
+    <!-- Query parameter configuration -->
     <DynamicParameterEditor
       :model-value="modelValue.params || []"
       parameter-type="query"
-      title="查询参数配置"
-      add-button-text="添加查询参数"
-      key-placeholder="参数名（如：deviceId）"
-      value-placeholder="参数值（如：DEV001）"
+      title="Query parameter configuration"
+      add-button-text="Add query parameters"
+      key-placeholder="Parameter name（like：deviceId）"
+      value-placeholder="Parameter value（like：DEV001）"
       :current-api-info="currentApiInfo"
       :current-component-id="componentId"
       @update:model-value="
@@ -189,10 +189,10 @@ const dismissRecommend = () => {
       "
     />
 
-    <!-- 提示信息 -->
+    <!-- Prompt message -->
     <div style="margin-top: 16px; padding: 12px; background: var(--info-color-suppl); border-radius: 6px">
       <n-text depth="3" style="font-size: 12px">
-        💡 提示：选择内部接口后，如果有预制参数会自动显示推荐卡片。也可在"添加查询参数"下拉菜单中选择"✨ 应用接口模板"导入
+        💡 hint：After selecting the internal interface，If there are pre-made parameters, recommended cards will be automatically displayed.。Also available in"Add query parameters"Select from the drop-down menu"✨ Application interface template"import
       </n-text>
     </div>
   </div>

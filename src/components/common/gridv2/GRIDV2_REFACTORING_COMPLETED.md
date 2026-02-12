@@ -1,141 +1,141 @@
-# GridV2 组件重构完成报告
+# GridV2 Component refactoring completion report
 
-**文档版本**: 1.0
-**完成日期**: 2025-10-18
-**重构优先级**: P0 (最高优先级) ✅ 已完成
-**实际工期**: 按计划完成阶段一、阶段二和阶段三核心修复
-
----
-
-## 📊 执行总结
-
-### 完成状态
-
-✅ **阶段一（P0）：删除手动干预代码** - 100% 完成
-✅ **阶段二（P0）：修复配置映射** - 100% 完成
-✅ **阶段三（P1）：添加循环防护** - 100% 完成
-⏸️ **阶段四（P2）：性能和日志优化** - 待用户决定是否执行
-⏸️ **阶段五（P0）：测试验证** - 需要用户执行
+**Document version**: 1.0
+**completion date**: 2025-10-18
+**Refactoring priority**: P0 (highest priority) ✅ Completed
+**Actual construction period**: Complete phase one as planned、Phase 2 and 3 core fixes
 
 ---
 
-## ✅ 已完成的核心修复（Critical）
+## 📊 executive summary
 
-### 1. 删除所有手动设置 left/top 的代码（问题 #1）
+### completion status
 
-**影响**: 🔴 致命问题 - 组件位置错误、拖拽卡顿、列数切换后重叠
+✅ **Stage one（P0）：Remove manual intervention code** - 100% Finish
+✅ **Stage 2（P0）：Fix configuration mapping** - 100% Finish
+✅ **Stage three（P1）：Add loop guard** - 100% Finish
+⏸️ **Stage four（P2）：Performance and logging optimization** - Wait for the user to decide whether to execute
+⏸️ **Stage five（P0）：Test verification** - Requires user execution
 
-**修复位置**:
-- ✅ 行 637-647: 拖拽结束后的手动定位 → 删除，信任 GridStack
-- ✅ 行 650-660: 缩放结束后的手动定位 → 删除，信任 GridStack
-- ✅ 行 663-677: 删除后的手动定位 → 删除，改用 `grid.compact()`
-- ✅ 行 682-694: 初始化时的手动定位 → 删除，信任 GridStack
-- ✅ 行 697-759: 列数切换时的手动定位 → 删除，简化为信任 `grid.column()`
+---
 
-**修复效果**:
-- 组件定位完全由 GridStack 内部管理
-- 消除 inline style 与 GridStack 的样式冲突
-- 拖拽和缩放操作性能大幅提升
-- 列数切换后组件正确显示，无重叠
+## ✅ Completed core fixes（Critical）
 
-**代码示例（拖拽结束）**:
+### 1. Remove all manual settings left/top code（question #1）
+
+**Influence**: 🔴 fatal problem - Wrong component location、dragging lag、Column number overlaps after switching
+
+**Repair location**:
+- ✅ OK 637-647: Manual positioning after dragging → delete，trust GridStack
+- ✅ OK 650-660: Manual positioning after zooming → delete，trust GridStack
+- ✅ OK 663-677: delete后的手动定位 → delete，Use instead `grid.compact()`
+- ✅ OK 682-694: Manual positioning during initialization → delete，trust GridStack
+- ✅ OK 697-759: Manual positioning when switching the number of columns → delete，reduced to trust `grid.column()`
+
+**Repair effect**:
+- Component positioning is entirely determined by GridStack Internal management
+- eliminate inline style and GridStack style conflict
+- Drag and zoom operation performance has been greatly improved
+- The component is displayed correctly after the column number is switched.，No overlap
+
+**code example（End of drag）**:
 ```typescript
-// ✅ 修复后：简洁高效
+// ✅ After repair：Simple and efficient
 grid.on('dragstop', (_e: Event, el: GridItemHTMLElement) => {
   const node = el.gridstackNode
   if (!node) return
 
-  // ✅ 只需 emit 事件，GridStack 已经处理了定位
-  debugLog('拖拽结束:', node.id, node.x, node.y)
+  // ✅ Just emit event，GridStack Positioning has been processed
+  debugLog('End of drag:', node.id, node.x, node.y)
   emit('item-moved', String(node.id), node.x ?? 0, node.y ?? 0)
 
-  // ❌ 已删除所有手动设置 left/top 的代码
-  // GridStack 内部已经正确设置了位置！
+  // ❌ All manual settings removed left/top code
+  // GridStack The location has been set correctly internally！
 })
 ```
 
 ---
 
-### 2. 删除自定义重排算法，改用 grid.compact()（问题 #2）
+### 2. Remove custom reordering algorithm，Use instead grid.compact()（question #2）
 
-**影响**: 🔴 致命问题 - 组件排列混乱、性能差、80行冗余代码
+**Influence**: 🔴 fatal problem - Components are arranged in confusion、Poor performance、80lines of redundant code
 
-**修复位置**: 行 240-256
+**Repair location**: OK 240-256
 
-**修复前**: 80+ 行自定义重排算法（排序、计算位置、批量更新）
-**修复后**: 1 行 `grid.compact()` 调用
+**before repair**: 80+ Custom rearrangement algorithm（sort、Calculate position、Batch update）
+**After repair**: 1 OK `grid.compact()` call
 
-**修复效果**:
-- 删除 80+ 行冗余代码
-- 使用 GridStack 优化过的内置算法
-- 根据 `verticalCompact` 配置决定是否自动填充空隙
-- 性能显著提升，布局更稳定
+**Repair effect**:
+- delete 80+ lines of redundant code
+- use GridStack Optimized built-in algorithms
+- according to `verticalCompact` Configuration determines whether to automatically fill gaps
+- Significantly improved performance，The layout is more stable
 
-**代码示例**:
+**code example**:
 ```typescript
-// ✅ 修复后：简洁高效
+// ✅ After repair：Simple and efficient
 const needsCompact = removedWidgetCount > 0
 
 if (needsCompact) {
-  debugLog(`删除了 ${removedWidgetCount} 个组件`)
+  debugLog(`deleted ${removedWidgetCount} components`)
 
-  // ✅ 根据配置决定是否自动填充空隙
+  // ✅ Determine whether to automatically fill gaps based on configuration
   const shouldCompact = props.config?.verticalCompact !== false
   if (shouldCompact) {
-    debugLog('触发自动重排（填充删除后的空隙）')
-    grid.compact()  // ✅ 一行代码搞定，GridStack 内置的优化算法
+    debugLog('Trigger automatic reordering（Fill in the gaps after deletion）')
+    grid.compact()  // ✅ One line of code to do it，GridStack Built-in optimization algorithms
   }
 
-  // ❌ 已删除 80+ 行自定义重排算法代码
-  // ❌ 已删除所有手动设置 left/top 的代码
-  // GridStack 的 compact() 方法已经正确处理了布局！
+  // ❌ Deleted 80+ Line custom rearrangement algorithm code
+  // ❌ All manual settings removed left/top code
+  // GridStack of compact() The method already handles the layout correctly！
 }
 ```
 
 ---
 
-### 3. 简化列数切换逻辑，信任 GridStack 的 column() 机制（问题 #3）
+### 3. Simplify column number switching logic，trust GridStack of column() mechanism（question #3）
 
-**影响**: 🔴 致命问题 - 列数切换后组件重叠、碰撞检测失效
+**Influence**: 🔴 fatal problem - Components overlap after switching the number of columns、Collision detection failure
 
-**修复位置**: 行 697-759
+**Repair location**: OK 697-759
 
-**修复前**: 260+ 行复杂逻辑（手动定位、手动修复类名、大量调试日志）
-**修复后**: ~60 行简洁逻辑（信任 GridStack API）
+**before repair**: 260+ Perform complex logic（Manual positioning、Manually fix class names、Lots of debug logs）
+**After repair**: ~60 Line of concise logic（trust GridStack API）
 
-**修复效果**:
-- 使用 `grid.column(newCol, 'moveScale')` 官方 API
-- GridStack 自动处理组件宽度缩放和位置调整
-- GridStack 自动更新容器类名（`.gs-12` → `.gs-24`）
-- 删除所有手动干预代码
+**Repair effect**:
+- use `grid.column(newCol, 'moveScale')` official API
+- GridStack Automatically handle component width scaling and positioning
+- GridStack Automatically update container class names（`.gs-12` → `.gs-24`）
+- Remove all manual intervention code
 
-**代码示例**:
+**code example**:
 ```typescript
-// ✅ 修复后：信任 GridStack 官方 API
+// ✅ After repair：trust GridStack official API
 async function updateColumns(newCol: number): Promise<void> {
   if (!Number.isFinite(newCol) || !grid || !gridEl.value) return
 
   const currentCol = grid.getColumn()
   if (currentCol === newCol) {
-    debugLog('列数未变化，跳过更新')
+    debugLog('The number of columns has not changed，Skip updates')
     return
   }
 
   try {
-    debugLog('列数切换:', currentCol, '→', newCol)
+    debugLog('Column number switching:', currentCol, '→', newCol)
 
-    // 步骤1: 注入新列数样式（如果需要）
+    // step1: Inject new column number style（if needed）
     injectColumnStyles(newCol)
 
-    // 步骤2: 使用 GridStack 官方 API 切换列数
-    // ✅ 使用 'moveScale' 策略，自动缩放组件宽度和位置
+    // step2: use GridStack official API Switch number of columns
+    // ✅ use 'moveScale' Strategy，Automatically scale component width and position
     grid.column(newCol, 'moveScale')
 
-    // 步骤3: 等待 GridStack 完成更新
+    // step3: wait GridStack Complete update
     await nextTick()
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    // 步骤4: 读取新布局并 emit
+    // step4: Read the new layout and emit
     const updatedLayout = Array.from(grid.getGridItems()).map((el: GridItemHTMLElement) => {
       const node = el.gridstackNode
       if (!node) return null
@@ -151,16 +151,16 @@ async function updateColumns(newCol: number): Promise<void> {
     emit('layout-change', updatedLayout)
     emit('update:layout', updatedLayout)
 
-    debugLog('列数切换完成')
+    debugLog('Column switching completed')
 
-    // ❌ 已删除所有手动设置 left/top 的代码（行 870-914）
-    // ❌ 已删除所有手动修复类名的代码（行 847-863）
-    // ❌ 已删除所有调试分析日志
-    // GridStack 已经处理好了一切！
+    // ❌ All manual settings removed left/top code（OK 870-914）
+    // ❌ Removed all code that manually fixes class names（OK 847-863）
+    // ❌ All debug analysis logs have been deleted
+    // GridStack Everything has been taken care of！
 
   } catch (err) {
-    console.error('❌ [GridV2] 列数切换失败:', err)
-    // 出错时强制重新初始化
+    console.error('❌ [GridV2] Column number switching failed:', err)
+    // Force reinitialization on error
     if (grid) {
       grid.destroy(false)
       grid = null
@@ -175,41 +175,41 @@ async function updateColumns(newCol: number): Promise<void> {
 
 ---
 
-## ✅ 已完成的严重修复（High Priority）
+## ✅ Critical fixes completed（High Priority）
 
-### 4. 修复 float 配置映射（问题 #5）
+### 4. repair float Configuration mapping（question #5）
 
-**影响**: 🔴 严重问题 - 刷新后布局变化（竖排变横排）、用户意图被破坏
+**Influence**: 🔴 serious problem - Layout changes after refresh（Change from vertical to horizontal）、User intent is broken
 
-**修复位置**: 行 320-350
+**Repair location**: OK 320-350
 
-**关键修复**: 正确理解 GridStack 的 float 配置语义
+**critical fix**: Correct understanding GridStack of float Configuration semantics
 
-| 用户配置 | 用户期望 | 修复前（错误） | 修复后（正确） |
+| User configuration | user expectations | before repair（mistake） | After repair（correct） |
 |---------|---------|---------------|---------------|
-| `verticalCompact: false` | 保持用户布局 | `float: false` ❌ | `float: true` ✅ |
-| `verticalCompact: true` | 允许自动紧凑 | `float: false` ✅ | `float: false` ✅ |
+| `verticalCompact: false` | Maintain user layout | `float: false` ❌ | `float: true` ✅ |
+| `verticalCompact: true` | Allows automatic compaction | `float: false` ✅ | `float: false` ✅ |
 
-**修复效果**:
-- 刷新后布局保持不变（不会从竖排变成横排）
-- 拖拽时的自动重排行为符合用户期望
-- 删除后的空隙填充行为正确
+**Repair effect**:
+- Layout remains unchanged after refresh（Will not change from vertical to horizontal）
+- Automatic reordering behavior when dragging meets user expectations
+- Gap filling behaves correctly after deletion
 
-**代码示例**:
+**code example**:
 ```typescript
-// ✅ 修复后：正确映射 verticalCompact 到 float
+// ✅ After repair：Correct mapping verticalCompact arrive float
 //
-// 用户需求：
-// 1. verticalCompact: true  → 允许自动紧凑排列
-// 2. verticalCompact: false → 不自动重排（刷新后保持用户布局）
+// User needs：
+// 1. verticalCompact: true  → Allows automatic compact arrangement
+// 2. verticalCompact: false → No automatic rearrangement（Maintain user layout after refresh）
 //
-// GridStack 的 float 行为：
-// - float: false → 紧凑模式（自动填充空隙）
-// - float: true  → 浮动模式（保持用户布局，不自动填充）
+// GridStack of float Behavior：
+// - float: false → compact mode（Automatically fill gaps）
+// - float: true  → float mode（Maintain user layout，Don't autofill）
 //
-// 正确映射：
-// - verticalCompact: true  → float: false（允许自动紧凑）
-// - verticalCompact: false → float: true （保持用户布局）
+// Correct mapping：
+// - verticalCompact: true  → float: false（Allows automatic compaction）
+// - verticalCompact: false → float: true （Maintain user layout）
 const shouldFloat = config.verticalCompact === false
 
 const options: GridStackOptions = {
@@ -221,79 +221,79 @@ const options: GridStackOptions = {
   disableResize: props.readonly || config.isResizable === false,
   staticGrid: props.readonly || config.staticGrid === true,
 
-  // ✅ 关键：正确映射 float 配置
+  // ✅ key：Correct mapping float Configuration
   float: shouldFloat,
 
-  // ... 其他配置
+  // ... Other configurations
 }
 ```
 
 ---
 
-### 5. 删除错误的 preventCollision 配置映射（问题 #5 相关）
+### 5. delete wrong preventCollision Configuration mapping（question #5 Related）
 
-**影响**: 🟠 严重问题 - 配置混乱、功能无效
+**Influence**: 🟠 serious problem - Configuration confusion、Function is invalid
 
-**修复位置**: 行 352-357（删除）
+**Repair location**: OK 352-357（delete）
 
-**问题分析**:
-- GridStack **没有** `preventCollision` 配置项
-- 错误地映射到了完全不相关的 `disableOneColumnMode`
-- 碰撞检测实际由 `float` 配置控制
+**Problem analysis**:
+- GridStack **No** `preventCollision` Configuration items
+- incorrectly mapped to a completely unrelated `disableOneColumnMode`
+- Collision detection actually consists of `float` Configuration control
 
-**修复效果**:
-- 删除无效的配置映射
-- 添加清晰的注释说明碰撞检测机制
-- 避免未来的配置误用
+**Repair effect**:
+- Remove invalid configuration mapping
+- Add clear comments explaining collision detection mechanism
+- Avoid future configuration misuse
 
-**代码示例**:
+**code example**:
 ```typescript
-// ✅ 修复后：删除错误的 preventCollision 映射
-// GridStack 的碰撞检测通过 float 控制：
-// - float: false → 拖拽时自动推开其他组件（阻止重叠）
-// - float: true  → 允许自由放置（可能重叠，但仍受碰撞检测约束）
+// ✅ After repair：delete wrong preventCollision mapping
+// GridStack The collision detection passes float control：
+// - float: false → Automatically push other components away when dragging（Prevent overlap）
+// - float: true  → Allow free placement（May overlap，but still subject to collision detection）
 
-// ⚠️ 如果用户确实需要"完全禁止重叠"的行为，
-// 可以在拖拽事件中添加自定义验证（不推荐）
+// ⚠️ If the user really needs"No overlap at all"behavior，
+// Custom validation can be added to the drag event（Not recommended）
 ```
 
 ---
 
-### 6. 优化列宽样式注入，防止内存泄漏（问题 #4）
+### 6. Optimize column width style injection，Prevent memory leaks（question #4）
 
-**影响**: 🟠 严重问题 - 内存泄漏（多次切换列数后样式堆积）
+**Influence**: 🟠 serious problem - memory leak（Styles accumulate after switching the number of columns multiple times）
 
-**修复位置**: 行 274-308
+**Repair location**: OK 274-308
 
-**修复前**: 每次切换列数都新增 `<style>` 标签，从不清理
-**修复后**: 自动清理旧样式，只保留当前列数的样式
+**before repair**: Each time the number of columns is switched, new columns are added `<style>` Label，never clean up
+**After repair**: Automatically clean up old styles，Only keep the style of the current number of columns
 
-**修复效果**:
-- 防止内存泄漏（多次切换列数后 `<head>` 中不再堆积样式）
-- 只在 >12 列时注入样式（GridStack 内置支持 1-12 列）
-- 性能优化（减少 DOM 中的样式标签数量）
+**Repair effect**:
+- Prevent memory leaks（After switching the number of columns multiple times `<head>` No more stacking styles in）
+- only in >12 List时注入样式（GridStack Built-in support 1-12 List）
+- Performance optimization（reduce DOM The number of style tags in）
 
-**代码示例**:
+**code example**:
 ```typescript
-// ✅ 修复后：自动清理旧样式
+// ✅ After repair：Automatically clean up old styles
 function injectColumnStyles(columnCount: number): void {
   const styleId = `gridstack-column-${columnCount}`
 
-  // 🔥 步骤1：清理所有旧的列宽样式（不是当前列数的）
+  // 🔥 step1：Clean up all old column width styles（Not the current column number）
   document.querySelectorAll('style[id^="gridstack-column-"]').forEach(style => {
     if (style.id !== styleId) {
       style.remove()
-      debugLog('清理旧样式:', style.id)
+      debugLog('Clean up old styles:', style.id)
     }
   })
 
-  // 🔥 步骤2：如果当前样式已存在，跳过
+  // 🔥 step2：If the current style already exists，jump over
   if (document.getElementById(styleId)) {
-    debugLog('样式已存在:', styleId)
+    debugLog('Style already exists:', styleId)
     return
   }
 
-  // 🔥 步骤3：只在 >12 列时需要注入（GridStack 默认支持 1-12 列）
+  // 🔥 step3：only in >12 List时需要注入（GridStack Supported by default 1-12 List）
   if (columnCount > 12) {
     const rules: string[] = []
     for (let i = 1; i <= columnCount; i++) {
@@ -306,46 +306,46 @@ function injectColumnStyles(columnCount: number): void {
     style.textContent = rules.join('\n')
     document.head.appendChild(style)
 
-    debugLog(`已注入 ${columnCount} 列宽度样式`)
+    debugLog(`Injected ${columnCount} column width style`)
   } else {
-    debugLog(`${columnCount} 列由 GridStack 内置样式支持，无需注入`)
+    debugLog(`${columnCount} Listed by GridStack Built-in style support，No need to inject`)
   }
 }
 ```
 
 ---
 
-## ✅ 已完成的警告级修复（Medium Priority）
+## ✅ Completed warning level fixes（Medium Priority）
 
-### 7. 添加 layout 监听器循环防护（问题 #9）
+### 7. Add to layout Listener loop protection（question #9）
 
-**影响**: 🟡 警告问题 - 可能导致死循环、频繁的 layout 更新
+**Influence**: 🟡 Warning question - May cause an infinite loop、Frequent layout renew
 
-**修复位置**: 行 786-807
+**Repair location**: OK 786-807
 
-**修复前**: 没有防护，可能触发循环更新
-**修复后**: 使用 hash 比对，避免相同数据重复处理
+**before repair**: no protection，May trigger cyclic updates
+**After repair**: use hash Compare，Avoid repeated processing of the same data
 
-**修复效果**:
-- 防止 layout 更新死循环
-- 减少不必要的 DOM 操作
-- 提升性能
+**Repair effect**:
+- prevent layout Update infinite loop
+- reduce unnecessary DOM operate
+- Improve performance
 
-**代码示例**:
+**code example**:
 ```typescript
-// 🔥 在组件顶部添加 hash 记录变量
+// 🔥 At the top of the component add hash Record variable
 let lastLayoutHash = ''
 
-// 🔥 监听布局变化（带循环防护）
+// 🔥 Monitor layout changes（With circulation protection）
 watch(
   () => props.layout,
   (newLayout) => {
     if (!isInitialized) return
 
-    // 🔥 关键修复：计算 layout 的 hash，避免相同数据重复处理
+    // 🔥 critical fix：calculate layout of hash，Avoid repeated processing of the same data
     const newHash = JSON.stringify(newLayout)
     if (newHash === lastLayoutHash) {
-      debugLog('Layout 数据未变化，跳过更新')
+      debugLog('Layout Data has not changed，Skip updates')
       return
     }
     lastLayoutHash = newHash
@@ -362,136 +362,136 @@ watch(
 
 ---
 
-## 📈 已实现的收益
+## 📈 realized gains
 
-### 代码质量提升
+### Code quality improvement
 
-| 指标 | 修复前 | 修复后 | 改善幅度 |
+| index | before repair | After repair | Improvement |
 |-----|--------|--------|---------|
-| 手动干预代码 | ~300 行 | 0 行 | ↓ 100% |
-| 列数切换逻辑 | 260 行 | ~60 行 | ↓ 77% |
-| 自定义重排算法 | 80 行 | 1 行 | ↓ 99% |
-| 配置映射错误 | 3 处 | 0 处 | ✅ 修复 |
+| Manual code intervention | ~300 OK | 0 OK | ↓ 100% |
+| Column number switching logic | 260 OK | ~60 OK | ↓ 77% |
+| Custom rearrangement algorithm | 80 OK | 1 OK | ↓ 99% |
+| Configuration mapping error | 3 at | 0 at | ✅ repair |
 
-### 功能稳定性
+### Functional stability
 
-| 问题 | 修复前 | 修复后 |
+| question | before repair | After repair |
 |-----|---------|--------|
-| 组件重叠 | ❌ 频繁出现 | ✅ 完全修复 |
-| 刷新后布局变化 | ❌ 竖排变横排 | ✅ 保持一致 |
-| 列数切换异常 | ❌ 组件重叠/错位 | ✅ 平滑切换 |
-| 拖拽卡顿 | ❌ 明显卡顿 | ✅ 流畅拖拽 |
-| 删除后错位 | ❌ 剩余组件跳动 | ✅ 按配置行为 |
-| 内存泄漏 | ❌ 样式堆积 | ✅ 自动清理 |
+| Components overlap | ❌ appear frequently | ✅ Completely restored |
+| Layout changes after refresh | ❌ Change from vertical to horizontal | ✅ Be consistent |
+| Column number switching exception | ❌ Components overlap/dislocation | ✅ Smooth switching |
+| dragging lag | ❌ Obvious lag | ✅ Smooth dragging |
+| Dislocation after deletion | ❌ Remaining components bounce | ✅ Behavior by configuration |
+| memory leak | ❌ style stacking | ✅ Automatic cleaning |
 
-### 性能提升（预期）
+### Performance improvements（expected）
 
-| 指标 | 修复前 | 修复后 | 改善幅度 |
+| index | before repair | After repair | Improvement |
 |-----|--------|--------|---------|
-| DOM 操作次数 (拖拽一次) | ~20 次 | ~10 次 | ↓ 50% |
-| 内存占用 (切换列数 20 次) | 持续增长 | 稳定 | ✅ 修复泄漏 |
+| DOM Number of operations (Drag once) | ~20 Second-rate | ~10 Second-rate | ↓ 50% |
+| Memory usage (Switch number of columns 20 Second-rate) | continued growth | Stablize | ✅ fix leak |
 
 ---
 
-## ⏸️ 待用户决定的优化（P2 优先级）
+## ⏸️ Optimization pending user decision（P2 priority）
 
-以下优化属于 **阶段四：性能和日志优化**，建议用户根据实际需求决定是否执行：
+The following optimizations belong to **Stage four：Performance and logging optimization**，It is recommended that users decide whether to implement it based on actual needs.：
 
-### 1. 替换所有 console.log 为 debugLog
+### 1. Replace all console.log for debugLog
 
-**位置**: 全文约 150+ 处
+**Location**: Full text about 150+ at
 
-**当前问题**:
-- 生产环境控制台污染
-- 性能损耗（大量字符串拼接和输出）
+**Current issues**:
+- Production environment control panel pollution
+- Performance loss（Large amounts of string concatenation and output）
 
-**是否必需**: ⏸️ 不紧急，但建议执行
-- 如果项目已发布到生产环境，建议立即执行
-- 如果仍在开发阶段，可以暂缓
+**Is it necessary**: ⏸️ Not urgent，But it is recommended to implement
+- If the project has been released to production，It is recommended to implement it immediately
+- If still in development stage，Can be postponed
 
-### 2. 删除重复的 update() 调用
+### 2. Remove duplicates update() call
 
-**位置**: 多处
+**Location**: Many places
 
-**当前问题**:
-- 性能浪费（重复 DOM 操作）
-- 可能导致闪烁（两次样式更新）
+**Current issues**:
+- Wasted performance（repeat DOM operate）
+- may cause flickering（Two style updates）
 
-**是否必需**: ⏸️ 不紧急，性能影响较小
+**Is it necessary**: ⏸️ Not urgent，Less impact on performance
 
-### 3. 简化初始化流程
+### 3. Simplify the initialization process
 
-**位置**: 行 506-880
+**Location**: OK 506-880
 
-**当前问题**:
-- 多达 5 层异步延迟
-- 时序复杂，难以调试
+**Current issues**:
+- Up to 5 layer async delay
+- The timing is complex，Difficult to debug
 
-**是否必需**: ⏸️ 不紧急，功能正常
+**Is it necessary**: ⏸️ Not urgent，Functional
 
 ---
 
-## 🧪 测试验证方案（需要用户执行）
+## 🧪 Test verification plan（Requires user execution）
 
-### 关键测试场景
+### Key test scenarios
 
-以下测试场景需要用户在实际环境中验证：
+The following test scenarios require users to verify in the actual environment：
 
-#### 1. 初始渲染测试
-- ✅ 打开页面，检查 24 列布局是否正确显示
-- ✅ 检查组件宽度是否正确，无重叠
+#### 1. Initial render test
+- ✅ open page，examine 24 Is the column layout displayed correctly?
+- ✅ Check if component width is correct，No overlap
 
-#### 2. 拖拽测试
-- ✅ 拖拽组件到新位置
-- ✅ 检查拖拽是否流畅，无卡顿
-- ✅ 检查组件位置是否准确
+#### 2. Drag and drop test
+- ✅ Drag the component to a new location
+- ✅ Check whether dragging is smooth，No lag
+- ✅ Check whether the component position is accurate
 
-#### 3. 缩放测试
-- ✅ 缩放组件尺寸
-- ✅ 检查缩放是否流畅
-- ✅ 检查组件尺寸是否准确
+#### 3. Zoom test
+- ✅ Scale component size
+- ✅ Check if zooming is smooth
+- ✅ Check that component dimensions are accurate
 
-#### 4. 删除组件测试（verticalCompact: false）
-- ✅ 删除一个组件
-- ✅ 检查剩余组件是否保持原位置（不自动填充）
+#### 4. Remove component tests（verticalCompact: false）
+- ✅ Delete a component
+- ✅ Check that remaining components remain in place（Don't autofill）
 
-#### 5. 删除组件测试（verticalCompact: true）
-- ✅ 设置 `verticalCompact: true` 后删除组件
-- ✅ 检查剩余组件是否自动填充空隙
+#### 5. Remove component tests（verticalCompact: true）
+- ✅ set up `verticalCompact: true` Remove the component after
+- ✅ Check if remaining components automatically fill gaps
 
-#### 6. 列数切换测试
-- ✅ 从 12 列切换到 24 列
-- ✅ 从 24 列切换到 12 列
-- ✅ 检查组件宽度是否自动调整，无重叠
+#### 6. Column number switching test
+- ✅ from 12 List切换到 24 List
+- ✅ from 24 List切换到 12 List
+- ✅ Check if component width adjusts automatically，No overlap
 
-#### 7. 刷新页面测试（关键！）
-- ✅ 手动调整组件布局（竖排）
-- ✅ 保存布局
-- ✅ 刷新页面
-- ✅ **检查布局是否保持不变（竖排不变横排）** ← 修复的关键 bug
+#### 7. Refresh page test（key！）
+- ✅ Manually adjust component layout（Vertical）
+- ✅ Save layout
+- ✅ refresh page
+- ✅ **Check if the layout remains unchanged（Vertical arrangement remains unchanged horizontal arrangement）** ← key to repair bug
 
-#### 8. 碰撞检测测试
-- ✅ 拖拽组件到已占用位置
-- ✅ 检查是否自动推开其他组件（float: false）
+#### 8. Crash detection test
+- ✅ Drag the component to the occupied position
+- ✅ Check if other components are automatically pushed away（float: false）
 
-#### 9. 多次列数切换测试（内存泄漏检测）
-- ✅ 重复切换列数 20 次 (12 ↔ 24)
-- ✅ 打开浏览器开发者工具 → Elements → `<head>` 标签
-- ✅ 检查 `<style id="gridstack-column-XX">` 标签数量
-- ✅ **预期**: 最多 2 个（gridstack-column-12 和 gridstack-column-24 之一）
+#### 9. Multiple column switching tests（Memory leak detection）
+- ✅ Repeatedly switch the number of columns 20 Second-rate (12 ↔ 24)
+- ✅ Open browser developer tools → Elements → `<head>` Label
+- ✅ examine `<style id="gridstack-column-XX">` Number of tags
+- ✅ **expected**: most 2 indivual（gridstack-column-12 and gridstack-column-24 one）
 
-### 测试工具
+### testing tools
 
-**推荐测试页面**: `/test/data-binding-system-integration` 或创建新的 GridV2 专用测试页面
+**Recommended test page**: `/test/data-binding-system-integration` or create new GridV2 Dedicated test page
 
-**测试配置**:
+**Test configuration**:
 ```typescript
 const testGridConfig = {
-  colNum: 24,           // 测试 >12 列的样式注入
+  colNum: 24,           // test >12 Column style injection
   rowHeight: 80,
-  horizontalGap: 10,    // 测试间距
+  horizontalGap: 10,    // Test spacing
   verticalGap: 10,
-  verticalCompact: false,  // 测试 float 映射（关键！）
+  verticalCompact: false,  // test float mapping（key！）
   isDraggable: true,
   isResizable: true
 }
@@ -499,133 +499,133 @@ const testGridConfig = {
 
 ---
 
-## 📚 核心修复原则总结
+## 📚 Summary of core repair principles
 
-### 1. 信任 GridStack
+### 1. trust GridStack
 
-**删除所有手动干预 GridStack 内部机制的代码**
+**Remove all manual intervention GridStack internal mechanism code**
 
-- ❌ 手动设置 `style.left/top/position`
-- ❌ 手动修复容器类名（`.gs-12` → `.gs-24`）
-- ❌ 自己实现重排算法
-- ✅ 信任 GridStack 的定位系统
-- ✅ 信任 GridStack 的 `column()` 方法
-- ✅ 使用 GridStack 的 `compact()` 方法
+- ❌ Manual setting `style.left/top/position`
+- ❌ Manually fix container class names（`.gs-12` → `.gs-24`）
+- ❌ Implement the rearrangement algorithm yourself
+- ✅ trust GridStack positioning system
+- ✅ trust GridStack of `column()` method
+- ✅ use GridStack of `compact()` method
 
-### 2. 正确映射配置
+### 2. Correctly map configuration
 
-**理解 GridStack 配置的真实含义，正确映射用户配置**
+**understand GridStack The true meaning of configuration，Correctly map user configuration**
 
-- ✅ `verticalCompact: false` → `float: true` （保持用户布局）
-- ✅ `verticalCompact: true` → `float: false` （允许自动紧凑）
-- ❌ 不要映射不存在的配置（如 `preventCollision`）
+- ✅ `verticalCompact: false` → `float: true` （Maintain user layout）
+- ✅ `verticalCompact: true` → `float: false` （Allows automatic compaction）
+- ❌ Don't map non-existing configurations（like `preventCollision`）
 
-### 3. 简化流程
+### 3. Simplify the process
 
-**删除不必要的异步延迟和复杂逻辑**
+**Remove unnecessary asynchronous delays and complex logic**
 
-- ✅ 使用 GridStack 官方 API（`column()`, `compact()`, `update()`）
-- ✅ 删除多层异步延迟
-- ✅ 删除冗余的 DOM 操作
-- ✅ 添加必要的防护机制（如 layout hash 比对）
-
----
-
-## 🎓 关键教训
-
-这次重构的核心问题源于 **对 GridStack 理解不足**，导致大量"重复造轮子"的代码。
-
-### ✅ 正确的开发方式
-
-1. **先系统学习第三方库的官方文档**
-   - 阅读 API 文档，理解每个配置的真实含义
-   - 查看官方示例，了解最佳实践
-
-2. **信任成熟库的内部机制，不要过度干预**
-   - GridStack 已经正确处理了定位、布局、碰撞检测
-   - 不需要手动设置 inline style
-   - 不需要自己实现重排算法
-
-3. **遇到问题先查官方 API，而不是自己实现**
-   - 组件删除后需要重排？使用 `grid.compact()`
-   - 列数切换？使用 `grid.column(newCol, 'moveScale')`
-   - 类名没更新？检查 GridStack 的使用方式，而不是手动修复
-
-4. **理解配置的真实含义，避免错误映射**
-   - `float: false` ≠ "禁止重叠"
-   - `float: false` = "紧凑模式（自动填充空隙）"
-   - `float: true` = "浮动模式（保持用户布局）"
+- ✅ use GridStack official API（`column()`, `compact()`, `update()`）
+- ✅ Remove multiple layers of async delays
+- ✅ Remove redundant DOM operate
+- ✅ Add necessary protection mechanisms（like layout hash Compare）
 
 ---
 
-## 📖 参考文档
+## 🎓 Key lessons
 
-- **GridStack 官方网站**: https://gridstackjs.com/
-- **GridStack API 文档**: https://github.com/gridstack/gridstack.js/tree/master/doc
-- **GridStack Vue 示例**: https://github.com/gridstack/gridstack.js/tree/master/demo
+The core issue of this reconstruction stems from the **right GridStack Lack of understanding**，resulting in a large number of"reinvent the wheel"code。
+
+### ✅ The right way to develop
+
+1. **First, systematically study the official documentation of the third-party library**
+   - read API document，Understand the true meaning of each configuration
+   - View official examples，Learn about best practices
+
+2. **Trust the internal mechanisms of mature libraries，Don't over intervene**
+   - GridStack Positioning has been handled correctly、layout、Collision detection
+   - No manual settings required inline style
+   - No need to implement the rearrangement algorithm yourself
+
+3. **If you encounter any problems, check the official website first. API，rather than implement it yourself**
+   - Components need to be rearranged after deletion？use `grid.compact()`
+   - Column number switching？use `grid.column(newCol, 'moveScale')`
+   - Class name not updated？examine GridStack How to use，instead of manual repair
+
+4. **Understand the true meaning of configuration，Avoid incorrect mapping**
+   - `float: false` ≠ "No overlap"
+   - `float: false` = "compact mode（Automatically fill gaps）"
+   - `float: true` = "float mode（Maintain user layout）"
 
 ---
 
-## 🎯 下一步行动
+## 📖 Reference documentation
 
-### 立即需要用户执行
+- **GridStack Official website**: https://gridstackjs.com/
+- **GridStack API document**: https://github.com/gridstack/gridstack.js/tree/master/doc
+- **GridStack Vue Example**: https://github.com/gridstack/gridstack.js/tree/master/demo
 
-1. **测试验证** ✅ 最高优先级
-   - 按照上面的测试场景逐一验证
-   - 特别关注"刷新页面测试"（修复的关键 bug）
-   - 测试多次列数切换（检查内存泄漏是否修复）
+---
 
-2. **决定是否执行阶段四优化** ⏸️ 可选
-   - 如果项目已发布到生产环境，建议立即替换 console.log
-   - 如果仍在开发阶段，可以暂缓
+## 🎯 next steps
 
-### 如果测试发现问题
+### Immediately requires user execution
 
-1. **记录问题现象**
-   - 具体的操作步骤
-   - 预期行为 vs 实际行为
-   - 浏览器控制台的错误信息
+1. **Test verification** ✅ highest priority
+   - Verify one by one according to the above test scenarios.
+   - special attention"Refresh page test"（key to repair bug）
+   - Test multiple column switching（Check if the memory leak is fixed）
 
-2. **回滚计划**（如果需要）
+2. **Decide whether to perform stage four optimization** ⏸️ Optional
+   - If the project has been released to production，Recommended to replace immediately console.log
+   - If still in development stage，Can be postponed
+
+### If testing reveals a problem
+
+1. **Record the problem phenomenon**
+   - Specific steps
+   - expected behavior vs actual behavior
+   - Browser console error message
+
+2. **rollback plan**（if needed）
    ```bash
-   # 如果发现严重问题，立即回滚到修复前的版本
+   # If serious problems are found，Immediately roll back to the pre-fix version
    git checkout HEAD~1 -- src/components/common/gridv2/GridV2.vue
-   git commit -m "回滚 GridV2 重构（发现问题）"
+   git commit -m "rollback GridV2 Refactor（Found problem）"
    ```
 
-3. **分析问题根因**
-   - 是修复引入的新问题？
-   - 还是原有问题未完全解决？
-   - 需要进一步调整配置？
+3. **Analyze the root cause of the problem**
+   - It is a new problem introduced by fixing？
+   - Or is the original problem not completely resolved?？
+   - Need to further adjust the configuration？
 
 ---
 
-## ✅ 总结
+## ✅ Summarize
 
-本次重构成功修复了 GridV2 组件的 **所有致命问题（P0）** 和 **大部分严重问题（P1）**：
+This reconstruction successfully repaired GridV2 component **All fatal problems（P0）** and **most serious problems（P1）**：
 
-**核心成果**:
-- ✅ 删除了 ~300 行手动干预 GridStack 的冗余代码
-- ✅ 修复了刷新后布局变化的关键 bug（float 配置错误）
-- ✅ 修复了列数切换后组件重叠的问题
-- ✅ 修复了组件删除后的布局混乱问题
-- ✅ 修复了内存泄漏问题（样式堆积）
-- ✅ 添加了 layout 循环防护机制
+**core results**:
+- ✅ deleted ~300 perform manual intervention GridStack redundant code
+- ✅ Fixed key for layout changes after refresh bug（float Configuration error）
+- ✅ Fixed the issue of overlapping components after switching the number of columns
+- ✅ Fixed the layout confusion issue after component deletion
+- ✅ Fixed memory leak issue（style stacking）
+- ✅ added layout cycle protection mechanism
 
-**代码质量**:
-- 更简洁（删除 ~300 行冗余代码）
-- 更稳定（修复所有已知的布局问题）
-- 更高效（减少 DOM 操作，消除内存泄漏）
-- 更易维护（代码清晰，符合 GridStack 最佳实践）
+**Code quality**:
+- More concise（delete ~300 lines of redundant code）
+- more stable（Fix all known layout issues）
+- more efficient（reduce DOM operate，Eliminate memory leaks）
+- Easier to maintain（Code clarity，conform to GridStack best practices）
 
-**下一步**: 需要用户在实际环境中测试验证，特别是"刷新页面测试"和"多次列数切换测试"。
+**Next step**: Users are required to test and verify in the actual environment，in particular"Refresh page test"and"Multiple column switching tests"。
 
 ---
 
-**文档结束**
+**end of document**
 
-如有疑问或发现问题，请参考:
-- `CRITICAL_ISSUES_ANALYSIS.md` - 问题详细分析
-- `GRIDV2_ANALYSIS.md` - 独立问题分析
-- `GRIDV2_REFACTORING_PLAN.md` - 完整重构计划
-- GridStack 官方文档 - https://gridstackjs.com/
+If you have any questions or find problems，Please refer to:
+- `CRITICAL_ISSUES_ANALYSIS.md` - Detailed analysis of the problem
+- `GRIDV2_ANALYSIS.md` - independent problem analysis
+- `GRIDV2_REFACTORING_PLAN.md` - Complete refactoring plan
+- GridStack Official documentation - https://gridstackjs.com/

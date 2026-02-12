@@ -1,100 +1,100 @@
 import { request } from '../request'
-/** 获取设备列表下拉菜单 */
+/** Get device list dropdown menu */
 export const deviceListAll = async (params: any) => {
   return await request.get<any>('/device/tenant/list', { params })
 }
 
-/** 获取设备配置下拉菜单 */
+/** Get device configuration drop-down menu */
 export const deviceConfigAll = async (params: any) => {
   return await request.get<any>('/device_config/menu', { params })
 }
 
-/** 单个设备条件选择下拉菜单 */
+/** Individual device condition selection drop-down menu */
 export const deviceMetricsConditionMenu = async (params: any) => {
   return await request.get<any>(`/device/metrics/condition/menu`, { params })
 }
 
-/** 单类设备条件选择下拉菜单 */
+/** Single type device condition selection drop-down menu */
 export const configMetricsConditionMenu = async (params: any) => {
   return await request.get<any>(`/device_config/metrics/condition/menu`, { params })
 }
 
-/** 单个设备动作选择下拉菜单 */
+/** Single device action selection drop-down menu */
 export const deviceMetricsMenu = async (params: any) => {
   return await request.get<any>(`/device/metrics/menu`, { params })
 }
 
-/** 单类设备动作选择下拉菜单 */
+/** Single type device action selection drop-down menu */
 export const deviceConfigMetricsMenu = async (params: any) => {
   return await request.get<any>(`/device_config/metrics/menu`, { params })
 }
 
-/** 创建场景 */
+/** Create a scene */
 export const sceneAdd = async (params: any) => {
   return await request.post<any>(`/scene`, params)
 }
 
-/** 修改场景 */
+/** Modify scene */
 export const sceneEdit = async (params: any) => {
   return await request.put<any>(`/scene`, params)
 }
 
-/** 获取场景列表 */
+/** Get scene list */
 export const sceneGet = async (params: any) => {
   return await request.get<any>(`/scene`, { params })
 }
 
-/** 删除场景 */
+/** delete scene */
 export const sceneDel = async (id: any) => {
   return await request.delete<any>(`/scene/${id}`)
 }
 
-/** 获取场景详情 */
+/** Get scene details */
 export const sceneInfo = async (id: any) => {
   return await request.get<any>(`/scene/detail/${id}`)
 }
 
-/** 获取场景日志 */
+/** Get scene log */
 export const sceneLog = async (params: any) => {
   return await request.get<any>(`/scene/log`, { params })
 }
 
-/** 激活场景 */
+/** Activate scene */
 export const sceneActive = async (id: any) => {
   return await request.post<any>(`/scene/active/${id}`)
 }
 
-/** 创建场景 */
+/** Create a scene */
 export const sceneAutomationsAdd = async (params: any) => {
   return await request.post<any>(`/scene_automations`, params)
 }
 
-/** 修改场景 */
+/** Modify scene */
 export const sceneAutomationsEdit = async (params: any) => {
   return await request.put<any>(`/scene_automations`, params)
 }
 
-/** 获取场景列表 */
+/** Get scene list */
 export const sceneAutomationsGet = async (params: any) => {
   return await request.get<any>(`/scene_automations/list`, { params })
 }
 
-/** 删除场景 */
+/** delete scene */
 export const sceneAutomationsDel = async (id: any) => {
   return await request.delete<any>(`/scene_automations/${id}`)
 }
 
-/** 获取场景详情 */
+/** Get scene details */
 export const sceneAutomationsInfo = async (id: any) => {
   return await request.get<any>(`/scene_automations/detail/${id}`)
 }
 
-/** 获取场景日志 */
+/** Get scene log */
 export const sceneAutomationsLog = async (params: any) => {
   return await request.get<any>(`/scene_automations/log`, { params })
 }
 
-/** 激活场景 */
+/** Activate scene */
 export const sceneAutomationsSwitch = async (id: any) => {
   return await request.post<any>(`/scene_automations/switch/${id}`)
 }

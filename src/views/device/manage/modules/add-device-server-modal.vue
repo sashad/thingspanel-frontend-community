@@ -14,7 +14,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 const props = withDefaults(defineProps<Props>(), {})
-const title = ref('OpenWeather气象服务')
+const title = ref('OpenWeatherMeteorological service')
 
 const modalVisible = computed({
   get() {

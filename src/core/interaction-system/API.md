@@ -1,30 +1,30 @@
-# 交互系统 API 文档
+# interactive system API document
 
-## 组件 API 参考
+## components API refer to
 
 ### InteractionSettingsForm
 
-主交互配置表单组件，提供完整的可视化交互配置界面。
+Main interactive configuration form component，Provides a complete visual interactive configuration interface。
 
 #### Props
 
-| 属性名 | 类型 | 默认值 | 必需 | 描述 |
+| attribute name | type | default value | required | describe |
 |--------|------|--------|------|------|
-| `componentId` | `string` | - | ❌ | 组件唯一标识符 |
-| `componentType` | `string` | - | ❌ | 组件类型，用于获取可监听属性 |
-| `modelValue` | `InteractionConfig[]` | `[]` | ❌ | 当前交互配置列表 |
-| `readonly` | `boolean` | `false` | ❌ | 是否为只读模式 |
-| `showAdvanced` | `boolean` | `true` | ❌ | 是否显示高级功能选项 |
+| `componentId` | `string` | - | ❌ | component unique identifier |
+| `componentType` | `string` | - | ❌ | Component type，Used to get listenable properties |
+| `modelValue` | `InteractionConfig[]` | `[]` | ❌ | Current interaction configuration list |
+| `readonly` | `boolean` | `false` | ❌ | Whether it is read-only mode |
+| `showAdvanced` | `boolean` | `true` | ❌ | Whether to display advanced function options |
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `update:modelValue` | `InteractionConfig[]` | 配置更新时触发 |
-| `change` | `InteractionConfig[]` | 配置变化时触发 |
-| `validate` | `{valid: boolean, errors: string[]}` | 验证结果变化时触发 |
+| `update:modelValue` | `InteractionConfig[]` | Triggered when configuration is updated |
+| `change` | `InteractionConfig[]` | Triggered when configuration changes |
+| `validate` | `{valid: boolean, errors: string[]}` | Triggered when the verification result changes |
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -45,12 +45,12 @@ import type { InteractionConfig } from '@/card2.1/core/interaction-types'
 const interactions = ref<InteractionConfig[]>([])
 
 const handleInteractionChange = (configs: InteractionConfig[]) => {
-  console.log('交互配置变化:', configs)
+  console.log('Interactive configuration changes:', configs)
 }
 
 const handleValidate = (result: {valid: boolean, errors: string[]}) => {
   if (!result.valid) {
-    console.error('配置验证失败:', result.errors)
+    console.error('Configuration verification failed:', result.errors)
   }
 }
 </script>
@@ -60,32 +60,32 @@ const handleValidate = (result: {valid: boolean, errors: string[]}) => {
 
 ### InteractionResponseEditor
 
-响应动作编辑器组件，用于配置具体的交互响应动作及其参数。
+React action editor component，Used to configure specific interactive response actions and their parameters。
 
 #### Props
 
-| 属性名 | 类型 | 默认值 | 必需 | 描述 |
+| attribute name | type | default value | required | describe |
 |--------|------|--------|------|------|
-| `modelValue` | `InteractionResponse` | - | ✅ | 当前响应动作配置 |
-| `readonly` | `boolean` | `false` | ❌ | 是否为只读模式 |
+| `modelValue` | `InteractionResponse` | - | ✅ | Current response action configuration |
+| `readonly` | `boolean` | `false` | ❌ | Whether it is read-only mode |
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `update:modelValue` | `InteractionResponse` | 响应配置更新时触发 |
-| `update` | `InteractionResponse` | 响应配置变化时触发 |
+| `update:modelValue` | `InteractionResponse` | Triggered in response to a configuration update |
+| `update` | `InteractionResponse` | Triggered in response to configuration changes |
 
-#### 支持的响应动作类型
+#### Supported response action types
 
-| 动作类型 | 值类型 | 描述 | 配置项 |
+| action type | value type | describe | Configuration items |
 |----------|--------|------|--------|
-| `navigateToUrl` | `string` | URL跳转 | `target`, `windowFeatures` |
-| `updateComponentData` | `any` | 更新组件数据 | `targetComponentId`, `targetProperty`, `updateValue`, `updateMode` |
-| `changeVisibility` | `'visible' \| 'hidden'` | 改变可见性 | - |
-| `triggerAnimation` | `string` | 触发动画 | `duration`, `easing` |
+| `navigateToUrl` | `string` | URLJump | `target`, `windowFeatures` |
+| `updateComponentData` | `any` | Update component data | `targetComponentId`, `targetProperty`, `updateValue`, `updateMode` |
+| `changeVisibility` | `'visible' \| 'hidden'` | change visibility | - |
+| `triggerAnimation` | `string` | trigger animation | `duration`, `easing` |
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -107,7 +107,7 @@ const response = ref<InteractionResponse>({
 })
 
 const handleResponseUpdate = (updatedResponse: InteractionResponse) => {
-  console.log('响应配置更新:', updatedResponse)
+  console.log('Respond to configuration updates:', updatedResponse)
 }
 </script>
 ```
@@ -116,30 +116,30 @@ const handleResponseUpdate = (updatedResponse: InteractionResponse) => {
 
 ### InteractionTemplateSelector
 
-交互模板选择器组件，提供预设的交互模板供用户快速选择。
+Interactive template selector component，Provide preset interaction templates for users to quickly select。
 
 #### Props
 
-无需传入Props，模板数据内置在组件中。
+No need to pass inProps，Template data is built into the component。
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `select` | `InteractionConfig` | 选择模板时触发 |
-| `cancel` | - | 取消选择时触发 |
+| `select` | `InteractionConfig` | Fires when a template is selected |
+| `cancel` | - | Fires when deselected |
 
-#### 模板分类
+#### Template classification
 
-| 分类 | 键值 | 描述 | 示例模板 |
+| Classification | key value | describe | Sample template |
 |------|------|------|----------|
-| 基础交互 | `basic` | 常用的基础交互效果 | 点击高亮、悬停缩放 |
-| 视觉效果 | `visual` | 视觉样式变化效果 | 彩虹边框、透明度切换 |
-| 动画效果 | `animation` | 动态动画效果 | 脉冲动画、震动提示 |
-| 复合交互 | `complex` | 多事件组合的复杂交互 | 完整反馈循环 |
-| 用户自定义 | `user` | 用户导入的自定义模板 | - |
+| basic interaction | `basic` | 常用的basic interaction效果 | Click to highlight、Hover zoom |
+| visual effects | `visual` | Visual style change effect | rainbow border、Transparency toggle |
+| Animation effects | `animation` | 动态Animation effects | pulse animation、Vibration reminder |
+| composite interaction | `complex` | Complex interactions of multiple event combinations | full feedback loop |
+| User defined | `user` | Custom templates imported by users | - |
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -154,13 +154,13 @@ import { InteractionTemplateSelector } from '@/core/interaction-system'
 import type { InteractionConfig } from '@/card2.1/core/interaction-types'
 
 const applyTemplate = (template: InteractionConfig) => {
-  console.log('应用模板:', template)
-  // 将模板配置应用到当前组件
+  console.log('Apply template:', template)
+  // Apply template configuration to current component
   currentInteractions.value.push(template)
 }
 
 const closeSelector = () => {
-  console.log('取消模板选择')
+  console.log('Cancel template selection')
 }
 </script>
 ```
@@ -169,29 +169,29 @@ const closeSelector = () => {
 
 ### InteractionTemplatePreview
 
-交互模板预览组件，提供模板的详细信息展示和效果演示功能。
+Interactive template preview component，Provide detailed information display and effect demonstration functions of templates。
 
 #### Props
 
-| 属性名 | 类型 | 默认值 | 必需 | 描述 |
+| attribute name | type | default value | required | describe |
 |--------|------|--------|------|------|
-| `template` | `InteractionTemplate` | - | ✅ | 要预览的交互模板 |
+| `template` | `InteractionTemplate` | - | ✅ | Interaction template to preview |
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `close` | - | 关闭预览时触发 |
-| `select` | `InteractionTemplate` | 选择模板时触发 |
+| `close` | - | Triggered when preview is closed |
+| `select` | `InteractionTemplate` | Fires when a template is selected |
 
-#### 核心功能
+#### Core functions
 
-- 📋 **模板信息展示**：显示模板基本信息和统计数据
-- 🎨 **配置详情**：展示模板包含的所有交互配置
-- 🎮 **实时演示**：提供可交互的演示元素
-- 💾 **模板导出**：支持导出模板为JSON文件
+- 📋 **Template information display**：Display template basic information and statistics
+- 🎨 **Configuration details**：Display all interactive configurations contained in the template
+- 🎮 **Live demo**：Provide interactive presentation elements
+- 💾 **Template export**：Supports exporting templates asJSONdocument
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -208,20 +208,20 @@ import type { InteractionTemplate } from '@/core/interaction-system'
 
 const selectedTemplate = ref<InteractionTemplate>({
   id: 'hover-scale',
-  name: '悬停缩放效果',
-  description: '鼠标悬停时元素缩放的交互效果',
+  name: 'Hover zoom effect',
+  description: 'Interaction effect of element scaling when mouse hovers',
   category: 'basic',
   icon: SettingsOutline,
   color: '#2080f0',
-  config: [/* 交互配置 */]
+  config: [/* Interactive configuration */]
 })
 
 const handleTemplateSelect = (template: InteractionTemplate) => {
-  console.log('选择模板:', template)
+  console.log('Select template:', template)
 }
 
 const closePreview = () => {
-  console.log('关闭预览')
+  console.log('Close preview')
 }
 </script>
 ```
@@ -230,29 +230,29 @@ const closePreview = () => {
 
 ### InteractionPreview
 
-交互预览组件，提供实时的交互效果预览和测试功能。
+Interactive preview component，Provide real-time interactive effect preview and testing functions。
 
 #### Props
 
-| 属性名 | 类型 | 默认值 | 必需 | 描述 |
+| attribute name | type | default value | required | describe |
 |--------|------|--------|------|------|
-| `interactions` | `InteractionConfig[]` | - | ✅ | 要预览的交互配置列表 |
-| `componentId` | `string` | - | ❌ | 关联的组件ID |
+| `interactions` | `InteractionConfig[]` | - | ✅ | List of interaction configurations to preview |
+| `componentId` | `string` | - | ❌ | associated componentsID |
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `close` | - | 关闭预览时触发 |
+| `close` | - | Triggered when preview is closed |
 
-#### 预览功能
+#### Preview function
 
-- 🎮 **交互测试**：模拟点击、悬停等事件
-- 📊 **执行日志**：详细记录交互执行过程
-- 🎛️ **配置控制**：动态启用/禁用配置
-- 🔄 **重置功能**：恢复预览元素初始状态
+- 🎮 **interactive testing**：simulate click、Hover and other events
+- 📊 **execution log**：Record the interactive execution process in detail
+- 🎛️ **Configuration control**：Dynamically enabled/Disable configuration
+- 🔄 **reset function**：Restore the initial state of the preview element
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -279,7 +279,7 @@ const interactionConfigs = ref<InteractionConfig[]>([
 ])
 
 const closePreview = () => {
-  console.log('关闭预览')
+  console.log('Close preview')
 }
 </script>
 ```
@@ -288,30 +288,30 @@ const closePreview = () => {
 
 ### InteractionCardWizard
 
-简化交互配置向导，提供弹窗式的简洁配置界面。
+Simplified interactive configuration wizard，Provides a simple pop-up configuration interface。
 
 #### Props
 
-| 属性名 | 类型 | 默认值 | 必需 | 描述 |
+| attribute name | type | default value | required | describe |
 |--------|------|--------|------|------|
-| `modelValue` | `any[]` | `[]` | ❌ | 当前交互配置 |
-| `componentId` | `string` | - | ❌ | 组件ID |
-| `componentType` | `string` | - | ❌ | 组件类型 |
+| `modelValue` | `any[]` | `[]` | ❌ | Current interaction configuration |
+| `componentId` | `string` | - | ❌ | componentsID |
+| `componentType` | `string` | - | ❌ | Component type |
 
 #### Events
 
-| 事件名 | 参数类型 | 描述 |
+| event name | Parameter type | describe |
 |--------|----------|------|
-| `update:modelValue` | `any[]` | 配置更新时触发 |
+| `update:modelValue` | `any[]` | Triggered when configuration is updated |
 
-#### 支持的操作
+#### Supported operations
 
-- ➕ **添加交互**：通过弹窗快速添加新的交互配置
-- ✏️ **编辑交互**：修改现有交互配置
-- 🗑️ **删除交互**：移除不需要的交互配置
-- 🔄 **切换状态**：启用/禁用特定交互
+- ➕ **Add interaction**：Quickly add new interaction configurations through pop-up windows
+- ✏️ **Edit interaction**：Modify existing interaction configuration
+- 🗑️ **Delete interaction**：Remove unnecessary interaction configuration
+- 🔄 **Switch status**：enable/Disable specific interactions
 
-#### 使用示例
+#### Usage example
 
 ```vue
 <template>
@@ -333,90 +333,90 @@ const componentType = ref('chart-component')
 
 ---
 
-## 管理器 API
+## Manager API
 
 ### ConfigRegistry
 
-配置组件注册表管理器，用于管理Card 2.1组件的自定义配置面板。
+Configuring the component registry manager，for managementCard 2.1Custom configuration panel for components。
 
-#### 方法
+#### method
 
-| 方法名 | 参数 | 返回值 | 描述 |
+| method name | parameter | return value | describe |
 |--------|------|--------|------|
-| `register` | `(componentId: string, configComponent: IConfigComponent)` | `void` | 注册配置组件 |
-| `get` | `(componentId: string)` | `IConfigComponent \| undefined` | 获取配置组件 |
-| `has` | `(componentId: string)` | `boolean` | 检查是否有自定义配置组件 |
-| `getAll` | `()` | `ConfigComponentRegistration[]` | 获取所有注册的配置组件 |
-| `clear` | `()` | `void` | 清除所有注册 |
-| `unregister` | `(componentId: string)` | `boolean` | 移除指定组件的配置 |
+| `register` | `(componentId: string, configComponent: IConfigComponent)` | `void` | Register configuration component |
+| `get` | `(componentId: string)` | `IConfigComponent \| undefined` | Get configuration components |
+| `has` | `(componentId: string)` | `boolean` | Check if there is a custom configuration component |
+| `getAll` | `()` | `ConfigComponentRegistration[]` | Get all registered configuration components |
+| `clear` | `()` | `void` | clear all registrations |
+| `unregister` | `(componentId: string)` | `boolean` | Remove the configuration of the specified component |
 
-#### 使用示例
+#### Usage example
 
 ```typescript
 import { configRegistry } from '@/core/interaction-system'
 
-// 注册自定义配置组件
+// Register a custom configuration component
 configRegistry.register('my-component', {
   component: MyCustomConfigPanel,
-  props: { /* 配置属性 */ },
-  validators: { /* 验证规则 */ }
+  props: { /* Configuration properties */ },
+  validators: { /* Validation rules */ }
 })
 
-// 检查是否有自定义配置
+// Check if there is a custom configuration
 if (configRegistry.has('my-component')) {
   const config = configRegistry.get('my-component')
-  // 使用自定义配置组件
+  // Use custom configuration components
 }
 
-// 获取所有注册的配置
+// Get all registered configurations
 const allConfigs = configRegistry.getAll()
-console.log('已注册的配置组件:', allConfigs)
+console.log('Registered configuration components:', allConfigs)
 ```
 
 ---
 
-## 类型定义
+## type definition
 
-### 核心接口
+### core interface
 
 ```typescript
-// 交互配置主接口
+// Interactively configure the main interface
 interface InteractionConfig {
-  event: InteractionEventType           // 触发事件类型
-  responses: InteractionResponse[]      // 响应动作列表
-  enabled: boolean                      // 是否启用
-  priority?: number                     // 执行优先级
-  name?: string                         // 配置名称
+  event: InteractionEventType           // Trigger event type
+  responses: InteractionResponse[]      // Response action list
+  enabled: boolean                      // Whether to enable
+  priority?: number                     // execution priority
+  name?: string                         // Configuration name
   
-  // 条件执行
+  // conditional execution
   condition?: ConditionConfig           
   watchedProperty?: string              
   sourceComponentType?: string          
   
-  // 跨组件交互
+  // Cross-component interaction
   targetComponentId?: string            
 }
 
-// 响应动作接口
+// Response action interface
 interface InteractionResponse {
-  action: InteractionActionType         // 动作类型
-  value: any                           // 动作值
-  delay?: number                       // 延迟执行时间(ms)
-  duration?: number                    // 持续时间(ms)
-  easing?: string                      // 缓动函数
+  action: InteractionActionType         // action type
+  value: any                           // action value
+  delay?: number                       // Delayed execution time(ms)
+  duration?: number                    // duration(ms)
+  easing?: string                      // Easing function
   
-  // URL跳转相关
-  target?: string                      // 跳转目标
-  windowFeatures?: string              // 新窗口特性
+  // URLJump related
+  target?: string                      // Jump target
+  windowFeatures?: string              // New window properties
   
-  // 组件数据更新相关
-  targetComponentId?: string           // 目标组件ID
-  targetProperty?: string              // 目标属性
-  updateValue?: any                    // 更新值
+  // Component data update related
+  targetComponentId?: string           // target componentID
+  targetProperty?: string              // target attribute
+  updateValue?: any                    // update value
   updateMode?: 'replace' | 'append' | 'prepend'
 }
 
-// 条件配置接口
+// Conditional configuration interface
 interface ConditionConfig {
   type: 'comparison' | 'range' | 'expression'
   operator?: ComparisonOperator
@@ -427,129 +427,129 @@ interface ConditionConfig {
 }
 ```
 
-### 枚举类型
+### enumeration type
 
 ```typescript
 /**
- * 交互事件类型枚举
- * 定义了所有支持的用户交互和系统事件类型
+ * Interaction event type enumeration
+ * Defines all supported user interaction and system event types
  */
 type InteractionEventType = 
-  | 'click'              // 鼠标点击事件 (MouseEvent)
-  | 'hover'              // 鼠标悬停事件 (MouseEvent: mouseenter/mouseleave)
-  | 'focus'              // 元素获得焦点事件 (FocusEvent)
-  | 'blur'               // 元素失去焦点事件 (FocusEvent)
-  | 'visibility'         // 元素可见性状态变化事件 (IntersectionObserver)
-  | 'dataChange'         // 组件数据属性值变化事件 (Vue Watcher)
-  | 'conditional'        // 条件表达式满足时触发的事件
-  | 'crossComponent'     // 跨组件通信事件 (CustomEvent)
-  | 'custom'             // 用户自定义事件类型
+  | 'click'              // mouse click event (MouseEvent)
+  | 'hover'              // mouseover event (MouseEvent: mouseenter/mouseleave)
+  | 'focus'              // element gets focus event (FocusEvent)
+  | 'blur'               // Element loses focus event (FocusEvent)
+  | 'visibility'         // Element visibility state change event (IntersectionObserver)
+  | 'dataChange'         // Component data attribute value change event (Vue Watcher)
+  | 'conditional'        // Event triggered when a conditional expression is met
+  | 'crossComponent'     // Cross-component communication events (CustomEvent)
+  | 'custom'             // User-defined event type
 
 /**
- * 交互响应动作类型枚举
- * 定义了交互触发后可执行的所有动作类型
+ * Interaction response action type enumeration
+ * Defines all action types that can be executed after the interaction is triggered
  */
 type InteractionActionType = 
-  // 导航动作
-  | 'navigateToUrl'            // URL跳转 (支持内部路由和外部链接)
-  | 'jumpToPage'               // 页面跳转 (内部路由专用)
+  // Navigation action
+  | 'navigateToUrl'            // URLJump (Supports internal routing and external links)
+  | 'jumpToPage'               // Page jump (Internal routing only)
   
-  // 数据操作动作
-  | 'updateComponentData'      // 更新目标组件数据
-  | 'modifyProperty'           // 修改组件属性 (新格式)
+  // Data manipulation actions
+  | 'updateComponentData'      // Update target component data
+  | 'modifyProperty'           // Modify component properties (new format)
   
-  // 视觉样式动作  
-  | 'changeVisibility'         // 改变元素可见性 (visible/hidden)
-  | 'changeBackgroundColor'    // 改变背景颜色
-  | 'changeTextColor'          // 改变文字颜色
-  | 'changeBorderColor'        // 改变边框颜色
-  | 'changeSize'               // 改变尺寸 (width/height)
-  | 'changeOpacity'            // 改变透明度 (0-1)
-  | 'changeTransform'          // CSS变换操作 (scale/rotate/translate)
-  | 'changeContent'            // 改变文本内容
+  // visual style actions  
+  | 'changeVisibility'         // Change element visibility (visible/hidden)
+  | 'changeBackgroundColor'    // Change background color
+  | 'changeTextColor'          // Change text color
+  | 'changeBorderColor'        // Change border color
+  | 'changeSize'               // change size (width/height)
+  | 'changeOpacity'            // change transparency (0-1)
+  | 'changeTransform'          // CSStransformation operation (scale/rotate/translate)
+  | 'changeContent'            // Change text content
   
-  // 动画效果动作
-  | 'triggerAnimation'         // 触发CSS动画或关键帧动画
-  | 'flashColor'               // 颜色闪烁效果
-  | 'pulseEffect'              // 脉冲动画效果
-  | 'shakeEffect'              // 震动动画效果
+  // animation effect action
+  | 'triggerAnimation'         // triggerCSSanimation or keyframe animation
+  | 'flashColor'               // color flash effect
+  | 'pulseEffect'              // Pulse animation effect
+  | 'shakeEffect'              // Vibration animation effect
   
-  // 高级功能动作
-  | 'conditionalStyle'         // 基于条件的样式应用
-  | 'callFunction'             // 调用JavaScript函数
-  | 'emitEvent'                // 发送自定义事件
-  | 'playSound'                // 播放音效 (Web Audio API)
-  | 'showNotification'         // 显示通知消息
+  // Advanced functional actions
+  | 'conditionalStyle'         // Condition-based style application
+  | 'callFunction'             // callJavaScriptfunction
+  | 'emitEvent'                // Send custom events
+  | 'playSound'                // Play sound effects (Web Audio API)
+  | 'showNotification'         // Show notification message
   
-  // 扩展动作
-  | 'custom'                   // 用户自定义动作处理器
+  // extended action
+  | 'custom'                   // User-defined action handler
 
 /**
- * 条件比较运算符枚举
- * 用于数据变化事件的条件判断
+ * Conditional comparison operators enumeration
+ * Conditional judgment for data change events
  */
 type ComparisonOperator = 
-  // 数值比较
-  | 'equals'                   // 等于 (===)
-  | 'notEquals'                // 不等于 (!==)
-  | 'greaterThan'              // 大于 (>)
-  | 'greaterThanOrEqual'       // 大于等于 (>=)
-  | 'lessThan'                 // 小于 (<)
-  | 'lessThanOrEqual'          // 小于等于 (<=)
+  // numerical comparison
+  | 'equals'                   // equal (===)
+  | 'notEquals'                // not equal to (!==)
+  | 'greaterThan'              // greater than (>)
+  | 'greaterThanOrEqual'       // Greater than or equal to (>=)
+  | 'lessThan'                 // less than (<)
+  | 'lessThanOrEqual'          // less than or equal to (<=)
   
-  // 字符串比较
-  | 'contains'                 // 包含 (includes)
-  | 'startsWith'               // 开始于 (startsWith)
-  | 'endsWith'                 // 结束于 (endsWith)
-  | 'matches'                  // 正则表达式匹配
+  // String comparison
+  | 'contains'                 // Include (includes)
+  | 'startsWith'               // Started with (startsWith)
+  | 'endsWith'                 // ends in (endsWith)
+  | 'matches'                  // Regular expression matching
   
-  // 集合比较
-  | 'in'                       // 存在于数组中
-  | 'notIn'                    // 不存在于数组中
+  // Set comparison
+  | 'in'                       // exists in the array
+  | 'notIn'                    // does not exist in the array
   
-  // 类型检查
-  | 'isEmpty'                  // 为空值 (null/undefined/'')
-  | 'isNotEmpty'               // 非空值
+  // type checking
+  | 'isEmpty'                  // is a null value (null/undefined/'')
+  | 'isNotEmpty'               // non-null value
 
 /**
- * 条件类型枚举
- * 定义了条件执行的判断方式
+ * condition type enum
+ * Defines the judgment method for conditional execution
  */
 type ConditionType = 
-  | 'always'                   // 总是执行
-  | 'never'                    // 从不执行  
-  | 'comparison'               // 比较判断 (使用ComparisonOperator)
-  | 'range'                    // 数值范围判断 (min-max)
-  | 'expression'               // JavaScript表达式判断
-  | 'function'                 // 自定义函数判断
+  | 'always'                   // always execute
+  | 'never'                    // never execute  
+  | 'comparison'               // comparative judgment (useComparisonOperator)
+  | 'range'                    // Numeric range judgment (min-max)
+  | 'expression'               // JavaScriptExpression judgment
+  | 'function'                 // Custom function judgment
 
 /**
- * 更新模式枚举
- * 定义了数据更新的方式
+ * Update mode enum
+ * Defines how data is updated
  */
 type UpdateMode = 
-  | 'replace'                  // 替换现有值
-  | 'append'                   // 追加到现有值后
-  | 'prepend'                  // 添加到现有值前
-  | 'merge'                    // 对象合并 (Object.assign)
-  | 'deepMerge'                // 深度对象合并
+  | 'replace'                  // Replace existing value
+  | 'append'                   // Append to existing value
+  | 'prepend'                  // Append before existing value
+  | 'merge'                    // Object merge (Object.assign)
+  | 'deepMerge'                // Deep object merging
 ```
 
 ---
 
-## 错误处理
+## Error handling
 
-### 常见错误码
+### Common error codes
 
-| 错误码 | 描述 | 解决方案 |
+| error code | describe | solution |
 |--------|------|----------|
-| `INTERACTION_CONFIG_INVALID` | 交互配置格式无效 | 检查配置对象结构 |
-| `COMPONENT_NOT_FOUND` | 目标组件未找到 | 确认组件ID是否正确 |
-| `PROPERTY_NOT_EXPOSED` | 属性未暴露 | 检查属性暴露配置 |
-| `TEMPLATE_FORMAT_ERROR` | 模板格式错误 | 验证模板JSON结构 |
-| `EXECUTION_TIMEOUT` | 交互执行超时 | 检查响应动作配置 |
+| `INTERACTION_CONFIG_INVALID` | Invalid interactive configuration format | Check configuration object structure |
+| `COMPONENT_NOT_FOUND` | Target component not found | Confirm componentIDIs it correct? |
+| `PROPERTY_NOT_EXPOSED` | Properties not exposed | Check property exposure configuration |
+| `TEMPLATE_FORMAT_ERROR` | Template format error | Validation templateJSONstructure |
+| `EXECUTION_TIMEOUT` | Interactive execution timeout | Check response action configuration |
 
-### 错误处理示例
+### Error handling example
 
 ```typescript
 try {
@@ -557,30 +557,30 @@ try {
 } catch (error) {
   switch (error.code) {
     case 'INTERACTION_CONFIG_INVALID':
-      console.error('交互配置无效:', error.message)
-      // 显示配置错误提示
+      console.error('Invalid interaction configuration:', error.message)
+      // Show configuration error message
       break
     case 'COMPONENT_NOT_FOUND':
-      console.error('目标组件未找到:', error.componentId)
-      // 提示用户选择有效组件
+      console.error('Target component not found:', error.componentId)
+      // Prompt user to select valid components
       break
     default:
-      console.error('未知错误:', error)
+      console.error('unknown error:', error)
   }
 }
 ```
 
 ---
 
-## 版本兼容性
+## Version compatibility
 
-| API版本 | 交互系统版本 | 向后兼容 | 主要变更 |
+| APIVersion | 交互系统Version | backwards compatible | Major changes |
 |---------|--------------|----------|----------|
-| v1.0 | 1.0.0 | - | 初始版本 |
-| v1.1 | 1.1.0 | ✅ | 新增条件执行功能 |
-| v1.2 | 1.2.0 | ✅ | 新增模板系统 |
-| v1.3 | 1.3.0 | ✅ | 新增实时预览 |
+| v1.0 | 1.0.0 | - | initial version |
+| v1.1 | 1.1.0 | ✅ | Added conditional execution function |
+| v1.2 | 1.2.0 | ✅ | Added template system |
+| v1.3 | 1.3.0 | ✅ | Added real-time preview |
 
 ---
 
-*API文档版本：v1.3 | 最后更新：2024年*
+*APIDocument version：v1.3 | last updated：2024Year*

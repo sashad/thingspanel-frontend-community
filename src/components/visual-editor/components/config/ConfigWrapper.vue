@@ -1,6 +1,6 @@
 <!--
-  配置组件包装器
-  支持原有的配置组件在新系统中正常工作，提供兼容的注入模式
+  Configure component wrapper
+  Support original configuration components to work normally in the new system，Provides compatible injection modes
 -->
 
 <script setup lang="ts">
@@ -12,17 +12,17 @@ import { smartDeepClone } from '@/utils/deep-clone'
 
 const logger = createLogger('ConfigWrapper')
 
-// ====== Props 定义 ======
+// ====== Props definition ======
 interface Props {
-  // 组件定义
+  // Component definition
   componentDefinition?: IComponentDefinition
-  // 配置组件（可以是 Vue 组件或异步组件）
+  // Configure components（can be Vue component or async component）
   configComponent?: Component | (() => Promise<Component>)
-  // 当前配置值
+  // Current configuration value
   modelValue?: Record<string, any>
-  // 是否为预览模式
+  // Whether it is preview mode
   preview?: boolean
-  // 是否启用兼容模式
+  // Whether to enable compatibility mode
   legacyMode?: boolean
 }
 
@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
   legacyMode: true
 })
 
-// ====== Emits 定义 ======
+// ====== Emits definition ======
 interface Emits {
   'update:modelValue': [value: Record<string, any>]
   'config-change': [value: Record<string, any>]
@@ -44,39 +44,39 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// ====== 响应式状态 ======
+// ====== Responsive state ======
 const configRef = ref<Component>()
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const loadedComponent = ref<Component | null>(null)
 
-// 内部配置状态（响应式）
+// Internal configuration status（Responsive）
 const internalConfig = reactive<Record<string, any>>({ ...props.modelValue })
 
-// 验证状态
+// Verification status
 const validationErrors = ref<string[]>([])
 const isValid = computed(() => validationErrors.value.length === 0)
 
-// ====== 配置上下文创建 ======
+// ====== Configuration context creation ======
 
-// 创建兼容的配置上下文，供原有配置组件使用
-// 参考原始 config-ctx.vue 的实现模式
+// Create a compatible configuration context，For use by original configuration components
+// Reference original config-ctx.vue implementation model
 const configContext: IConfigCtx = {
   config: internalConfig,
   view: props.preview
 }
 
-// 提供配置上下文给子组件
+// Provide configuration context to child components
 provide('config-ctx', configContext)
 
-// ====== 配置组件加载 ======
+// ====== Configuration component loading ======
 
 /**
- * 加载配置组件
+ * Load configuration components
  */
 async function loadConfigComponent() {
   if (!props.configComponent) {
-    logger.warn('没有提供配置组件')
+    logger.warn('No configuration components provided')
     return
   }
 
@@ -86,10 +86,10 @@ async function loadConfigComponent() {
   try {
     let component: Component
 
-    // 处理异步组件
+    // Handle asynchronous components
     if (typeof props.configComponent === 'function') {
       component = await props.configComponent()
-      // 处理 default export
+      // deal with default export
       if (component && typeof component === 'object' && 'default' in component) {
         component = (component as any).default
       }
@@ -99,29 +99,29 @@ async function loadConfigComponent() {
 
     loadedComponent.value = component
     emit('component-loaded', component)
-    logger.info('配置组件加载成功')
+    logger.info('Configuration component loaded successfully')
   } catch (err: any) {
-    error.value = err.message || '配置组件加载失败'
+    error.value = err.message || 'Configuration component loading failed'
     emit('component-error', error.value)
-    logger.error('配置组件加载失败:', err)
+    logger.error('Configuration component loading failed:', err)
   } finally {
     isLoading.value = false
   }
 }
 
-// ====== 配置值同步 ======
+// ====== Configuration value synchronization ======
 
-// 监听外部配置变化，同步到内部状态
+// Monitor external configuration changes，Sync to internal state
 watch(
   () => props.modelValue,
   newValue => {
     if (newValue && typeof newValue === 'object') {
-      // 避免循环更新
+      // Avoid cyclic updates
       const currentStr = JSON.stringify(internalConfig)
       const newStr = JSON.stringify(newValue)
       if (currentStr !== newStr) {
-        logger.debug('外部配置更新，同步到内部:', newValue)
-        // 清空现有配置，然后重新赋值
+        logger.debug('External configuration updates，Sync to internal:', newValue)
+        // Clear existing configuration，and then reassign
         Object.keys(internalConfig).forEach(key => delete internalConfig[key])
         Object.assign(internalConfig, newValue)
       }
@@ -130,16 +130,16 @@ watch(
   { deep: true, immediate: true }
 )
 
-// 监听内部配置变化，向外传递（参考原始 config-ctx.vue 的实现）
+// Monitor internal configuration changes，pass outward（Reference original config-ctx.vue realization）
 watch(
   internalConfig,
   newValue => {
-    // 防止循环更新
+    // Prevent cyclic updates
     const currentStr = JSON.stringify(newValue)
     const propsStr = JSON.stringify(props.modelValue)
     if (currentStr !== propsStr) {
-      logger.debug('内部配置更新，向外传递:', newValue)
-      // 🔥 使用智能深拷贝，自动处理Vue响应式对象
+      logger.debug('Internal configuration update，pass outward:', newValue)
+      // 🔥 Use smart deep copy，Automatic processingVueReactive objects
       const clonedValue = smartDeepClone(newValue)
       emit('update:modelValue', clonedValue)
       emit('config-change', clonedValue)
@@ -148,7 +148,7 @@ watch(
   { deep: true }
 )
 
-// 监听预览模式变化，更新上下文
+// Monitor preview mode changes，update context
 watch(
   () => props.preview,
   newPreview => {
@@ -156,10 +156,10 @@ watch(
   }
 )
 
-// ====== 默认配置处理 ======
+// ====== Default configuration processing ======
 
 /**
- * 应用组件定义中的默认配置
+ * Apply default configuration from component definition
  */
 function applyDefaultConfig(force: boolean = false) {
   if (!props.componentDefinition?.properties) return
@@ -173,31 +173,31 @@ function applyDefaultConfig(force: boolean = false) {
         key in internalConfig && internalConfig[key] !== undefined && internalConfig[key] !== null
 
       if (force) {
-        // 强制模式：覆盖所有值
+        // Forced mode：override all values
         overrides[key] = prop.default
       } else if (!hasExistingValue) {
-        // 正常模式：只设置空值
+        // normal mode：Only set empty values
         defaults[key] = prop.default
       }
     }
   })
 
-  // 应用默认值
+  // Apply defaults
   if (Object.keys(defaults).length > 0) {
     Object.assign(internalConfig, defaults)
-    logger.info('应用默认配置:', defaults)
+    logger.info('Apply default configuration:', defaults)
   }
 
-  // 应用强制覆盖值
+  // Apply force override value
   if (Object.keys(overrides).length > 0) {
     Object.assign(internalConfig, overrides)
-    logger.info('强制应用默认配置:', overrides)
+    logger.info('Force application of default configuration:', overrides)
   }
 }
 
 /**
- * 智能合并配置
- * 根据配置项的优先级和来源智能合并配置
+ * Smart merge configuration
+ * Intelligently merge configurations based on priority and source of configuration items
  */
 function smartMergeConfig(newConfig: Record<string, any>, source: 'user' | 'component' | 'system' = 'user') {
   if (!newConfig || typeof newConfig !== 'object') return
@@ -208,16 +208,16 @@ function smartMergeConfig(newConfig: Record<string, any>, source: 'user' | 'comp
     const prop = props.componentDefinition?.properties?.[key]
     const currentValue = internalConfig[key]
 
-    // 判断是否应该更新值
+    // Determine whether the value should be updated
     let shouldUpdate = true
 
     if (prop && typeof prop === 'object') {
-      // 检查配置项的更新策略
+      // Check the update policy of configuration items
       const updateStrategy = prop.updateStrategy || 'replace'
 
       switch (updateStrategy) {
         case 'merge':
-          // 合并模式：对象类型进行深度合并
+          // merge mode：Object types for deep merging
           if (typeof value === 'object' && typeof currentValue === 'object' && !Array.isArray(value)) {
             mergedConfig[key] = { ...currentValue, ...value }
           } else {
@@ -226,7 +226,7 @@ function smartMergeConfig(newConfig: Record<string, any>, source: 'user' | 'comp
           break
 
         case 'append':
-          // 追加模式：数组类型进行追加
+          // append mode：Array type to append
           if (Array.isArray(currentValue) && Array.isArray(value)) {
             mergedConfig[key] = [...currentValue, ...value]
           } else {
@@ -235,7 +235,7 @@ function smartMergeConfig(newConfig: Record<string, any>, source: 'user' | 'comp
           break
 
         case 'preserve':
-          // 保持模式：如果当前有值则不更新
+          // hold mode：If there is currently a value, do not update
           if (currentValue === undefined || currentValue === null) {
             mergedConfig[key] = value
           } else {
@@ -245,149 +245,149 @@ function smartMergeConfig(newConfig: Record<string, any>, source: 'user' | 'comp
 
         case 'replace':
         default:
-          // 替换模式：直接替换
+          // replacement pattern：direct replacement
           mergedConfig[key] = value
           break
       }
     } else {
-      // 没有属性定义，直接替换
+      // no attribute definition，direct replacement
       mergedConfig[key] = value
     }
 
-    // 根据来源和优先级决定是否更新
+    // Decide whether to update based on source and priority
     if (shouldUpdate && source === 'system') {
-      // 系统级配置有最高优先级
+      // System-level configuration has the highest priority
       mergedConfig[key] = value
     } else if (shouldUpdate && source === 'component' && currentValue === undefined) {
-      // 组件级配置只在没有值时应用
+      // Component level configuration is only applied if there is no value
       mergedConfig[key] = value
     } else if (shouldUpdate && source === 'user') {
-      // 用户配置有中等优先级
+      // User configuration has medium priority
       if (key in mergedConfig) {
-        // 已经在合并配置中，使用合并结果
+        // Already in merge configuration，Use merged results
       } else {
         mergedConfig[key] = value
       }
     }
   })
 
-  // 应用合并后的配置
+  // Apply the merged configuration
   if (Object.keys(mergedConfig).length > 0) {
     Object.assign(internalConfig, mergedConfig)
-    logger.info(`智能合并配置 (${source}):`, mergedConfig)
+    logger.info(`Smart merge configuration (${source}):`, mergedConfig)
   }
 }
 
 /**
- * 检查并应用默认配置的最佳时机
+ * Best time to check and apply default configuration
  */
 function checkAndApplyDefaults() {
-  // 检查是否是首次加载
+  // Check if it is loading for the first time
   const isFirstLoad = Object.keys(internalConfig).length === 0
 
-  // 检查是否有组件定义变更
+  // Check if there are any component definition changes
   const hasComponentChanged = props.componentDefinition?.id !== lastComponentId.value
 
   if (isFirstLoad || hasComponentChanged) {
-    // 首次加载或组件变更时应用默认配置
+    // Apply default configuration when first loading or component changes
     applyDefaultConfig(isFirstLoad)
     lastComponentId.value = props.componentDefinition?.id || ''
   }
 }
 
-// 记录上次的组件ID，用于检测组件变更
+// Record the last componentID，Used to detect component changes
 const lastComponentId = ref('')
 
-// ====== 配置验证 ======
+// ====== Configuration verification ======
 
 /**
- * 验证单个配置项
+ * Verify a single configuration item
  */
 function validateConfigItem(key: string, value: any, prop: any): string[] {
   const errors: string[] = []
   const label = prop.label || key
 
-  // 检查必填项
+  // Check required fields
   if (prop.required && (value === undefined || value === null || value === '')) {
-    errors.push(`${label} 是必填项`)
-    return errors // 必填项检查失败，跳过其他检查
+    errors.push(`${label} is required`)
+    return errors // Required field check failed，Skip other checks
   }
 
-  // 如果值为空且非必填，跳过其他检查
+  // If the value is empty and not required，Skip other checks
   if (value === undefined || value === null || value === '') {
     return errors
   }
 
-  // 检查类型
+  // Check type
   if (prop.type) {
     const expectedType = prop.type
     const actualType = Array.isArray(value) ? 'array' : typeof value
 
     if (expectedType !== actualType) {
-      // 特殊类型转换检查
+      // Special type conversion checks
       if (!(expectedType === 'number' && !isNaN(Number(value)))) {
-        errors.push(`${label} 类型错误，期望 ${expectedType}，实际 ${actualType}`)
-        return errors // 类型错误，跳过后续检查
+        errors.push(`${label} type error，expect ${expectedType}，actual ${actualType}`)
+        return errors // type error，Skip follow-up checks
       }
     }
   }
 
-  // 数字类型的范围检查
+  // Range checking for numeric types
   if (typeof value === 'number' || (prop.type === 'number' && !isNaN(Number(value)))) {
     const numValue = typeof value === 'number' ? value : Number(value)
 
     if (prop.min !== undefined && numValue < prop.min) {
-      errors.push(`${label} 不能小于 ${prop.min}`)
+      errors.push(`${label} cannot be less than ${prop.min}`)
     }
     if (prop.max !== undefined && numValue > prop.max) {
-      errors.push(`${label} 不能大于 ${prop.max}`)
+      errors.push(`${label} cannot be greater than ${prop.max}`)
     }
     if (prop.step !== undefined && numValue % prop.step !== 0) {
-      errors.push(`${label} 必须是 ${prop.step} 的倍数`)
+      errors.push(`${label} must be ${prop.step} multiples of`)
     }
   }
 
-  // 字符串类型的检查
+  // String type check
   if (typeof value === 'string' || prop.type === 'string') {
     const strValue = String(value)
 
     if (prop.minLength !== undefined && strValue.length < prop.minLength) {
-      errors.push(`${label} 长度不能小于 ${prop.minLength}`)
+      errors.push(`${label} The length cannot be less than ${prop.minLength}`)
     }
     if (prop.maxLength !== undefined && strValue.length > prop.maxLength) {
-      errors.push(`${label} 长度不能大于 ${prop.maxLength}`)
+      errors.push(`${label} The length cannot be greater than ${prop.maxLength}`)
     }
     if (prop.pattern && !new RegExp(prop.pattern).test(strValue)) {
-      errors.push(`${label} 格式不正确`)
+      errors.push(`${label} Incorrect format`)
     }
   }
 
-  // 数组类型的检查
+  // Array type check
   if (Array.isArray(value) || prop.type === 'array') {
     const arrValue = Array.isArray(value) ? value : []
 
     if (prop.minItems !== undefined && arrValue.length < prop.minItems) {
-      errors.push(`${label} 至少需要 ${prop.minItems} 项`)
+      errors.push(`${label} At least required ${prop.minItems} item`)
     }
     if (prop.maxItems !== undefined && arrValue.length > prop.maxItems) {
-      errors.push(`${label} 最多只能有 ${prop.maxItems} 项`)
+      errors.push(`${label} At most there can only be ${prop.maxItems} item`)
     }
   }
 
-  // 枚举值检查
+  // Enumeration value checking
   if (prop.enum && !prop.enum.includes(value)) {
-    errors.push(`${label} 必须是以下值之一: ${prop.enum.join(', ')}`)
+    errors.push(`${label} Must be one of the following values: ${prop.enum.join(', ')}`)
   }
 
-  // 自定义验证函数
+  // Custom validation function
   if (prop.validator && typeof prop.validator === 'function') {
     try {
       const result = prop.validator(value)
       if (result !== true) {
-        errors.push(typeof result === 'string' ? result : `${label} 验证失败`)
+        errors.push(typeof result === 'string' ? result : `${label} Authentication failed`)
       }
     } catch (err: any) {
-      errors.push(`${label} 验证出错: ${err.message}`)
+      errors.push(`${label} Verification error: ${err.message}`)
     }
   }
 
@@ -395,7 +395,7 @@ function validateConfigItem(key: string, value: any, prop: any): string[] {
 }
 
 /**
- * 验证当前配置
+ * Verify current configuration
  */
 function validateConfig() {
   const errors: string[] = []
@@ -410,15 +410,15 @@ function validateConfig() {
     })
   }
 
-  // 自定义配置级别的验证
+  // Custom configuration level validation
   if (props.componentDefinition?.validator && typeof props.componentDefinition.validator === 'function') {
     try {
       const result = props.componentDefinition.validator(internalConfig)
       if (result !== true) {
-        errors.push(typeof result === 'string' ? result : '配置验证失败')
+        errors.push(typeof result === 'string' ? result : 'Configuration verification failed')
       }
     } catch (err: any) {
-      errors.push(`配置验证出错: ${err.message}`)
+      errors.push(`Configuration validation error: ${err.message}`)
     }
   }
 
@@ -427,23 +427,23 @@ function validateConfig() {
 }
 
 /**
- * 异步验证配置
+ * Asynchronous verification configuration
  */
 async function validateConfigAsync(): Promise<boolean> {
-  validateConfig() // 先执行同步验证
+  validateConfig() // Perform sync verification first
 
-  // 如果有异步验证器
+  // If there is an async validator
   if (props.componentDefinition?.asyncValidator && typeof props.componentDefinition.asyncValidator === 'function') {
     try {
       const result = await props.componentDefinition.asyncValidator(internalConfig)
       if (result !== true) {
-        const asyncError = typeof result === 'string' ? result : '异步配置验证失败'
+        const asyncError = typeof result === 'string' ? result : 'Asynchronous configuration verification failed'
         validationErrors.value = [...validationErrors.value, asyncError]
         emit('validation-change', false, validationErrors.value)
         return false
       }
     } catch (err: any) {
-      const asyncError = `异步配置验证出错: ${err.message}`
+      const asyncError = `Asynchronous configuration validation error: ${err.message}`
       validationErrors.value = [...validationErrors.value, asyncError]
       emit('validation-change', false, validationErrors.value)
       return false
@@ -453,31 +453,31 @@ async function validateConfigAsync(): Promise<boolean> {
   return isValid.value
 }
 
-// 监听配置变化，触发验证
+// Listen for configuration changes，trigger verification
 watch(internalConfig, validateConfig, { deep: true })
 
-// ====== 工具方法 ======
+// ====== Tool method ======
 
 /**
- * 重置配置到默认值
+ * Reset configuration to default
  */
 function resetToDefaults() {
-  // 清空当前配置
+  // Clear current configuration
   Object.keys(internalConfig).forEach(key => {
     delete internalConfig[key]
   })
 
-  // 重新应用默认配置
+  // Reapply default configuration
   applyDefaultConfig()
 
-  // 发送重置事件
+  // Send reset event
   emit('config-reset', { ...internalConfig })
 
-  logger.info('配置已重置到默认值')
+  logger.info('Configuration has been reset to default')
 }
 
 /**
- * 获取配置摘要信息
+ * Get configuration summary information
  */
 function getConfigSummary() {
   return {
@@ -490,26 +490,26 @@ function getConfigSummary() {
   }
 }
 
-// ====== 生命周期 ======
+// ====== life cycle ======
 
 onMounted(async () => {
-  // 加载配置组件
+  // Load configuration components
   await loadConfigComponent()
 
-  // 检查并应用默认配置（智能时机）
+  // Check and apply default configuration（smart timing）
   checkAndApplyDefaults()
 
-  // 初始验证
+  // Initial verification
   await nextTick()
   validateConfig()
 })
 
-// 监听组件定义变化，重新应用默认配置
+// Listen for component definition changes，Reapply default configuration
 watch(
   () => props.componentDefinition,
   (newDefinition, oldDefinition) => {
     if (newDefinition?.id !== oldDefinition?.id) {
-      logger.info('组件定义已变更，重新应用默认配置')
+      logger.info('Component definition has changed，Reapply default configuration')
       checkAndApplyDefaults()
     }
   },
@@ -517,11 +517,11 @@ watch(
 )
 
 onUnmounted(() => {
-  // 清理资源
+  // Clean up resources
   loadedComponent.value = null
 })
 
-// ====== 暴露给父组件的方法 ======
+// ====== Methods exposed to the parent component ======
 defineExpose({
   resetToDefaults,
   validateConfig,
@@ -538,23 +538,23 @@ defineExpose({
 
 <template>
   <div class="config-wrapper">
-    <!-- 加载状态 -->
+    <!-- Loading status -->
     <div v-if="isLoading" class="config-loading">
       <n-spin size="medium">
-        <template #description>{{ $t('common.loading') }}配置组件...</template>
+        <template #description>{{ $t('common.loading') }}Configure components...</template>
       </n-spin>
     </div>
 
-    <!-- 错误状态 -->
+    <!-- error status -->
     <div v-else-if="error" class="config-error">
       <n-alert type="error" :title="$t('common.error')">
         {{ error }}
       </n-alert>
     </div>
 
-    <!-- 配置组件渲染 -->
+    <!-- Configure component rendering -->
     <div v-else-if="loadedComponent" class="config-content">
-      <!-- 验证错误提示 -->
+      <!-- Verification error message -->
       <div v-if="!isValid && validationErrors.length > 0" class="config-validation-errors mb-4">
         <n-alert type="warning" :title="$t('common.validationErrors')">
           <ul class="mt-2">
@@ -565,44 +565,44 @@ defineExpose({
         </n-alert>
       </div>
 
-      <!-- 配置组件内容 -->
+      <!-- Configure component content -->
       <div class="config-component-wrapper">
         <component :is="loadedComponent" ref="configRef" v-bind="$attrs" />
       </div>
 
-      <!-- 调试信息（开发环境） -->
+      <!-- debugging information（development environment） -->
       <div v-if="process.env.NODE_ENV === 'development'" class="config-debug mt-4">
         <n-collapse>
-          <n-collapse-item title="调试信息" name="debug">
+          <n-collapse-item title="debugging information" name="debug">
             <div class="space-y-2 text-xs">
               <div>
-                <strong>组件ID:</strong>
+                <strong>componentsID:</strong>
                 {{ componentDefinition?.id }}
               </div>
               <div>
-                <strong>配置项数量:</strong>
+                <strong>Number of configuration items:</strong>
                 {{ Object.keys(internalConfig).length }}
               </div>
               <div>
-                <strong>验证状态:</strong>
-                {{ isValid ? '通过' : '失败' }}
+                <strong>Verification status:</strong>
+                {{ isValid ? 'pass' : 'fail' }}
               </div>
               <div>
-                <strong>错误数量:</strong>
+                <strong>number of errors:</strong>
                 {{ validationErrors.length }}
               </div>
               <div>
-                <strong>预览模式:</strong>
-                {{ preview ? '是' : '否' }}
+                <strong>preview mode:</strong>
+                {{ preview ? 'yes' : 'no' }}
               </div>
               <div>
-                <strong>兼容模式:</strong>
-                {{ legacyMode ? '是' : '否' }}
+                <strong>Compatibility mode:</strong>
+                {{ legacyMode ? 'yes' : 'no' }}
               </div>
 
               <n-divider />
 
-              <div><strong>当前配置:</strong></div>
+              <div><strong>Current configuration:</strong></div>
               <pre class="bg-gray-100 p-2 rounded text-xs overflow-auto max-h-40">{{
                 JSON.stringify(internalConfig, null, 2)
               }}</pre>
@@ -612,9 +612,9 @@ defineExpose({
       </div>
     </div>
 
-    <!-- 无配置组件 -->
+    <!-- No configuration components -->
     <div v-else class="config-empty">
-      <n-empty description="该组件没有可配置的选项" />
+      <n-empty description="This component has no configurable options" />
     </div>
   </div>
 </template>
@@ -652,7 +652,7 @@ defineExpose({
   @apply border-t border-gray-200 pt-4;
 }
 
-/* 深层样式覆盖，确保内部组件样式正常 */
+/* Deep style override，Make sure internal components are styled correctly */
 :deep(.n-form) {
   @apply w-full;
 }

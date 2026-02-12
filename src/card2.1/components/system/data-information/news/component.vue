@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 /**
- * 消息资讯组件，与原版保持1:1功能匹配
+ * Message information component，Keep with the original1:1Function matching
  */
 import { ref } from 'vue'
 import { $t } from '@/locales'
@@ -30,19 +30,19 @@ import { tenantNum } from '@/service/api'
 import { createLogger } from '@/utils/logger'
 import GenericCard from '@/card2.1/components/common/generic-card/component.vue'
 
-const logger = createLogger('News') // 与原版保持一致的logger名称
+const logger = createLogger('News') // consistent with the originalloggername
 
-// 卡片数据配置，与原版保持1:1一致
+// Card data configuration，Keep with the original1:1consistent
 const cardData = ref({
-  id: 'trade', // 与原版保持一致
+  id: 'trade', // Stay consistent with the original
   title: $t('card.msgTotal'),
   value: 0,
   unit: $t('card.msgUnit'),
   colors: ['#fcbc25', '#f68057'],
-  icon: 'fa-envelope' // 与原版保持一致
+  icon: 'fa-envelope' // Stay consistent with the original
 })
 
-// 获取数据，与原版保持1:1一致
+// Get data，Keep with the original1:1consistent
 const getData = async () => {
   try {
     const response = await tenantNum()
@@ -52,19 +52,19 @@ const getData = async () => {
       logger.error('Data does not contain the required properties or they are not numbers.')
     }
   } catch (error) {
-    // 处理请求数据时的错误
+    // Error while processing request data
     logger.error('Error fetching data:')
   }
 }
 
-// 调用 getData 函数，与原版保持一致
+// call getData function，Stay consistent with the original
 getData()
 
 defineOptions({
-  name: 'NumCard' // 与原版保持一致的组件名
+  name: 'NumCard' // Component names consistent with the original version
 })
 </script>
 
 <style scoped>
-/* 所有样式都由 GenericCard 处理，这里无需额外样式 */
+/* All styles are created by GenericCard deal with，No additional styling required here */
 </style>

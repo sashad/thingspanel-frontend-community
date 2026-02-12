@@ -1,45 +1,45 @@
 /**
- * 仪表盘图表配置定义
- * 用于定义仪表盘组件的可配置属性
+ * Dashboard chart configuration definition
+ * Configurable properties used to define dashboard components
  */
 
 import type { TSConfig } from '@/card2.1/types/setting-config'
 
 /**
- * 仪表盘组件自定义配置接口
+ * Dashboard component custom configuration interface
  */
 export interface GaugeChartCustomize {
-  // 数据配置
-  value?: number          // 当前值
-  min?: number           // 最小值
-  max?: number           // 最大值
-  unit?: string          // 单位
+  // Data configuration
+  value?: number          // current value
+  min?: number           // minimum value
+  max?: number           // maximum value
+  unit?: string          // unit
 
-  // 样式配置
-  title?: string         // 标题
-  titleColor?: string    // 标题颜色
-  valueColor?: string    // 数值颜色
+  // Style configuration
+  title?: string         // title
+  titleColor?: string    // title color
+  valueColor?: string    // numerical color
 
-  // 仪表盘颜色配置
-  gaugeColor?: string[]  // 仪表盘颜色渐变数组
+  // Dashboard color configuration
+  gaugeColor?: string[]  // Dashboard color gradient array
 
-  // 尺寸配置
-  radius?: string        // 仪表盘半径
-  thickness?: number     // 仪表盘厚度
+  // Size configuration
+  radius?: string        // Dashboard radius
+  thickness?: number     // Instrument panel thickness
 
-  // 动画配置
-  animationDuration?: number  // 动画持续时间（毫秒）
+  // Animation configuration
+  animationDuration?: number  // animation duration（millisecond）
 }
 
 /**
- * 默认配置
+ * Default configuration
  */
 export const customConfig: GaugeChartCustomize = {
   value: 75,
   min: 0,
   max: 100,
   unit: '%',
-  title: '数据指标',
+  title: 'Data indicators',
   titleColor: '#333333',
   valueColor: '#1890ff',
   gaugeColor: ['#5470c6', '#91cc75', '#fac858', '#ee6666'],
@@ -49,108 +49,108 @@ export const customConfig: GaugeChartCustomize = {
 }
 
 /**
- * 仪表盘配置表单定义
+ * Dashboard configuration form definition
  */
 export const gaugeChartSettingConfig: TSConfig = {
   groups: [
     {
       id: 'data',
-      name: '数据配置',
+      name: 'Data configuration',
       icon: 'i-carbon-data-1',
       fields: [
         {
           id: 'value',
-          name: '当前值',
+          name: 'current value',
           type: 'number',
           defaultValue: 75,
           required: false,
-          description: '仪表盘显示的当前数值'
+          description: 'The current value displayed on the dashboard'
         },
         {
           id: 'min',
-          name: '最小值',
+          name: 'minimum value',
           type: 'number',
           defaultValue: 0,
           required: false,
-          description: '仪表盘的最小刻度值'
+          description: 'The minimum scale value of the dashboard'
         },
         {
           id: 'max',
-          name: '最大值',
+          name: 'maximum value',
           type: 'number',
           defaultValue: 100,
           required: false,
-          description: '仪表盘的最大刻度值'
+          description: 'The maximum scale value of the dashboard'
         },
         {
           id: 'unit',
-          name: '单位',
+          name: 'unit',
           type: 'string',
           defaultValue: '%',
           required: false,
-          description: '数值单位'
+          description: 'numerical unit'
         }
       ]
     },
     {
       id: 'style',
-      name: '样式配置',
+      name: 'Style configuration',
       icon: 'i-carbon-paint-brush',
       fields: [
         {
           id: 'title',
-          name: '标题',
+          name: 'title',
           type: 'string',
-          defaultValue: '数据指标',
+          defaultValue: 'Data indicators',
           required: false,
-          description: '仪表盘标题'
+          description: 'Dashboard title'
         },
         {
           id: 'titleColor',
-          name: '标题颜色',
+          name: 'title color',
           type: 'color',
           defaultValue: '#333333',
           required: false,
-          description: '标题文字颜色'
+          description: 'Title text color'
         },
         {
           id: 'valueColor',
-          name: '数值颜色',
+          name: 'numerical color',
           type: 'color',
           defaultValue: '#1890ff',
           required: false,
-          description: '中心数值颜色'
+          description: 'Center value color'
         },
         {
           id: 'radius',
-          name: '仪表盘大小',
+          name: 'Dashboard size',
           type: 'string',
           defaultValue: '75%',
           required: false,
-          description: '仪表盘半径大小（支持百分比）'
+          description: 'Dashboard radius size（Support percentage）'
         },
         {
           id: 'thickness',
-          name: '仪表盘厚度',
+          name: 'Instrument panel thickness',
           type: 'number',
           defaultValue: 10,
           required: false,
-          description: '仪表盘指针厚度'
+          description: 'Instrument panel pointer thickness'
         }
       ]
     },
     {
       id: 'animation',
-      name: '动画配置',
+      name: 'Animation configuration',
       icon: 'i-carbon-play',
       fields: [
         {
           id: 'animationDuration',
-          name: '动画时长',
+          name: 'Animation duration',
           type: 'number',
           defaultValue: 1000,
           required: false,
-          description: '数值变化动画持续时间（毫秒）'
+          description: 'Value change animation duration（millisecond）'
         }
       ]
     }

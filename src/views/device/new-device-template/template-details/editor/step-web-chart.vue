@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 步骤3：Web图表配置
- * 使用template-panel组件配置Web端图表
+ * step3：WebChart configuration
+ * usetemplate-panelComponent configurationWebend chart
  */
 
 import { provide, ref } from 'vue'
@@ -30,17 +30,17 @@ const props = defineProps({
 const web_chart_config = ref<ICardView[]>([])
 provide('web_chart_config', web_chart_config)
 
-// 取消
+// Cancel
 const cancellation: () => void = () => {
   emit('update:modalVisible', false)
 }
 
-// 上一步
+// Previous step
 const back: () => void = () => {
   emit('update:stepCurrent', 2)
 }
 
-// 下一步
+// Next step
 const next = async () => {
   let flag = false
   let theIndex = 0

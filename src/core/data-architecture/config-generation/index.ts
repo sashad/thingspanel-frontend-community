@@ -1,18 +1,18 @@
 /**
- * 配置生成模块导出
- * 包含简化的数据源配置生成器
+ * Configure build module export
+ * Contains simplified data source configuration generator
  */
 
-// 配置生成器
+// Configuration generator
 export { SimpleConfigGenerator, simpleConfigGenerator } from '@/core/data-architecture/config-generation/SimpleConfigGenerator'
 
-// 向后兼容的别名导出
+// Backwards compatible alias export
 export { simpleConfigGenerator as configGenerator } from '@/core/data-architecture/config-generation/SimpleConfigGenerator'
 
-// 系统对象导出（向后兼容）
+// System object export（backwards compatible）
 import { simpleConfigGenerator } from '@/core/data-architecture/config-generation/SimpleConfigGenerator'
 
 export const dataSourceSystem = {
-  // 核心组件
+  // core components
   configGenerator: simpleConfigGenerator
 }

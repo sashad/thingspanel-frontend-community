@@ -17,7 +17,7 @@ import { useI18n } from 'vue-i18n'
 // import { createLogger } from '@/utils/logger'
 // const logger = createLogger('DataHandle')
 
-// 获取国际化函数
+// Get internationalization function
 const { t } = useI18n()
 // const message = useMessage();
 const dialog = useDialog()
@@ -68,17 +68,17 @@ function defaultConfigForm() {
   return {
     id: null,
     content: `function encodeInp(msg,topic) 
- -- 说明：该函数为编码函数，将输入的消息编码为平台可识别的消息格式或者设备可识别的消息格式，请根据实际需求编写编码逻辑 
- -- 入参：输入的msg，可以是任意数据类型的字符串。 
- -- 出参：返回值为编码后的消息,需要是json字符串形式 
- -- 注意：string与jsonObj互转需导入json库：local json = require("json") 
- -- 例，string转jsonObj：local jsonData = json.decode(msgString) 
- -- 例，jsonObj转string：local jsonStr = json.encode(jsonTable) 
+ -- illustrate：This function is a coding function，Encode incoming messages into a platform-recognizable message format or a device-recognizable message format，Please write coding logic according to actual needs 
+ -- Add ginseng：inputmsg，Can be a string of any data type。 
+ -- Take out the ginseng：The return value is the encoded message,need to bejsonstring form 
+ -- Notice：stringandjsonObjImporting is required for mutual transferjsonLibrary：local json = require("json") 
+ -- example，stringchangejsonObj：local jsonData = json.decode(msgString) 
+ -- example，jsonObjchangestring：local jsonStr = json.encode(jsonTable) 
  local json = require("json") 
  local jsonData = json.decode(msg) 
- -- 例 if jsonData.temp then 
- -- 例 jsonData.temp = jsonData.temp * 10 
- -- 例 end 
+ -- example if jsonData.temp then 
+ -- example jsonData.temp = jsonData.temp * 10 
+ -- example end 
  local newJsonString = json.encode(jsonData) 
  return newJsonString 
  end`,
@@ -94,7 +94,7 @@ function defaultConfigForm() {
   }
 }
 
-// Monaco Editor 配置
+// Monaco Editor Configuration
 const editorOptions = ref({
   automaticLayout: true,
   theme: 'vs',
@@ -144,10 +144,10 @@ const editorOptions = ref({
   formatOnType: true
 })
 
-// 编辑器实例引用
+// Editor instance reference
 const editorRef = ref(null)
 
-// 编辑器工具栏功能
+// Editor toolbar features
 const formatCode = () => {
   if (editorRef.value) {
     editorRef.value.getAction('editor.action.formatDocument').run()
@@ -195,25 +195,25 @@ const showModal = ref(false)
 
 const openModal = (type: any, item: any) => {
   modalTitle.value = type
-  // 先用默认值初始化表单
+  // Initialize the form with default values ​​first
   configForm.value = defaultConfigForm()
 
   if (modalTitle.value === $t('common.edit')) {
-    // 编辑模式：加载选中项的数据
+    // edit mode：Load selected data
     configForm.value = JSON.parse(JSON.stringify(item))
   } else {
-    // 添加模式：检查筛选器是否有值
+    // Add mode：Check if filter has value
     if (queryData.value.script_type) {
-      // 如果筛选器有值，则将该值预设给表单的 script_type 字段
+      // if filter has value，then the value is preset to the form's script_type Field
       configForm.value.script_type = queryData.value.script_type
     }
   }
-  // 先设置 showModal 为 true，让模态框和表单开始渲染
+  // Set up first showModal for true，Let modals and forms start rendering
   showModal.value = true
 
-  // 使用 nextTick 确保 VDOM 更新和组件挂载完成后执行
+  // use nextTick make sure VDOM Executed after updates and component mounting are complete
   nextTick(() => {
-    // 清除可能由初始数据绑定触发的校验提示
+    // Clear validation prompts that may be triggered by initial data binding
     configFormRef.value?.restoreValidation()
   })
 }
@@ -270,14 +270,14 @@ const handleClose = () => {
   configFormRef.value?.restoreValidation()
   showModal.value = false
 }
-// 提交表单
+// Submit form
 const handleSubmit = async () => {
   await configFormRef?.value?.validate()
   configForm.value.device_config_id = props.configInfo.id
   if (!configForm.value.id) {
     const res = await dataScriptAdd(configForm.value)
     if (!res.error) {
-      // message.success('新增成功');
+      // message.success('Added successfully');
       handleClose()
       searchDataScript()
     }
@@ -285,7 +285,7 @@ const handleSubmit = async () => {
     const res = await dataScriptEdit(configForm.value)
     if (!res.error) {
       handleClose()
-      // message.success('修改成功');
+      // message.success('Modification successful');
       searchDataScript()
     }
   }
@@ -308,21 +308,21 @@ const doQuiz = async () => {
 
   try {
     const response = await dataScriptQuiz(configForm.value)
-    // 添加详细调试信息
-    // 检查是否是错误响应结构 {data: null, error: {...}}
+    // Add detailed debugging information
+    // Check if it is an error response structure {data: null, error: {...}}
     if (response.error && response.data === null) {
       // if (process.env.NODE_ENV === 'development') {
       // }
-      // 处理网络错误或后端错误
+      // Handle network errors or backend errors
       const errorInfo = response.error
       const errorMessage = errorInfo.message || t('page.dataForward.requestFailed')
       configForm.value.resolt_analog_input = `${t('page.dataForward.debugFailed')}\n${t('page.dataForward.errorType')}: ${errorInfo.name || 'Unknown'}\n${t('page.dataForward.errorCode')}: ${errorInfo.code || 'N/A'}\n${t('page.dataForward.errorMessage')}: ${errorMessage}`
       return
     }
 
-    // 检查响应结构，可能是嵌套的
+    // Check response structure，may be nested
     let actualResponse = response
-    // 如果response.data存在且包含code属性，说明真正的响应在response.data中
+    // ifresponse.dataexist and containcodeproperty，Indicates that the real response is inresponse.datamiddle
     if (response.data && typeof response.data === 'object' && 'code' in response.data) {
       actualResponse = response.data
       // if (process.env.NODE_ENV === 'development') {
@@ -330,30 +330,30 @@ const doQuiz = async () => {
     }
     // if (process.env.NODE_ENV === 'development') {
     // }
-    // 根据返回的code值决定显示内容
-    // 使用宽松比较，因为code可能是字符串"200"
+    // According to the returnedcodeThe value determines what is displayed
+    // Use loose comparison，becausecodemay be a string"200"
     if (actualResponse.code == 200 || actualResponse.code === '200') {
-      // code为200时显示data的值
+      // codefor200time displaydatavalue
       if (typeof actualResponse.data === 'string') {
-        // 如果data是字符串，直接显示（包括"null"字符串）
+        // ifdatais a string，display directly（include"null"string）
         configForm.value.resolt_analog_input =
           actualResponse.data === 'null' ? t('page.dataForward.debugSuccessWithNull') : actualResponse.data
       } else if (actualResponse.data === null || actualResponse.data === undefined) {
-        // 如果data是null或undefined
+        // ifdatayesnullorundefined
         configForm.value.resolt_analog_input = t('page.dataForward.debugSuccessWithNull')
       } else {
-        // 如果data是对象，转换为JSON字符串
+        // ifdatais an object，Convert toJSONstring
         configForm.value.resolt_analog_input = JSON.stringify(actualResponse.data, null, 2)
       }
     } else {
-      // code不为200时显示错误信息
-      // 优先显示message，如果message为空则显示默认错误信息
+      // codeNot for200error message is displayed when
+      // Show prioritymessage，ifmessageIf empty, the default error message will be displayed.
       const errorMessage = actualResponse.message || t('page.dataForward.noErrorMessage')
       configForm.value.resolt_analog_input = `${t('page.dataForward.debugFailed')}\ncode: ${actualResponse.code}\nmessage: ${errorMessage}`
     }
   } catch (error) {
-    // 处理请求异常
-    console.error('调试请求异常:', error)
+    // Handling request exceptions
+    console.error('Debug request exception:', error)
     configForm.value.resolt_analog_input =
       t('page.dataForward.debugRequestFailed') + ': ' + (error.message || t('page.dataForward.unknownError'))
   }
@@ -384,7 +384,7 @@ onMounted(() => {
         <template #default>
           <div class="item-desc">{{ item.description }}</div>
         </template>
-        <!-- 右上角开关 -->
+        <!-- Upper right corner switch -->
         <template #top-right-icon>
           <NSwitch
             v-model:value="item.enable_flag"
@@ -394,7 +394,7 @@ onMounted(() => {
           />
         </template>
 
-        <!-- 底部操作按钮 -->
+        <!-- Bottom operation button -->
         <template #footer>
           <div class="flex items-center gap-2 w-full justify-between">
             <NButton size="small" quaternary circle @click="openModal($t('common.edit'), item)">
@@ -488,7 +488,7 @@ onMounted(() => {
       </NFormItem>
       <NFormItem class="w-100%" :label="$t('generate.parse-script')" :rules="configFormRules" path="content">
         <div class="editor-container">
-          <!-- 编辑器工具栏 -->
+          <!-- Editor toolbar -->
           <div class="editor-toolbar">
             <div class="toolbar-left">
               <NButton size="small" tertiary @click="formatCode">
@@ -502,7 +502,7 @@ onMounted(() => {
                     </svg>
                   </n-icon>
                 </template>
-                格式化
+                format
               </NButton>
               <NButton size="small" tertiary @click="toggleWordWrap">
                 <template #icon>
@@ -515,7 +515,7 @@ onMounted(() => {
                     </svg>
                   </n-icon>
                 </template>
-                自动换行
+                Automatic line wrapping
               </NButton>
               <NButton size="small" tertiary @click="toggleMinimap">
                 <template #icon>
@@ -528,7 +528,7 @@ onMounted(() => {
                     </svg>
                   </n-icon>
                 </template>
-                小地图
+                mini map
               </NButton>
             </div>
             <div class="toolbar-right">
@@ -633,7 +633,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* 编辑器容器样式 */
+/* Editor container style */
 .editor-container {
   width: 100%;
   border: 1px solid #e0e0e6;
@@ -682,7 +682,7 @@ onMounted(() => {
   width: 100% !important;
 }
 
-/* 编辑器工具栏按钮样式优化 */
+/* Editor toolbar button style optimization */
 .editor-toolbar .n-button {
   height: 28px;
   padding: 0 8px;
@@ -693,7 +693,7 @@ onMounted(() => {
   font-size: 14px;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .editor-toolbar {
     flex-direction: column;

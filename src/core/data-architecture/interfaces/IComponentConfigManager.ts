@@ -1,15 +1,15 @@
 /**
- * 组件配置管理接口
- * 负责管理单个组件的四层配置：基础配置、组件属性、数据源配置、交互配置
+ * Component configuration management interface
+ * Responsible for managing the four-layer configuration of individual components：Basic configuration、Component properties、Data source configuration、Interactive configuration
  */
 
 /**
- * 配置层类型
+ * Configuration layer type
  */
 export type ConfigLayer = 'base' | 'component' | 'dataSource' | 'interaction'
 
 /**
- * 基础配置（位置、大小、样式等）
+ * Basic configuration（Location、size、style etc.）
  */
 export interface BaseConfig {
   position?: { x: number; y: number }
@@ -21,7 +21,7 @@ export interface BaseConfig {
 }
 
 /**
- * 组件属性配置（组件特有的业务属性）
+ * Component property configuration（Component-specific business properties）
  */
 export interface ComponentConfig {
   properties?: Record<string, any>
@@ -31,7 +31,7 @@ export interface ComponentConfig {
 }
 
 /**
- * 数据源配置（数据绑定相关）
+ * Data source configuration（Data binding related）
  */
 export interface DataSourceConfig {
   type?: 'static' | 'api' | 'websocket' | 'data-source-bindings'
@@ -48,7 +48,7 @@ export interface DataSourceConfig {
 }
 
 /**
- * 交互配置（事件响应、动作等）
+ * Interactive configuration（incident response、Actions etc.）
  */
 export interface InteractionConfig {
   configs?: Array<{
@@ -66,18 +66,18 @@ export interface InteractionConfig {
 }
 
 /**
- * 组件完整配置
+ * Complete configuration of components
  */
 export interface WidgetConfiguration {
-  /** 基础配置层 */
+  /** Basic configuration layer */
   base: BaseConfig
-  /** 组件配置层 */
+  /** Component configuration layer */
   component: ComponentConfig
-  /** 数据源配置层 */
+  /** Data source configuration layer */
   dataSource: DataSourceConfig
-  /** 交互配置层 */
+  /** interactive configuration layer */
   interaction: InteractionConfig
-  /** 配置元数据 */
+  /** Configuration metadata */
   metadata: {
     version: string
     createdAt: number
@@ -87,7 +87,7 @@ export interface WidgetConfiguration {
 }
 
 /**
- * 配置变更事件
+ * Configuration change event
  */
 export interface ConfigChangeEvent {
   widgetId: string
@@ -98,7 +98,7 @@ export interface ConfigChangeEvent {
 }
 
 /**
- * 配置验证结果
+ * Configuration verification results
  */
 export interface ConfigValidationResult {
   valid: boolean
@@ -115,104 +115,104 @@ export interface ConfigValidationResult {
 }
 
 /**
- * 组件配置管理器接口
- * 职责：
- * 1. 管理组件的四层配置数据存取
- * 2. 提供配置验证和默认值处理
- * 3. 发出配置变更事件，但不直接触发数据执行
- * 4. 支持配置的导入导出和版本管理
+ * Component Configuration Manager Interface
+ * Responsibilities：
+ * 1. Four-layer configuration data access for management components
+ * 2. Provides configuration validation and default value handling
+ * 3. Emit configuration change events，But it does not directly trigger data execution
+ * 4. Supports configuration import, export and version management
  */
 export interface IComponentConfigManager {
   /**
-   * 获取组件完整配置
+   * Get the complete configuration of the component
    */
   getConfiguration(widgetId: string): WidgetConfiguration | null
 
   /**
-   * 设置组件完整配置
+   * Set component complete configuration
    */
   setConfiguration(widgetId: string, config: WidgetConfiguration): void
 
   /**
-   * 获取特定层的配置
+   * Get the configuration of a specific layer
    */
   getLayerConfig<T = any>(widgetId: string, layer: ConfigLayer): T | null
 
   /**
-   * 更新特定层的配置
+   * Update the configuration of a specific layer
    */
   updateLayerConfig<T = any>(widgetId: string, layer: ConfigLayer, config: T): void
 
   /**
-   * 删除组件配置
+   * Delete component configuration
    */
   deleteConfiguration(widgetId: string): boolean
 
-  // --- 配置验证和默认值 ---
+  // --- Configure validation and default values ---
 
   /**
-   * 验证配置
+   * Verify configuration
    */
   validateConfiguration(config: WidgetConfiguration): ConfigValidationResult
 
   /**
-   * 创建默认配置
+   * Create default configuration
    */
   createDefaultConfiguration(): WidgetConfiguration
 
   /**
-   * 获取层级默认配置
+   * Get the default configuration of the hierarchy
    */
   getLayerDefaults<T = any>(layer: ConfigLayer): T
 
-  // --- 批量操作 ---
+  // --- Batch operations ---
 
   /**
-   * 获取所有组件配置
+   * Get all component configurations
    */
   getAllConfigurations(): Record<string, WidgetConfiguration>
 
   /**
-   * 批量设置配置
+   * Batch setup configuration
    */
   setMultipleConfigurations(configs: Record<string, WidgetConfiguration>): void
 
   /**
-   * 清空所有配置
+   * Clear all configuration
    */
   clearAllConfigurations(): void
 
-  // --- 事件监听 ---
+  // --- event listening ---
 
   /**
-   * 监听配置变更
+   * Listen for configuration changes
    */
   onConfigChange(listener: (event: ConfigChangeEvent) => void): () => void
 
   /**
-   * 监听特定组件配置变更
+   * Monitor configuration changes of specific components
    */
   onWidgetConfigChange(widgetId: string, listener: (event: ConfigChangeEvent) => void): () => void
 
   /**
-   * 监听特定层配置变更
+   * Monitor specific layer configuration changes
    */
   onLayerConfigChange(layer: ConfigLayer, listener: (event: ConfigChangeEvent) => void): () => void
 
-  // --- 导入导出 ---
+  // --- Import and export ---
 
   /**
-   * 导出配置
+   * Export configuration
    */
   exportConfiguration(widgetId?: string): any
 
   /**
-   * 导入配置
+   * Import configuration
    */
   importConfiguration(data: any, widgetId?: string): boolean
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   destroy(): void
 }

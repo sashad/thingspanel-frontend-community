@@ -7,17 +7,17 @@ import dayjs from 'dayjs'
 import type { DataTableColumns, PaginationProps } from 'naive-ui'
 
 /**
- * 设备状态历史记录类型定义
+ * Device status history type definition
  * @interface StatusHistoryItem
- * @property {number} status - 状态 0: 离线 1: 在线
- * @property {string | number} change_time - 状态改变时间
+ * @property {number} status - state 0: Offline 1: online
+ * @property {string | number} change_time - state change time
  */
 interface StatusHistoryItem {
   status: 0 | 1
   change_time?: string | number
 }
 
-// 请求参数类型定义
+// Request parameter type definition
 interface StatusHistoryParams {
   device_id: string
   page: number
@@ -27,13 +27,13 @@ interface StatusHistoryParams {
   status?: number
 }
 
-// 响应数据类型定义
+// Response data type definition
 interface StatusHistoryListResponse {
   list?: StatusHistoryItem[]
   total?: number
 }
 
-// 响应数据类型定义
+// Response data type definition
 interface StatusHistoryResponse {
   data?: StatusHistoryListResponse
   error?: unknown

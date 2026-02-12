@@ -1,6 +1,6 @@
 /**
- * Grid 响应式布局管理 Hook
- * 处理断点变化和响应式布局转换
+ * Grid Responsive layout management Hook
+ * Handle breakpoint changes and responsive layout transitions
  */
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
@@ -8,21 +8,21 @@ import type { GridLayoutPlusItem, ResponsiveLayout, GridLayoutPlusConfig } from 
 import { createResponsiveLayout, transformLayoutForBreakpoint } from '../gridLayoutPlusUtils'
 
 export interface UseGridResponsiveOptions {
-  /** 是否启用响应式 */
+  /** Whether to enable responsiveness */
   responsive?: boolean
-  /** 断点配置 */
+  /** Breakpoint configuration */
   breakpoints?: Record<string, number>
-  /** 列数配置 */
+  /** Column number configuration */
   cols?: Record<string, number>
-  /** 初始响应式布局 */
+  /** Initial responsive layout */
   initialResponsiveLayouts?: ResponsiveLayout
-  /** 断点变化回调 */
+  /** Breakpoint change callback */
   onBreakpointChange?: (breakpoint: string, layout: GridLayoutPlusItem[]) => void
 }
 
 /**
- * 响应式网格布局管理Hook
- * 提供断点监听和响应式布局转换功能
+ * Responsive grid layout managementHook
+ * Provides breakpoint monitoring and responsive layout conversion functions
  */
 export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
   const {
@@ -33,23 +33,23 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     onBreakpointChange
   } = options
 
-  // 响应式状态
+  // Responsive state
   const currentBreakpoint = ref<string>('lg')
   const containerWidth = ref(0)
   const responsiveLayouts = ref<ResponsiveLayout>(initialResponsiveLayouts)
   const isResponsive = ref(responsive)
 
-  // 断点监听
+  // Breakpoint monitoring
   let resizeObserver: ResizeObserver | null = null
   let containerElement: HTMLElement | null = null
 
-  // 计算属性
+  // Computed properties
   const currentCols = computed(() => {
     return cols[currentBreakpoint.value] || cols.lg || 12
   })
 
   const sortedBreakpoints = computed(() => {
-    return Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // 从大到小排序
+    return Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // Sort from large to small
   })
 
   const breakpointInfo = computed(() => {
@@ -66,7 +66,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     }
   })
 
-  // 断点计算
+  // Breakpoint calculation
   const calculateBreakpoint = (width: number): string => {
     for (const [bp, minWidth] of sortedBreakpoints.value) {
       if (width >= minWidth) {
@@ -76,7 +76,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     return sortedBreakpoints.value[sortedBreakpoints.value.length - 1][0] || 'xs'
   }
 
-  // 布局转换
+  // Layout transformation
   const transformLayoutForCurrentBreakpoint = (
     sourceLayout: GridLayoutPlusItem[],
     fromBreakpoint: string = 'lg'
@@ -94,7 +94,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     }
   }
 
-  // 响应式布局管理
+  // Responsive layout management
   const setResponsiveLayout = (breakpoint: string, layout: GridLayoutPlusItem[]) => {
     if (!isResponsive.value) return
 
@@ -118,7 +118,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     return !!responsiveLayouts.value[breakpoint]
   }
 
-  // 创建完整的响应式布局配置
+  // Create a complete responsive layout configuration
   const createFullResponsiveLayout = (baseLayout: GridLayoutPlusItem[]): ResponsiveLayout => {
     if (!isResponsive.value) return {}
 
@@ -130,30 +130,30 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     }
   }
 
-  // 断点切换处理
+  // Breakpoint switching processing
   const handleBreakpointChange = (newBreakpoint: string, currentLayout: GridLayoutPlusItem[]) => {
     const previousBreakpoint = currentBreakpoint.value
 
     console.debug(`[GridResponsive] Breakpoint changed: ${previousBreakpoint} -> ${newBreakpoint}`)
 
-    // 保存当前布局到之前的断点
+    // Save the current layout to the previous breakpoint
     if (currentLayout.length > 0) {
       setResponsiveLayout(previousBreakpoint, currentLayout)
     }
 
-    // 更新当前断点
+    // Update current breakpoint
     currentBreakpoint.value = newBreakpoint
 
-    // 获取新断点的布局
+    // Get the layout of the new breakpoint
     let newLayout = getResponsiveLayout(newBreakpoint)
 
     if (!newLayout) {
-      // 如果没有对应断点的布局，从当前布局转换
+      // If there is no layout corresponding to the breakpoint，Convert from current layout
       newLayout = transformLayoutForCurrentBreakpoint(currentLayout, previousBreakpoint)
       setResponsiveLayout(newBreakpoint, newLayout)
     }
 
-    // 触发回调
+    // trigger callback
     if (onBreakpointChange) {
       onBreakpointChange(newBreakpoint, newLayout)
     }
@@ -161,23 +161,23 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     return newLayout
   }
 
-  // 监听容器尺寸变化
+  // Monitor container size changes
   const observeContainer = (element: HTMLElement) => {
     containerElement = element
 
     if (!isResponsive.value) return
 
-    // 初始尺寸
+    // initial size
     const rect = element.getBoundingClientRect()
     containerWidth.value = rect.width
 
-    // 创建ResizeObserver
+    // createResizeObserver
     if (window.ResizeObserver) {
       resizeObserver = new ResizeObserver(entries => {
         for (const entry of entries) {
           const newWidth = entry.contentRect.width
           if (Math.abs(newWidth - containerWidth.value) > 10) {
-            // 避免频繁触发
+            // Avoid frequent triggering
             containerWidth.value = newWidth
           }
         }
@@ -185,7 +185,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
 
       resizeObserver.observe(element)
     } else {
-      // 回退到window resize事件
+      // Fallback towindow resizeevent
       const handleResize = () => {
         const rect = element.getBoundingClientRect()
         containerWidth.value = rect.width
@@ -193,7 +193,7 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
 
       window.addEventListener('resize', handleResize)
 
-      // 清理函数
+      // Cleanup function
       return () => window.removeEventListener('resize', handleResize)
     }
   }
@@ -206,19 +206,19 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     containerElement = null
   }
 
-  // 监听容器宽度变化，计算断点
+  // Monitor container width changes，Calculate breakpoints
   watch(containerWidth, newWidth => {
     if (!isResponsive.value || newWidth <= 0) return
 
     const newBreakpoint = calculateBreakpoint(newWidth)
     if (newBreakpoint !== currentBreakpoint.value) {
-      // 断点变化需要外部布局数据，这里只更新断点状态
-      // 实际的布局转换由外部调用 handleBreakpointChange 处理
+      // Breakpoint changes require external layout data，Only breakpoint status is updated here
+      // The actual layout transformation is called externally handleBreakpointChange deal with
       console.debug(`[GridResponsive] Container width changed: ${newWidth}px, new breakpoint: ${newBreakpoint}`)
     }
   })
 
-  // 工具方法
+  // Tool method
   const getBreakpointConfig = () => ({
     breakpoints,
     cols,
@@ -240,37 +240,37 @@ export function useGridResponsive(options: UseGridResponsiveOptions = {}) {
     return currentIndex <= targetIndex
   }
 
-  // 生命周期清理
+  // lifecycle cleanup
   onUnmounted(() => {
     unobserveContainer()
   })
 
   return {
-    // 状态
+    // state
     currentBreakpoint,
     containerWidth,
     responsiveLayouts,
     isResponsive,
 
-    // 计算属性
+    // Computed properties
     currentCols,
     breakpointInfo,
     sortedBreakpoints,
 
-    // 方法
+    // method
     observeContainer,
     unobserveContainer,
     handleBreakpointChange,
     transformLayoutForCurrentBreakpoint,
 
-    // 布局管理
+    // layout management
     setResponsiveLayout,
     getResponsiveLayout,
     getCurrentResponsiveLayout,
     hasResponsiveLayout,
     createFullResponsiveLayout,
 
-    // 工具方法
+    // Tool method
     getBreakpointConfig,
     isBreakpoint,
     isBreakpointOrSmaller,

@@ -1,65 +1,65 @@
 /**
- * 全局预览模式状态管理
- * 用于控制可视化编辑器的预览状态，影响所有渲染器的交互行为
+ * Global preview mode status management
+ * Used to control the preview state of the visual editor，Affects the interactive behavior of all renderers
  */
 import { ref, computed, readonly } from 'vue'
 
-// 全局预览模式状态
+// Global preview mode status
 const isPreviewMode = ref(false)
 
 /**
- * 可视化编辑器预览模式管理钩子
+ * Visual editor preview mode management hook
  */
 export function usePreviewMode() {
-  // 设置预览模式
+  // Set preview mode
   const setPreviewMode = (preview: boolean) => {
     const oldValue = isPreviewMode.value
     isPreviewMode.value = preview
-    // 🔥 如果从预览模式切换到编辑模式，可能需要重新初始化系统
+    // 🔥 If you switch from preview mode to edit mode，May need to reinitialize the system
     if (oldValue === true && preview === false) {
     }
   }
 
-  // 切换预览模式
+  // Switch preview mode
   const togglePreviewMode = () => {
     setPreviewMode(!isPreviewMode.value)
     return isPreviewMode.value
   }
 
-  // 编辑模式状态（预览模式的反向）
+  // Edit mode status（Preview mode reverse）
   const isEditMode = computed(() => !isPreviewMode.value)
 
-  // 渲染器配置计算属性
+  // Renderer configuration computed properties
   const rendererConfig = computed(() => ({
-    // 是否只读模式
+    // Whether to read-only mode
     readonly: isPreviewMode.value,
-    // 是否显示网格
+    // Whether to display the grid
     showGrid: !isPreviewMode.value,
-    // 是否可拖拽
+    // Whether it can be dragged
     draggable: !isPreviewMode.value,
-    // 是否可调整大小
+    // Is it resizable?
     resizable: !isPreviewMode.value,
-    // 是否显示选择框
+    // Whether to display the selection box
     showSelection: !isPreviewMode.value,
-    // 是否显示控制柄
+    // Whether to show the control handle
     showHandles: !isPreviewMode.value,
-    // 是否静态网格（GridStack）
+    // Whether static mesh（GridStack）
     staticGrid: isPreviewMode.value
   }))
 
   return {
-    // 状态
+    // state
     isPreviewMode: readonly(isPreviewMode),
     isEditMode,
 
-    // 方法
+    // method
     setPreviewMode,
     togglePreviewMode,
 
-    // 配置
+    // Configuration
     rendererConfig
   }
 }
 
-// 导出全局实例，确保状态同步
+// Export global instance，Ensure status is synchronized
 export const globalPreviewMode = usePreviewMode()

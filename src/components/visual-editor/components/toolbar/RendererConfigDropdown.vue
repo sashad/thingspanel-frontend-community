@@ -1,6 +1,6 @@
 <!--
-  渲染器配置下拉面板
-  替代弹窗方案，提供更流畅的交互体验
+  Renderer configuration drop-down panel
+  Alternative pop-ups，Provide a smoother interactive experience
 -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -20,24 +20,24 @@ import {
 import { $t } from '@/locales'
 
 /**
- * 组件属性接口
+ * Component property interface
  */
 interface Props {
-  // 显示状态
+  // Show status
   show: boolean
-  // 当前渲染器类型
+  // Current renderer type
   currentRenderer: string
-  // 配置数据
+  // Configuration data
   canvasConfig?: Record<string, any>
   gridstackConfig?: Record<string, any>
   visualizationConfig?: Record<string, any>
 }
 
 /**
- * 组件事件接口
+ * Component event interface
  */
 interface Emits {
-  // 配置变更事件
+  // Configuration change event
   (e: 'canvas-config-change', config: Record<string, any>): void
   (e: 'gridstack-config-change', config: Record<string, any>): void
   (e: 'visualization-config-change', config: Record<string, any>): void
@@ -51,15 +51,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 主题变量
+// Topic variables
 const themeVars = useThemeVars()
 
-// 渲染器类型判断
+// Renderer type judgment
 const isCanvasRenderer = computed(() => props.currentRenderer === 'canvas')
 const isGridstackRenderer = computed(() => props.currentRenderer === 'gridstack')
 const isVisualizationRenderer = computed(() => props.currentRenderer === 'visualization')
 
-// 计算配置对象
+// Compute configuration object
 const canvasConfig = computed(() => ({
   width: 1200,
   height: 800,
@@ -70,9 +70,9 @@ const canvasConfig = computed(() => ({
 }))
 
 const gridstackConfig = computed(() => ({
-  colNum: 24, // 🔥 修复：统一默认为24列
+  colNum: 24, // 🔥 repair：The unified default is24List
   rowHeight: 80,
-  // 🔥 移除间距配置，在渲染器内部写死
+  // 🔥 Remove spacing configuration，Hardcoded inside the renderer
   isDraggable: true,
   isResizable: true,
   staticGrid: false,
@@ -86,20 +86,20 @@ const visualizationConfig = computed(() => ({
   ...props.visualizationConfig
 }))
 
-// 配置选项
-// 12的倍数列数选项
+// Configuration options
+// 12Multiple column options
 const columnOptions = [
-  { label: '12列', value: 12 },
-  { label: '24列', value: 24 },
-  { label: '36列', value: 36 },
-  { label: '48列', value: 48 },
-  { label: '60列', value: 60 },
-  { label: '72列', value: 72 },
-  { label: '84列', value: 84 },
-  { label: '96列', value: 96 }
+  { label: '12List', value: 12 },
+  { label: '24List', value: 24 },
+  { label: '36List', value: 36 },
+  { label: '48List', value: 48 },
+  { label: '60List', value: 60 },
+  { label: '72List', value: 72 },
+  { label: '84List', value: 84 },
+  { label: '96List', value: 96 }
 ]
 
-// 行高已改为滑块控制，不再需要选项数组
+// Row height has been changed to slider control，Options array no longer needed
 
 const themeOptions = [
   { label: $t('visualEditor.defaultTheme'), value: 'default' },
@@ -107,7 +107,7 @@ const themeOptions = [
   { label: $t('visualEditor.lightTheme'), value: 'light' }
 ]
 
-// 配置变更处理
+// Configuration change handling
 const handleCanvasConfigChange = (config: Record<string, any>) => {
   emit('canvas-config-change', config)
 }
@@ -125,7 +125,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   <Transition name="dropdown-fade">
     <div v-if="show" class="config-dropdown" @click.stop>
       <NCard class="config-panel" :bordered="true" size="small">
-        <!-- Canvas 配置 -->
+        <!-- Canvas Configuration -->
         <div v-if="isCanvasRenderer" class="config-section">
           <h4 class="section-title">{{ $t('visualEditor.canvasConfig') }}</h4>
           <NForm label-placement="left" label-width="80px" size="small">
@@ -171,7 +171,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
           </NForm>
         </div>
 
-        <!-- Gridstack 配置 -->
+        <!-- Gridstack Configuration -->
         <div v-else-if="isGridstackRenderer" class="config-section">
           <h4 class="section-title">{{ $t('visualEditor.gridConfig') }}</h4>
           <NForm label-placement="left" label-width="80px" size="small">
@@ -214,7 +214,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
           </NForm>
         </div>
 
-        <!-- 可视化配置 -->
+        <!-- Visual configuration -->
         <div v-else-if="isVisualizationRenderer" class="config-section">
           <h4 class="section-title">{{ $t('visualEditor.visualizationConfig') }}</h4>
           <NForm label-placement="left" label-width="80px" size="small">
@@ -243,7 +243,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
 </template>
 
 <style scoped>
-/* 🎯 下拉面板容器 */
+/* 🎯 dropdown panel container */
 .config-dropdown {
   position: absolute;
   top: 100%;
@@ -254,18 +254,18 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   margin-top: 8px;
 }
 
-/* 🎨 配置面板样式 - 78%透明 */
+/* 🎨 Configure panel style - 78%transparent */
 .config-panel {
-  /* 78%透明背景 */
+  /* 78%Transparent background */
   background: rgba(255, 255, 255, 0.78) !important;
 
-  /* 阴影和边框 */
+  /* shadows and borders */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
 }
 
-/* 📝 配置区块 */
+/* 📝 Configuration block */
 .config-section {
   padding: 16px;
 }
@@ -284,7 +284,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 📋 表单单行布局 */
+/* 📋 Form single row layout */
 .form-row {
   margin-bottom: 16px;
 }
@@ -294,7 +294,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   width: 100%;
 }
 
-/* 🎭 过渡动画 */
+/* 🎭 transition animation */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -311,7 +311,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   transform: scale(0.95) translateY(-8px);
 }
 
-/* 📱 响应式处理 */
+/* 📱 Responsive processing */
 @media (max-width: 768px) {
   .config-dropdown {
     right: 8px;
@@ -330,7 +330,7 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   }
 }
 
-/* 🌙 深色主题适配 - 78%透明 */
+/* 🌙 Dark theme adaptation - 78%transparent */
 [data-theme='dark'] .config-panel {
   background: rgba(42, 42, 45, 0.78) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;

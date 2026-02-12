@@ -2,9 +2,9 @@
   <div class="digit-indicator-setting">
     <n-form :model="config" label-placement="left" label-width="auto" size="small">
 
-      <!-- 图标样式 -->
+      <!-- icon style -->
       <n-divider title-placement="left">
-        <span class="section-title">📱 图标样式</span>
+        <span class="section-title">📱 icon style</span>
       </n-divider>
 
       <n-form-item label="">
@@ -14,9 +14,9 @@
         />
       </n-form-item>
 
-      <!-- 风格套装选择 -->
+      <!-- Style suit options -->
       <n-divider title-placement="left">
-        <span class="section-title">🎨 视觉风格</span>
+        <span class="section-title">🎨 visual style</span>
       </n-divider>
 
       <n-form-item label="">
@@ -57,28 +57,28 @@
             @click="openJsonEditor"
             style="align-self: flex-start; margin-top: 8px;"
           >
-            🔧 高级定制 (JSON)
+            🔧 Advanced customization (JSON)
           </n-button>
         </n-space>
       </n-form-item>
 
-      <!-- 性能选项 -->
+      <!-- Performance options -->
       <n-divider title-placement="left">
-        <span class="section-title">⚡ 性能选项</span>
+        <span class="section-title">⚡ Performance options</span>
       </n-divider>
 
-      <n-form-item label="悬停效果">
+      <n-form-item label="hover effect">
         <n-switch v-model:value="config.enableHover" />
         <template #feedback>
-          <span class="help-text">启用会更好看但可能影响性能，关闭可提升渲染性能</span>
+          <span class="help-text">Enabling it will look better but may affect performance，Turn off to improve rendering performance</span>
         </template>
       </n-form-item>
 
-      <!-- JSON编辑器模态框 -->
+      <!-- JSONEditor modal box -->
       <n-modal
         v-model:show="showJsonEditor"
         preset="card"
-        title="高级配置 - JSON编辑"
+        title="Advanced configuration - JSONedit"
         style="width: 600px;"
       >
         <n-space vertical>
@@ -86,12 +86,12 @@
             v-model:value="jsonConfigText"
             type="textarea"
             :rows="15"
-            placeholder="编辑配置JSON..."
+            placeholder="Edit configurationJSON..."
             style="font-family: monospace; font-size: 12px;"
           />
           <n-space justify="end">
-            <n-button @click="showJsonEditor = false">取消</n-button>
-            <n-button type="primary" @click="applyJsonConfig">应用配置</n-button>
+            <n-button @click="showJsonEditor = false">Cancel</n-button>
+            <n-button type="primary" @click="applyJsonConfig">Application configuration</n-button>
           </n-space>
         </n-space>
       </n-modal>
@@ -101,8 +101,8 @@
 
 <script setup lang="ts">
 /**
- * 数字指示器组件配置表单 - 简化版
- * 专注样式配置，去除冗余功能
+ * Digital indicator component configuration form - Simplified version
+ * Focus on style configuration，Remove redundant functionality
  */
 
 import { ref, watch, nextTick } from 'vue'
@@ -142,44 +142,44 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 配置数据
+// Configuration data
 const config = ref<DigitIndicatorCustomize>({ ...props.modelValue })
 
-// 防止循环更新的标记
+// Tags that prevent cyclic updates
 const isUpdatingFromProps = ref(false)
 
-// 图标选择处理器
+// Icon selection handler
 const handleIconSelect = (iconName: string) => {
   config.value.iconName = iconName
 }
 
-// 完整视觉风格套装 - 包含所有样式属性（除悬停效果）
+// Complete visual style package - Contains all style attributes（Remove hover effect）
 const stylePresets = [
   {
-    name: '简约商务',
-    description: '专业、干净、现代',
+    name: 'Simple business',
+    description: 'major、clean、modern',
     value: {
-      // 颜色搭配
+      // Color matching
       iconColor: '#595959',
       valueColor: '#262626',
       unitColor: '#8c8c8c',
       titleColor: '#bfbfbf',
       backgroundColor: '',
-      // 尺寸设计
+      // Dimensional design
       iconSize: 40,
       valueSize: 28,
       unitSize: 14,
       titleSize: 12,
       padding: 12,
-      // 视觉效果
+      // visual effects
       valueFontWeight: 500,
       showGradient: false
-      // enableHover 由用户单独控制
+      // enableHover Individually controlled by the user
     }
   },
   {
-    name: '科技未来',
-    description: '动感、科技、炫酷',
+    name: 'Technology future',
+    description: 'Dynamic、science and technology、Cool',
     value: {
       iconColor: '#1890ff',
       valueColor: '#1890ff',
@@ -196,8 +196,8 @@ const stylePresets = [
     }
   },
   {
-    name: '温馨家居',
-    description: '温暖、舒适、亲和',
+    name: 'Warm home',
+    description: 'warmth、Comfortable、Affinity',
     value: {
       iconColor: '#ff7a45',
       valueColor: '#fa541c',
@@ -214,8 +214,8 @@ const stylePresets = [
     }
   },
   {
-    name: '自然清新',
-    description: '清新、环保、生机',
+    name: 'Natural and fresh',
+    description: 'fresh、Environmental friendly、vitality',
     value: {
       iconColor: '#52c41a',
       valueColor: '#389e0d',
@@ -232,8 +232,8 @@ const stylePresets = [
     }
   },
   {
-    name: '警示醒目',
-    description: '醒目、警示、重要',
+    name: 'Eye-catching warning',
+    description: 'Eye-catching、warning、important',
     value: {
       iconColor: '#ff4d4f',
       valueColor: '#cf1322',
@@ -250,8 +250,8 @@ const stylePresets = [
     }
   },
   {
-    name: '优雅紫调',
-    description: '优雅、神秘、高贵',
+    name: 'Elegant purple tone',
+    description: 'grace、mystery、noble',
     value: {
       iconColor: '#722ed1',
       valueColor: '#531dab',
@@ -268,8 +268,8 @@ const stylePresets = [
     }
   },
   {
-    name: '极简黑白',
-    description: '极简、现代、经典',
+    name: 'minimalist black and white',
+    description: 'minimalist、modern、classic',
     value: {
       iconColor: '#000000',
       valueColor: '#000000',
@@ -286,8 +286,8 @@ const stylePresets = [
     }
   },
   {
-    name: '夜间模式',
-    description: '深色、护眼、酷炫',
+    name: 'Night mode',
+    description: 'Dark、Eye protection、Cool',
     value: {
       iconColor: '#177ddc',
       valueColor: '#91d5ff',
@@ -305,16 +305,16 @@ const stylePresets = [
   }
 ]
 
-// 应用预制风格 - 保留用户的悬停效果设置
+// Apply a premade style - Preserve user's hover effect settings
 const applyPreset = (preset: typeof stylePresets[0]) => {
-  const currentHoverSetting = config.value.enableHover // 保存当前悬停设置
+  const currentHoverSetting = config.value.enableHover // Save current hover settings
   Object.assign(config.value, preset.value)
-  config.value.enableHover = currentHoverSetting // 恢复悬停设置
+  config.value.enableHover = currentHoverSetting // Restore hover settings
   emit('update:modelValue', { ...config.value })
   emit('change', { ...config.value })
 }
 
-// JSON配置编辑
+// JSONConfiguration editor
 const showJsonEditor = ref(false)
 const jsonConfigText = ref('')
 
@@ -331,12 +331,12 @@ const applyJsonConfig = () => {
     emit('change', { ...config.value })
     showJsonEditor.value = false
   } catch (error) {
-    // 简单的错误提示
-    alert('JSON格式错误，请检查语法')
+    // Simple error message
+    alert('JSONFormat error，Please check the syntax')
   }
 }
 
-// 监听配置变化并向上传递
+// Listen for configuration changes and pass them up
 watch(
   config,
   (newConfig) => {
@@ -348,7 +348,7 @@ watch(
   { deep: true, immediate: true }
 )
 
-// 监听外部配置变化
+// Monitor external configuration changes
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -372,7 +372,7 @@ watch(
   padding: 16px;
 }
 
-/* 样式优化 */
+/* Style optimization */
 .n-form-item {
   margin-bottom: 20px;
 }
@@ -393,7 +393,7 @@ watch(
   line-height: 1.4;
 }
 
-/* 风格预设卡片样式 */
+/* Style preset card styles */
 .preset-card {
   cursor: pointer;
   transition: all 0.3s ease;

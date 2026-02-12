@@ -1,110 +1,110 @@
 /**
- * Card 2.1 - 全局分类定义
+ * Card 2.1 - Global classification definition
  * @description
- * 该文件定义了组件的全局分类体系，包括顶级分类（系统、图表）及其所有子分类。
- * 它是"约定优于配置"的核心，自动化注册系统将依据此文件来补充和修正组件的分类信息。
+ * This file defines the global classification system of components，Includes top categories（system、chart）and all its subcategories。
+ * it is"Convention over configuration"core，The automated registration system will supplement and correct the component classification information based on this document。
  */
 
 import type { CategoryConfig } from '../types'
 
 /**
- * 顶级分类定义
+ * Top level category definition
  */
 export const TOP_LEVEL_CATEGORIES: Record<'system' | 'chart', CategoryConfig> = {
   system: {
     id: 'system',
-    displayName: 'categories.system', // 对应中文：系统
+    displayName: 'categories.system', // Corresponds to Chinese：system
     order: 1,
     icon: 'settings',
-    description: '系统级组件，用于监控和管理平台状态',
+    description: 'system level components，Used to monitor and manage platform status',
     enabled: true,
   },
   chart: {
     id: 'chart',
-    displayName: 'categories.chart', // 对应中文：图表
+    displayName: 'categories.chart', // Corresponds to Chinese：chart
     order: 2,
     icon: 'chart',
-    description: '图表级组件，用于数据可视化和交互',
+    description: 'chart-level components，for data visualization and interaction',
     enabled: true,
   },
 };
 
 /**
- * 子分类定义：系统
+ * Subcategory definition：system
  */
 export const SYSTEM_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   'system-monitoring': {
     id: 'system-monitoring',
-    displayName: 'subCategories.systemMonitoring', // 对应中文：系统监控
+    displayName: 'subCategories.systemMonitoring', // Corresponds to Chinese：System monitoring
     order: 10,
     icon: 'dashboard',
-    description: '展示系统级别的硬件资源使用情况',
+    description: 'Display system-level hardware resource usage',
     enabled: true,
     parentId: 'system',
   },
   'device-status': {
     id: 'device-status',
-    displayName: 'subCategories.deviceStatus', // 对应中文：设备状态
+    displayName: 'subCategories.deviceStatus', // Corresponds to Chinese：Device status
     order: 20,
     icon: 'laptop',
-    description: '监控和展示设备的在线状态',
+    description: 'Monitor and display the online status of your device',
     enabled: true,
     parentId: 'system',
   },
   'alarm-management': {
     id: 'alarm-management',
-    displayName: 'subCategories.alarmManagement', // 对应中文：告警管理
+    displayName: 'subCategories.alarmManagement', // Corresponds to Chinese：Alarm management
     order: 30,
     icon: 'alert',
-    description: '展示与告警相关的信息',
+    description: 'Display information related to alarms',
     enabled: true,
     parentId: 'system',
   },
   'tenant-app': {
     id: 'tenant-app',
-    displayName: 'subCategories.tenantApp', // 对应中文：租户与应用
+    displayName: 'subCategories.tenantApp', // Corresponds to Chinese：Tenants and applications
     order: 40,
     icon: 'appstore',
-    description: '提供与租户和应用相关的数据和功能',
+    description: 'Provides data and functionality related to tenants and applications',
     enabled: true,
     parentId: 'system',
   },
   'data-information': {
     id: 'data-information',
-    displayName: 'subCategories.dataInformation', // 对应中文：数据与信息
+    displayName: 'subCategories.dataInformation', // Corresponds to Chinese：Data and information
     order: 50,
     icon: 'info-circle',
-    description: '用于展示通用数据和信息',
+    description: 'Used to display general data and information',
     enabled: true,
     parentId: 'system',
   },
   'user-behavior': {
     id: 'user-behavior',
-    displayName: 'subCategories.userBehavior', // 对应中文：用户行为
+    displayName: 'subCategories.userBehavior', // Corresponds to Chinese：user behavior
     order: 60,
     icon: 'user',
-    description: '追踪和展示用户的活动',
+    description: 'Track and display user activity',
     enabled: true,
     parentId: 'system',
   },
   'operation-guide': {
     id: 'operation-guide',
-    displayName: 'subCategories.operationGuide', // 对应中文：操作指引
+    displayName: 'subCategories.operationGuide', // Corresponds to Chinese：Operating Instructions
     order: 70,
     icon: 'book',
-    description: '为用户提供操作上的引导',
+    description: 'Provide users with operational guidance',
     enabled: true,
     parentId: 'system',
   },
 };
 
 /**
- * 子分类定义：图表
+ * Subcategory definition：chart
  */
 export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   dashboard: {
     id: 'dashboard',
-    displayName: 'subCategories.dashboard', // 对应中文：仪表盘
+    displayName: 'subCategories.dashboard', // Corresponds to Chinese：Dashboard
     order: 10,
     icon: 'dashboard',
     enabled: true,
@@ -112,7 +112,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   information: {
     id: 'information',
-    displayName: 'subCategories.information', // 对应中文：信息
+    displayName: 'subCategories.information', // Corresponds to Chinese：information
     order: 20,
     icon: 'info-circle',
     enabled: true,
@@ -120,7 +120,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   control: {
     id: 'control',
-    displayName: 'subCategories.control', // 对应中文：控制
+    displayName: 'subCategories.control', // Corresponds to Chinese：control
     order: 30,
     icon: 'control',
     enabled: true,
@@ -128,7 +128,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   device: {
     id: 'device',
-    displayName: 'subCategories.device', // 对应中文：设备
+    displayName: 'subCategories.device', // Corresponds to Chinese：equipment
     order: 40,
     icon: 'device',
     enabled: true,
@@ -136,7 +136,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   data: {
     id: 'data',
-    displayName: 'subCategories.data', // 对应中文：数据
+    displayName: 'subCategories.data', // Corresponds to Chinese：data
     order: 50,
     icon: 'chart-bar',
     enabled: true,
@@ -144,7 +144,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   statistics: {
     id: 'statistics',
-    displayName: 'subCategories.statistics', // 对应中文：统计
+    displayName: 'subCategories.statistics', // Corresponds to Chinese：statistics
     order: 60,
     icon: 'statistics',
     enabled: true,
@@ -152,7 +152,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   location: {
     id: 'location',
-    displayName: 'subCategories.location', // 对应中文：位置
+    displayName: 'subCategories.location', // Corresponds to Chinese：Location
     order: 70,
     icon: 'location',
     enabled: true,
@@ -160,7 +160,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   media: {
     id: 'media',
-    displayName: 'subCategories.media', // 对应中文：音视频
+    displayName: 'subCategories.media', // Corresponds to Chinese：Audio and video
     order: 80,
     icon: 'play-circle',
     enabled: true,
@@ -168,7 +168,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
   },
   alarm: {
     id: 'alarm',
-    displayName: 'subCategories.alarm', // 对应中文：告警
+    displayName: 'subCategories.alarm', // Corresponds to Chinese：Alarm
     order: 90,
     icon: 'warning',
     enabled: true,
@@ -177,7 +177,7 @@ export const CHART_SUB_CATEGORIES: Record<string, CategoryConfig> = {
 };
 
 /**
- * 合并所有子分类
+ * Merge all subcategories
  */
 export const SUB_CATEGORIES: Record<string, CategoryConfig> = {
   ...SYSTEM_SUB_CATEGORIES,
@@ -185,12 +185,12 @@ export const SUB_CATEGORIES: Record<string, CategoryConfig> = {
 };
 
 /**
- * 组件到子分类的映射表
- * key: 组件ID (通常是组件目录名)
- * value: 子分类的ID
+ * Component to subcategory mapping table
+ * key: componentsID (通常是components目录名)
+ * value: subcategoryID
  */
 export const COMPONENT_TO_CATEGORY_MAP: Record<string, string> = {
-  // --- 系统组件 ---
+  // --- system components ---
   'cpu-usage': 'system-monitoring',
   'disk-usage': 'system-monitoring',
   'memory-usage': 'system-monitoring',
@@ -206,30 +206,30 @@ export const COMPONENT_TO_CATEGORY_MAP: Record<string, string> = {
   'reported-data': 'data-information',
   'news': 'data-information',
   'version': 'data-information',
-  'access': 'device-status', // 修正：设备总数应该属于设备状态分类
+  'access': 'device-status', // Correction：The total number of devices should belong to the device status category
   'recently-visited': 'user-behavior',
   'operation-guide-card': 'operation-guide',
 
-  // --- 图表组件 (可以根据组件名推断，也可以在这里显式指定) ---
+  // --- chart component (Can be inferred from the component name，You can also specify it explicitly here) ---
   'alert-status': 'alarm',
   'alert-status-v2': 'alarm',
   'switch-controller': 'control',
   'digit-indicator': 'data',
-  'gauge-chart': 'data', // 仪表盘图表组件
-  'line-chart': 'data', // 折线图组件
-  'bar-chart': 'data', // 柱状图组件
-  'pie-chart': 'data', // 饼图组件
+  'gauge-chart': 'data', // Dashboard chart component
+  'line-chart': 'data', // Line chart component
+  'bar-chart': 'data', // Bar chart component
+  'pie-chart': 'data', // Pie chart component
 };
 
 /**
- * 获取组件分类信息
+ * Get component classification information
  */
 export function getCategoryFromComponentId(componentId: string): { mainCategory: string; subCategory: string } {
-  // 从映射表中查找组件对应的子分类ID
+  // Find the subcategory corresponding to the component from the mapping tableID
   const subCategoryId = COMPONENT_TO_CATEGORY_MAP[componentId]
 
   if (subCategoryId) {
-    // 根据子分类ID确定主分类
+    // According to subcategoryIDDetermine main category
     const subCategoryConfig = SUB_CATEGORIES[subCategoryId]
     if (subCategoryConfig) {
       const mainCategory = subCategoryConfig.parentId === 'system'
@@ -243,7 +243,7 @@ export function getCategoryFromComponentId(componentId: string): { mainCategory:
     }
   }
 
-  // 默认分类
+  // Default classification
   return {
     mainCategory: 'categories.chart',
     subCategory: 'subCategories.other'

@@ -1,6 +1,6 @@
 /**
- * 数据仓库测试套件
- * 测试多数据源隔离、性能优化、内存管理等功能
+ * Data warehouse test suite
+ * Test multiple data source isolation、Performance optimization、Memory management and other functions
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { dataWarehouse, EnhancedDataWarehouse, type DataStorageItem, type PerformanceMetrics } from '@/core/data-architecture/DataWarehouse'
@@ -9,14 +9,14 @@ describe('EnhancedDataWarehouse', () => {
   let warehouse: EnhancedDataWarehouse
 
   beforeEach(() => {
-    // 为每个测试创建新的仓库实例
+    // Create a new repository instance for each test
     warehouse = new EnhancedDataWarehouse()
-    // 设置较短的缓存过期时间便于测试
+    // Set a shorter cache expiration time for testing
     warehouse.setCacheExpiry(100)
   })
 
-  describe('基础数据存储和获取', () => {
-    it('应该能存储和获取组件数据', () => {
+  describe('Basic data storage and retrieval', () => {
+    it('Should be able to store and retrieve component data', () => {
       const testData = { temperature: 25, humidity: 60 }
 
       warehouse.storeComponentData('comp1', 'sensor1', testData, 'json')
@@ -25,7 +25,7 @@ describe('EnhancedDataWarehouse', () => {
       expect(retrievedData).toEqual({ sensor1: testData })
     })
 
-    it('应该支持多数据源隔离存储', () => {
+    it('Multiple data sources should be supported for isolated storage', () => {
       const sensorData = { temperature: 25 }
       const apiData = { status: 'ok' }
 
@@ -39,36 +39,36 @@ describe('EnhancedDataWarehouse', () => {
       })
     })
 
-    it('应该返回null当组件数据不存在时', () => {
+    it('should returnnullWhen component data does not exist', () => {
       const result = warehouse.getComponentData('nonexistent')
       expect(result).toBeNull()
     })
   })
 
-  describe('缓存过期机制', () => {
-    it('应该在数据过期后返回null', async () => {
+  describe('Cache expiration mechanism', () => {
+    it('Should be returned after the data has expirednull', async () => {
       const testData = { value: 123 }
 
       warehouse.storeComponentData('comp1', 'source1', testData, 'json')
 
-      // 验证数据初始存在
+      // Verify initial existence of data
       expect(warehouse.getComponentData('comp1')).toEqual({ source1: testData })
 
-      // 等待过期
+      // Waiting for expiration
       await new Promise(resolve => setTimeout(resolve, 150))
 
-      // 验证数据已过期
+      // Verification data has expired
       expect(warehouse.getComponentData('comp1')).toBeNull()
     })
 
-    it('应该自动清理过期数据', async () => {
+    it('Expired data should be automatically cleaned', async () => {
       warehouse.storeComponentData('comp1', 'source1', { value: 1 }, 'json')
       warehouse.storeComponentData('comp2', 'source2', { value: 2 }, 'json')
 
-      // 等待过期
+      // Waiting for expiration
       await new Promise(resolve => setTimeout(resolve, 150))
 
-      // 触发清理
+      // trigger cleanup
       warehouse.performMaintenance()
 
       const stats = warehouse.getStorageStats()
@@ -77,24 +77,24 @@ describe('EnhancedDataWarehouse', () => {
     })
   })
 
-  describe('性能监控', () => {
-    it('应该跟踪缓存命中率', () => {
+  describe('Performance monitoring', () => {
+    it('Cache hit ratio should be tracked', () => {
       const testData = { value: 123 }
 
-      // 存储数据
+      // Store data
       warehouse.storeComponentData('comp1', 'source1', testData, 'json')
 
-      // 多次访问以生成命中统计
-      warehouse.getComponentData('comp1') // 命中
-      warehouse.getComponentData('comp1') // 命中
-      warehouse.getComponentData('comp2') // 未命中
+      // Multiple visits to generate hit statistics
+      warehouse.getComponentData('comp1') // hit
+      warehouse.getComponentData('comp1') // hit
+      warehouse.getComponentData('comp2') // miss
 
       const metrics = warehouse.getPerformanceMetrics()
-      expect(metrics.cacheHitRate).toBe(2 / 3) // 2命中 / 3总访问
+      expect(metrics.cacheHitRate).toBe(2 / 3) // 2hit / 3total visits
       expect(metrics.totalRequests).toBe(3)
     })
 
-    it('应该跟踪响应时间', () => {
+    it('Response times should be tracked', () => {
       const testData = { value: 123 }
 
       warehouse.storeComponentData('comp1', 'source1', testData, 'json')
@@ -106,8 +106,8 @@ describe('EnhancedDataWarehouse', () => {
     })
   })
 
-  describe('内存管理', () => {
-    it('应该计算内存使用量', () => {
+  describe('Memory management', () => {
+    it('Memory usage should be calculated', () => {
       const largeData = { data: 'x'.repeat(1000) }
 
       warehouse.storeComponentData('comp1', 'source1', largeData, 'json')
@@ -116,7 +116,7 @@ describe('EnhancedDataWarehouse', () => {
       expect(stats.memoryUsageMB).toBeGreaterThan(0)
     })
 
-    it('应该跟踪组件和数据源数量', () => {
+    it('The number of components and data sources should be tracked', () => {
       warehouse.storeComponentData('comp1', 'source1', { a: 1 }, 'json')
       warehouse.storeComponentData('comp1', 'source2', { b: 2 }, 'http')
       warehouse.storeComponentData('comp2', 'source3', { c: 3 }, 'json')
@@ -127,8 +127,8 @@ describe('EnhancedDataWarehouse', () => {
     })
   })
 
-  describe('缓存清理功能', () => {
-    it('应该能清除单个组件缓存', () => {
+  describe('Cache cleaning function', () => {
+    it('Should be able to clear individual component caches', () => {
       warehouse.storeComponentData('comp1', 'source1', { a: 1 }, 'json')
       warehouse.storeComponentData('comp2', 'source2', { b: 2 }, 'json')
 
@@ -138,7 +138,7 @@ describe('EnhancedDataWarehouse', () => {
       expect(warehouse.getComponentData('comp2')).toEqual({ source2: { b: 2 } })
     })
 
-    it('应该能清除所有缓存', () => {
+    it('This should clear all caches', () => {
       warehouse.storeComponentData('comp1', 'source1', { a: 1 }, 'json')
       warehouse.storeComponentData('comp2', 'source2', { b: 2 }, 'json')
 
@@ -152,29 +152,29 @@ describe('EnhancedDataWarehouse', () => {
     })
   })
 
-  describe('动态参数预留接口', () => {
-    it('应该提供动态参数存储接口（预留）', () => {
-      // 验证接口存在（为Phase 2准备）
+  describe('Dynamic parameter reservation interface', () => {
+    it('A dynamic parameter storage interface should be provided（reserved）', () => {
+      // Verify that the interface exists（forPhase 2Prepare）
       expect(typeof warehouse.storeDynamicParameter).toBe('function')
       expect(typeof warehouse.getDynamicParameter).toBe('function')
       expect(typeof warehouse.getAllDynamicParameters).toBe('function')
     })
 
-    it('动态参数接口应该返回预期值', () => {
-      // 当前阶段返回默认值
+    it('Dynamic parameter interfaces should return expected values', () => {
+      // Return to default value for current stage
       warehouse.storeDynamicParameter('comp1', 'param1', 'value1')
 
       const value = warehouse.getDynamicParameter('comp1', 'param1')
       const allParams = warehouse.getAllDynamicParameters('comp1')
 
-      // Phase 1: 返回默认值，Phase 2: 实现完整功能
+      // Phase 1: Return to default value，Phase 2: Realize full functionality
       expect(value).toBeDefined()
       expect(allParams).toBeDefined()
     })
   })
 
-  describe('错误处理', () => {
-    it('应该优雅处理无效输入', () => {
+  describe('Error handling', () => {
+    it('Invalid input should be handled gracefully', () => {
       expect(() => {
         warehouse.storeComponentData('', 'source1', {}, 'json')
       }).not.toThrow()
@@ -184,7 +184,7 @@ describe('EnhancedDataWarehouse', () => {
       }).not.toThrow()
     })
 
-    it('应该处理循环引用数据', () => {
+    it('Circular reference data should be handled', () => {
       const circularData: any = { name: 'test' }
       circularData.self = circularData
 
@@ -194,9 +194,9 @@ describe('EnhancedDataWarehouse', () => {
     })
   })
 
-  describe('边界条件测试', () => {
-    it('应该处理大量数据存储', () => {
-      // 存储100个组件，每个2个数据源
+  describe('Boundary condition testing', () => {
+    it('Should handle large amounts of data storage', () => {
+      // storage100components，each2data sources
       for (let i = 0; i < 100; i++) {
         warehouse.storeComponentData(`comp${i}`, 'source1', { value: i }, 'json')
         warehouse.storeComponentData(`comp${i}`, 'source2', { value: i * 2 }, 'http')
@@ -208,10 +208,10 @@ describe('EnhancedDataWarehouse', () => {
       expect(stats.memoryUsageMB).toBeGreaterThan(0)
     })
 
-    it('应该处理频繁的读写操作', () => {
+    it('Should handle frequent read and write operations', () => {
       const startTime = Date.now()
 
-      // 执行1000次读写操作
+      // implement1000Read and write operations
       for (let i = 0; i < 1000; i++) {
         warehouse.storeComponentData('testComp', 'source1', { iteration: i }, 'json')
         warehouse.getComponentData('testComp')
@@ -220,16 +220,16 @@ describe('EnhancedDataWarehouse', () => {
       const endTime = Date.now()
       const duration = endTime - startTime
 
-      // 性能检查：1000次操作应该在合理时间内完成
-      expect(duration).toBeLessThan(1000) // 少于1秒
+      // Performance check：1000The operation should be completed within a reasonable time
+      expect(duration).toBeLessThan(1000) // less than1Second
 
       const metrics = warehouse.getPerformanceMetrics()
       expect(metrics.totalRequests).toBe(1000)
     })
   })
 
-  describe('维护和监控', () => {
-    it('应该提供详细的性能指标', () => {
+  describe('Maintenance and monitoring', () => {
+    it('Detailed performance metrics should be provided', () => {
       warehouse.storeComponentData('comp1', 'source1', { value: 1 }, 'json')
       warehouse.getComponentData('comp1')
       warehouse.getComponentData('nonexistent')
@@ -247,8 +247,8 @@ describe('EnhancedDataWarehouse', () => {
       expect(metrics.totalRequests).toBe(2)
     })
 
-    it('应该支持性能指标重置', () => {
-      warehouse.getComponentData('comp1') // 生成一些指标
+    it('Performance indicator reset should be supported', () => {
+      warehouse.getComponentData('comp1') // Generate some indicators
 
       warehouse.resetPerformanceMetrics()
 
@@ -260,12 +260,12 @@ describe('EnhancedDataWarehouse', () => {
   })
 })
 
-describe('全局数据仓库实例', () => {
-  it('应该提供全局单例', () => {
+describe('Global data warehouse instance', () => {
+  it('A global singleton should be provided', () => {
     expect(dataWarehouse).toBeInstanceOf(EnhancedDataWarehouse)
   })
 
-  it('全局实例应该与新实例隔离', () => {
+  it('Global instances should be isolated from new instances', () => {
     const newWarehouse = new EnhancedDataWarehouse()
 
     dataWarehouse.storeComponentData('comp1', 'source1', { global: true }, 'json')

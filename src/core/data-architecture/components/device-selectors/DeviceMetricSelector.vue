@@ -1,11 +1,11 @@
 <!--
-  设备指标选择器组件
-  中等复杂模式：选择设备和指标，生成deviceId + metric参数
+  Device Metrics Selector Component
+  Moderately complex mode：Select device and indicator，generatedeviceId + metricparameter
 -->
 <script setup lang="ts">
 /**
- * DeviceMetricSelector - 设备指标选择器（中等复杂）
- * 需要选择设备和指标，生成deviceId + metric两个参数
+ * DeviceMetricSelector - Device Metrics Selector（medium complexity）
+ * Need to select equipment and indicators，generatedeviceId + metrictwo parameters
  */
 
 import { ref, computed, watch } from 'vue'
@@ -15,11 +15,11 @@ import type { DeviceInfo, DeviceMetric } from '@/core/data-architecture/types/de
 import type { SelectOption } from 'naive-ui'
 
 interface Props {
-  /** 预选择的设备（编辑模式下使用） */
+  /** Pre-selected devices（Used in edit mode） */
   preSelectedDevice?: DeviceInfo
-  /** 预选择的指标（编辑模式下使用） */
+  /** Pre-selected indicators（Used in edit mode） */
   preSelectedMetric?: DeviceMetric
-  /** 是否为编辑模式 */
+  /** Is it in edit mode? */
   editMode?: boolean
 }
 
@@ -32,85 +32,85 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 /**
- * 模拟设备数据
+ * Analog device data
  */
 const mockDevices: DeviceInfo[] = [
   {
     deviceId: 'sensor_001',
-    deviceName: '温湿度传感器-01',
-    deviceType: '环境传感器',
+    deviceName: 'Temperature and humidity sensor-01',
+    deviceType: 'environmental sensor',
     deviceModel: 'TH-2000'
   },
   {
     deviceId: 'sensor_002',
-    deviceName: '温湿度传感器-02',
-    deviceType: '环境传感器',
+    deviceName: 'Temperature and humidity sensor-02',
+    deviceType: 'environmental sensor',
     deviceModel: 'TH-2000'
   },
   {
     deviceId: 'power_001',
-    deviceName: '电能表-A区',
-    deviceType: '电力设备',
+    deviceName: 'Electric energy meter-Adistrict',
+    deviceType: 'Electrical equipment',
     deviceModel: 'PM-300'
   }
 ]
 
 /**
- * 模拟设备指标数据（根据设备类型提供不同指标）
+ * Analog device indicator data（Provide different indicators based on device type）
  */
 const getMetricsByDeviceType = (deviceType: string): DeviceMetric[] => {
   const metricMap: Record<string, DeviceMetric[]> = {
-    环境传感器: [
+    'environmental sensor': [
       {
         metricKey: 'temperature',
-        metricLabel: '温度',
+        metricLabel: 'temperature',
         metricType: 'number',
         unit: '°C',
-        description: '环境温度值'
+        description: 'ambient temperature value'
       },
       {
         metricKey: 'humidity',
-        metricLabel: '湿度',
+        metricLabel: 'humidity',
         metricType: 'number',
         unit: '%RH',
-        description: '环境湿度值'
+        description: 'ambient humidity value'
       },
       {
         metricKey: 'pressure',
-        metricLabel: '大气压力',
+        metricLabel: 'atmospheric pressure',
         metricType: 'number',
         unit: 'hPa',
-        description: '大气压力值'
+        description: 'Atmospheric pressure value'
       }
     ],
-    电力设备: [
+    'Electrical equipment': [
       {
         metricKey: 'voltage',
-        metricLabel: '电压',
+        metricLabel: 'Voltage',
         metricType: 'number',
         unit: 'V',
-        description: '电压值'
+        description: 'Voltage value'
       },
       {
         metricKey: 'current',
-        metricLabel: '电流',
+        metricLabel: 'current',
         metricType: 'number',
         unit: 'A',
-        description: '电流值'
+        description: 'Current value'
       },
       {
         metricKey: 'power',
-        metricLabel: '功率',
+        metricLabel: 'power',
         metricType: 'number',
         unit: 'W',
-        description: '功率值'
+        description: 'Power value'
       },
       {
         metricKey: 'energy',
-        metricLabel: '电能',
+        metricLabel: 'Electric energy',
         metricType: 'number',
         unit: 'kWh',
-        description: '累计电能值'
+        description: 'Accumulated electric energy value'
       }
     ]
   }
@@ -118,11 +118,11 @@ const getMetricsByDeviceType = (deviceType: string): DeviceMetric[] => {
   return metricMap[deviceType] || []
 }
 
-// 当前选择状态
+// Current selection status
 const selectedDeviceId = ref<string>(props.preSelectedDevice?.deviceId || '')
 const selectedMetricKey = ref<string>(props.preSelectedMetric?.metricKey || '')
 
-// 设备选项
+// Device options
 const deviceOptions = computed<SelectOption[]>(() => {
   return mockDevices.map(device => ({
     label: `${device.deviceName} (${device.deviceType})`,
@@ -131,19 +131,19 @@ const deviceOptions = computed<SelectOption[]>(() => {
   }))
 })
 
-// 当前选择的设备
+// Currently selected device
 const selectedDevice = computed<DeviceInfo | null>(() => {
   if (!selectedDeviceId.value) return null
   return mockDevices.find(device => device.deviceId === selectedDeviceId.value) || null
 })
 
-// 可用的指标选项（根据选择的设备动态变化）
+// Available indicator options（Dynamically changes based on selected device）
 const availableMetrics = computed<DeviceMetric[]>(() => {
   if (!selectedDevice.value) return []
   return getMetricsByDeviceType(selectedDevice.value.deviceType)
 })
 
-// 指标选项
+// Indicator options
 const metricOptions = computed<SelectOption[]>(() => {
   return availableMetrics.value.map(metric => ({
     label: `${metric.metricLabel}${metric.unit ? ` (${metric.unit})` : ''}`,
@@ -152,19 +152,19 @@ const metricOptions = computed<SelectOption[]>(() => {
   }))
 })
 
-// 当前选择的指标
+// Currently selected indicator
 const selectedMetric = computed<DeviceMetric | null>(() => {
   if (!selectedMetricKey.value) return null
   return availableMetrics.value.find(metric => metric.metricKey === selectedMetricKey.value) || null
 })
 
-// 是否可以确认选择
+// Is it possible to confirm the selection?
 const canConfirm = computed(() => {
   return selectedDevice.value !== null && selectedMetric.value !== null
 })
 
 /**
- * 监听设备变化，重置指标选择
+ * Listen for device changes，Reset indicator selection
  */
 watch(selectedDeviceId, (newDeviceId, oldDeviceId) => {
   if (newDeviceId !== oldDeviceId && !props.editMode) {
@@ -173,21 +173,21 @@ watch(selectedDeviceId, (newDeviceId, oldDeviceId) => {
 })
 
 /**
- * 处理设备选择
+ * Processing device selection
  */
 const handleDeviceChange = (deviceId: string) => {
   selectedDeviceId.value = deviceId
 }
 
 /**
- * 处理指标选择
+ * Handling indicator selection
  */
 const handleMetricChange = (metricKey: string) => {
   selectedMetricKey.value = metricKey
 }
 
 /**
- * 确认选择
+ * Confirm selection
  */
 const confirmSelection = () => {
   if (!selectedDevice.value || !selectedMetric.value) return
@@ -198,7 +198,7 @@ const confirmSelection = () => {
 }
 
 /**
- * 取消选择
+ * Deselect
  */
 const cancelSelection = () => {
   emit('cancel')
@@ -207,34 +207,34 @@ const cancelSelection = () => {
 
 <template>
   <div class="device-metric-selector">
-    <!-- 选择器标题 -->
+    <!-- selector title -->
     <div class="selector-header">
       <n-space align="center">
         <n-icon size="20" color="#2080f0">
           <MetricIcon />
         </n-icon>
-        <n-text strong>{{ editMode ? '重新选择设备指标' : '选择设备指标' }}</n-text>
+        <n-text strong>{{ editMode ? '重新Select device metrics' : 'Select device metrics' }}</n-text>
       </n-space>
       <n-text depth="3" style="font-size: 12px; margin-top: 4px">
-        选择设备和指标，将生成
+        Select device and indicator，will generate
         <strong>deviceId</strong>
         +
         <strong>metric</strong>
-        两个参数
+        two parameters
       </n-text>
     </div>
 
-    <!-- 设备选择 -->
+    <!-- Equipment selection -->
     <div class="selection-step">
       <n-space align="center" style="margin-bottom: 8px">
         <n-icon size="16"><DeviceIcon /></n-icon>
-        <n-text strong>第1步：选择设备</n-text>
+        <n-text strong>No.1step：Select device</n-text>
       </n-space>
 
       <n-select
         v-model:value="selectedDeviceId"
         :options="deviceOptions"
-        placeholder="请选择设备..."
+        placeholder="Please select a device..."
         clearable
         filterable
         @update:value="handleDeviceChange"
@@ -243,79 +243,79 @@ const cancelSelection = () => {
 
     <n-divider style="margin: 12px 0" />
 
-    <!-- 指标选择 -->
+    <!-- Indicator selection -->
     <div class="selection-step">
       <n-space align="center" style="margin-bottom: 8px">
         <n-icon size="16"><MetricIcon /></n-icon>
-        <n-text strong>第2步：选择指标</n-text>
-        <n-text v-if="!selectedDevice" depth="3" style="font-size: 12px">（请先选择设备）</n-text>
+        <n-text strong>No.2step：Select indicators</n-text>
+        <n-text v-if="!selectedDevice" depth="3" style="font-size: 12px">（Please select your device first）</n-text>
       </n-space>
 
       <n-select
         v-model:value="selectedMetricKey"
         :options="metricOptions"
-        placeholder="请选择指标..."
+        placeholder="Please select an indicator..."
         :disabled="!selectedDevice"
         clearable
         @update:value="handleMetricChange"
       />
     </div>
 
-    <!-- 选择预览 -->
+    <!-- Select Preview -->
     <div v-if="selectedDevice || selectedMetric" class="selection-preview">
       <n-alert type="info" style="margin-top: 16px">
         <template #header>
-          <span>选择预览</span>
+          <span>Select Preview</span>
         </template>
 
         <n-space vertical size="small">
-          <!-- 设备信息 -->
+          <!-- Device information -->
           <div v-if="selectedDevice">
             <n-space align="center" style="margin-bottom: 8px">
               <n-icon size="16"><DeviceIcon /></n-icon>
-              <n-text strong>选择的设备：</n-text>
+              <n-text strong>Selected device：</n-text>
             </n-space>
             <div style="padding-left: 20px">
               <n-space vertical size="small">
                 <n-space>
-                  <n-text depth="3">设备名称：</n-text>
+                  <n-text depth="3">Device name：</n-text>
                   <n-text>{{ selectedDevice.deviceName }}</n-text>
                 </n-space>
                 <n-space>
-                  <n-text depth="3">设备类型：</n-text>
+                  <n-text depth="3">Device type：</n-text>
                   <n-text>{{ selectedDevice.deviceType }}</n-text>
                 </n-space>
               </n-space>
             </div>
           </div>
 
-          <!-- 指标信息 -->
+          <!-- Indicator information -->
           <div v-if="selectedMetric">
             <n-space align="center" style="margin-bottom: 8px">
               <n-icon size="16"><MetricIcon /></n-icon>
-              <n-text strong>选择的指标：</n-text>
+              <n-text strong>Selected indicators：</n-text>
             </n-space>
             <div style="padding-left: 20px">
               <n-space vertical size="small">
                 <n-space>
-                  <n-text depth="3">指标名称：</n-text>
+                  <n-text depth="3">Indicator name：</n-text>
                   <n-text>{{ selectedMetric.metricLabel }}</n-text>
                 </n-space>
                 <n-space>
-                  <n-text depth="3">数据类型：</n-text>
+                  <n-text depth="3">data type：</n-text>
                   <n-text>{{ selectedMetric.metricType }}</n-text>
                 </n-space>
                 <n-space v-if="selectedMetric.unit">
-                  <n-text depth="3">单位：</n-text>
+                  <n-text depth="3">unit：</n-text>
                   <n-text>{{ selectedMetric.unit }}</n-text>
                 </n-space>
               </n-space>
             </div>
           </div>
 
-          <!-- 生成参数预览 -->
+          <!-- Generate parameter preview -->
           <div v-if="canConfirm" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color)">
-            <n-text depth="3" style="font-size: 12px">💡 将生成参数：</n-text>
+            <n-text depth="3" style="font-size: 12px">💡 Parameters will be generated：</n-text>
             <div
               style="
                 margin-top: 8px;
@@ -340,12 +340,12 @@ const cancelSelection = () => {
       </n-alert>
     </div>
 
-    <!-- 操作按钮 -->
+    <!-- Action button -->
     <div class="selector-actions">
       <n-space justify="end">
-        <n-button @click="cancelSelection">取消</n-button>
+        <n-button @click="cancelSelection">Cancel</n-button>
         <n-button type="primary" :disabled="!canConfirm" @click="confirmSelection">
-          {{ editMode ? '更新参数' : '生成参数' }}
+          {{ editMode ? 'Update parameters' : 'Generate parameters' }}
         </n-button>
       </n-space>
     </div>

@@ -49,7 +49,7 @@ const activeModule = computed(() => {
   return findItem || modules[0]
 })
 
-// 计算当前模块的标题
+// Calculate the title of the current module
 const moduleTitle = computed(() => {
   switch (props.module) {
     case 'pwd-login':
@@ -65,7 +65,7 @@ const moduleTitle = computed(() => {
   }
 })
 
-// 卡片背景色
+// Card background color
 const cardBgColor = computed(() => {
   if (themeStore.darkMode) {
     return 'rgba(31, 41, 55, 0.95)'
@@ -73,7 +73,7 @@ const cardBgColor = computed(() => {
   return 'rgba(255, 255, 255, 0.95)'
 })
 
-// 边框颜色
+// border color
 const borderColor = computed(() => {
   if (themeStore.darkMode) {
     return '#374151'
@@ -81,7 +81,7 @@ const borderColor = computed(() => {
   return '#e5e7eb'
 })
 
-// 监听标题变化
+// Listen for title changes
 watch(moduleTitle, newTitle => {
   useTitle(newTitle)
 })
@@ -99,15 +99,15 @@ watch(moduleTitle, newTitle => {
           : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%)'
     }"
   >
-    <!-- 使用 LoginBg 组件显示后端配置的背景图片 -->
+    <!-- use LoginBg The component displays the background image of the backend configuration -->
     <LoginBg v-if="sysSetting.home_background" :themeColor="themeStore.themeColor" :sysSetting="sysSetting" />
 
-    <!-- 默认背景动画效果 -->
+    <!-- Default background animation effect -->
     <div v-else class="bg-animation">
       <div class="bg-animation-inner" :class="{ 'dark-theme': themeStore.darkMode }"></div>
     </div>
 
-    <!-- 登录卡片 -->
+    <!-- Login card -->
     <div
       class="relative z-10 w-full max-w-md mx-4 p-8 rounded-2xl shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-4 duration-500"
       :style="{
@@ -117,7 +117,7 @@ watch(moduleTitle, newTitle => {
         boxShadow: themeStore.darkMode ? '0 20px 60px rgba(0, 0, 0, 0.3)' : '0 20px 60px rgba(0, 0, 0, 0.1)'
       }"
     >
-      <!-- 顶部控制栏 -->
+      <!-- top control bar -->
       <div class="flex justify-end gap-2 mb-4">
         <button
           class="flex items-center gap-1 px-2 py-1.5 text-xs rounded-lg border transition-all duration-200 hover:scale-105"
@@ -150,11 +150,11 @@ watch(moduleTitle, newTitle => {
               d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"
             />
           </svg>
-          <span>{{ appStore.locale === 'zh-CN' ? '中文' : 'EN' }}</span>
+          <span>{{ appStore.locale === 'zh-CN' ? 'Chinese' : 'EN' }}</span>
         </button>
       </div>
 
-      <!-- Logo区域 -->
+      <!-- Logoarea -->
       <div class="text-center mb-6">
         <div
           class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 shadow-lg transition-transform duration-300 hover:scale-110"
@@ -181,7 +181,7 @@ watch(moduleTitle, newTitle => {
         </p>
       </div>
 
-      <!-- 表单区域 -->
+      <!-- form area -->
       <div class="space-y-6">
         <!-- <h2
           class="text-lg font-medium text-center"
@@ -201,7 +201,7 @@ watch(moduleTitle, newTitle => {
 </template>
 
 <style scoped>
-/* 背景动画效果 */
+/* Background animation effect */
 .bg-animation {
   position: absolute;
   width: 100%;
@@ -240,7 +240,7 @@ watch(moduleTitle, newTitle => {
   }
 }
 
-/* 进入动画 */
+/* Enter animation */
 @keyframes slide-in-from-bottom {
   from {
     opacity: 0;
@@ -257,7 +257,7 @@ watch(moduleTitle, newTitle => {
   animation: slide-in-from-bottom 0.5s ease-out;
 }
 
-/* 标题容器样式 */
+/* Title container style */
 .title-container {
   position: relative;
   margin: 0 auto;
@@ -265,7 +265,7 @@ watch(moduleTitle, newTitle => {
   max-width: 90%;
 }
 
-/* 移除了横线装饰
+/* Removed horizontal line decoration
 .title-container::before,
 .title-container::after {
   content: '';
@@ -288,7 +288,7 @@ watch(moduleTitle, newTitle => {
 }
 */
 
-/* 标题艺术化样式 */
+/* Title artistic style */
 .title-artistic {
   word-break: break-word;
   hyphens: auto;
@@ -307,7 +307,7 @@ watch(moduleTitle, newTitle => {
   font-size: 1.2em;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 640px) {
   .size-full {
     padding: 1rem;
@@ -332,7 +332,7 @@ watch(moduleTitle, newTitle => {
   }
 }
 
-/* 过渡动画 */
+/* transition animation */
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.3s ease;

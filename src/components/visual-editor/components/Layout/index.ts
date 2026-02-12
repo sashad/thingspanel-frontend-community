@@ -1,5 +1,5 @@
 /**
- * EditorLayout 组件模块统一导出
+ * EditorLayout Unified export of component modules
  */
 
 import EditorLayout from '@/components/visual-editor/components/Layout/EditorLayout.vue'
@@ -7,7 +7,7 @@ import EditorLayout from '@/components/visual-editor/components/Layout/EditorLay
 export { EditorLayout }
 export default EditorLayout
 
-// 导出类型定义
+// Export type definition
 export type {
   DrawerPlacement,
   DrawerState,
@@ -20,5 +20,5 @@ export type {
   ResponsiveConfig
 } from './types'
 
-// 导出常量
+// Export constants
 export { LAYOUT_BREAKPOINTS } from '@/components/visual-editor/components/Layout/types'

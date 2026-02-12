@@ -1,35 +1,35 @@
 /**
- * 表单生成器
- * 根据组件定义自动生成配置表单
+ * form builder
+ * Automatically generate configuration forms based on component definitions
  */
 
 import type { ComponentDefinition, TSConfig, FormField, FormGroup } from '../types'
 import { ConfigManager } from './config-manager'
 
 /**
- * 表单生成器类
+ * form builder class
  */
 export class FormGenerator {
   /**
-   * 根据组件定义生成表单配置
+   * Generate form configuration based on component definition
    */
   static generateFormConfig(definition: ComponentDefinition): TSConfig {
-    // 如果组件已经有配置，直接返回
+    // If the component is already configured，Return directly
     if (definition.defaultConfig?.staticParams) {
       return this.generateFromStaticParams(definition)
     }
 
-    // 如果组件有属性白名单，基于白名单生成
+    // If the component has a property whitelist，Generate based on whitelist
     if (definition.propertyWhitelist) {
       return this.generateFromPropertyWhitelist(definition)
     }
 
-    // 生成默认配置
+    // Generate default configuration
     return this.generateDefaultConfig(definition)
   }
 
   /**
-   * 基于静态参数生成表单配置
+   * Generate form configuration based on static parameters
    */
   private static generateFromStaticParams(definition: ComponentDefinition): TSConfig {
     const staticParams = definition.defaultConfig?.staticParams || {}
@@ -43,7 +43,7 @@ export class FormGenerator {
     })
 
     return {
-      title: `${definition.name} 配置`,
+      title: `${definition.name} Configuration`,
       description: definition.description,
       fields,
       groups: this.generateDefaultGroups(fields)
@@ -51,7 +51,7 @@ export class FormGenerator {
   }
 
   /**
-   * 基于属性白名单生成表单配置
+   * Generate form configuration based on attribute whitelist
    */
   private static generateFromPropertyWhitelist(definition: ComponentDefinition): TSConfig {
     const whitelist = definition.propertyWhitelist || {}
@@ -62,7 +62,7 @@ export class FormGenerator {
         type: this.mapPropertyTypeToFieldType(config.type),
         label: config.label,
         field: propName,
-        group: config.group || '基础配置',
+        group: config.group || 'Basic configuration',
         placeholder: config.description || '',
         defaultValue: config.defaultValue,
         required: config.required || false,
@@ -75,7 +75,7 @@ export class FormGenerator {
     })
 
     return {
-      title: `${definition.name} 配置`,
+      title: `${definition.name} Configuration`,
       description: definition.description,
       fields,
       groups: this.generateDefaultGroups(fields)
@@ -83,25 +83,25 @@ export class FormGenerator {
   }
 
   /**
-   * 生成默认配置
+   * Generate default configuration
    */
   private static generateDefaultConfig(definition: ComponentDefinition): TSConfig {
     return ConfigManager.generateDefaultTSConfig(definition.type)
   }
 
   /**
-   * 根据值推断字段类型
+   * Infer field type from value
    */
   private static inferFieldFromValue(key: string, value: any): FormField | null {
     const field: FormField = {
       type: 'input',
       label: this.formatLabel(key),
       field: key,
-      group: '基础配置',
+      group: 'Basic configuration',
       defaultValue: value
     }
 
-    // 根据值类型推断字段类型
+    // Infer field type based on value type
     if (typeof value === 'boolean') {
       field.type = 'switch'
     } else if (typeof value === 'number') {
@@ -109,7 +109,7 @@ export class FormGenerator {
     } else if (Array.isArray(value)) {
       field.type = 'select'
       field.options = value.map((item, index) => ({
-        label: `选项 ${index + 1}`,
+        label: `Options ${index + 1}`,
         value: item
       }))
     } else if (typeof value === 'object' && value !== null) {
@@ -120,26 +120,26 @@ export class FormGenerator {
   }
 
   /**
-   * 格式化标签
+   * formatting tags
    */
   private static formatLabel(key: string): string {
-    // 将 camelCase 转换为中文标签
+    // Will camelCase Convert to Chinese label
     const labelMap: Record<string, string> = {
-      deviceId: '设备ID',
-      metricsList: '指标列表',
-      name: '名称',
-      description: '描述',
-      title: '标题',
-      size: '尺寸',
-      color: '颜色',
-      enabled: '启用状态'
+      deviceId: 'equipmentID',
+      metricsList: 'Indicator list',
+      name: 'name',
+      description: 'describe',
+      title: 'title',
+      size: 'size',
+      color: 'color',
+      enabled: 'Enabled status'
     }
 
     return labelMap[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
   }
 
   /**
-   * 映射属性类型到字段类型
+   * Mapping attribute types to field types
    */
   private static mapPropertyTypeToFieldType(propertyType: string): string {
     const typeMap: Record<string, string> = {
@@ -154,18 +154,18 @@ export class FormGenerator {
   }
 
   /**
-   * 生成默认分组
+   * Generate default grouping
    */
   private static generateDefaultGroups(fields: FormField[]): FormGroup[] {
     const groups: Record<string, FormGroup> = {}
 
     fields.forEach(field => {
-      const groupName = field.group || '基础配置'
+      const groupName = field.group || 'Basic configuration'
       if (!groups[groupName]) {
         groups[groupName] = {
           name: groupName.toLowerCase().replace(/\s+/g, '-'),
           label: groupName,
-          description: `${groupName}相关配置项`,
+          description: `${groupName}Related configuration items`,
           fields: [],
           collapsible: true,
           defaultExpanded: true
@@ -178,25 +178,25 @@ export class FormGenerator {
   }
 
   /**
-   * 验证表单配置
+   * Validate form configuration
    */
   static validateFormConfig(config: TSConfig): { valid: boolean; errors: string[] } {
     const errors: string[] = []
 
     if (!config.fields || !Array.isArray(config.fields)) {
-      errors.push('表单配置必须包含 fields 数组')
+      errors.push('The form configuration must contain fields array')
       return { valid: false, errors }
     }
 
     config.fields.forEach((field, index) => {
       if (!field.type) {
-        errors.push(`字段 ${index} 缺少 type 属性`)
+        errors.push(`Field ${index} Lack type property`)
       }
       if (!field.label) {
-        errors.push(`字段 ${index} 缺少 label 属性`)
+        errors.push(`Field ${index} Lack label property`)
       }
       if (!field.field) {
-        errors.push(`字段 ${index} 缺少 field 属性`)
+        errors.push(`Field ${index} Lack field property`)
       }
     })
 
@@ -207,7 +207,7 @@ export class FormGenerator {
   }
 
   /**
-   * 获取表单统计信息
+   * Get form statistics
    */
   static getFormStats(config: TSConfig): {
     fieldCount: number
@@ -234,11 +234,11 @@ export class FormGenerator {
 }
 
 /**
- * 全局表单生成器实例
+ * Global form builder instance
  */
 export const formGenerator = FormGenerator
 
 /**
- * 默认导出
+ * Default export
  */
 export default FormGenerator

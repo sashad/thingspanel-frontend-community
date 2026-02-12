@@ -1,12 +1,12 @@
 /**
- * 增强数据仓库系统 (Enhanced Data Warehouse)
- * SUBTASK-003: 数据仓库优化增强
+ * Enhance data warehouse system (Enhanced Data Warehouse)
+ * SUBTASK-003: Data warehouse optimization and enhancement
  *
- * 核心功能:
- * 1. 多数据源数据隔离存储
- * 2. 性能优化和内存管理
- * 3. 动态参数存储管理（预留）
- * 4. 缓存策略和过期管理
+ * Core functions:
+ * 1. Multiple data sources data isolation storage
+ * 2. Performance optimization and memory management
+ * 3. Dynamic parameter storage management（reserved）
+ * 4. Cache strategy and expiration management
  */
 
 import type { ComponentDataRequirement } from '@/core/data-architecture/SimpleDataBridge'
@@ -14,148 +14,148 @@ import { dataSourceLogger } from '@/utils/logger'
 import { ref, reactive, type Ref } from 'vue'
 
 /**
- * 数据存储项接口
+ * Data storage item interface
  */
 export interface DataStorageItem {
-  /** 数据内容 */
+  /** Data content */
   data: any
-  /** 存储时间戳 */
+  /** Store timestamp */
   timestamp: number
-  /** 过期时间戳 */
+  /** Expiration timestamp */
   expiresAt?: number
-  /** 数据来源信息 */
+  /** Data source information */
   source: {
-    /** 数据源ID */
+    /** data sourceID */
     sourceId: string
-    /** 数据源类型 */
+    /** Data source type */
     sourceType: string
-    /** 组件ID */
+    /** componentsID */
     componentId: string
   }
-  /** 数据大小（字节） */
+  /** Data size（byte） */
   size: number
-  /** 访问次数 */
+  /** Visits */
   accessCount: number
-  /** 最后访问时间 */
+  /** last access time */
   lastAccessed: number
-  /** 🔥 新增：数据版本号 */
+  /** 🔥 New：Data version number */
   dataVersion?: string
-  /** 🔥 新增：执行ID */
+  /** 🔥 New：implementID */
   executionId?: string
 }
 
 /**
- * 组件数据存储结构
+ * Component data storage structure
  */
 export interface ComponentDataStorage {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 数据源数据映射 */
+  /** Data source data mapping */
   dataSources: Map<string, DataStorageItem>
-  /** 合并后的数据（缓存） */
+  /** Merged data（cache） */
   mergedData?: DataStorageItem
-  /** 组件创建时间 */
+  /** Component creation time */
   createdAt: number
-  /** 最后更新时间 */
+  /** Last updated */
   updatedAt: number
 }
 
 /**
- * 动态参数存储接口（预留Phase 2使用）
+ * Dynamic parameter storage interface（reservedPhase 2use）
  */
 export interface DynamicParameterStorage {
-  /** 参数名称 */
+  /** Parameter name */
   name: string
-  /** 参数值 */
+  /** Parameter value */
   value: any
-  /** 参数类型 */
+  /** Parameter type */
   type: 'string' | 'number' | 'boolean' | 'object' | 'array'
-  /** 作用域 */
+  /** Scope */
   scope: 'global' | 'component' | 'session'
-  /** 过期时间 */
+  /** Expiration time */
   expiresAt?: number
-  /** 依赖关系 */
+  /** Dependencies */
   dependencies?: string[]
 }
 
 /**
- * 仓库配置选项
+ * Warehouse configuration options
  */
 export interface DataWarehouseConfig {
-  /** 默认缓存过期时间（毫秒） */
+  /** Default cache expiration time（millisecond） */
   defaultCacheExpiry: number
-  /** 最大内存使用量（MB） */
+  /** Maximum memory usage（MB） */
   maxMemoryUsage: number
-  /** 清理检查间隔（毫秒） */
+  /** Cleanup check interval（millisecond） */
   cleanupInterval: number
-  /** 最大存储项数量 */
+  /** Maximum number of storage items */
   maxStorageItems: number
-  /** 启用性能监控 */
+  /** Enable performance monitoring */
   enablePerformanceMonitoring: boolean
 }
 
 /**
- * 性能监控数据
+ * Performance monitoring data
  */
 export interface PerformanceMetrics {
-  /** 总内存使用（MB） */
+  /** Total memory usage（MB） */
   memoryUsage: number
-  /** 存储项数量 */
+  /** Number of storage items */
   itemCount: number
-  /** 组件数量 */
+  /** Number of components */
   componentCount: number
-  /** 平均响应时间（ms） */
+  /** average response time（ms） */
   averageResponseTime: number
-  /** 缓存命中率 */
+  /** Cache hit rate */
   cacheHitRate: number
-  /** 最后清理时间 */
+  /** Last cleanup time */
   lastCleanupTime: number
 }
 
 /**
- * 增强数据仓库类
- * 提供多数据源隔离存储和性能优化功能
+ * Enhanced data warehouse class
+ * Provides multiple data source isolation storage and performance optimization functions
  */
 export class EnhancedDataWarehouse {
-  /** 组件数据存储 */
+  /** Component data storage */
   private componentStorage = new Map<string, ComponentDataStorage>()
 
-  /** 🔥 组件级响应式通知器：避免全局响应式导致的性能问题 */
+  /** 🔥 Component-level reactive notifier：Avoid performance problems caused by global responsiveness */
   private componentChangeNotifiers = new Map<string, any>()
 
-  /** 🔥 移除全局通知器，避免所有组件响应任何组件的数据变化 */
-  // private dataChangeNotifier = ref(0) // 已移除，使用组件级通知器替代
+  /** 🔥 Remove global notifier，Avoid all components responding to data changes in any component */
+  // private dataChangeNotifier = ref(0) // Removed，Use component-level notifiers instead
 
-  /** 🔥 新增：组件最新数据版本追踪 */
+  /** 🔥 New：Component latest data version tracking */
   private componentLatestVersions = new Map<string, string>()
 
-  /** 动态参数存储（预留） */
+  /** Dynamic parameter storage（reserved） */
   private parameterStorage = new Map<string, DynamicParameterStorage>()
 
-  /** 仓库配置 */
+  /** Warehouse configuration */
   private config: DataWarehouseConfig
 
-  /** 性能监控数据 */
+  /** Performance monitoring data */
   private metrics: PerformanceMetrics
 
-  /** 清理定时器 */
+  /** Cleanup timer */
   private cleanupTimer: NodeJS.Timeout | null = null
 
-  /** 性能监控定时器 */
+  /** Performance monitoring timer */
   private metricsTimer: NodeJS.Timeout | null = null
 
   constructor(config: Partial<DataWarehouseConfig> = {}) {
-    // 初始化配置
+    // Initial configuration
     this.config = {
-      defaultCacheExpiry: 5 * 60 * 1000, // 5分钟
+      defaultCacheExpiry: 5 * 60 * 1000, // 5minute
       maxMemoryUsage: 100, // 100MB
-      cleanupInterval: 60 * 1000, // 1分钟
+      cleanupInterval: 60 * 1000, // 1minute
       maxStorageItems: 1000,
       enablePerformanceMonitoring: true,
       ...config
     }
 
-    // 初始化性能监控数据
+    // Initialize performance monitoring data
     this.metrics = {
       memoryUsage: 0,
       itemCount: 0,
@@ -165,22 +165,22 @@ export class EnhancedDataWarehouse {
       lastCleanupTime: Date.now()
     }
 
-    // 启动定期清理
+    // Start regular cleanup
     this.startCleanupTimer()
 
-    // 启动性能监控
+    // Start performance monitoring
     if (this.config.enablePerformanceMonitoring) {
       this.startMetricsCollection()
     }
   }
 
   /**
-   * 存储组件数据
-   * @param componentId 组件ID
-   * @param sourceId 数据源ID
-   * @param data 数据内容
-   * @param sourceType 数据源类型
-   * @param customExpiry 自定义过期时间
+   * Store component data
+   * @param componentId componentsID
+   * @param sourceId data sourceID
+   * @param data Data content
+   * @param sourceType Data source type
+   * @param customExpiry Custom expiration time
    */
   storeComponentData(
     componentId: string,
@@ -192,18 +192,18 @@ export class EnhancedDataWarehouse {
     const now = Date.now()
     const startTime = now
 
-    // 🔥 关键修复：添加数据值检查和执行序号追踪
+    // 🔥 critical fix：Add data value checking and execution sequence number tracking
     const dataValue = this.extractDataValue(data)
     const executionId = `${componentId}-${now}-${Math.random().toString(36).substr(2, 9)}`
 
-    // 🔥 新增：版本控制机制，防止过期数据覆盖新数据
+    // 🔥 New：version control mechanism，Prevent expired data from overwriting new data
     const dataVersion = this.generateDataVersion(componentId, data)
     if (!this.shouldAcceptData(componentId, dataVersion)) {
       return
     }
 
 
-    // 🔥 临时调试：详细记录存储过程，包含执行追踪
+    // 🔥 Temporary debugging：Detailed documentation of stored procedures，Contains execution trace
     ;(window as any).debugLastStorage = {
       componentId,
       sourceId,
@@ -215,16 +215,16 @@ export class EnhancedDataWarehouse {
       step: 'start'
     }
 
-    // 计算数据大小（估算）
+    // Calculate data size（Estimate）
     const dataSize = this.calculateDataSize(data)
 
-    // 检查内存限制
+    // Check memory limits
     if (this.shouldRejectStorage(dataSize)) {
       ;(window as any).debugLastStorage.step = 'rejected'
       return
     }
 
-    // 获取或创建组件存储
+    // Get or create component storage
     let componentStorage = this.componentStorage.get(componentId)
     if (!componentStorage) {
       componentStorage = {
@@ -237,7 +237,7 @@ export class EnhancedDataWarehouse {
       ;(window as any).debugLastStorage.step = 'created_storage'
     }
 
-    // 创建存储项
+    // Create storage item
     const storageItem: DataStorageItem = {
       data,
       timestamp: now,
@@ -250,32 +250,32 @@ export class EnhancedDataWarehouse {
       size: dataSize,
       accessCount: 0,
       lastAccessed: now,
-      // 🔥 新增：数据版本控制字段
+      // 🔥 New：Data versioning fields
       dataVersion,
       executionId
     }
 
-    // 存储数据
+    // Store data
     componentStorage.dataSources.set(sourceId, storageItem)
     componentStorage.updatedAt = now
 
-    // 清除合并数据缓存（因为数据源发生变化）
+    // Clear merge data cache（Because the data source changes）
     if (componentStorage.mergedData) {
       componentStorage.mergedData = undefined
     }
 
-    // 更新组件的最新数据版本
+    // Update the latest data version of the component
     this.updateLatestDataVersion(componentId, dataVersion)
 
 
-    // 🔥 临时调试：验证存储结果，包含数据值追踪
+    // 🔥 Temporary debugging：Verify stored results，Contains data value tracking
     const verification = this.componentStorage.get(componentId)
     const storedData = verification?.dataSources.get(sourceId)?.data
     const storedValue = this.extractDataValue(storedData)
     ;(window as any).debugLastStorage.step = 'stored'
     ;(window as any).debugLastStorage.verification = verification
 
-    // 🔥 关键修复：只触发该组件的响应式更新，避免全局重计算
+    // 🔥 critical fix：Only trigger responsive updates for this component，Avoid global recalculation
     let componentNotifier = this.componentChangeNotifiers.get(componentId)
     if (!componentNotifier) {
       componentNotifier = ref(0)
@@ -284,62 +284,62 @@ export class EnhancedDataWarehouse {
     const oldValue = componentNotifier.value
     componentNotifier.value++
 
-    // 🚨 强制调试：响应式更新触发
+    // 🚨 Force debugging：Reactive update trigger
 
-    // 🔥 完全移除全局通知器，避免触发所有组件的无效重计算
-    // this.dataChangeNotifier.value++ // 已移除，避免"好几千次"的重复打印问题
+    // 🔥 Remove global notifier completely，Avoid triggering invalid recalculation of all components
+    // this.dataChangeNotifier.value++ // Removed，avoid"Thousands of times"Repeat printing problem
 
-    // 🔥 移除循环打印日志，避免200+组件场景下的性能问题
-    // DataWarehouse 存储操作应该是静默的，避免大量组件时的日志爆炸
+    // 🔥 Remove circular print log，avoid200+Performance issues in component scenarios
+    // DataWarehouse Storage operations should be silent，Avoid log explosion when there are a large number of components
 
-    // 更新性能监控
+    // Update performance monitoring
     const responseTime = Date.now() - startTime
     this.updateMetrics(responseTime, 'store')
 
-    // 🔥 临时调试：最终状态检查
+    // 🔥 Temporary debugging：final status check
     const finalStats = this.getStorageStats()
     ;(window as any).debugLastStorage.finalStats = finalStats
   }
 
   /**
-   * 获取组件数据
-   * @param componentId 组件ID
-   * @returns 组件完整数据或null
+   * Get component data
+   * @param componentId componentsID
+   * @returns Component complete data ornull
    */
   getComponentData(componentId: string): Record<string, any> | null {
     const startTime = Date.now()
 
-    // 🔥 关键修复：使用组件级响应式，只有该组件的数据更新时才重新计算
+    // 🔥 critical fix：Use component-level reactivity，Recalculate only when the component's data is updated
     let componentNotifier = this.componentChangeNotifiers.get(componentId)
     if (!componentNotifier) {
       componentNotifier = ref(0)
       this.componentChangeNotifiers.set(componentId, componentNotifier)
     }
-    // 🔥 关键修复：访问组件级通知器，建立精确的响应式依赖
-    // 这确保只有该组件的数据更新时才会重新计算，而不是所有组件
+    // 🔥 critical fix：Access component-level notifiers，Build precise reactive dependencies
+    // This ensures that it is only recalculated when that component's data is updated，instead of all components
     const changeNotifier = componentNotifier.value
 
-    // 🚨 强制调试：响应式依赖访问
+    // 🚨 Force debugging：Responsive dependency access
 
     const componentStorage = this.componentStorage.get(componentId)
     if (!componentStorage) {
-      // 🔥 性能优化：减少无意义的日志输出，避免在200+组件场景下的日志爆炸
-      // 组件没有数据是正常状态，不需要每次都打印
+      // 🔥 Performance optimization：Reduce meaningless log output，avoid in200+Log explosion in component scenario
+      // It is normal for a component to have no data.，No need to print every time
       this.updateMetrics(Date.now() - startTime, 'get', false)
       return null
     }
 
-    // 检查是否有缓存的合并数据
+    // Check if there is cached merged data
     if (componentStorage.mergedData && !this.isExpired(componentStorage.mergedData)) {
       const cachedValue = this.extractDataValue(componentStorage.mergedData.data)
       componentStorage.mergedData.accessCount++
       componentStorage.mergedData.lastAccessed = Date.now()
       this.updateMetrics(Date.now() - startTime, 'get', true)
-      // 🔥 性能优化：减少重复日志，避免68个组件每次都打印缓存获取日志
+      // 🔥 Performance optimization：Reduce duplicate logs，avoid68Each component prints the cache acquisition log every time
       return componentStorage.mergedData.data
     }
 
-    // 构建组件数据对象
+    // Build component data objects
     const componentData: Record<string, any> = {}
     let hasValidData = false
 
@@ -357,35 +357,35 @@ export class EnhancedDataWarehouse {
     }
 
     if (!hasValidData) {
-      // 🔥 性能优化：组件没有数据是正常状态，不需要每次都打印错误日志
+      // 🔥 Performance optimization：It is normal for a component to have no data.，No need to print error log every time
       this.updateMetrics(Date.now() - startTime, 'get', false)
       return null
     }
 
     this.updateMetrics(Date.now() - startTime, 'get', true)
 
-    // 🔥 修复：如果有 complete 数据源，解包其中的实际数据
+    // 🔥 repair：if there is complete data source，Unpack the actual data inside
     const sourceIds = Object.keys(componentData)
 
-    // 🔥 关键修复：处理数据解包，得到最终要返回的数据
+    // 🔥 critical fix：Handle data unpacking，Get the final data to be returned
     let finalData = componentData
 
-    // 如果有 complete 数据源，解包其中的数据源数据
+    // if there is complete data source，解包其中的data source数据
     if ('complete' in componentData && componentData.complete) {
       const completeData = componentData.complete
 
-      // 检查 complete 是否包含 deviceData
+      // examine complete Does it contain deviceData
       if (completeData.deviceData && completeData.deviceData.data) {
         finalData = completeData.deviceData.data
       } else {
-        // 如果不是标准结构，返回 complete 的直接内容
+        // If it is not a standard structure，return complete the direct content of
         finalData = completeData
       }
     }
 
-    // 🔥 关键修复：缓存最终解包后的数据，而不是原始包装数据
+    // 🔥 critical fix：Cache the final unpacked data，instead of raw packed data
     componentStorage.mergedData = {
-      data: finalData,  // 缓存解包后的最终数据
+      data: finalData,  // Cache the final unpacked data
       timestamp: Date.now(),
       expiresAt: Date.now() + this.config.defaultCacheExpiry,
       source: {
@@ -402,10 +402,10 @@ export class EnhancedDataWarehouse {
     return finalData
   }
 
-  // ==================== 新增工具方法 ====================
+  // ==================== Add new tool method ====================
 
   /**
-   * 🔥 新增：生成数据版本号
+   * 🔥 New：Generate data version number
    */
   private generateDataVersion(componentId: string, data: any): string {
     const dataHash = this.calculateDataHash(data)
@@ -414,15 +414,15 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 🔥 新增：检查是否应该接受数据（版本控制）
+   * 🔥 New：Check if data should be accepted（version control）
    */
   private shouldAcceptData(componentId: string, dataVersion: string): boolean {
     const latestVersion = this.componentLatestVersions.get(componentId)
     if (!latestVersion) {
-      return true // 首次存储，直接接受
+      return true // first save，Accept directly
     }
 
-    // 提取时间戳进行比较
+    // Extract timestamps for comparison
     const currentTimestamp = this.extractTimestampFromVersion(dataVersion)
     const latestTimestamp = this.extractTimestampFromVersion(latestVersion)
 
@@ -430,14 +430,14 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 🔥 新增：更新最新数据版本
+   * 🔥 New：Update the latest data version
    */
   private updateLatestDataVersion(componentId: string, dataVersion: string): void {
     this.componentLatestVersions.set(componentId, dataVersion)
   }
 
   /**
-   * 🔥 新增：从版本号中提取时间戳
+   * 🔥 New：Extract timestamp from version number
    */
   private extractTimestampFromVersion(version: string): number {
     const parts = version.split('-')
@@ -448,7 +448,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 🔥 新增：计算数据哈希值
+   * 🔥 New：Calculate data hash value
    */
   private calculateDataHash(data: any): string {
     try {
@@ -457,7 +457,7 @@ export class EnhancedDataWarehouse {
       for (let i = 0; i < dataString.length; i++) {
         const char = dataString.charCodeAt(i)
         hash = ((hash << 5) - hash) + char
-        hash = hash & hash // 转换为32位整数
+        hash = hash & hash // Convert to32bit integer
       }
       return Math.abs(hash).toString(36)
     } catch (error) {
@@ -466,19 +466,19 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 🔥 新增：提取数据中的关键数值（用于调试追踪）
-   * 智能提取各种数据结构中的核心数值
+   * 🔥 New：Extract key values ​​from data（for debugging trace）
+   * Intelligently extract core values ​​from various data structures
    */
   private extractDataValue(data: any): any {
     if (!data) return undefined
 
-    // 尝试多种可能的数值字段
+    // Try many possible numeric fields
     const possibleFields = ['value', 'val', 'data', 'result', 'number', 'count']
 
-    // 直接数值
+    // direct numerical value
     if (typeof data === 'number') return data
 
-    // 对象中的数值字段
+    // Numeric fields in objects
     if (typeof data === 'object' && data !== null) {
       for (const field of possibleFields) {
         if (data[field] !== undefined) {
@@ -486,12 +486,12 @@ export class EnhancedDataWarehouse {
         }
       }
 
-      // 检查嵌套结构
+      // Check nested structures
       if (data.deviceData?.data?.value !== undefined) {
         return data.deviceData.data.value
       }
 
-      // 如果是数组，尝试提取第一个元素的值
+      // If it is an array，Try to extract the value of the first element
       if (Array.isArray(data) && data.length > 0) {
         return this.extractDataValue(data[0])
       }
@@ -501,10 +501,10 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 获取单个数据源数据
-   * @param componentId 组件ID
-   * @param sourceId 数据源ID
-   * @returns 数据源数据或null
+   * Get data from a single data source
+   * @param componentId componentsID
+   * @param sourceId data sourceID
+   * @returns data source data ornull
    */
   getDataSourceData(componentId: string, sourceId: string): any {
     const componentStorage = this.componentStorage.get(componentId)
@@ -526,31 +526,31 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 清除组件缓存
-   * @param componentId 组件ID
+   * Clear component cache
+   * @param componentId componentsID
    */
   clearComponentCache(componentId: string): void {
     const componentStorage = this.componentStorage.get(componentId)
     if (componentStorage) {
       this.componentStorage.delete(componentId)
-      // 🔥 关键修复：同时清理组件级响应式通知器，避免内存泄漏
+      // 🔥 critical fix：Also clean up component-level reactive notifiers，Avoid memory leaks
       this.componentChangeNotifiers.delete(componentId)
     }
   }
 
   /**
-   * 🔥 强制清除组件的合并数据缓存，保持响应式依赖
-   * @param componentId 组件ID
+   * 🔥 Force clearing of a component's merged data cache，Keep dependencies responsive
+   * @param componentId componentsID
    */
   clearComponentMergedCache(componentId: string): void {
     const componentStorage = this.componentStorage.get(componentId)
     if (componentStorage) {
-      // 🔥 关键修复：无条件清除合并缓存，解决并发时序问题
+      // 🔥 critical fix：Clear merge cache unconditionally，Solving concurrent timing issues
       const hadCache = !!componentStorage.mergedData
       componentStorage.mergedData = undefined
 
 
-      // 🔥 关键：无论是否有缓存都触发响应式更新，确保组件重新获取数据
+      // 🔥 key：Trigger responsive updates regardless of cache，Make sure the component re-fetches data
       let componentNotifier = this.componentChangeNotifiers.get(componentId)
       if (!componentNotifier) {
         componentNotifier = ref(0)
@@ -562,18 +562,18 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 清除数据源缓存
-   * @param componentId 组件ID
-   * @param sourceId 数据源ID
+   * Clear data source cache
+   * @param componentId componentsID
+   * @param sourceId data sourceID
    */
   clearDataSourceCache(componentId: string, sourceId: string): void {
     const componentStorage = this.componentStorage.get(componentId)
     if (componentStorage) {
       const removed = componentStorage.dataSources.delete(sourceId)
       if (removed) {
-        // 清除合并数据缓存
+        // Clear merge data cache
         componentStorage.mergedData = undefined
-        // 🔥 关键修复：只触发该组件的响应式更新
+        // 🔥 critical fix：Only trigger responsive updates for this component
         const componentNotifier = this.componentChangeNotifiers.get(componentId)
         if (componentNotifier) {
           componentNotifier.value++
@@ -583,26 +583,26 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 清除所有缓存
+   * clear all cache
    */
   clearAllCache(): void {
     const componentCount = this.componentStorage.size
     this.componentStorage.clear()
     this.parameterStorage.clear()
-    // 🔥 关键修复：同时清理所有组件级响应式通知器，避免内存泄漏
+    // 🔥 critical fix：Also clean up all component-level reactive notifiers，Avoid memory leaks
     this.componentChangeNotifiers.clear()
   }
 
   /**
-   * 设置缓存过期时间
-   * @param milliseconds 过期时间（毫秒）
+   * Set cache expiration time
+   * @param milliseconds Expiration time（millisecond）
    */
   setCacheExpiry(milliseconds: number): void {
     this.config.defaultCacheExpiry = milliseconds
   }
 
   /**
-   * 获取性能监控数据
+   * Get performance monitoring data
    */
   getPerformanceMetrics(): PerformanceMetrics {
     this.updateCurrentMetrics()
@@ -610,7 +610,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 获取存储统计信息
+   * Get storage statistics
    */
   getStorageStats() {
     let totalItems = 0
@@ -642,14 +642,14 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 预留：存储动态参数（Phase 2使用）
+   * reserved：Store dynamic parameters（Phase 2use）
    */
   storeDynamicParameter(name: string, parameter: DynamicParameterStorage): void {
     this.parameterStorage.set(name, parameter)
   }
 
   /**
-   * 预留：获取动态参数（Phase 2使用）
+   * reserved：Get dynamic parameters（Phase 2use）
    */
   getDynamicParameter(name: string): DynamicParameterStorage | null {
     const param = this.parameterStorage.get(name)
@@ -661,10 +661,10 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 销毁数据仓库
+   * Destroy data warehouse
    */
   destroy(): void {
-    // 停止定时器
+    // Stop timer
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer)
       this.cleanupTimer = null
@@ -675,32 +675,32 @@ export class EnhancedDataWarehouse {
       this.metricsTimer = null
     }
 
-    // 清除所有数据（已包含组件级响应式通知器清理）
+    // Clear all data（Component-level reactive notifier cleanup included）
     this.clearAllCache()
   }
 
-  // ==================== 私有方法 ====================
+  // ==================== private method ====================
 
   /**
-   * 检查数据项是否过期
+   * Check if the data item is expired
    */
   private isExpired(item: DataStorageItem): boolean {
     return item.expiresAt !== undefined && Date.now() > item.expiresAt
   }
 
   /**
-   * 计算数据大小（估算）
+   * Calculate data size（Estimate）
    */
   private calculateDataSize(data: any): number {
     try {
-      return JSON.stringify(data).length * 2 // 粗略估算UTF-16字节数
+      return JSON.stringify(data).length * 2 // Rough estimateUTF-16Number of bytes
     } catch {
-      return 1024 // 默认1KB
+      return 1024 // default1KB
     }
   }
 
   /**
-   * 检查是否应该拒绝存储（内存限制）
+   * Check if storage should be denied（memory limit）
    */
   private shouldRejectStorage(dataSize: number): boolean {
     const currentMemoryMB = this.getCurrentMemoryUsage()
@@ -713,7 +713,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 获取当前内存使用量（MB）
+   * Get current memory usage（MB）
    */
   private getCurrentMemoryUsage(): number {
     let totalSize = 0
@@ -729,7 +729,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 获取总存储项数量
+   * Get the total number of stored items
    */
   private getTotalItemCount(): number {
     let count = 0
@@ -741,7 +741,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 启动清理定时器
+   * Start cleanup timer
    */
   private startCleanupTimer(): void {
     this.cleanupTimer = setInterval(() => {
@@ -750,18 +750,18 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 执行清理操作
+   * Perform cleanup operations
    */
   private performCleanup(): void {
     const startTime = Date.now()
     let removedItems = 0
     let removedComponents = 0
 
-    // 清理过期数据
+    // Clean up expired data
     for (const [componentId, storage] of this.componentStorage) {
       let hasValidData = false
 
-      // 清理数据源
+      // Clean data source
       for (const [sourceId, item] of storage.dataSources) {
         if (this.isExpired(item)) {
           storage.dataSources.delete(sourceId)
@@ -771,20 +771,20 @@ export class EnhancedDataWarehouse {
         }
       }
 
-      // 清理合并数据缓存
+      // Clean merge data cache
       if (storage.mergedData && this.isExpired(storage.mergedData)) {
         storage.mergedData = undefined
         removedItems++
       }
 
-      // 如果组件没有有效数据，移除整个组件
+      // If the component does not have valid data，Remove entire component
       if (!hasValidData && !storage.mergedData) {
         this.componentStorage.delete(componentId)
         removedComponents++
       }
     }
 
-    // 内存压力清理：移除最少访问的数据
+    // Memory pressure cleanup：Remove least accessed data
     if (this.getCurrentMemoryUsage() > this.config.maxMemoryUsage * 0.8) {
       const itemsToRemove = this.getLeastAccessedItems(10)
       itemsToRemove.forEach(({ componentId, sourceId }) => {
@@ -797,7 +797,7 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 获取最少访问的数据项
+   * Get the least accessed data items
    */
   private getLeastAccessedItems(count: number): Array<{ componentId: string; sourceId: string }> {
     const allItems: Array<{ componentId: string; sourceId: string; accessCount: number; lastAccessed: number }> = []
@@ -813,7 +813,7 @@ export class EnhancedDataWarehouse {
       }
     }
 
-    // 按访问次数和最后访问时间排序
+    // Sort by number of visits and last visit time
     allItems.sort((a, b) => {
       if (a.accessCount !== b.accessCount) {
         return a.accessCount - b.accessCount
@@ -825,16 +825,16 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 启动性能监控
+   * Start performance monitoring
    */
   private startMetricsCollection(): void {
     this.metricsTimer = setInterval(() => {
       this.updateCurrentMetrics()
-    }, 30000) // 30秒更新一次
+    }, 30000) // 30Update once every second
   }
 
   /**
-   * 更新当前监控数据
+   * Update current monitoring data
    */
   private updateCurrentMetrics(): void {
     this.metrics.memoryUsage = this.getCurrentMemoryUsage()
@@ -843,13 +843,13 @@ export class EnhancedDataWarehouse {
   }
 
   /**
-   * 更新性能监控指标
+   * Update performance monitoring metrics
    */
   private updateMetrics(responseTime: number, operation: 'store' | 'get', cacheHit?: boolean): void {
-    // 更新平均响应时间
+    // Update average response time
     this.metrics.averageResponseTime = (this.metrics.averageResponseTime + responseTime) / 2
 
-    // 更新缓存命中率
+    // Update cache hit rate
     if (operation === 'get' && cacheHit !== undefined) {
       this.metrics.cacheHitRate = (this.metrics.cacheHitRate + (cacheHit ? 1 : 0)) / 2
     }
@@ -857,17 +857,17 @@ export class EnhancedDataWarehouse {
 }
 
 /**
- * 默认配置的数据仓库实例
+ * Default configured data warehouse instance
  */
 export const dataWarehouse = new EnhancedDataWarehouse()
 
-// 🔥 临时调试：暴露到全局
+// 🔥 Temporary debugging：Exposed to the whole world
 if (typeof window !== 'undefined') {
   ;(window as any).debugDataWarehouse = dataWarehouse
 }
 
 /**
- * 创建自定义配置的数据仓库实例
+ * Create a custom configured data warehouse instance
  */
 export function createDataWarehouse(config: Partial<DataWarehouseConfig> = {}): EnhancedDataWarehouse {
   return new EnhancedDataWarehouse(config)

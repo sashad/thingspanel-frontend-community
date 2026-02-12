@@ -1,24 +1,24 @@
 /**
- * Grid Layout Plus 组件导出
- * 基于 grid-layout-plus 的企业级网格布局解决方案
+ * Grid Layout Plus Component export
+ * based on grid-layout-plus Enterprise-level grid layout solutions
  */
 
-// 导出主要组件
+// Export main components
 export { default as GridLayoutPlus } from './GridLayoutPlus.vue'
 
-// 导出类型定义
+// Export type definition
 export type * from './gridLayoutPlusTypes'
 
-// 导出工具函数
+// Export utility functions
 export * from './gridLayoutPlusUtils'
 
-// 导出Hook
+// ExportHook
 export { useGridLayoutPlus } from './hooks/useGridLayoutPlus'
 
-// 导出默认配置和主题
+// Export default configuration and themes
 export { DEFAULT_GRID_LAYOUT_PLUS_CONFIG, LIGHT_THEME, DARK_THEME } from './gridLayoutPlusTypes'
 
-// 导出常用类型别名
+// Export common type aliases
 export type {
   GridLayoutPlusItem as GridItem,
   GridLayoutPlusConfig as GridConfig,
@@ -26,28 +26,28 @@ export type {
   GridLayoutPlusEmits as GridEmits
 } from './gridLayoutPlusTypes'
 
-// 版本信息
+// Version information
 export const GRID_LAYOUT_PLUS_VERSION = '1.0.0'
 
 /**
- * 获取组件信息
+ * Get component information
  */
 export function getGridLayoutPlusInfo() {
   return {
     name: 'Grid Layout Plus',
     version: GRID_LAYOUT_PLUS_VERSION,
-    description: '基于 grid-layout-plus 的企业级网格布局组件',
+    description: 'based on grid-layout-plus Enterprise Grid Layout Component',
     features: [
-      '基于 Grid Layout Plus 库',
-      '完整的 TypeScript 支持',
-      '响应式布局',
-      '拖拽和调整大小',
-      '主题支持',
-      '性能优化',
-      '丰富的 API',
-      '事件处理',
-      '历史记录',
-      '导入导出'
+      'based on Grid Layout Plus Library',
+      'complete TypeScript support',
+      'Responsive layout',
+      'Drag and resize',
+      'Theme support',
+      'Performance optimization',
+      'rich API',
+      'event handling',
+      'History',
+      'Import and export'
     ],
     dependencies: {
       'grid-layout-plus': '^1.0.0',

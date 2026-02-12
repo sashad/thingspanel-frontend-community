@@ -1,6 +1,6 @@
 <!--
-  可视化编辑器主工具栏组件
-  统一管理公共工具栏和渲染器特有工具栏
+  Visual editor main toolbar component
+  Unified management of public toolbars and renderer-specific toolbars
 -->
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
@@ -26,31 +26,31 @@ interface Props {
 }
 
 interface Emits {
-  // 编辑状态控制
+  // Edit status control
   (e: 'mode-change', mode: 'edit' | 'preview'): void
   (e: 'renderer-change', rendererId: string): void
-  // 文档操作
+  // Document operations
   (e: 'save'): void
   (e: 'import'): void
   (e: 'export'): void
   (e: 'import-config', config: Record<string, any>): void
   (e: 'export-config'): void
-  // 编辑操作
+  // Edit operations
   (e: 'undo'): void
   (e: 'redo'): void
   (e: 'clear-all'): void
-  // 视图控制
+  // View control
   (e: 'zoom-in'): void
   (e: 'zoom-out'): void
   (e: 'reset-zoom'): void
   (e: 'fit-content'): void
   (e: 'center-view'): void
   (e: 'preview-mode'): void
-  // 面板配置
+  // Panel configuration
   (e: 'open-config'): void
   (e: 'toggle-left-drawer'): void
   (e: 'toggle-right-drawer'): void
-  // 配置变更
+  // Configuration changes
   (e: 'canvas-config-change', config: Record<string, any>): void
   (e: 'gridstack-config-change', config: Record<string, any>): void
 }
@@ -68,22 +68,22 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 路由管理
+// Route management
 const router = useRouter()
 const route = useRoute()
 
-// 配置面板显示状态
+// Configuration panel display status
 const showConfigPanel = ref(false)
 
-// 消息提示
+// Message prompt
 const message = useMessage()
 
-// 全屏状态管理
+// Full screen status management
 const isFullscreen = ref(false)
 
-// 移除自定义行高状态，由独立组件处理
+// Remove custom row height status，Handled by independent components
 
-// 主题支持 - 使用Naive UI主题系统
+// Theme support - useNaive UItheme system
 const themeVars = useThemeVars()
 const toolbarColors = computed(() => ({
   '--toolbar-bg': themeVars.value.bodyColor,
@@ -96,14 +96,14 @@ const toolbarColors = computed(() => ({
   '--modal-header-border': themeVars.value.dividerColor
 }))
 
-// 判断当前渲染器类型
+// Determine the current renderer type
 const isCanvasRenderer = computed(() => props.currentRenderer === 'canvas')
 const isGridstackRenderer = computed(() => props.currentRenderer === 'gridstack')
 const isVisualizationRenderer = computed(() => props.currentRenderer === 'visualization')
 
-// 选项配置已移至独立的配置组件中
+// Options configuration has been moved to a separate configuration component
 
-// 计算当前配置（提供默认值）
+// Calculate current configuration（Provide default value）
 const canvasConfig = computed(() => ({
   width: 1200,
   height: 800,
@@ -114,9 +114,9 @@ const canvasConfig = computed(() => ({
 }))
 
 const gridstackConfig = computed(() => ({
-  colNum: 24, // 🔥 修复：统一默认为24列
+  colNum: 24, // 🔥 repair：The unified default is24List
   rowHeight: 80,
-  // 🔥 间距配置已在渲染器内部写死，不再从这里传递
+  // 🔥 Spacing configuration is hard-coded inside the renderer，no longer passed from here
   isDraggable: true,
   isResizable: true,
   staticGrid: false,
@@ -130,17 +130,17 @@ const visualizationConfig = computed(() => ({
   ...props.visualizationConfig
 }))
 
-// 编辑状态控制
+// Edit status control
 const handleModeChange = (mode: 'edit' | 'preview') => {
   if (mode === 'preview') {
-    // 跳转到预览页面，在新标签页打开，传递当前渲染器信息
+    // Jump to preview page，Open in new tab，Pass current renderer information
     const panelId = route.query.id
     if (panelId) {
       const previewUrl = router.resolve({
         path: '/ultra-kanban/kanban-preview',
         query: {
           id: panelId,
-          renderer: props.currentRenderer // 传递当前选择的渲染器类型
+          renderer: props.currentRenderer // Pass the currently selected renderer type
         }
       })
       window.open(previewUrl.href, '_blank')
@@ -148,21 +148,21 @@ const handleModeChange = (mode: 'edit' | 'preview') => {
       message.error($t('common.invalidParameter'))
     }
   } else {
-    // 编辑模式正常处理
+    // Edit mode handles normally
     emit('mode-change', mode)
   }
 }
 const handleRendererChange = (rendererId: string) => emit('renderer-change', rendererId)
 
-// 文档操作
+// Document operations
 const handleSave = () => emit('save')
 
-// 编辑操作
+// Edit operations
 const handleUndo = () => emit('undo')
 const handleRedo = () => emit('redo')
 const handleClearAll = () => emit('clear-all')
 
-// 渲染器配置变更
+// Renderer configuration changes
 const handleCanvasConfigChange = (config: Record<string, any>) => {
   emit('canvas-config-change', config)
 }
@@ -175,69 +175,69 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   emit('visualization-config-change', config)
 }
 
-// 视图控制事件
+// view control events
 const handleZoomIn = () => emit('zoom-in')
 const handleZoomOut = () => emit('zoom-out')
 const handleResetZoom = () => emit('reset-zoom')
 const handleFitContent = () => emit('fit-content')
 const handleCenterView = () => emit('center-view')
 
-// 抽屉控制事件
+// Drawer control event
 const handleToggleLeftDrawer = () => emit('toggle-left-drawer')
 const handleToggleRightDrawer = () => emit('toggle-right-drawer')
 
 /**
- * 全屏切换功能
- * 进入/退出编辑器区域全屏模式（而非整个浏览器页面）
+ * Full screen switching function
+ * Enter/Exit editor area full screen mode（rather than the entire browser page）
  */
 const handleToggleFullscreen = async (event?: Event) => {
-  // 🔥 阻止事件冒泡，防止触发其他全屏事件
+  // 🔥 Prevent events from bubbling up，Prevent other full-screen events from being triggered
   if (event) {
     event.preventDefault()
     event.stopPropagation()
   }
 
-  // 查找编辑器容器元素
+  // Find editor container element
   const editorWrapper = document.querySelector('.panel-editor-wrapper') as HTMLElement
 
   if (!editorWrapper) {
-    message.warning('未找到编辑器容器')
+    message.warning('Editor container not found')
     return
   }
 
-  // 🔥 修复：直接检查当前是否有全屏元素，而不依赖状态变量
+  // 🔥 repair：Directly check if there is currently a full screen element，without relying on state variables
   const currentFullscreenElement =
     document.fullscreenElement ||
     (document as any).webkitFullscreenElement ||
     (document as any).mozFullScreenElement ||
     (document as any).msFullscreenElement
 
-  console.log('🔍 [Fullscreen Debug] 当前全屏元素:', currentFullscreenElement)
-  console.log('🔍 [Fullscreen Debug] 编辑器容器:', editorWrapper)
+  console.log('🔍 [Fullscreen Debug] Current full screen element:', currentFullscreenElement)
+  console.log('🔍 [Fullscreen Debug] Editor container:', editorWrapper)
 
   if (!currentFullscreenElement) {
-    // 进入全屏 - 只全屏编辑器区域
-    console.log('🚀 [Fullscreen] 正在进入全屏...')
+    // Go to full screen - Full screen editor area only
+    console.log('🚀 [Fullscreen] Entering full screen...')
     try {
       if (editorWrapper.requestFullscreen) {
         await editorWrapper.requestFullscreen()
       } else if ((editorWrapper as any).webkitRequestFullscreen) {
-        // Safari 支持
+        // Safari support
         await (editorWrapper as any).webkitRequestFullscreen()
       } else if ((editorWrapper as any).mozRequestFullScreen) {
-        // Firefox 支持
+        // Firefox support
         await (editorWrapper as any).mozRequestFullScreen()
       } else if ((editorWrapper as any).msRequestFullscreen) {
-        // IE11 支持
+        // IE11 support
         await (editorWrapper as any).msRequestFullscreen()
       }
-      console.log('✅ [Fullscreen] 已进入全屏')
+      console.log('✅ [Fullscreen] Entered full screen')
     } catch (error) {
-      console.error('❌ [Fullscreen] 进入全屏失败:', error)
+      console.error('❌ [Fullscreen] Failed to enter full screen:', error)
     }
   } else {
-    // 退出全屏
-    console.log('🚪 [Fullscreen] 正在退出全屏...')
+    // Exit full screen
+    console.log('🚪 [Fullscreen] Exiting full screen...')
     try {
       if (document.exitFullscreen) {
         await document.exitFullscreen()
@@ -248,14 +248,14 @@ const handleToggleFullscreen = async (event?: Event) => {
       } else if ((document as any).msExitFullscreen) {
         await (document as any).msExitFullscreen()
       }
-      console.log('✅ [Fullscreen] 已退出全屏')
+      console.log('✅ [Fullscreen] Exited full screen')
     } catch (error) {
-      console.error('❌ [Fullscreen] 退出全屏失败:', error)
+      console.error('❌ [Fullscreen] Failed to exit full screen:', error)
     }
   }
 }
 
-// 监听全屏状态变化
+// Monitor full screen status changes
 const handleFullscreenChange = () => {
   const currentFullscreenElement =
     document.fullscreenElement ||
@@ -265,41 +265,41 @@ const handleFullscreenChange = () => {
 
   isFullscreen.value = !!currentFullscreenElement
 
-  console.log('📺 [Fullscreen Change] 全屏状态改变:', {
+  console.log('📺 [Fullscreen Change] Full screen status change:', {
     isFullscreen: isFullscreen.value,
     element: currentFullscreenElement,
     elementClass: currentFullscreenElement?.className
   })
 }
 
-// 切换配置面板显示状态
+// Switch configuration panel display status
 const handleToggleRendererConfig = () => {
   showConfigPanel.value = !showConfigPanel.value
 }
 
-// 点击外部关闭配置面板 - 优化版
+// Click outside to close the configuration panel - Optimized version
 const handleClickOutside = (event: Event) => {
   if (showConfigPanel.value) {
     const target = event.target as HTMLElement
     const dropdown = document.querySelector('.config-dropdown')
     const button = document.querySelector('[data-config-button]')
 
-    // 检查点击是否在下拉菜单内（Naive UI的下拉菜单通常有n-select-menu类）
+    // Check if the click is within the dropdown menu（Naive UIThe drop-down menu usually hasn-select-menukind）
     const isInDropdownMenu = target.closest(
       '.n-select-menu, .n-color-picker-panel, .n-popover, .v-binder-follower-container'
     )
 
-    // 只有当点击真正在外部时才关闭
+    // Only close if the click is actually outside
     if (dropdown && button && !dropdown.contains(target) && !button.contains(target) && !isInDropdownMenu) {
       showConfigPanel.value = false
     }
   }
 }
 
-// 添加全局点击监听
+// Add global click monitoring
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  // 监听全屏状态变化
+  // Monitor full screen status changes
   document.addEventListener('fullscreenchange', handleFullscreenChange)
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange)
   document.addEventListener('mozfullscreenchange', handleFullscreenChange)
@@ -308,18 +308,18 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
-  // 移除全屏状态监听
+  // Remove full screen status monitoring
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
   document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
   document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
   document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
 })
 
-// 文件导入导出处理
+// File import and export processing
 const fileInputRef = ref<HTMLInputElement>()
 
 const handleImport = () => {
-  // 创建一个隐藏的文件输入元素
+  // Create a hidden file input element
   if (!fileInputRef.value) {
     const input = document.createElement('input')
     input.type = 'file'
@@ -345,18 +345,18 @@ const handleImport = () => {
 }
 
 const handleExport = () => {
-  // 触发导出事件，由父组件提供当前配置
+  // trigger export event，The current configuration is provided by the parent component
   emit('export-config')
 }
 
-// 标题获取逻辑已移至独立组件
+// Title retrieval logic has been moved to a separate component
 </script>
 
 <template>
   <div class="visual-editor-toolbar h-12 flex items-center relative" :style="toolbarColors">
-    <!-- 左侧：添加组件 -->
+    <!-- left side：Add component -->
     <div class="toolbar-left flex items-center gap-2">
-      <!-- 添加组件按钮 - 仅编辑模式显示 -->
+      <!-- Add component button - Only shown in edit mode -->
       <template v-if="mode === 'edit'">
         <NButton size="small" :type="showLeftDrawer ? 'primary' : 'default'" @click="handleToggleLeftDrawer">
           <template #icon>
@@ -365,7 +365,7 @@ const handleExport = () => {
           {{ $t('visualEditor.addComponent') }}
         </NButton>
 
-        <!-- 渲染器选择 -->
+        <!-- Renderer selection -->
         <NDivider vertical />
         <span class="text-12px text-gray-500">{{ $t('visualEditor.renderer') }}:</span>
         <NSelect
@@ -378,12 +378,12 @@ const handleExport = () => {
       </template>
     </div>
 
-    <!-- 右侧：操作按钮组 -->
+    <!-- right side：Action button group -->
     <div class="toolbar-right flex items-center">
       <NSpace align="center" :size="4">
-        <!-- 编辑模式下的功能 -->
+        <!-- Functions in edit mode -->
         <template v-if="mode === 'edit'">
-          <!-- 文档操作组 -->
+          <!-- Document Action Group -->
           <div class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -399,7 +399,7 @@ const handleExport = () => {
                   </template>
                 </NButton>
               </template>
-              <span v-if="isCanvasRenderer">Canvas功能开发中，暂不支持保存</span>
+              <span v-if="isCanvasRenderer">CanvasFunction under development，Saving is not supported yet</span>
               <span v-else>{{ $t('visualEditor.shortcuts.save') }}</span>
             </NTooltip>
 
@@ -416,7 +416,7 @@ const handleExport = () => {
             </NButton>
           </div>
 
-          <!-- 编辑操作组 -->
+          <!-- Edit action group -->
           <div class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -456,7 +456,7 @@ const handleExport = () => {
             </NPopconfirm>
           </div>
 
-          <!-- Canvas视图控制组 - 仅Canvas模式显示 -->
+          <!-- Canvasview control group - onlyCanvasMode display -->
           <div v-if="isCanvasRenderer" class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -492,14 +492,14 @@ const handleExport = () => {
             </NTooltip>
           </div>
 
-          <!-- 配置按钮 -->
+          <!-- Configure button -->
           <NButton size="small" type="tertiary" data-config-button @click="handleToggleRendererConfig">
             <template #icon>
               <SvgIcon icon="material-symbols:settings-outline" />
             </template>
           </NButton>
 
-          <!-- 全屏按钮 -->
+          <!-- full screen button -->
           <NTooltip trigger="hover">
             <template #trigger>
               <NButton size="small" type="tertiary" @click.stop.prevent="handleToggleFullscreen($event)">
@@ -514,7 +514,7 @@ const handleExport = () => {
           </NTooltip>
         </template>
 
-        <!-- 编辑/预览按钮 - 预览改为跳转新页面 -->
+        <!-- edit/preview button - Preview changes to jump to new page -->
         <NDivider vertical />
         <NButton
           size="small"
@@ -529,7 +529,7 @@ const handleExport = () => {
       </NSpace>
     </div>
 
-    <!-- 渲染器配置下拉面板 - 更简洁的交互 -->
+    <!-- Renderer configuration drop-down panel - Simpler interactions -->
     <RendererConfigDropdown
       :show="showConfigPanel"
       :current-renderer="currentRenderer"
@@ -572,7 +572,7 @@ const handleExport = () => {
   margin-left: auto;
 }
 
-/* 按钮组样式 */
+/* Button group style */
 .btn-group {
   display: flex;
   align-items: center;
@@ -588,7 +588,7 @@ const handleExport = () => {
   border-color: var(--toolbar-border);
 }
 
-/* 工具栏按钮悬停效果 */
+/* Toolbar button hover effect */
 .n-button {
   transition: all 0.2s ease;
 }
@@ -597,23 +597,23 @@ const handleExport = () => {
   transform: translateY(-1px);
 }
 
-/* 分割线优化 */
+/* Split line optimization */
 .n-divider--vertical {
   height: 20px;
   margin: 0 8px;
   opacity: 0.6;
 }
 
-/* 移除弹窗相关样式，由独立组件处理 */
+/* Remove pop-up related styles，Handled by independent components */
 
 .dialog-actions {
   border-top: 1px solid var(--border-color);
   padding-top: 16px;
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 1200px) {
-  /* 中等屏幕：隐藏部分按钮文本 */
+  /* medium screen：Hide part of button text */
   .btn-group .n-button .n-button__content {
     padding: 0 8px;
   }
@@ -626,7 +626,7 @@ const handleExport = () => {
     min-height: 48px;
   }
 
-  /* 小屏幕：只显示图标 */
+  /* small screen：Show only icons */
   .toolbar-left span {
     display: none;
   }
@@ -645,14 +645,14 @@ const handleExport = () => {
     max-height: 50vh;
   }
 
-  /* 如果空间太小，隐藏Canvas特有的控制 */
+  /* If the space is too small，hideCanvasUnique controls */
   .btn-group:has(+ .btn-group) {
     display: none;
   }
 }
 
 @media (max-width: 480px) {
-  /* 超小屏幕：进一步简化 */
+  /* super small screen：Simplify further */
   .toolbar-right .n-space {
     gap: 2px !important;
   }

@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 遥测Tab内容
- * 从 src/views/device/template/components/step/model-definition.vue 复制遥测部分逻辑
+ * telemetryTabcontent
+ * from src/views/device/template/components/step/model-definition.vue Copy the telemetry part logic
  */
 
 import { ref, onMounted, reactive, watch } from 'vue'
@@ -21,18 +21,18 @@ const loading = ref(false)
 const telemetryList = ref<any[]>([])
 const total = ref(0)
 
-// 分页参数
+// Paging parameters
 const queryParams = reactive({
   page: 1,
   page_size: 5,
   device_template_id: ''
 })
 
-// 编辑弹窗
+// Edit pop-up window
 const showEditModal = ref(false)
 const editingItem = ref<any>({})
 
-// 表格列配置
+// Table column configuration
 const columns: any = [
   ...test.value,
   {
@@ -63,10 +63,10 @@ const columns: any = [
 ]
 
 /**
- * 加载遥测数据
+ * Load telemetry data
  */
 const loadData = async () => {
-  // 🔥 严格验证：必须有有效的模板ID
+  // 🔥 Strict verification：Must have a valid templateID
   if (!templateData.value?.id || templateData.value.id === '') {
     return
   }
@@ -80,11 +80,11 @@ const loadData = async () => {
       telemetryList.value = res.data.list || []
       total.value = Math.ceil(res.data.total / queryParams.page_size)
 
-      // 处理读写标志显示
+      // Handling read and write flag display
       telemetryList.value.forEach((item: any) => {
-        if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+        if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
           item.read_write_flag = $t('device_template.table_header.readOnly')
-        } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+        } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
           item.read_write_flag = $t('device_template.table_header.readAndWrite')
         }
       })
@@ -97,7 +97,7 @@ const loadData = async () => {
 }
 
 /**
- * 新增遥测
+ * Add telemetry
  */
 const handleAdd = () => {
   editingItem.value = {}
@@ -105,7 +105,7 @@ const handleAdd = () => {
 }
 
 /**
- * 编辑遥测
+ * Edit telemetry
  */
 const handleEdit = (row: any) => {
   editingItem.value = { ...row }
@@ -113,7 +113,7 @@ const handleEdit = (row: any) => {
 }
 
 /**
- * 删除遥测
+ * Delete telemetry
  */
 const handleDelete = async (id: string) => {
   await delTelemetry(id)
@@ -122,7 +122,7 @@ const handleDelete = async (id: string) => {
 }
 
 /**
- * 编辑成功回调
+ * Edit success callback
  */
 const handleEditSuccess = () => {
   showEditModal.value = false
@@ -131,7 +131,7 @@ const handleEditSuccess = () => {
 }
 
 /**
- * 取消编辑
+ * Cancel edit
  */
 const handleEditCancel = () => {
   showEditModal.value = false
@@ -139,7 +139,7 @@ const handleEditCancel = () => {
 }
 
 /**
- * 分页变化
+ * Pagination changes
  */
 const handlePageChange = (page: number) => {
   queryParams.page = page
@@ -147,8 +147,8 @@ const handlePageChange = (page: number) => {
 }
 
 /**
- * 🔥 监听 templateData 变化
- * 当父组件加载完模板数据后，自动加载遥测数据
+ * 🔥 monitor templateData change
+ * After the parent component loads the template data，Automatically load telemetry data
  */
 watch(
   () => templateData.value?.id,
@@ -157,12 +157,12 @@ watch(
       loadData()
     }
   },
-  { immediate: true } // 立即执行一次
+  { immediate: true } // Execute once immediately
 )
 
-// 🔥 移除 onMounted 中的 loadData()，改为通过 watch 触发
+// 🔥 Remove onMounted in loadData()，pass instead watch trigger
 onMounted(() => {
-  // 不再在这里调用 loadData()，交给 watch 处理
+  // no longer called here loadData()，hand over watch deal with
 })
 </script>
 
@@ -181,10 +181,10 @@ onMounted(() => {
       <NPagination :page-count="total" :page-size="queryParams.page_size" @update:page="handlePageChange" />
     </div>
 
-    <!-- 自定义控制 - 只有当templateData存在且id有效时才渲染 -->
+    <!-- Custom controls - only iftemplateDataexist andidRender only when valid -->
     <CustomControls v-if="templateData?.id" :id="templateData.id" />
 
-    <!-- 编辑弹窗 -->
+    <!-- Edit pop-up window -->
     <NModal
       v-model:show="showEditModal"
       :title="editingItem.id ? $t('common.edit') : $t('common.add')"

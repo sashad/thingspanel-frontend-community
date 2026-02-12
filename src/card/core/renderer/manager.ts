@@ -1,6 +1,6 @@
 /**
- * 渲染器管理器
- * 实现多渲染器的统一管理和调度
+ * Renderer Manager
+ * Achieve unified management and scheduling of multiple renderers
  */
 
 import type {
@@ -14,18 +14,18 @@ import type {
 import type { IComponentInstance } from '../types/component'
 
 /**
- * 渲染器管理器实现类
+ * Renderer manager implementation class
  */
 export class RendererManager implements IRendererManager {
-  /** 注册的渲染器 */
+  /** Registered renderer */
   private renderers = new Map<RendererType, IRenderer>()
-  /** 渲染器配置 */
+  /** Renderer configuration */
   private configs = new Map<RendererType, IRendererConfig>()
-  /** 活跃的渲染上下文 */
+  /** active rendering context */
   private contexts = new Map<string, IRenderContext>()
-  /** 资源池 */
+  /** resource pool */
   private resourcePool: IResourcePool
-  /** 默认渲染器类型 */
+  /** Default renderer type */
   private defaultRendererType: RendererType = 'vue'
 
   constructor() {
@@ -34,10 +34,10 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 注册渲染器
-   * @param type 渲染器类型
-   * @param renderer 渲染器实例
-   * @param config 渲染器配置
+   * Register renderer
+   * @param type Renderer type
+   * @param renderer Renderer instance
+   * @param config Renderer configuration
    */
   register(type: RendererType, renderer: IRenderer, config?: IRendererConfig): void {
     this.renderers.set(type, renderer)
@@ -51,16 +51,16 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 注销渲染器
-   * @param type 渲染器类型
+   * Unregister the renderer
+   * @param type Renderer type
    */
   unregister(type: RendererType): void {
     const renderer = this.renderers.get(type)
     if (renderer) {
-      // 销毁相关的渲染上下文
+      // Destroy the associated rendering context
       this.destroyContextsByRenderer(type)
 
-      // 调用渲染器的销毁方法
+      // Call the renderer's destruction method
       if (renderer.destroy) {
         renderer.destroy()
       }
@@ -74,27 +74,27 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 获取渲染器
-   * @param type 渲染器类型
-   * @returns 渲染器实例
+   * Get renderer
+   * @param type Renderer type
+   * @returns Renderer instance
    */
   getRenderer(type?: RendererType): IRenderer {
     const rendererType = type || this.defaultRendererType
     const renderer = this.renderers.get(rendererType)
 
     if (!renderer) {
-      throw new Error(`渲染器 ${rendererType} 未注册`)
+      throw new Error(`Renderer ${rendererType} Not registered`)
     }
 
     return renderer
   }
 
   /**
-   * 创建渲染上下文
-   * @param contextId 上下文ID
-   * @param rendererType 渲染器类型
-   * @param container 容器元素
-   * @returns 渲染上下文
+   * Create rendering context
+   * @param contextId contextID
+   * @param rendererType Renderer type
+   * @param container container element
+   * @returns rendering context
    */
   createContext(contextId: string, rendererType: RendererType, container: HTMLElement): IRenderContext {
     const renderer = this.getRenderer(rendererType)
@@ -120,9 +120,9 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 获取渲染上下文
-   * @param contextId 上下文ID
-   * @returns 渲染上下文
+   * Get rendering context
+   * @param contextId contextID
+   * @returns rendering context
    */
   getContext(contextId: string): IRenderContext | undefined {
     const context = this.contexts.get(contextId)
@@ -133,19 +133,19 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 销毁渲染上下文
-   * @param contextId 上下文ID
+   * Destroy rendering context
+   * @param contextId contextID
    */
   destroyContext(contextId: string): void {
     const context = this.contexts.get(contextId)
     if (!context) return
 
-    // 销毁上下文中的所有组件实例
+    // Destroy all component instances in the context
     context.instances.forEach((instance, instanceId) => {
       this.destroyInstance(contextId, instanceId)
     })
 
-    // 清理容器
+    // clean container
     if (context.container) {
       context.container.innerHTML = ''
     }
@@ -156,24 +156,24 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 渲染组件实例
-   * @param contextId 上下文ID
-   * @param instance 组件实例
-   * @returns 渲染结果Promise
+   * Render component instance
+   * @param contextId contextID
+   * @param instance Component instance
+   * @returns Rendering resultPromise
    */
   async renderInstance(contextId: string, instance: IComponentInstance): Promise<void> {
     const context = this.getContext(contextId)
     if (!context) {
-      throw new Error(`渲染上下文 ${contextId} 不存在`)
+      throw new Error(`rendering context ${contextId} does not exist`)
     }
 
     try {
       context.state = 'rendering'
 
-      // 调用渲染器的渲染方法
+      // Call the renderer's render method
       await context.renderer.render(instance, context)
 
-      // 将实例添加到上下文
+      // Add instance to context
       context.instances.set(instance.id, instance)
 
       context.state = 'idle'
@@ -183,30 +183,30 @@ export class RendererManager implements IRendererManager {
       }
     } catch (error) {
       context.state = 'error'
-      console.error(`[RendererManager] 渲染失败:`, error)
+      console.error(`[RendererManager] Rendering failed:`, error)
       throw error
     }
   }
 
   /**
-   * 更新组件实例
-   * @param contextId 上下文ID
-   * @param instanceId 实例ID
-   * @param data 更新数据
+   * Update component instance
+   * @param contextId contextID
+   * @param instanceId ExampleID
+   * @param data Update data
    */
   async updateInstance(contextId: string, instanceId: string, data: any): Promise<void> {
     const context = this.getContext(contextId)
     if (!context) {
-      throw new Error(`渲染上下文 ${contextId} 不存在`)
+      throw new Error(`rendering context ${contextId} does not exist`)
     }
 
     const instance = context.instances.get(instanceId)
     if (!instance) {
-      throw new Error(`组件实例 ${instanceId} 不存在`)
+      throw new Error(`Component instance ${instanceId} does not exist`)
     }
 
     try {
-      // 调用渲染器的更新方法
+      // Call the renderer's update method
       await context.renderer.update(instance, data, context)
 
       context.lastUsedAt = Date.now()
@@ -214,15 +214,15 @@ export class RendererManager implements IRendererManager {
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[RendererManager] 更新失败:`, error)
+      console.error(`[RendererManager] Update failed:`, error)
       throw error
     }
   }
 
   /**
-   * 销毁组件实例
-   * @param contextId 上下文ID
-   * @param instanceId 实例ID
+   * Destroy component instance
+   * @param contextId contextID
+   * @param instanceId ExampleID
    */
   async destroyInstance(contextId: string, instanceId: string): Promise<void> {
     const context = this.getContext(contextId)
@@ -232,34 +232,34 @@ export class RendererManager implements IRendererManager {
     if (!instance) return
 
     try {
-      // 调用渲染器的销毁方法
+      // Call the renderer's destruction method
       await context.renderer.destroy(instance, context)
 
-      // 从上下文中移除实例
+      // Remove instance from context
       context.instances.delete(instanceId)
 
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[RendererManager] 销毁实例失败:`, error)
+      console.error(`[RendererManager] Failed to destroy instance:`, error)
     }
   }
 
   /**
-   * 获取支持的渲染器类型列表
-   * @returns 渲染器类型数组
+   * Get a list of supported renderer types
+   * @returns Array of renderer types
    */
   getSupportedRenderers(): RendererType[] {
     return Array.from(this.renderers.keys())
   }
 
   /**
-   * 设置默认渲染器
-   * @param type 渲染器类型
+   * Set default renderer
+   * @param type Renderer type
    */
   setDefaultRenderer(type: RendererType): void {
     if (!this.renderers.has(type)) {
-      throw new Error(`渲染器 ${type} 未注册`)
+      throw new Error(`Renderer ${type} Not registered`)
     }
     this.defaultRendererType = type
     if (process.env.NODE_ENV === 'development') {
@@ -267,8 +267,8 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 获取渲染器统计信息
-   * @returns 统计信息
+   * Get renderer statistics
+   * @returns Statistics
    */
   getStats() {
     const contextStats = Array.from(this.contexts.values()).reduce(
@@ -293,8 +293,8 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 清理未使用的上下文
-   * @param maxIdleTime 最大空闲时间（毫秒）
+   * Clean up unused context
+   * @param maxIdleTime maximum idle time（millisecond）
    */
   cleanupIdleContexts(maxIdleTime: number = 5 * 60 * 1000): void {
     const now = Date.now()
@@ -317,8 +317,8 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 销毁指定渲染器的所有上下文
-   * @param rendererType 渲染器类型
+   * Destroys all contexts for the specified renderer
+   * @param rendererType Renderer type
    */
   private destroyContextsByRenderer(rendererType: RendererType): void {
     const contextsToDestroy: string[] = []
@@ -335,32 +335,32 @@ export class RendererManager implements IRendererManager {
   }
 
   /**
-   * 初始化默认渲染器
+   * Initialize the default renderer
    */
   private initializeDefaultRenderers(): void {
-    // 这里可以注册默认的渲染器
-    // 实际的渲染器实现将在具体的渲染器文件中定义
+    // Here you can register the default renderer
+    // The actual renderer implementation will be defined in the specific renderer file
     if (process.env.NODE_ENV === 'development') {
     }
   }
 }
 
 /**
- * 资源池实现类
+ * Resource pool implementation class
  */
 class ResourcePool implements IResourcePool {
-  /** 资源缓存 */
+  /** Resource cache */
   private resources = new Map<string, any>()
-  /** 资源使用计数 */
+  /** Resource usage count */
   private usageCounts = new Map<string, number>()
-  /** 资源创建时间 */
+  /** Resource creation time */
   private createdTimes = new Map<string, number>()
 
   /**
-   * 获取资源
-   * @param key 资源键
-   * @param factory 资源工厂函数
-   * @returns 资源
+   * Get resources
+   * @param key resource key
+   * @param factory Resource factory function
+   * @returns resource
    */
   get<T>(key: string, factory?: () => T): T | undefined {
     let resource = this.resources.get(key)
@@ -381,9 +381,9 @@ class ResourcePool implements IResourcePool {
   }
 
   /**
-   * 设置资源
-   * @param key 资源键
-   * @param resource 资源
+   * Set up resources
+   * @param key resource key
+   * @param resource resource
    */
   set(key: string, resource: any): void {
     this.resources.set(key, resource)
@@ -393,8 +393,8 @@ class ResourcePool implements IResourcePool {
   }
 
   /**
-   * 删除资源
-   * @param key 资源键
+   * Delete resources
+   * @param key resource key
    */
   delete(key: string): void {
     this.resources.delete(key)
@@ -405,7 +405,7 @@ class ResourcePool implements IResourcePool {
   }
 
   /**
-   * 清理资源池
+   * Clean up the resource pool
    */
   clear(): void {
     this.resources.clear()
@@ -416,8 +416,8 @@ class ResourcePool implements IResourcePool {
   }
 
   /**
-   * 获取统计信息
-   * @returns 统计信息
+   * Get statistics
+   * @returns Statistics
    */
   getStats() {
     return {
@@ -431,8 +431,8 @@ class ResourcePool implements IResourcePool {
   }
 }
 
-// 创建全局渲染器管理器实例
+// Create a global renderer manager instance
 export const rendererManager = new RendererManager()
 
-// 导出类型
+// Export type
 export type { IRendererManager, IResourcePool }

@@ -199,7 +199,7 @@ const getPlatform = computed(() => {
   const { proxy }: any = getCurrentInstance()
   return proxy.getPlatform()
 })
-// 初始化
+// initialization
 init()
 </script>
 

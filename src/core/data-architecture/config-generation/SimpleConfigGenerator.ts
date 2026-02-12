@@ -1,6 +1,6 @@
 /**
- * 简化的数据源配置生成器
- * 学习自 visual-editor 和 card2.1 系统的核心价值，去除过度复杂性
+ * Simplified data source configuration generator
+ * learn from visual-editor and card2.1 The core value of the system，Remove excessive complexity
  */
 
 import type {
@@ -16,25 +16,25 @@ import type {
 import { SIMPLE_DATA_SOURCE_CONSTANTS } from '@/core/data-architecture/types/simple-types'
 
 /**
- * 简化的配置生成器
- * 职责：接收组件需求和用户输入，生成标准化配置
+ * Simplified configuration generator
+ * Responsibilities：Receive component requirements and user input，Generate standardized configuration
  */
 export class SimpleConfigGenerator {
   /**
-   * 生成数据源配置
-   * 这是配置器的核心功能：将组件需求和用户输入转换为标准配置
+   * Generate data source configuration
+   * This is the core functionality of the configurator：Convert component requirements and user input into standard configurations
    */
   generateConfig(requirement: ComponentDataRequirement, userInputs: UserDataSourceInput[]): SimpleDataSourceConfig {
-    // 基础验证
+    // Basic verification
     this.validateInputs(requirement, userInputs)
 
-    // 生成数据源定义列表
+    // Generate a list of data source definitions
     const dataSources = this.generateDataSources(requirement, userInputs)
 
-    // 生成触发器配置（默认配置，简化处理）
+    // Generate trigger configuration（Default configuration，Simplified processing）
     const triggers = this.generateDefaultTriggers(userInputs)
 
-    // 构建完整配置
+    // Build full configuration
     const config: SimpleDataSourceConfig = {
       id: `config_${requirement.componentId}_${Date.now()}`,
       componentId: requirement.componentId,
@@ -46,32 +46,32 @@ export class SimpleConfigGenerator {
   }
 
   /**
-   * 基础输入验证
-   * 简化版本：只检查关键必填项，避免过度验证
+   * Basic input validation
+   * Simplified version：Check only key required fields，Avoid over-validation
    */
   private validateInputs(requirement: ComponentDataRequirement, userInputs: UserDataSourceInput[]): void {
     if (!requirement.componentId) {
-      throw new Error('组件ID不能为空')
+      throw new Error('componentsIDcannot be empty')
     }
 
     if (!Array.isArray(userInputs) || userInputs.length === 0) {
-      throw new Error('用户输入不能为空')
+      throw new Error('User input cannot be empty')
     }
 
-    // 检查必需的数据源是否都有对应的用户输入
+    // Check if required data sources have corresponding user input
     const requiredSources = requirement.dataSources.filter(ds => ds.required)
     const inputSourceIds = userInputs.map(input => input.dataSourceId)
 
     for (const requiredSource of requiredSources) {
       if (!inputSourceIds.includes(requiredSource.id)) {
-        throw new Error(`缺少必需的数据源配置: ${requiredSource.name}`)
+        throw new Error(`Required data source configuration is missing: ${requiredSource.name}`)
       }
     }
   }
 
   /**
-   * 生成数据源定义列表
-   * 将用户输入转换为标准的数据源定义
+   * Generate a list of data source definitions
+   * Convert user input into standard data source definitions
    */
   private generateDataSources(
     requirement: ComponentDataRequirement,
@@ -80,17 +80,17 @@ export class SimpleConfigGenerator {
     const dataSources: DataSourceDefinition[] = []
 
     for (const userInput of userInputs) {
-      // 查找对应的需求定义
+      // Find the corresponding requirement definition
       const sourceRequirement = requirement.dataSources.find(ds => ds.id === userInput.dataSourceId)
 
       if (!sourceRequirement) {
         continue
       }
 
-      // 生成字段映射（简化版）
+      // Generate field mapping（Simplified version）
       const fieldMapping = this.generateFieldMapping(sourceRequirement, userInput)
 
-      // 创建数据源定义
+      // Create a data source definition
       const dataSourceDef: DataSourceDefinition = {
         id: userInput.dataSourceId,
         type: userInput.type,
@@ -105,20 +105,20 @@ export class SimpleConfigGenerator {
   }
 
   /**
-   * 生成字段映射
-   * 学习自 visual-editor 的 JSON 路径映射机制，但简化实现
+   * Generate field mapping
+   * learn from visual-editor of JSON path mapping mechanism，But simplified implementation
    */
   private generateFieldMapping(
     sourceRequirement: any,
     userInput: UserDataSourceInput
   ): { [targetField: string]: string } | undefined {
-    // 如果是静态数据，尝试直接映射
+    // If it is static data，Try direct mapping
     if (userInput.type === 'static') {
       const fieldMapping: { [key: string]: string } = {}
 
-      // 为每个需求字段生成映射路径
+      // Generate mapping paths for each requirement field
       sourceRequirement.fields?.forEach((field: any) => {
-        // 简单映射策略：假设数据结构和字段名匹配
+        // Simple mapping strategy：Assuming the data structure and field names match
         if (sourceRequirement.structureType === 'object') {
           fieldMapping[field.name] = field.name
         } else if (sourceRequirement.structureType === 'array') {
@@ -129,22 +129,22 @@ export class SimpleConfigGenerator {
       return Object.keys(fieldMapping).length > 0 ? fieldMapping : undefined
     }
 
-    // 对于其他数据源类型，暂时不生成映射，由执行器处理
+    // For other data source types，No mapping is generated yet，Processed by executor
     return undefined
   }
 
   /**
-   * 生成默认触发器配置
-   * 简化版本：根据数据源类型生成基础触发器
+   * Generate default trigger configuration
+   * Simplified version：Generate basic triggers based on data source type
    */
   private generateDefaultTriggers(userInputs: UserDataSourceInput[]): TriggerConfig[] {
     const triggers: TriggerConfig[] = []
 
-    // 检查是否包含需要轮询的数据源
+    // Check whether the data source that needs to be polled is included
     const hasApiSource = userInputs.some(input => input.type === 'api')
     const hasWebSocketSource = userInputs.some(input => input.type === 'websocket')
 
-    // API数据源添加定时器触发器
+    // APIAdd timer trigger to data source
     if (hasApiSource) {
       triggers.push({
         type: 'timer',
@@ -155,7 +155,7 @@ export class SimpleConfigGenerator {
       })
     }
 
-    // WebSocket数据源添加WebSocket触发器
+    // WebSocketData source addedWebSockettrigger
     if (hasWebSocketSource) {
       const wsInput = userInputs.find(input => input.type === 'websocket')
       if (wsInput && 'url' in wsInput.config) {
@@ -169,7 +169,7 @@ export class SimpleConfigGenerator {
       }
     }
 
-    // 如果没有特殊触发器，添加手动触发器
+    // If there is no special trigger，Add manual trigger
     if (triggers.length === 0) {
       triggers.push({
         type: 'manual',
@@ -181,30 +181,30 @@ export class SimpleConfigGenerator {
   }
 
   /**
-   * 验证生成的配置
-   * 简化版本：基础检查，避免过度验证
+   * Verify the generated configuration
+   * Simplified version：basic check，Avoid over-validation
    */
   validateConfig(config: SimpleDataSourceConfig): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
-    // 基础检查
-    if (!config.id) errors.push('配置ID不能为空')
-    if (!config.componentId) errors.push('组件ID不能为空')
+    // basic check
+    if (!config.id) errors.push('ConfigurationIDcannot be empty')
+    if (!config.componentId) errors.push('componentsIDcannot be empty')
     if (!Array.isArray(config.dataSources) || config.dataSources.length === 0) {
-      errors.push('至少需要一个数据源')
+      errors.push('At least one data source is required')
     }
 
-    // 检查数据源配置
+    // Check data source configuration
     config.dataSources.forEach((ds, index) => {
-      if (!ds.id) errors.push(`数据源 ${index + 1} 缺少ID`)
-      if (!ds.type) errors.push(`数据源 ${index + 1} 缺少类型`)
-      if (!ds.config) warnings.push(`数据源 ${index + 1} 缺少配置`)
+      if (!ds.id) errors.push(`data source ${index + 1} LackID`)
+      if (!ds.type) errors.push(`data source ${index + 1} Missing type`)
+      if (!ds.config) warnings.push(`data source ${index + 1} Missing configuration`)
     })
 
-    // 检查触发器配置
+    // Check trigger configuration
     if (!Array.isArray(config.triggers) || config.triggers.length === 0) {
-      warnings.push('建议至少配置一个触发器')
+      warnings.push('It is recommended to configure at least one trigger')
     }
 
     return {
@@ -215,8 +215,8 @@ export class SimpleConfigGenerator {
   }
 
   /**
-   * 预览字段映射结果
-   * 帮助用户理解映射效果
+   * Preview field mapping results
+   * Help users understand mapping effects
    */
   previewMapping(sourceData: any, fieldMapping: { [targetField: string]: string }): MappingPreviewResult[] {
     const results: MappingPreviewResult[] = []
@@ -236,7 +236,7 @@ export class SimpleConfigGenerator {
           sourcePath,
           mappedValue: null,
           success: false,
-          error: error instanceof Error ? error.message : '映射失败'
+          error: error instanceof Error ? error.message : 'Mapping failed'
         })
       }
     }
@@ -245,42 +245,42 @@ export class SimpleConfigGenerator {
   }
 
   /**
-   * 根据 JSON 路径提取值
-   * 简化版本的路径解析器，学习自 visual-editor
+   * according to JSON Path extraction value
+   * Simplified version of path parser，learn from visual-editor
    */
   private extractValueByPath(obj: any, path: string): any {
     if (!obj || !path) return undefined
 
-    // 处理简单路径 (如 "name", "user.name")
+    // Handling simple paths (like "name", "user.name")
     if (!path.includes('[') && !path.includes('(')) {
       return path.split('.').reduce((current, key) => {
         return current && typeof current === 'object' ? current[key] : undefined
       }, obj)
     }
 
-    // 对于复杂路径，使用简单的正则解析
+    // For complex paths，Use simple regular parsing
     try {
-      // 这里可以扩展更复杂的路径解析逻辑
-      // 现在先支持基本的点记法和数组索引
+      // More complex path parsing logic can be expanded here
+      // Now supports basic dot notation and array indexing
       return new Function('obj', `return obj.${path.replace(/\[(\d+)\]/g, '[$1]')}`)(obj)
     } catch {
-      throw new Error(`无法解析路径: ${path}`)
+      throw new Error(`Unable to resolve path: ${path}`)
     }
   }
 
   /**
-   * 获取配置摘要信息
-   * 用于调试和展示
+   * Get configuration summary information
+   * for debugging and demonstration
    */
   getConfigSummary(config: SimpleDataSourceConfig): string {
     const dataSourceTypes = config.dataSources.map(ds => ds.type).join(', ')
     const triggerTypes = config.triggers.map(t => t.type).join(', ')
 
-    return `组件: ${config.componentId} | 数据源: ${dataSourceTypes} | 触发器: ${triggerTypes}`
+    return `components: ${config.componentId} | data source: ${dataSourceTypes} | trigger: ${triggerTypes}`
   }
 }
 
 /**
- * 导出单例实例，简化使用
+ * Export singleton instance，Simplified use
  */
 export const simpleConfigGenerator = new SimpleConfigGenerator()

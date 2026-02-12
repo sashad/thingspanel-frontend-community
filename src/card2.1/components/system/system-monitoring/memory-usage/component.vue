@@ -35,8 +35,8 @@ import GenericCard from '@/card2.1/components/common/generic-card/component.vue'
 import { createLogger } from '@/utils/logger';
 
 /**
- * @description 内存使用率组件
- * @summary 显示系统内存使用率百分比，每30秒自动刷新
+ * @description Memory Usage Component
+ * @summary Display system memory usage percentage，Every30Automatically refresh in seconds
  */
 
 const logger = createLogger('MemoryUsageCard');
@@ -49,13 +49,13 @@ const unit = ref<string>('');
 let intervalId: number | null = null;
 
 /**
- * 获取系统指标数据
+ * Get system indicator data
  */
 const fetchData = async () => {
   startLoading();
   try {
     const response = await getSystemMetricsCurrent();
-    logger.info('System Metrics Response:', response); // 与原版保持1:1一致
+    logger.info('System Metrics Response:', response); // Keep with the original1:1consistent
 
     const memoryUsagePercent = response?.data?.memory_usage;
 
@@ -63,12 +63,12 @@ const fetchData = async () => {
       value.value = parseFloat(memoryUsagePercent.toFixed(1));
       unit.value = '%';
     } else {
-      logger.warn('Memory usage percentage not found or not a number in response:', response); // 与原版保持一致
+      logger.warn('Memory usage percentage not found or not a number in response:', response); // Stay consistent with the original
       value.value = null;
       unit.value = '';
     }
   } catch (error) {
-    logger.error('Error fetching system metrics:', error); // 与原版保持一致
+    logger.error('Error fetching system metrics:', error); // Stay consistent with the original
     value.value = null;
     unit.value = '';
   } finally {

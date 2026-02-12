@@ -14,7 +14,7 @@ const cardRef = ref<HTMLElement | null>(null)
 const fontSize = ref('14px')
 const iconSize = ref('24px')
 let resizeObserver: ResizeObserver | null = null
-const deviceName = computed(() => props.card?.dataSource?.deviceSource?.[0]?.name || '设备1')
+const deviceName = computed(() => props.card?.dataSource?.deviceSource?.[0]?.name || 'equipment1')
 
 const config = computed(() => props.card?.config || {})
 const buttonIcon = computed(() => (ionicons5 as any)[config.value.iconName || 'Play'])

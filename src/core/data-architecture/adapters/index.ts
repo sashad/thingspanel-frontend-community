@@ -1,15 +1,15 @@
 /**
- * 配置适配器模块导出索引
- * 提供配置版本转换和兼容性处理功能
+ * Configure adapter module export index
+ * Provide configuration version conversion and compatibility processing functions
  */
 
-// ==================== 主要适配器类导出 ====================
+// ==================== Main adapter class export ====================
 export { ConfigurationAdapter, createConfigurationAdapter, type ConversionResult } from '@/core/data-architecture/adapters/ConfigurationAdapter'
 
-// ==================== 便捷函数导出 ====================
+// ==================== Convenient function export ====================
 export { detectConfigVersion, upgradeToV2, downgradeToV1 } from '@/core/data-architecture/adapters/ConfigurationAdapter'
 
-// ==================== 适配器版本信息 ====================
+// ==================== Adapter version information ====================
 export const ADAPTER_VERSION = '1.0.0'
 
 export const ADAPTER_FEATURES = {

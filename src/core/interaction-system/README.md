@@ -1,92 +1,92 @@
-# 核心交互系统 (Core Interaction System)
+# core interactive system (Core Interaction System)
 
-> 一个功能完整、设计精良的可视化交互配置和管理系统，用于ThingsPanel前端平台的组件交互行为定制。
+> A fully functional、Well-designed visual interactive configuration and management system，used forThingsPanelCustomization of component interaction behavior of front-end platform。
 
-## 📋 系统概览
+## 📋 System overview
 
-**核心交互系统**是ThingsPanel前端架构中的一个关键模块，专门负责处理组件间的交互逻辑配置和管理。该系统采用模块化设计，提供了从基础配置到高级定制的完整解决方案。
+**core interactive system**yesThingsPanelA key module in front-end architecture，Specially responsible for handling the interaction logic configuration and management between components。The system adopts modular design，Provides complete solutions from basic configuration to advanced customization。
 
-### 🎯 设计目标
+### 🎯 design goals
 
-- **可视化配置**：通过直观的UI界面配置复杂的交互逻辑
-- **模块化架构**：高度解耦的组件设计，易于扩展和维护
-- **类型安全**：完整的TypeScript类型定义，确保开发时的类型安全
-- **实时预览**：所见即所得的交互效果预览功能
-- **模板化支持**：预设模板和自定义模板系统
+- **Visual configuration**：through intuitiveUIInterface configuration complex interaction logic
+- **Modular architecture**：Highly decoupled component design，Easy to expand and maintain
+- **type safety**：completeTypeScripttype definition，确保开发时的type safety
+- **Live preview**：WYSIWYG interactive effect preview function
+- **Templating support**：Preset and custom template systems
 
-## 🏗️ 系统架构
+## 🏗️ System architecture
 
 ```
 src/core/interaction-system/
-├── index.ts                          # 统一导出入口
+├── index.ts                          # Unified export portal
 ├── managers/
-│   └── ConfigRegistry.ts             # 配置组件注册管理器
+│   └── ConfigRegistry.ts             # Configure component registration manager
 └── components/
-    ├── InteractionSettingsForm.vue   # 主配置表单组件
-    ├── InteractionResponseEditor.vue # 响应动作编辑器  
-    ├── InteractionTemplateSelector.vue # 模板选择器
-    ├── InteractionPreview.vue        # 实时预览组件
-    ├── InteractionTemplatePreview.vue # 模板预览组件
-    └── InteractionCardWizard.vue     # 简化配置向导
+    ├── InteractionSettingsForm.vue   # Main configuration form component
+    ├── InteractionResponseEditor.vue # Response Action Editor  
+    ├── InteractionTemplateSelector.vue # template selector
+    ├── InteractionPreview.vue        # Live preview of components
+    ├── InteractionTemplatePreview.vue # Template preview component
+    └── InteractionCardWizard.vue     # Simplified configuration wizard
 ```
 
-### 核心架构特点
+### Core architectural features
 
-1. **分层设计**：管理器层 + 组件层的清晰分层架构
-2. **单一职责**：每个组件专注于特定功能领域
-3. **可扩展性**：通过注册机制支持自定义配置组件
-4. **状态管理**：基于Vue 3 Composition API的响应式状态管理
+1. **layered design**：manager layer + Clear layered architecture at the component level
+2. **single responsibility**：Each component focuses on a specific functional area
+3. **Scalability**：Support custom configuration components through registration mechanism
+4. **Status management**：based onVue 3 Composition API的响应式Status management
 
-## 🚀 核心功能特性
+## 🚀 Core features
 
-### 1. 交互配置管理 (`InteractionSettingsForm`)
+### 1. Interactive configuration management (`InteractionSettingsForm`)
 
-**主要职责**：提供可视化的交互配置界面
+**Main responsibilities**：Provides a visual interactive configuration interface
 
-**核心特性**：
-- ✅ **多种触发事件**：支持 `click`、`hover`、`dataChange` 等事件
-- ✅ **条件执行系统**：基于属性变化的条件触发机制
-- ✅ **响应动作链**：支持多个响应动作的串联执行
-- ✅ **属性暴露集成**：与属性暴露注册表深度集成
-- ✅ **Visual Editor集成**：支持获取画布组件进行跨组件交互
+**Core features**：
+- ✅ **Multiple trigger events**：support `click`、`hover`、`dataChange` etc events
+- ✅ **conditional execution system**：Conditional triggering mechanism based on attribute changes
+- ✅ **response action chain**：Supports serial execution of multiple response actions
+- ✅ **Property exposure integration**：Deep integration with property exposure registry
+- ✅ **Visual Editorintegrated**：Supports obtaining canvas components for cross-component interaction
 
-**技术亮点**：
+**Technical Highlights**：
 ```vue
-// 支持的触发事件类型
+// Supported trigger event types
 const coreEventOptions = [
-  { label: '点击事件', value: 'click' },
-  { label: '悬停事件', value: 'hover' }, 
-  { label: '可见性变化', value: 'visibility' },
-  { label: '数据变化', value: 'dataChange' }
+  { label: 'click event', value: 'click' },
+  { label: 'hover event', value: 'hover' }, 
+  { label: 'Visibility changes', value: 'visibility' },
+  { label: 'Data changes', value: 'dataChange' }
 ]
 
-// 智能属性选择
+// Smart attribute selection
 const availablePropertyOptions = computed(() => {
   const componentExposure = propertyExposureRegistry.getComponentExposure(componentType)
   return componentExposure?.listenableProperties || []
 })
 ```
 
-### 2. 响应动作编辑器 (`InteractionResponseEditor`)
+### 2. Response Action Editor (`InteractionResponseEditor`)
 
-**主要职责**：精细化配置交互响应动作的参数
+**Main responsibilities**：Finely configure the parameters of interactive response actions
 
-**核心功能**：
-- 🎯 **URL跳转配置**：支持外部链接和内部菜单跳转
-- 🎯 **组件数据更新**：跨组件属性修改功能
-- 🎯 **高级选项**：延时执行、执行条件等高级配置
-- 🎯 **实时预览**：响应动作的即时效果预览
+**Core functions**：
+- 🎯 **URLJump configuration**：Support external links and internal menu jumps
+- 🎯 **Component data update**：Cross-component property modification function
+- 🎯 **Advanced options**：Delayed execution、Advanced configuration such as execution conditions
+- 🎯 **Live preview**：Instant effect preview of response actions
 
-**设计模式**：
+**design pattern**：
 ```typescript
-// 响应动作配置结构
+// Response action configuration structure
 interface InteractionResponse {
   action: InteractionActionType
   value: any
-  delay?: number        // 延时执行
-  duration?: number     // 执行时长
-  target?: string       // 跳转目标
-  // 跨组件更新配置
+  delay?: number        // Delayed execution
+  duration?: number     // Execution time
+  target?: string       // Jump target
+  // Update configuration across components
   targetComponentId?: string
   targetProperty?: string  
   updateValue?: any
@@ -94,20 +94,20 @@ interface InteractionResponse {
 }
 ```
 
-### 3. 模板系统 (`InteractionTemplateSelector`)
+### 3. template system (`InteractionTemplateSelector`)
 
-**主要职责**：提供预设模板和自定义模板管理
+**Main responsibilities**：Provides preset template and custom template management
 
-**模板分类**：
-- 📚 **基础交互**：点击高亮、悬停缩放等常用效果
-- 🎨 **视觉效果**：彩虹边框、透明度切换等视觉交互
-- 🎬 **动画效果**：脉冲动画、震动提示等动态效果  
-- ⚙️ **复合交互**：多事件组合的复杂交互逻辑
-- 👤 **用户自定义**：支持导入和保存用户自定义模板
+**Template classification**：
+- 📚 **basic interaction**：Click to highlight、Common effects such as hover zoom
+- 🎨 **visual effects**：rainbow border、Visual interactions such as transparency switching
+- 🎬 **Animation effects**：pulse animation、Dynamic effects such as vibration prompts  
+- ⚙️ **composite interaction**：Complex interaction logic of multiple event combinations
+- 👤 **User defined**：支持导入和保存User defined模板
 
-**技术实现**：
+**Technical implementation**：
 ```typescript
-// 模板数据结构
+// template data structure
 interface InteractionTemplate {
   id: string
   name: string
@@ -115,41 +115,41 @@ interface InteractionTemplate {
   category: 'basic' | 'visual' | 'animation' | 'complex' | 'user'
   icon: any
   color: string
-  config: InteractionConfig[]  // 完整的交互配置
+  config: InteractionConfig[]  // Complete interactive configuration
   tags?: string[]
 }
 ```
 
-### 4. 实时预览系统 (`InteractionPreview`)
+### 4. Live preview system (`InteractionPreview`)
 
-**主要职责**：提供交互效果的实时预览和测试
+**Main responsibilities**：Provide real-time preview and testing of interactive effects
 
-**预览功能**：
-- 🎮 **交互测试**：模拟各种事件触发效果
-- 📊 **执行日志**：详细记录交互执行过程
-- 🎛️ **配置控制**：动态启用/禁用特定交互配置
-- 📈 **性能监控**：交互响应时间和执行状态监控
+**Preview function**：
+- 🎮 **interactive testing**：Simulate various event triggering effects
+- 📊 **execution log**：Record the interactive execution process in detail
+- 🎛️ **Configuration control**：Dynamically enabled/Disable specific interaction configurations
+- 📈 **Performance monitoring**：Interaction response time and execution status monitoring
 
-### 5. 模板预览组件 (`InteractionTemplatePreview`)
+### 5. Template preview component (`InteractionTemplatePreview`)
 
-**主要职责**：提供交互模板的详细预览和演示功能
+**Main responsibilities**：Provides detailed preview and demonstration capabilities of interactive templates
 
-**核心特性**：
-- 📋 **模板信息展示**：完整显示模板名称、描述和统计信息
-- 🎨 **配置详情视图**：逐项展示模板包含的交互配置和响应动作
-- 🎮 **实时效果演示**：提供可交互的演示元素，实时展示模板效果
-- 💾 **模板导出功能**：支持将模板导出为JSON文件供其他项目使用
+**Core features**：
+- 📋 **Template information display**：Show template name in full、Description and statistics
+- 🎨 **Configuration details view**：Display the interactive configuration and response actions included in the template item by item
+- 🎮 **Real-time effect demonstration**：Provide interactive presentation elements，Real-time display of template effects
+- 💾 **Template export function**：Supports exporting templates asJSONFile for use in other projects
 
-**技术实现**：
+**Technical implementation**：
 ```typescript
-// 模板预览核心逻辑
+// Template preview core logic
 const executeDemoResponse = (response: InteractionResponse) => {
   const { action, value, duration = 300, easing = 'ease' } = response
   
-  // 设置CSS过渡效果
+  // set upCSStransition effect
   element.style.transition = `all ${duration}ms ${easing}`
   
-  // 根据动作类型执行相应效果
+  // Perform corresponding effects based on action type
   switch (action) {
     case 'changeBackgroundColor':
       element.style.backgroundColor = value
@@ -157,105 +157,105 @@ const executeDemoResponse = (response: InteractionResponse) => {
     case 'triggerAnimation':
       element.style.animation = `${value} ${duration}ms ${easing}`
       break
-    // ... 更多动作处理
+    // ... More action handling
   }
 }
 ```
 
-### 6. 简化配置向导 (`InteractionCardWizard`)
+### 6. Simplified configuration wizard (`InteractionCardWizard`)
 
-**主要职责**：为移动端和简化场景提供轻量级配置界面
+**Main responsibilities**：Provides a lightweight configuration interface for mobile terminals and simplified scenarios
 
-**设计特点**：
-- 📱 **移动端优化**：针对小屏幕设备优化的交互体验
-- ⚡ **快速配置**：通过弹窗和向导式流程简化配置步骤
-- 🎯 **核心功能聚焦**：仅保留最常用的交互类型和配置选项
-- 📝 **摘要式展示**：用简洁的摘要形式展示已配置的交互
+**design features**：
+- 📱 **Mobile optimization**：Interactive experience optimized for small screen devices
+- ⚡ **Quick configuration**：Simplify configuration steps through pop-ups and wizard-based processes
+- 🎯 **Focus on core functions**：Keep only the most commonly used interaction types and configuration options
+- 📝 **summary display**：Display configured interactions in a concise summary form
 
-### 7. 配置注册管理器 (`ConfigRegistry`)
+### 7. Configure the registration manager (`ConfigRegistry`)
 
-**主要职责**：管理Card 2.1组件的自定义配置面板
+**Main responsibilities**：manageCard 2.1Custom configuration panel for components
 
-**注册机制**：
+**Registration mechanism**：
 ```typescript
 class ConfigRegistry {
-  // 注册自定义配置组件
+  // Register a custom configuration component
   register(componentId: string, configComponent: IConfigComponent): void
   
-  // 获取配置组件
+  // Get configuration components
   get(componentId: string): IConfigComponent | undefined
   
-  // 检查是否存在自定义配置
+  // Check if custom configuration exists
   has(componentId: string): boolean
 }
 ```
 
-## 🔧 技术架构详解
+## 🔧 Detailed explanation of technical architecture
 
-### 系统架构设计图
+### System architecture design drawing
 
 ```mermaid
 graph TB
-    subgraph "用户界面层 (UI Layer)"
-        A[InteractionSettingsForm<br/>主配置表单]
-        B[InteractionResponseEditor<br/>响应动作编辑器]
-        C[InteractionTemplateSelector<br/>模板选择器]
-        D[InteractionTemplatePreview<br/>模板预览]
-        E[InteractionPreview<br/>实时预览]
-        F[InteractionCardWizard<br/>简化向导]
+    subgraph "user interface layer (UI Layer)"
+        A[InteractionSettingsForm<br/>Main configuration form]
+        B[InteractionResponseEditor<br/>Response Action Editor]
+        C[InteractionTemplateSelector<br/>template selector]
+        D[InteractionTemplatePreview<br/>Template preview]
+        E[InteractionPreview<br/>Live preview]
+        F[InteractionCardWizard<br/>Simplified Wizard]
     end
     
-    subgraph "业务逻辑层 (Business Logic Layer)"
-        G[InteractionManager<br/>交互管理器]
-        H[ConfigRegistry<br/>配置注册表]
-        I[TemplateManager<br/>模板管理器]
-        J[ValidationEngine<br/>验证引擎]
+    subgraph "business logic layer (Business Logic Layer)"
+        G[InteractionManager<br/>Interaction Manager]
+        H[ConfigRegistry<br/>Configure the registry]
+        I[TemplateManager<br/>Template manager]
+        J[ValidationEngine<br/>Validation engine]
     end
     
-    subgraph "数据持久层 (Persistence Layer)"
-        K[LocalStorage<br/>本地存储]
-        L[ComponentConfig<br/>组件配置]
-        M[UserTemplates<br/>用户模板]
+    subgraph "data persistence layer (Persistence Layer)"
+        K[LocalStorage<br/>local storage]
+        L[ComponentConfig<br/>Component configuration]
+        M[UserTemplates<br/>User template]
     end
     
-    subgraph "外部系统集成 (External Systems)"
-        N[PropertyExposureRegistry<br/>属性暴露注册表]
-        O[VisualEditor<br/>可视化编辑器]
-        P[MenuSystem<br/>菜单系统]
-        Q[ComponentRuntime<br/>组件运行时]
+    subgraph "External system integration (External Systems)"
+        N[PropertyExposureRegistry<br/>Property exposure registry]
+        O[VisualEditor<br/>visual editor]
+        P[MenuSystem<br/>Menu system]
+        Q[ComponentRuntime<br/>Component runtime]
     end
     
-    %% UI Layer 内部关系
+    %% UI Layer internal relations
     A --> B
     A --> C
     C --> D
     A --> E
     F --> G
     
-    %% UI到Business Logic的数据流
-    A -->|配置数据| G
-    B -->|动作配置| G
-    C -->|模板选择| I
-    E -->|预览测试| G
+    %% UIarriveBusiness Logicdata flow
+    A -->|Configuration data| G
+    B -->|Action configuration| G
+    C -->|Template selection| I
+    E -->|preview test| G
     
-    %% Business Logic内部处理
+    %% Business LogicInternal processing
     G --> J
     G --> H
     I --> G
     
-    %% 数据持久化
-    G -->|保存配置| L
-    I -->|保存模板| M
-    H -->|缓存配置| K
+    %% Data persistence
+    G -->|Save configuration| L
+    I -->|Save template| M
+    H -->|Cache configuration| K
     
-    %% 外部系统集成
-    N -->|属性信息| A
-    O -->|组件列表| A
-    O -->|组件列表| F
-    P -->|路由信息| B
-    G -->|注册交互| Q
+    %% External system integration
+    N -->|Attribute information| A
+    O -->|Component list| A
+    O -->|Component list| F
+    P -->|routing information| B
+    G -->|Register interaction| Q
     
-    %% 样式定义
+    %% style definition
     classDef uiLayer fill:#e1f5fe
     classDef businessLayer fill:#f3e5f5
     classDef persistenceLayer fill:#e8f5e8
@@ -267,27 +267,27 @@ graph TB
     class N,O,P,Q externalLayer
 ```
 
-### 核心类型定义
+### core type definition
 
 ```typescript
-// 交互配置核心接口
+// Interactive configuration core interface
 interface InteractionConfig {
-  event: InteractionEventType           // 触发事件
-  responses: InteractionResponse[]      // 响应动作列表
-  enabled: boolean                      // 是否启用
-  priority?: number                     // 执行优先级
-  name?: string                         // 配置名称
+  event: InteractionEventType           // trigger event
+  responses: InteractionResponse[]      // Response action list
+  enabled: boolean                      // Whether to enable
+  priority?: number                     // execution priority
+  name?: string                         // Configuration name
   
-  // 条件执行相关
-  condition?: ConditionConfig           // 执行条件
-  watchedProperty?: string              // 监听属性
-  sourceComponentType?: string          // 源组件类型
+  // Conditional execution related
+  condition?: ConditionConfig           // Execution conditions
+  watchedProperty?: string              // Listening properties
+  sourceComponentType?: string          // Source component type
   
-  // 跨组件交互
-  targetComponentId?: string            // 目标组件ID
+  // Cross-component interaction
+  targetComponentId?: string            // target componentID
 }
 
-// 条件配置
+// Conditional configuration
 interface ConditionConfig {
   type: 'comparison' | 'range' | 'expression'
   operator?: ComparisonOperator
@@ -297,39 +297,39 @@ interface ConditionConfig {
   expression?: string
 }
 
-// 响应动作类型
+// response action type
 type InteractionActionType = 
-  | 'navigateToUrl'           // URL跳转
-  | 'updateComponentData'     // 更新组件数据
-  | 'changeVisibility'        // 改变可见性
-  | 'triggerAnimation'        // 触发动画
-  // ... 更多动作类型
+  | 'navigateToUrl'           // URLJump
+  | 'updateComponentData'     // Update component data
+  | 'changeVisibility'        // change visibility
+  | 'triggerAnimation'        // trigger animation
+  // ... More action types
 ```
 
-### 设计模式应用
+### Design pattern application
 
-1. **注册表模式 (Registry Pattern)**
-   - `ConfigRegistry` 管理自定义配置组件
-   - 支持动态注册和查询
+1. **Registry mode (Registry Pattern)**
+   - `ConfigRegistry` Manage custom configuration components
+   - Support dynamic registration and query
 
-2. **策略模式 (Strategy Pattern)**  
-   - 不同的响应动作类型对应不同的处理策略
-   - 易于扩展新的动作类型
+2. **strategy pattern (Strategy Pattern)**  
+   - Different response action types correspond to different processing strategies
+   - Easily extendable with new action types
 
-3. **组合模式 (Composite Pattern)**
-   - 响应动作可以组合成复杂的交互序列
-   - 支持嵌套和递归执行
+3. **Combination mode (Composite Pattern)**
+   - Response actions can be combined into complex interaction sequences
+   - Supports nested and recursive execution
 
-4. **观察者模式 (Observer Pattern)**
-   - 基于Vue的响应式系统实现状态变化监听
-   - 属性变化触发交互执行
+4. **Observer pattern (Observer Pattern)**
+   - based onVueResponsive system implements state change monitoring
+   - Property changes trigger interactive execution
 
-## 📦 使用指南
+## 📦 User Guide
 
-### 1. 基础集成
+### 1. Basic integration
 
 ```typescript
-// 导入交互系统组件
+// Import interactive system components
 import { 
   InteractionSettingsForm,
   InteractionResponseEditor,
@@ -339,27 +339,27 @@ import {
 } from '@/core/interaction-system'
 ```
 
-### 2. 注册自定义配置组件
+### 2. Register a custom configuration component
 
 ```typescript
-// 注册组件特定的配置面板
+// Register component-specific configuration panels
 import { configRegistry } from '@/core/interaction-system'
 
 configRegistry.register('my-component', {
   component: MyCustomConfigPanel,
-  props: { /* 配置属性 */ },
-  validators: { /* 验证规则 */ }
+  props: { /* Configuration properties */ },
+  validators: { /* Validation rules */ }
 })
 ```
 
-### 3. 在Visual Editor中集成
+### 3. existVisual EditorCentral integration
 
 ```vue
 <template>
   <div class="component-config-panel">
-    <!-- 其他配置项 -->
+    <!-- Other configuration items -->
     
-    <!-- 交互配置部分 -->
+    <!-- Interactive configuration section -->
     <InteractionSettingsForm
       v-model="interactionConfigs"
       :component-id="currentComponentId"
@@ -376,64 +376,64 @@ import type { InteractionConfig } from '@/card2.1/core/interaction-types'
 
 const interactionConfigs = ref<InteractionConfig[]>([])
 
-// 处理交互配置变化
+// Handling interactive configuration changes
 const handleInteractionChange = (configs: InteractionConfig[]) => {
-  // 保存到组件配置
+  // Save to component configuration
   currentComponent.value.interactionConfigs = configs
   
-  // 触发重新渲染或其他逻辑
+  // Trigger re-rendering or other logic
   updateComponentConfig()
 }
 </script>
 ```
 
-### 4. 模板使用示例
+### 4. Template usage example
 
 ```typescript
-// 使用模板选择器
+// Use template selector
 const applyTemplate = (template: InteractionConfig) => {
-  // 应用模板到当前组件
+  // Apply template to current component
   interactionConfigs.value.push({
     ...template,
-    name: `${template.name} (来自模板)`
+    name: `${template.name} (from template)`
   })
 }
 
-// 自定义模板导入
+// Custom template import
 const importCustomTemplate = (templateJson: string) => {
   const template = JSON.parse(templateJson)
-  // 验证和应用模板
+  // Validate and apply templates
   if (validateTemplate(template)) {
     userTemplates.value.push(template)
   }
 }
 ```
 
-## 🛠️ 高级配置
+## 🛠️ Advanced configuration
 
-### 1. 条件执行配置
+### 1. Conditional execution configuration
 
 ```typescript
-// 配置数据变化触发条件
+// Configure data change trigger conditions
 const dataChangeConfig: InteractionConfig = {
   event: 'dataChange',
-  watchedProperty: 'temperature',  // 监听温度属性
+  watchedProperty: 'temperature',  // Monitor temperature properties
   condition: {
     type: 'comparison',
     operator: 'greaterThan',
-    value: 30                      // 当温度 > 30时触发
+    value: 30                      // when temperature > 30triggered when
   },
   responses: [{
     action: 'changeVisibility',
-    value: 'visible'               // 显示警告组件
+    value: 'visible'               // Show warning component
   }]
 }
 ```
 
-### 2. 跨组件交互配置
+### 2. Cross-component interaction configuration
 
 ```typescript
-// 配置跨组件属性修改
+// Configure cross-component property modifications
 const crossComponentConfig: InteractionConfig = {
   event: 'click',
   responses: [{
@@ -446,10 +446,10 @@ const crossComponentConfig: InteractionConfig = {
 }
 ```
 
-### 3. 复合动作序列
+### 3. compound action sequence
 
 ```typescript
-// 配置多步骤响应序列
+// Configure a multi-step response sequence
 const complexInteraction: InteractionConfig = {
   event: 'hover',
   responses: [
@@ -461,60 +461,60 @@ const complexInteraction: InteractionConfig = {
     {
       action: 'triggerAnimation',
       value: 'pulse',
-      delay: 200,        // 延时200ms执行
+      delay: 200,        // delay200msimplement
       duration: 1000
     }
   ]
 }
 ```
 
-## 🎯 最佳实践
+## 🎯 best practices
 
-### 1. 性能优化建议
+### 1. Performance optimization suggestions
 
-- ✅ **合理使用条件执行**：避免过于频繁的属性监听
-- ✅ **优化响应动作**：使用适当的延时和时长控制
-- ✅ **限制交互复杂度**：避免过长的响应动作链
-- ✅ **及时清理资源**：组件销毁时注销交互监听
+- ✅ **Fair use conditions enforced**：Avoid too frequent property monitoring
+- ✅ **Optimize response actions**：Use appropriate delays and duration controls
+- ✅ **Limit interaction complexity**：Avoid long response action chains
+- ✅ **Clean up resources promptly**：Unregister the interaction listener when the component is destroyed
 
-### 2. 用户体验优化
+### 2. User experience optimization
 
-- 🎨 **提供预览功能**：让用户能够即时查看交互效果
-- 🎨 **模板化常用配置**：减少重复配置工作
-- 🎨 **智能默认值**：根据上下文提供合理的默认配置
-- 🎨 **错误处理和提示**：友好的错误信息和操作指导
+- 🎨 **Provide preview function**：Allow users to instantly view interaction effects
+- 🎨 **Templated common configurations**：Reduce duplication of configuration work
+- 🎨 **Smart defaults**：Provide sensible default configurations based on context
+- 🎨 **Error handling and prompts**：Friendly error messages and operating instructions
 
-### 3. 可维护性原则
+### 3. maintainability principle
 
-- 🔧 **类型安全**：充分利用TypeScript类型系统
-- 🔧 **组件解耦**：通过事件和props进行组件通信
-- 🔧 **配置验证**：实现完善的配置数据验证机制
-- 🔧 **文档完善**：为自定义扩展提供详细文档
+- 🔧 **type safety**：Make full use ofTypeScripttype system
+- 🔧 **Component decoupling**：through events andpropsCommunicate between components
+- 🔧 **Configuration verification**：Implement a complete configuration data verification mechanism
+- 🔧 **Complete documentation**：Provide detailed documentation for custom extensions
 
-## 🔍 调试和故障排除
+## 🔍 Debugging and troubleshooting
 
-### 常见问题解决
+### Frequently Asked Questions
 
-1. **交互不生效**
+1. **Interaction does not take effect**
    ```typescript
-   // 检查交互配置是否正确注册
-   console.log('[交互调试]', interactionManager.getComponentConfigs(componentId))
+   // Check whether the interaction configuration is correctly registered
+   console.log('[Interactive debugging]', interactionManager.getComponentConfigs(componentId))
    
-   // 检查属性暴露是否正确配置
-   console.log('[属性调试]', propertyExposureRegistry.getComponentExposure(componentType))
+   // Check if property exposure is configured correctly
+   console.log('[Property debugging]', propertyExposureRegistry.getComponentExposure(componentType))
    ```
 
-2. **跨组件交互失败**
+2. **Cross-component interaction failed**
    ```typescript
-   // 检查目标组件是否存在
+   // Check if target component exists
    const targetExists = visualEditorState.getAvailableComponents()
      .find(comp => comp.id === targetComponentId)
-   console.log('[目标组件]', targetExists)
+   console.log('[target component]', targetExists)
    ```
 
-3. **模板加载失败**
+3. **Template loading failed**
    ```typescript
-   // 验证模板格式
+   // Validate template format
    const validateTemplate = (template: any) => {
      return template.name && 
             template.config && 
@@ -522,132 +522,132 @@ const complexInteraction: InteractionConfig = {
    }
    ```
 
-## 🚀 扩展开发
+## 🚀 Extended development
 
-### 添加新的响应动作类型
+### Add new response action type
 
-1. **扩展类型定义**
+1. **Extended type definition**
    ```typescript
-   // 在 interaction-types.ts 中添加新类型
+   // exist interaction-types.ts Add new type in
    type InteractionActionType = 
      | 'navigateToUrl'
      | 'updateComponentData' 
-     | 'myCustomAction'     // 新增动作类型
+     | 'myCustomAction'     // New action type
    ```
 
-2. **实现动作处理逻辑**
+2. **Implement action processing logic**
    ```typescript
-   // 在 InteractionResponseEditor 中添加配置界面
+   // exist InteractionResponseEditor Add configuration interface in
    const handleCustomAction = () => {
-     // 自定义动作的参数配置逻辑
+     // Parameter configuration logic for custom actions
    }
    ```
 
-3. **注册到系统**
+3. **Register to the system**
    ```typescript
-   // 在相应的选项列表中注册新动作
+   // Register new actions in the corresponding options list
    const actionTypeOptions = [
-     // ... 现有选项
-     { label: '我的自定义动作', value: 'myCustomAction' }
+     // ... Existing options
+     { label: 'My custom action', value: 'myCustomAction' }
    ]
    ```
 
-## 📊 系统监控与性能
+## 📊 System monitoring and performance
 
-### 性能基准指标
+### Performance Benchmarks
 
-| 性能指标 | 基准值 | 优秀表现 | 说明 |
+| Performance indicators | base value | Excellent performance | illustrate |
 |----------|--------|----------|------|
-| **交互响应时间** | < 100ms | < 50ms | 从事件触发到动作执行完成的时间 |
-| **配置加载时间** | < 200ms | < 100ms | 组件交互配置的加载和解析时间 |
-| **模板渲染时间** | < 150ms | < 75ms | 模板选择器的完整渲染时间 |
-| **预览启动时间** | < 300ms | < 150ms | 预览组件的初始化和首次渲染时间 |
-| **内存占用** | < 5MB | < 2MB | 整个交互系统的内存使用量 |
-| **配置存储大小** | < 100KB | < 50KB | 单个组件的完整交互配置大小 |
+| **Interactive response time** | < 100ms | < 50ms | The time from event triggering to completion of action execution |
+| **Configure load time** | < 200ms | < 100ms | Loading and parsing time of component interaction configuration |
+| **Template rendering time** | < 150ms | < 75ms | Full rendering time of template selector |
+| **Preview start time** | < 300ms | < 150ms | Preview component initialization and first render time |
+| **Memory usage** | < 5MB | < 2MB | Memory usage of the entire interactive system |
+| **Configure storage size** | < 100KB | < 50KB | Full interactive configuration size of a single component |
 
-### 系统监控能力
+### System monitoring capabilities
 
-该交互系统提供了完整的调试和监控能力：
+The interactive system provides complete debugging and monitoring capabilities：
 
-#### 🔍 调试与诊断
-- **详细日志记录**：分级记录交互配置、执行过程和错误信息
-- **执行链路追踪**：完整追踪交互从触发到完成的整个执行链路
-- **性能分析器**：内置的性能分析工具，监控关键操作耗时
-- **状态快照**：支持在任意时间点导出系统状态快照用于问题诊断
+#### 🔍 Debugging and Diagnostics
+- **Detailed logging**：Hierarchical recording interaction configuration、Execution process and error messages
+- **Perform link tracing**：Completely trace the entire execution link of an interaction from trigger to completion
+- **Performance Analyzer**：Built-in performance analysis tools，Monitor time spent on key operations
+- **status snapshot**：支持在任意时间点导出系统status snapshot用于问题诊断
 
-#### 📈 性能监控
-- **响应时间统计**：实时监控各类交互的平均响应时间和P99延迟
-- **执行频率分析**：统计不同交互类型的触发频率和热点分析
-- **资源使用监控**：监控CPU、内存、DOM操作等资源使用情况
-- **错误率统计**：跟踪交互执行失败率和错误类型分布
+#### 📈 Performance monitoring
+- **Response time statistics**：Real-time monitoring of average response times andP99Delay
+- **Perform frequency analysis**：Statistics on trigger frequency and hotspot analysis of different interaction types
+- **资源使用monitor**：monitorCPU、Memory、DOMResource usage such as operations
+- **Error rate statistics**：Track interactive execution failure rate and error type distribution
 
-#### 🎯 运行时监控
-- **配置状态跟踪**：实时监控所有交互配置的启用/禁用状态
-- **组件健康检查**：定期检查关联组件的存在性和可访问性
-- **依赖关系监控**：监控跨组件交互的依赖关系完整性
-- **用户行为分析**：收集用户交互行为数据用于系统优化
+#### 🎯 Runtime monitoring
+- **Configure status tracking**：Real-time monitoring of all interactive configuration enablements/disabled state
+- **Component health check**：Regularly check the existence and accessibility of associated components
+- **Dependency monitoring**：Monitor dependency integrity across component interactions
+- **User behavior analysis**：Collect user interaction behavior data for system optimization
 
-#### 🛠️ 开发者工具
-- **Vue DevTools集成**：支持Vue DevTools进行组件状态调试
-- **浏览器扩展支持**：提供专门的浏览器扩展用于深度调试
-- **API测试工具**：内置的API接口测试和验证工具
-- **配置验证器**：实时验证交互配置的正确性和完整性
+#### 🛠️ Developer Tools
+- **Vue DevToolsintegrated**：supportVue DevToolsDebugging component status
+- **Browser extension support**：Provides specialized browser extensions for in-depth debugging
+- **APItesting tools**：built-inAPIInterface testing and verification tools
+- **Configure validator**：Verify the correctness and completeness of interactive configurations in real time
 
-#### 📊 数据统计与分析
+#### 📊 Data Statistics and Analysis
 
 ```typescript
-// 性能监控数据结构
+// Performance monitoring data structure
 interface PerformanceMetrics {
-  // 响应时间统计
+  // Response time statistics
   responseTime: {
-    average: number        // 平均响应时间
-    p95: number           // 95分位数
-    p99: number           // 99分位数
-    max: number           // 最大响应时间
+    average: number        // average response time
+    p95: number           // 95Quantile
+    p99: number           // 99Quantile
+    max: number           // maximum response time
   }
   
-  // 执行统计
+  // Execution statistics
   execution: {
-    totalCount: number     // 总执行次数
-    successRate: number    // 成功率
-    errorRate: number      // 错误率
-    avgPerSecond: number   // 每秒平均执行次数
+    totalCount: number     // Total execution times
+    successRate: number    // success rate
+    errorRate: number      // error rate
+    avgPerSecond: number   // average number of executions per second
   }
   
-  // 资源使用
+  // Resource usage
   resources: {
-    memoryUsage: number    // 内存使用量(MB)
-    cpuUsage: number       // CPU使用率(%)
-    domOperations: number  // DOM操作次数
+    memoryUsage: number    // Memory usage(MB)
+    cpuUsage: number       // CPUUsage rate(%)
+    domOperations: number  // DOMNumber of operations
   }
 }
 
-// 获取性能监控数据
+// Get performance monitoring data
 const metrics = interactionManager.getPerformanceMetrics()
-console.log('交互系统性能指标:', metrics)
+console.log('Interactive system performance indicators:', metrics)
 ```
 
-## 📚 相关文档
+## 📚 Related documents
 
-- [Card 2.1 数据绑定系统](../card2.1/DATA_BINDING_SYSTEM_SUMMARY.md)
-- [属性暴露注册表](../card2.1/core/property-exposure/README.md)
-- [Visual Editor 架构指南](../components/visual-editor/ARCHITECTURE_GUIDE.md)
-- [交互类型定义](../card2.1/core/interaction-types.ts)
-
----
-
-## 🏆 总结
-
-核心交互系统是ThingsPanel前端架构中的一个**技术标杆**，体现了以下设计优势：
-
-- ✨ **架构先进性**：采用现代化的组件设计模式和类型安全机制
-- ✨ **功能完整性**：从基础配置到高级定制的全方位支持
-- ✨ **用户体验**：可视化配置、实时预览、模板化支持
-- ✨ **扩展能力**：通过注册机制和插件化设计支持无限扩展
-- ✨ **工程质量**：完整的类型定义、错误处理和调试支持
-
-该系统不仅解决了组件交互配置的技术问题，更重要的是为开发者提供了一个**可视化、模板化、智能化**的交互设计工具，极大提升了开发效率和用户体验。
+- [Card 2.1 data binding system](../card2.1/DATA_BINDING_SYSTEM_SUMMARY.md)
+- [Property exposure registry](../card2.1/core/property-exposure/README.md)
+- [Visual Editor Architecture Guide](../components/visual-editor/ARCHITECTURE_GUIDE.md)
+- [Interaction type definition](../card2.1/core/interaction-types.ts)
 
 ---
 
-*文档版本：v1.0 | 最后更新：2024年*
+## 🏆 Summarize
+
+The core interactive system isThingsPanelOne of the front-end architecture**Technical benchmark**，Reflects the following design advantages：
+
+- ✨ **Architecture advancement**：Adopt modern component design patterns and type safety mechanisms
+- ✨ **functional completeness**：Comprehensive support from basic configuration to advanced customization
+- ✨ **user experience**：Visual configuration、Live preview、Templating support
+- ✨ **Expansion capabilities**：Support unlimited expansion through registration mechanism and plug-in design
+- ✨ **Project quality**：complete type definition、Error handling and debugging support
+
+This system not only solves the technical problem of interactive configuration of components，More importantly, it provides developers with a**Visualization、Templating、Intelligent**interaction design tools，Greatly improve development efficiency and user experience。
+
+---
+
+*Document version：v1.0 | last updated：2024Year*

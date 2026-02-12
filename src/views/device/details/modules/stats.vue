@@ -62,7 +62,7 @@ const columns0 = [
   }
 ]
 
-// 操作类型
+// Operation type
 const formatOperationType = status => {
   switch (status) {
     case '1':
@@ -74,7 +74,7 @@ const formatOperationType = status => {
   }
 }
 
-// 状态
+// state
 const formatStatus = status => {
   switch (status) {
     case '1':

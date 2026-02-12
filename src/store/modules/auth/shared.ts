@@ -26,7 +26,7 @@ export function isTokenExpired() {
   const expiresTime = parseInt(tokenExpiresIn)
   const currentTime = Date.now()
 
-  // 提前5分钟检查过期，避免在请求过程中过期
+  // in advance5minute check expiration，Avoid expiration during request
   return currentTime >= expiresTime - 5 * 60 * 1000
 }
 

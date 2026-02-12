@@ -27,7 +27,7 @@ const selectIcon = option => {
   selectedIcon.value = option.component
   selectedIconName.value = option.name
   emit('iconSelected', option.name)
-  // 选择后自动收起面板
+  // Automatically collapse the panel after selection
   isExpanded.value = false
 }
 
@@ -42,7 +42,7 @@ onMounted(() => {
     if (defaultOption) {
       selectedIcon.value = defaultOption.component
       selectedIconName.value = defaultOption.name
-      // 不需要emit，因为这是初始化设置
+      // unnecessaryemit，Because this is the initialization setting
     }
   }
 })
@@ -146,7 +146,7 @@ onMounted(() => {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 选中状态样式 */
+/* Selected state style */
 .icon-cell.selected {
   background: var(--primary-color);
   border-color: var(--primary-color);
@@ -157,7 +157,7 @@ onMounted(() => {
   color: white;
 }
 
-/* 图标颜色适配 */
+/* Icon color adaptation */
 .icon-cell :deep(.n-icon) {
   color: var(--text-color);
   transition: color 0.2s ease;
@@ -167,7 +167,7 @@ onMounted(() => {
   color: var(--primary-color);
 }
 
-/* 当前选中的图标样式 */
+/* Currently selected icon style */
 .icon-display :deep(.n-icon) {
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
@@ -175,7 +175,7 @@ onMounted(() => {
   padding: 2px;
 }
 
-/* 滚动条美化 */
+/* Scroll bar beautification */
 .icon-picker-dialog::-webkit-scrollbar {
   width: 6px;
 }
@@ -195,7 +195,7 @@ onMounted(() => {
   background: var(--primary-color);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 480px) {
   .icon-grid {
     grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
@@ -224,7 +224,7 @@ onMounted(() => {
   }
 }
 
-/* 暗主题适配 */
+/* Dark theme adaptation */
 [data-theme="dark"] .icon-cell {
   background: var(--input-color);
   border-color: var(--border-color);

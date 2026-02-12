@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 轮询控制器组件
- * 支持全局轮询控制和未来的单卡片轮询控制
+ * Polling controller component
+ * Support global polling control and future single-card polling control
  */
 
 import { computed } from 'vue'
@@ -10,15 +10,15 @@ import { useGlobalPollingManager } from '@/components/visual-editor/core/GlobalP
 import { $t } from '@/locales'
 
 interface Props {
-  /** 控制模式：global-全局控制, card-卡片控制 */
+  /** control mode：global-global control, card-card control */
   mode?: 'global' | 'card'
-  /** 卡片模式下的组件ID */
+  /** Components in card modeID */
   componentId?: string
-  /** 控制器位置 */
+  /** Controller location */
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-  /** 是否显示统计信息 */
+  /** Whether to display statistics */
   showStats?: boolean
-  /** 低调模式：仅显示小图标，悬停显示完整按钮 */
+  /** low profile mode：Show only small icons，Show full button on hover */
   lowProfile?: boolean
 }
 
@@ -38,11 +38,11 @@ const emit = defineEmits<{
 const message = useMessage()
 const pollingManager = useGlobalPollingManager()
 
-// 全局轮询状态
+// Global polling status
 const globalPollingEnabled = computed(() => pollingManager.isGlobalPollingEnabled())
 const pollingStats = computed(() => pollingManager.getStatistics())
 
-// 根据模式计算当前状态
+// Calculate the current state based on the pattern
 const isPollingEnabled = computed(() => {
   if (props.mode === 'global') {
     return globalPollingEnabled.value
@@ -52,7 +52,7 @@ const isPollingEnabled = computed(() => {
   return false
 })
 
-// 统计信息
+// Statistics
 const statsText = computed(() => {
   if (props.mode === 'global') {
     return `${pollingStats.value.activeTasks}/${pollingStats.value.totalTasks}`
@@ -63,16 +63,16 @@ const statsText = computed(() => {
   return '0/0'
 })
 
-// 按钮文字
+// button text
 const buttonText = computed(() => {
   if (props.mode === 'global') {
     return isPollingEnabled.value ? $t('visualEditor.pollingPause') : $t('visualEditor.pollingStart')
   } else {
-    return isPollingEnabled.value ? '暂停' : '启动'
+    return isPollingEnabled.value ? 'pause' : 'start up'
   }
 })
 
-// 切换轮询状态
+// Switch polling status
 const togglePolling = () => {
   if (props.mode === 'global') {
     handleGlobalPollingToggle()
@@ -81,7 +81,7 @@ const togglePolling = () => {
   }
 }
 
-// 全局轮询切换
+// Global polling switch
 const handleGlobalPollingToggle = () => {
   const wasEnabled = globalPollingEnabled.value
 
@@ -98,32 +98,32 @@ const handleGlobalPollingToggle = () => {
   emit('polling-toggle', !wasEnabled)
 }
 
-// 卡片轮询切换
+// Card polling switch
 const handleCardPollingToggle = () => {
   if (!props.componentId) return
 
   const wasEnabled = pollingManager.isComponentPollingActive(props.componentId)
 
   if (wasEnabled) {
-    // 停止该组件的所有轮询任务
+    // Stop all polling tasks for this component
     const success = pollingManager.stopComponentTasks(props.componentId)
     if (success) {
-      message.info(`组件轮询已暂停`)
+      message.info(`Component polling is paused`)
       emit('polling-disabled')
       emit('polling-toggle', false)
     }
   } else {
-    // 启动该组件的所有轮询任务
+    // Start all polling tasks for this component
     const success = pollingManager.startComponentTasks(props.componentId)
     if (success) {
-      message.success(`组件轮询已启动`)
+      message.success(`Component polling started`)
       emit('polling-enabled')
       emit('polling-toggle', true)
     }
   }
 }
 
-// 位置样式类
+// Position style class
 const positionClass = computed(() => {
   switch (props.position) {
     case 'bottom-right':
@@ -145,12 +145,12 @@ const positionClass = computed(() => {
     class="polling-controller"
     :class="[positionClass, { 'low-profile': lowProfile, 'polling-active': isPollingEnabled }]"
   >
-    <!-- 低调模式：悬停前显示的小图标 -->
+    <!-- low profile mode：Small icon shown before hovering -->
     <div v-if="lowProfile" class="polling-indicator">
       <div class="indicator-dot" :class="{ active: isPollingEnabled }"></div>
     </div>
 
-    <!-- 完整按钮：低调模式下悬停显示，普通模式下直接显示 -->
+    <!-- full button：Hover display in low profile mode，Display directly in normal mode -->
     <div class="polling-button-container" :class="{ 'hover-show': lowProfile }">
       <n-button
         :type="isPollingEnabled ? 'success' : 'default'"
@@ -170,14 +170,14 @@ const positionClass = computed(() => {
 </template>
 
 <style scoped>
-/* 主容器 */
+/* main container */
 .polling-controller {
   position: fixed;
   z-index: 999;
   transition: all 0.3s ease;
 }
 
-/* 位置样式 */
+/* position style */
 .polling-controller.bottom-right {
   bottom: 20px;
   right: 20px;
@@ -198,7 +198,7 @@ const positionClass = computed(() => {
   left: 20px;
 }
 
-/* 低调模式样式 */
+/* low profile style */
 .polling-controller.low-profile {
   width: 16px;
   height: 16px;
@@ -210,7 +210,7 @@ const positionClass = computed(() => {
   height: auto;
 }
 
-/* 小指示器 */
+/* small indicator */
 .polling-indicator {
   position: absolute;
   top: 0;
@@ -239,7 +239,7 @@ const positionClass = computed(() => {
   animation: polling-pulse-dot 2s infinite ease-in-out;
 }
 
-/* 小点的脉冲动画 */
+/* Pulse animation of dots */
 @keyframes polling-pulse-dot {
   0%,
   100% {
@@ -250,7 +250,7 @@ const positionClass = computed(() => {
   }
 }
 
-/* 完整按钮容器 */
+/* Complete button container */
 .polling-button-container {
   transition: all 0.3s ease;
 }
@@ -274,7 +274,7 @@ const positionClass = computed(() => {
   transform: scale(0.8);
 }
 
-/* 按钮样式 */
+/* button style */
 .polling-btn {
   display: flex;
   align-items: center;
@@ -308,7 +308,7 @@ const positionClass = computed(() => {
   color: inherit;
 }
 
-/* 成功状态的轮询按钮动画 */
+/* Poll button animation for success status */
 :deep(.polling-btn.n-button--success-type) {
   animation: polling-pulse 2s infinite ease-in-out;
 }
@@ -325,7 +325,7 @@ const positionClass = computed(() => {
   }
 }
 
-/* 暗色主题适配 */
+/* Dark theme adaptation */
 .dark .polling-btn {
   background-color: rgba(42, 42, 42, 0.9) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
@@ -345,7 +345,7 @@ const positionClass = computed(() => {
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .polling-controller.bottom-right {
     bottom: 10px;

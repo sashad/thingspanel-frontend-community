@@ -1,29 +1,29 @@
 /**
- * 柱状图组件定义
+ * Bar chart component definition
  */
 import type { ComponentDefinition } from '@/card2.1/core2'
 import type { BarChartCustomize } from './settingConfig'
 
 export const barChartDefinition: ComponentDefinition = {
   id: 'bar-chart',
-  name: '柱状图',
-  description: 'ECharts柱状图，用于展示分类数据的比较',
+  name: 'bar chart',
+  description: 'EChartsbar chart，Used to display comparisons of categorical data',
   category: 'chart',
   subCategory: 'data',
   version: '1.0.0',
   author: 'ThingsPanel',
 
-  // 组件配置接口
+  // Component configuration interface
   component: {} as BarChartCustomize,
 
-  // 默认配置
+  // Default configuration
   defaultConfig: {
-    title: '数据对比',
+    title: 'Data comparison',
     showLegend: true,
     barWidth: '60%',
     showLabel: false,
-    xAxisLabel: '类别',
-    yAxisLabel: '数值',
+    xAxisLabel: 'category',
+    yAxisLabel: 'numerical value',
     showGrid: true,
     barColor: '#5470c6',
     barGradient: true,
@@ -32,33 +32,33 @@ export const barChartDefinition: ComponentDefinition = {
     animationDelay: 50
   },
 
-  // 数据源定义 - 支持分类数据
+  // Data source definition - Support categorical data
   dataSources: [
     {
       key: 'main',
-      name: '数据源',
-      description: '柱状图的分类数据',
+      name: 'data source',
+      description: 'Categorical data for bar charts',
       supportedTypes: ['static', 'api', 'websocket'],
       required: false,
       example: {
-        xData: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        xData: ['on Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         yData: [120, 200, 150, 80, 70, 110, 130],
         timestamp: '2025-10-15T10:30:00.000Z'
       }
     }
   ],
 
-  // 交互能力
+  // Interactive capabilities
   interactionCapabilities: {
     canTrigger: false,
     canReceive: false,
     exposedProperties: []
   },
 
-  // 组件标签
-  tags: ['图表', '柱状图', 'ECharts', '对比'],
+  // component label
+  tags: ['chart', 'bar chart', 'ECharts', 'contrast'],
 
-  // 预览配置
+  // Preview configuration
   preview: {
     width: 400,
     height: 300

@@ -1,122 +1,122 @@
 /**
- * 渲染器接口定义
- * 定义渲染器的统一规范和生命周期
+ * Renderer interface definition
+ * Define unified specifications and life cycle of renderers
  */
 
 import type { IDataNode, RendererType, IComponentInstance } from './index'
 
-// 渲染器接口
+// Renderer interface
 export interface IRenderer {
-  /** 渲染器类型 */
+  /** Renderer type */
   type: RendererType
-  /** 渲染器名称 */
+  /** Renderer name */
   name: string
-  /** 渲染器版本 */
+  /** Renderer version */
   version: string
-  /** 是否已初始化 */
+  /** Has it been initialized? */
   initialized: boolean
-  /** 是否处于休眠状态 */
+  /** Is it in sleep state? */
   sleeping: boolean
 
-  /** 初始化渲染器 */
+  /** Initialize renderer */
   init(container: HTMLElement): Promise<void>
-  /** 渲染组件 */
+  /** render component */
   render(component: IComponentInstance): Promise<void>
-  /** 更新组件 */
+  /** Update component */
   update(component: IComponentInstance): Promise<void>
-  /** 移除组件 */
+  /** Remove component */
   remove(componentId: string): Promise<void>
-  /** 休眠渲染器 */
+  /** Sleep renderer */
   sleep(): Promise<void>
-  /** 唤醒渲染器 */
+  /** Wake up the renderer */
   wakeup(): Promise<void>
-  /** 销毁渲染器 */
+  /** Destroy renderer */
   destroy(): Promise<void>
-  /** 获取渲染上下文 */
+  /** Get rendering context */
   getContext(): any
 }
 
-// 渲染器配置
+// Renderer configuration
 export interface IRendererConfig {
-  /** 渲染器类型 */
+  /** Renderer type */
   type: RendererType
-  /** 配置参数 */
+  /** Configuration parameters */
   options?: Record<string, any>
-  /** 性能配置 */
+  /** Performance configuration */
   performance?: {
-    /** 是否启用硬件加速 */
+    /** Whether to enable hardware acceleration */
     hardwareAcceleration?: boolean
-    /** 最大FPS */
+    /** maximumFPS */
     maxFPS?: number
-    /** 是否启用批量渲染 */
+    /** Whether to enable batch rendering */
     batchRendering?: boolean
   }
 }
 
-// 渲染上下文
+// rendering context
 export interface IRenderContext {
-  /** 渲染器类型 */
+  /** Renderer type */
   rendererType: RendererType
-  /** 容器元素 */
+  /** container element */
   container: HTMLElement
-  /** Canvas元素 (如果适用) */
+  /** Canvaselement (if applicable) */
   canvas?: HTMLCanvasElement
-  /** 渲染上下文 (2D/WebGL) */
+  /** rendering context (2D/WebGL) */
   context?: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext
-  /** 视口信息 */
+  /** Viewport information */
   viewport: {
     width: number
     height: number
     devicePixelRatio: number
   }
-  /** 渲染状态 */
+  /** Rendering status */
   state: {
-    /** 是否正在渲染 */
+    /** Is rendering */
     rendering: boolean
-    /** 渲染帧数 */
+    /** Rendering frames */
     frameCount: number
-    /** 最后渲染时间 */
+    /** Last render time */
     lastRenderTime: number
   }
 }
 
-// 渲染器事件
+// Renderer events
 export interface IRendererEvent {
-  /** 事件类型 */
+  /** event type */
   type: 'init' | 'render' | 'update' | 'sleep' | 'wakeup' | 'destroy' | 'error'
-  /** 渲染器类型 */
+  /** Renderer type */
   rendererType: RendererType
-  /** 事件数据 */
+  /** event data */
   data?: any
-  /** 错误信息 (如果是错误事件) */
+  /** error message (If it is an error event) */
   error?: Error
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
-// 渲染器管理器接口
+// Renderer manager interface
 export interface IRendererManager {
-  /** 注册渲染器 */
+  /** Register renderer */
   register(renderer: IRenderer): void
-  /** 获取渲染器 */
+  /** Get renderer */
   getRenderer(type: RendererType): IRenderer | null
-  /** 切换渲染器 */
+  /** Switch renderer */
   switchRenderer(fromType: RendererType, toType: RendererType): Promise<void>
-  /** 获取所有渲染器 */
+  /** Get all renderers */
   getAllRenderers(): IRenderer[]
-  /** 销毁所有渲染器 */
+  /** Destroy all renderers */
   destroyAll(): Promise<void>
 }
 
-// 资源池接口 (用于渲染器资源管理)
+// Resource pool interface (For renderer resource management)
 export interface IResourcePool {
-  /** 获取资源 */
+  /** Get resources */
   acquire<T>(key: string, factory: () => T): T
-  /** 释放资源 */
+  /** Release resources */
   release(key: string): void
-  /** 清理未使用的资源 */
+  /** Clean up unused resources */
   cleanup(): void
-  /** 获取资源使用统计 */
+  /** Get resource usage statistics */
   getStats(): {
     total: number
     active: number
@@ -124,14 +124,14 @@ export interface IResourcePool {
   }
 }
 
-// 渲染器钩子函数
+// Renderer hook function
 export interface IRendererHooks {
-  /** 渲染前钩子 */
+  /** Pre-render hook */
   beforeRender?: (context: IRenderContext) => void | Promise<void>
-  /** 渲染后钩子 */
+  /** Post-render hook */
   afterRender?: (context: IRenderContext) => void | Promise<void>
-  /** 错误处理钩子 */
+  /** Error handling hook */
   onError?: (error: Error, context: IRenderContext) => void
-  /** 性能监控钩子 */
+  /** Performance monitoring hooks */
   onPerformance?: (metrics: { renderTime: number; fps: number; memoryUsage?: number }) => void
 }

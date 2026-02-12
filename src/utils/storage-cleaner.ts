@@ -1,10 +1,10 @@
 /**
- * localStorage 清理工具
- * 用于清理不再需要的本地存储项
+ * localStorage cleaning tool
+ * Used to clean up local storage items that are no longer needed
  */
 
 /**
- * 需要清理的localStorage键列表
+ * Need to be cleanedlocalStoragekey list
  */
 const STORAGE_KEYS_TO_CLEAN = [
   'globalTabs',
@@ -19,7 +19,7 @@ const STORAGE_KEYS_TO_CLEAN = [
 ] as const
 
 /**
- * 清理指定的localStorage项
+ * Clean up the specifiedlocalStorageitem
  */
 export function cleanupLocalStorage(): void {
 
@@ -37,7 +37,7 @@ export function cleanupLocalStorage(): void {
         skippedKeys.push(key)
       }
     } catch (error) {
-      console.error(`❌ 清理失败: ${key}`, error)
+      console.error(`❌ Cleanup failed: ${key}`, error)
     }
   })
 
@@ -45,10 +45,10 @@ export function cleanupLocalStorage(): void {
 }
 
 /**
- * 清理所有localStorage（危险操作）
+ * clean alllocalStorage（Dangerous operation）
  */
 export function clearAllLocalStorage(): void {
-  console.error('⚠️ 正在清理所有localStorage...')
+  console.error('⚠️ Cleaning alllocalStorage...')
 
   const allKeys = Object.keys(localStorage)
 
@@ -56,12 +56,12 @@ export function clearAllLocalStorage(): void {
   try {
     localStorage.clear()
   } catch (error) {
-    console.error('❌ 清理localStorage失败:', error)
+    console.error('❌ clean uplocalStoragefail:', error)
   }
 }
 
 /**
- * 检查localStorage使用情况
+ * examinelocalStorageUsage
  */
 export function inspectLocalStorage(): void {
 
@@ -73,13 +73,13 @@ export function inspectLocalStorage(): void {
       const size = value ? new Blob([value]).size : 0
 
     } catch (error) {
-      console.error(`无法读取 ${key}:`, error)
+      console.error(`Unable to read ${key}:`, error)
     }
   })
 
 }
 
-// 开发环境下自动暴露到全局
+// Automatically exposed to the global environment in the development environment
 if (import.meta.env.DEV) {
   (window as any).storageCleanup = {
     clean: cleanupLocalStorage,

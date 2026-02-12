@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Web图表配置展示区块
- * 支持在预览时配置Web端图表
+ * WebChart configuration display block
+ * Support configuration during previewWebend chart
  */
 
 import { inject } from 'vue'

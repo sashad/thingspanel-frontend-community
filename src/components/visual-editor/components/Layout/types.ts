@@ -1,97 +1,97 @@
 /**
- * EditorLayout 组件相关类型定义
+ * EditorLayout Component related type definitions
  */
 
-/** 抽屉位置 */
+/** Drawer location */
 export type DrawerPlacement = 'left' | 'right' | 'top' | 'bottom'
 
-/** 抽屉状态 */
+/** drawer status */
 export interface DrawerState {
-  /** 是否可见 */
+  /** visible or not */
   visible: boolean
-  /** 抽屉宽度 */
+  /** Drawer width */
   width: number | string
-  /** 抽屉标题 */
+  /** Drawer title */
   title: string
-  /** 是否可关闭 */
+  /** Can it be closed */
   closable: boolean
 }
 
-/** 编辑器布局配置 */
+/** Editor layout configuration */
 export interface EditorLayoutConfig {
-  /** 左侧抽屉配置 */
+  /** Left drawer configuration */
   left: DrawerState
-  /** 右侧抽屉配置 */
+  /** Right drawer configuration */
   right: DrawerState
-  /** 是否显示工具栏 */
+  /** Whether to display the toolbar */
   showToolbar: boolean
-  /** 是否显示遮罩 */
+  /** Whether to display the mask */
   showMask: boolean
-  /** 点击遮罩是否关闭 */
+  /** Click on whether the mask is closed */
   maskClosable: boolean
-  /** ESC键是否关闭 */
+  /** ESCIs the key off? */
   closeOnEsc: boolean
 }
 
-/** 布局主题变量 */
+/** Layout theme variables */
 export interface LayoutThemeVars {
-  /** 编辑器背景色 */
+  /** Editor background color */
   '--editor-bg-color': string
-  /** 工具栏背景色 */
+  /** Toolbar background color */
   '--toolbar-bg-color': string
-  /** 工具栏边框色 */
+  /** Toolbar border color */
   '--toolbar-border-color': string
-  /** 工具栏阴影 */
+  /** toolbar shadow */
   '--toolbar-shadow': string
 }
 
-/** 抽屉状态变化事件 */
+/** Drawer state change event */
 export interface DrawerChangeEvent {
-  /** 抽屉位置 */
+  /** Drawer location */
   placement: DrawerPlacement
-  /** 当前状态 */
+  /** Current status */
   visible: boolean
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
-/** 编辑器布局实例方法 */
+/** Editor layout instance methods */
 export interface EditorLayoutInstance {
-  /** 左侧抽屉显示状态 */
+  /** Left drawer shows status */
   leftDrawerVisible: boolean
-  /** 右侧抽屉显示状态 */
+  /** Right drawer shows status */
   rightDrawerVisible: boolean
-  /** 打开左侧抽屉 */
+  /** Open left drawer */
   openLeftDrawer: () => void
-  /** 关闭左侧抽屉 */
+  /** Close left drawer */
   closeLeftDrawer: () => void
-  /** 切换左侧抽屉 */
+  /** Switch left drawer */
   toggleLeftDrawer: () => void
-  /** 打开右侧抽屉 */
+  /** Open the right drawer */
   openRightDrawer: () => void
-  /** 关闭右侧抽屉 */
+  /** Close the right drawer */
   closeRightDrawer: () => void
-  /** 切换右侧抽屉 */
+  /** Switch right drawer */
   toggleRightDrawer: () => void
 }
 
-/** 工具栏按钮配置 */
+/** Toolbar button configuration */
 export interface ToolbarButtonConfig {
-  /** 按钮标识 */
+  /** Button logo */
   key: string
-  /** 按钮标题 */
+  /** button title */
   title: string
-  /** 图标 */
+  /** icon */
   icon?: string
-  /** 是否激活状态 */
+  /** Whether to activate the status */
   active?: boolean
-  /** 是否禁用 */
+  /** Whether to disable */
   disabled?: boolean
-  /** 点击事件 */
+  /** click event */
   onClick?: () => void
 }
 
-/** 布局响应式断点 */
+/** Layout responsive breakpoints */
 export const LAYOUT_BREAKPOINTS = {
   xs: 0,
   sm: 576,
@@ -103,14 +103,14 @@ export const LAYOUT_BREAKPOINTS = {
 
 export type LayoutBreakpoint = keyof typeof LAYOUT_BREAKPOINTS
 
-/** 响应式配置 */
+/** Responsive configuration */
 export interface ResponsiveConfig {
-  /** 断点 */
+  /** breakpoint */
   breakpoint: LayoutBreakpoint
-  /** 左侧抽屉配置 */
+  /** Left drawer configuration */
   leftDrawer?: Partial<DrawerState>
-  /** 右侧抽屉配置 */
+  /** Right drawer configuration */
   rightDrawer?: Partial<DrawerState>
-  /** 是否显示工具栏 */
+  /** Whether to display the toolbar */
   showToolbar?: boolean
 }

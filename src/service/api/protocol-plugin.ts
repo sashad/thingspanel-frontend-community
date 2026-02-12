@@ -1,6 +1,6 @@
 import { request } from '../request'
 
-/** 获取协议插件列表 */
+/** Get list of protocol plugins */
 export const fetchProtocolPluginList = async (params: any) => {
   const data = await request.get<Api.ApiApplyManagement.Data | null>('/protocol_plugin', {
     params
@@ -8,19 +8,19 @@ export const fetchProtocolPluginList = async (params: any) => {
   return data
 }
 
-/** 创建协议插件 */
+/** Create protocol plug-in */
 export const addProtocolPlugin = async (params: any) => {
   const data = await request.post<Api.BaseApi.Data>('/protocol_plugin', params)
   return data
 }
 
-/** 编辑协议插件 */
+/** Edit protocol plugin */
 export const editProtocolPlugin = async (params: any) => {
   const data = await request.put<Api.BaseApi.Data>('/protocol_plugin', params)
   return data
 }
 
-/** 删除协议插件 */
+/** Remove protocol plugin */
 export const delProtocolPlugin = async (id: string) => {
   const data = await request.delete<Api.BaseApi.Data>(`/protocol_plugin/${id}`)
   return data

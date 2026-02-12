@@ -1,8 +1,8 @@
 /**
- * 配置系统鲁棒性增强
- * 处理边界情况、存储限制、并发问题等
+ * Configuration system robustness enhancement
+ * Handle edge cases、storage limit、Concurrency issues, etc.
  *
- * 🔥 针对用户反馈的深度分析，确保不是"写死解决问题"
+ * 🔥 In-depth analysis of user feedback，Make sure it's not"Solving problems by writing them down"
  */
 
 import { configurationStateManager } from '@/components/visual-editor/configuration/ConfigurationStateManager'
@@ -10,7 +10,7 @@ import { simpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
 import type { WidgetConfiguration } from '@/components/visual-editor/configuration/types'
 
 /**
- * 存储容量检查结果
+ * Storage capacity check results
  */
 interface StorageCapacityCheck {
   isAvailable: boolean
@@ -22,7 +22,7 @@ interface StorageCapacityCheck {
 }
 
 /**
- * 配置一致性检查结果
+ * Configuration consistency check results
  */
 interface ConfigurationConsistencyCheck {
   isConsistent: boolean
@@ -36,17 +36,17 @@ interface ConfigurationConsistencyCheck {
 }
 
 /**
- * 配置系统鲁棒性管理器
+ * Configuring System Robustness Manager
  */
 export class ConfigurationRobustnessManager {
-  private readonly MAX_STORAGE_SIZE = 5 * 1024 * 1024 // 5MB 限制
-  private readonly WARNING_THRESHOLD = 0.8 // 80% 使用率警告
+  private readonly MAX_STORAGE_SIZE = 5 * 1024 * 1024 // 5MB limit
+  private readonly WARNING_THRESHOLD = 0.8 // 80% Usage warning
 
   /**
-   * 检查存储容量状态 - 🔥 已移除localStorage依赖
+   * Check storage capacity status - 🔥 RemovedlocalStoragerely
    */
   checkStorageCapacity(): StorageCapacityCheck {
-    // 🔥 配置完全依赖统一配置中心，无需检查localStorage容量
+    // 🔥 Configuration completely relies on the unified configuration center，No need to checklocalStoragecapacity
     return {
       isAvailable: true,
       usedSpace: 0,
@@ -58,7 +58,7 @@ export class ConfigurationRobustnessManager {
   }
 
   /**
-   * 检查配置与数据缓存的一致性
+   * Check the consistency of configuration and data cache
    */
   async checkConfigurationConsistency(): Promise<ConfigurationConsistencyCheck> {
     const inconsistentComponents: string[] = []
@@ -70,14 +70,14 @@ export class ConfigurationRobustnessManager {
     }> = []
 
     try {
-      // 获取所有配置状态
+      // Get all configuration status
       const allStates = configurationStateManager.getAllConfigurationStates()
 
       for (const [componentId, state] of allStates) {
-        // 检查配置哈希
+        // Check configuration hash
         const configHash = this.hashConfiguration(state.configuration)
 
-        // 检查缓存数据
+        // Check cached data
         const cachedData = simpleDataBridge.getComponentData(componentId)
         let cacheHash = ''
         let issue = ''
@@ -85,20 +85,20 @@ export class ConfigurationRobustnessManager {
         if (cachedData) {
           cacheHash = this.hashData(cachedData)
 
-          // 检查时间戳合理性
+          // Check timestamp plausibility
           if (state.updatedAt > Date.now()) {
-            issue = '配置时间戳异常（未来时间）'
+            issue = 'Configuration timestamp exception（future time）'
             inconsistentComponents.push(componentId)
           }
 
-          // 检查数据结构合理性
+          // Check the rationality of data structure
           if (this.isCircularStructure(cachedData)) {
-            issue = '缓存数据包含循环引用'
+            issue = 'Cache data contains circular references'
             inconsistentComponents.push(componentId)
           }
         } else if (state.configuration.dataSource) {
-          // 有配置但无缓存，可能需要重新加载
-          issue = '有数据源配置但无缓存数据'
+          // Configuration but no cache，May need to reload
+          issue = 'There is data source configuration but no cached data'
           inconsistentComponents.push(componentId)
         }
 
@@ -126,7 +126,7 @@ export class ConfigurationRobustnessManager {
             componentId: '__system__',
             configHash: '',
             cacheHash: '',
-            issue: `一致性检查异常: ${error instanceof Error ? error.message : String(error)}`
+            issue: `Consistency check exception: ${error instanceof Error ? error.message : String(error)}`
           }
         ]
       }
@@ -134,7 +134,7 @@ export class ConfigurationRobustnessManager {
   }
 
   /**
-   * 修复配置不一致问题
+   * Fix configuration inconsistencies
    */
   async repairConfigurationInconsistencies(): Promise<{
     repairedCount: number
@@ -152,28 +152,28 @@ export class ConfigurationRobustnessManager {
         const { componentId, issue } = mismatch
 
         try {
-          if (issue.includes('无缓存数据')) {
-            // 清理并重新执行数据获取
+          if (issue.includes('No cached data')) {
+            // Clean and re-execute data acquisition
             simpleDataBridge.clearComponentCache(componentId)
-            repairLog.push(`🔧 [Repair] 清理组件缓存: ${componentId}`)
+            repairLog.push(`🔧 [Repair] Clear component cache: ${componentId}`)
             repairedCount++
-          } else if (issue.includes('循环引用')) {
-            // 清理有问题的缓存数据
+          } else if (issue.includes('circular reference')) {
+            // Clean problematic cached data
             simpleDataBridge.clearComponentCache(componentId)
-            repairLog.push(`🧹 [Repair] 清理循环引用缓存: ${componentId}`)
+            repairLog.push(`🧹 [Repair] Clean circular reference cache: ${componentId}`)
             repairedCount++
-          } else if (issue.includes('时间戳异常')) {
-            // 重新设置配置以修正时间戳
+          } else if (issue.includes('Timestamp exception')) {
+            // Reset configuration to correct timestamps
             const config = configurationStateManager.getConfiguration(componentId)
             if (config) {
               configurationStateManager.setConfiguration(componentId, config, 'repair')
-              repairLog.push(`⏰ [Repair] 修正配置时间戳: ${componentId}`)
+              repairLog.push(`⏰ [Repair] Fix configuration timestamp: ${componentId}`)
               repairedCount++
             }
           }
         } catch (error) {
           failedComponents.push(componentId)
-          repairLog.push(`❌ [Repair] 修复失败 ${componentId}: ${error}`)
+          repairLog.push(`❌ [Repair] Repair failed ${componentId}: ${error}`)
         }
       }
 
@@ -183,7 +183,7 @@ export class ConfigurationRobustnessManager {
         repairLog
       }
     } catch (error) {
-      repairLog.push(`❌ [Repair] 修复过程异常: ${error}`)
+      repairLog.push(`❌ [Repair] Abnormal repair process: ${error}`)
       return {
         repairedCount: 0,
         failedComponents: ['__repair_failed__'],
@@ -193,7 +193,7 @@ export class ConfigurationRobustnessManager {
   }
 
   /**
-   * 生成配置哈希（用于一致性检查）
+   * Generate configuration hash（for consistency checking）
    */
   private hashConfiguration(config: WidgetConfiguration): string {
     try {
@@ -205,32 +205,32 @@ export class ConfigurationRobustnessManager {
   }
 
   /**
-   * 生成数据哈希
+   * Generate data hash
    */
   private hashData(data: any): string {
     try {
       const dataString = JSON.stringify(data)
-      return this.simpleHash(dataString.substring(0, 1000)) // 只取前1000字符避免性能问题
+      return this.simpleHash(dataString.substring(0, 1000)) // Only take the front1000Characters to avoid performance issues
     } catch {
       return 'hash_error'
     }
   }
 
   /**
-   * 简单哈希函数
+   * Simple hash function
    */
   private simpleHash(str: string): string {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i)
       hash = (hash << 5) - hash + char
-      hash = hash & hash // 转换为32位整数
+      hash = hash & hash // Convert to32bit integer
     }
     return Math.abs(hash).toString(16)
   }
 
   /**
-   * 检查是否包含循环引用
+   * Check for circular references
    */
   private isCircularStructure(obj: any, seen = new WeakSet()): boolean {
     if (obj === null || typeof obj !== 'object') {
@@ -250,7 +250,7 @@ export class ConfigurationRobustnessManager {
         }
       }
     } catch {
-      return true // 访问错误也认为是循环引用
+      return true // Access errors are also considered circular references
     }
 
     seen.delete(obj)
@@ -258,7 +258,7 @@ export class ConfigurationRobustnessManager {
   }
 
   /**
-   * 获取系统健康状态报告
+   * Get system health status report
    */
   async getSystemHealthReport(): Promise<{
     storage: StorageCapacityCheck
@@ -270,23 +270,23 @@ export class ConfigurationRobustnessManager {
     const consistency = await this.checkConfigurationConsistency()
     const recommendations: string[] = []
 
-    // 存储建议
+    // Storage recommendations
     if (!storage.isAvailable) {
-      recommendations.push('🚨 存储空间不足，建议清理无用配置或升级存储方案')
+      recommendations.push('🚨 Not enough storage space，It is recommended to clean up useless configurations or upgrade storage solutions')
     } else if (storage.usedSpace > storage.warningThreshold) {
-      recommendations.push('⚠️ 存储使用率较高，建议定期清理旧配置')
+      recommendations.push('⚠️ High storage usage，It is recommended to clean the old configuration regularly')
     }
 
-    // 一致性建议
+    // Consistency recommendations
     if (!consistency.isConsistent) {
-      recommendations.push('🔧 发现配置不一致问题，建议执行自动修复')
+      recommendations.push('🔧 Found configuration inconsistencies，It is recommended to perform automatic repair')
     }
 
     if (consistency.cacheDataMismatches.length > 0) {
-      recommendations.push('🧹 建议清理异常缓存数据以提高系统稳定性')
+      recommendations.push('🧹 It is recommended to clear abnormal cache data to improve system stability')
     }
 
-    // 整体健康状态评估
+    // Overall health status assessment
     let overallHealth: 'good' | 'warning' | 'critical' = 'good'
 
     if (!storage.isAvailable || !consistency.isConsistent) {
@@ -305,15 +305,15 @@ export class ConfigurationRobustnessManager {
 }
 
 /**
- * 全局鲁棒性管理器实例
+ * Global robustness manager instance
  */
 export const configurationRobustnessManager = new ConfigurationRobustnessManager()
 
 /**
- * 开发环境自动健康检查
+ * Automatic health check of development environment
  */
 if (import.meta.env.DEV) {
-  // 延迟执行，避免影响初始化
+  // Delayed execution，Avoid affecting initialization
   setTimeout(async () => {
     try {
       const healthReport = await configurationRobustnessManager.getSystemHealthReport()
@@ -322,7 +322,7 @@ if (import.meta.env.DEV) {
         healthReport.recommendations.forEach(rec => {})
       }
 
-      // 如果有不一致问题，提供修复选项
+      // If there are any inconsistencies，Provide repair options
     } catch (error) {}
   }, 3000)
 }

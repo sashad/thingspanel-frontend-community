@@ -26,20 +26,20 @@ interface Option {
 }
 
 interface Validate {
-  message: string // 验证失败时显示的错误消息
-  required?: boolean // 指定字段是否必填
-  rules?: string // 用于验证字段值的正则表达式规则
-  type?: 'number' | 'string' | 'array' | 'boolean' | 'object' // 验证的类型
+  message: string // Error message displayed when verification fails
+  required?: boolean // Specifies whether the field is required
+  rules?: string // Regular expression rules for validating field values
+  type?: 'number' | 'string' | 'array' | 'boolean' | 'object' // Type of verification
 }
 
 interface FormElement {
-  type: FormElementType // 表单元素的类型
-  dataKey: string // 用于唯一标识表单元素的键
-  label: string // 显示为表单元素标签的文本
-  options?: Option[] // 下拉选择的枚举选项，仅 select 类型时有效
-  placeholder?: string // 提示文本，仅 input 类型时有效
-  validate?: Validate // 包含表单验证规则的对象
-  array?: FormElement[] // 仅 table 类型时有效，定义表格列的配置
+  type: FormElementType // Type of form element
+  dataKey: string // The key used to uniquely identify the form element
+  label: string // The text that appears as the form element label
+  options?: Option[] // Enumeration options for drop-down selection，only select Valid when type
+  placeholder?: string // Prompt text，only input Valid when type
+  validate?: Validate // Object containing form validation rules
+  array?: FormElement[] // only table Valid when type，Define the configuration of table columns
 }
 
 const formElements = ref<FormElement[]>([])
@@ -67,7 +67,7 @@ const extendForm = ref({
 const extendFormRules = ref({})
 const protocol_config = ref({})
 
-// 主题映射表格相关
+// Topic mapping table related
 interface TopicMapping {
   id?: string | number
   mapping_name: string
@@ -245,7 +245,7 @@ const handleSubmit = async () => {
 
   const res = await deviceConfigEdit(postData)
   if (!res.error) {
-    // message.success('修改成功');
+    // message.success('Modification successful');
     emit('upDateConfig')
   }
 }
@@ -356,7 +356,7 @@ watch(
       <NFormItem v-if="formElements?.length > 0">
         <FormInput v-model:protocol-config="protocol_config" :form-elements="formElements" :edit="true"></FormInput>
       </NFormItem>
-      <!-- 主题映射 -->
+      <!-- topic mapping -->
       <NFormItem class="topic-mapping-form-item">
         <div class="topic-mapping-section">
           <div class="topic-mapping-header">
@@ -382,7 +382,7 @@ watch(
         <FormInput v-model:protocol-config="protocol_config" :form-elements="formElements"></FormInput>
       </n-drawer-content>
     </n-drawer>
-    <!-- 主题映射弹窗 -->
+    <!-- Theme mapping pop-up window -->
     <TopicMappingModal
       v-model:visible="topicMappingModalVisible"
       :edit-data="currentEditTopicMapping"

@@ -1,37 +1,37 @@
 <template>
   <div class="simple-array-test">
-    <n-card title="简单数组数据测试" size="small">
+    <n-card title="Simple array data test" size="small">
       <n-space vertical>
-        <!-- 测试说明 -->
-        <n-alert type="info" title="简单数组测试">
+        <!-- Test instructions -->
+        <n-alert type="info" title="Simple array test">
           <template #default>
-            <p>测试 digit-indicator 组件对简单数组数据的处理</p>
+            <p>test digit-indicator Component processing of simple array data</p>
           </template>
         </n-alert>
 
-        <!-- 测试按钮 -->
+        <!-- test button -->
         <n-space>
-          <n-button type="primary" @click="sendSimpleArray">发送简单数组 [25.6]</n-button>
-          <n-button type="success" @click="sendObjectArray">发送对象数组 [{value: 72.3, unit: '%'}]</n-button>
+          <n-button type="primary" @click="sendSimpleArray">Send simple array [25.6]</n-button>
+          <n-button type="success" @click="sendObjectArray">Send array of objects [{value: 72.3, unit: '%'}]</n-button>
         </n-space>
 
-        <!-- Digit Indicator 组件 -->
-        <n-divider title-placement="left">Digit Indicator 组件</n-divider>
+        <!-- Digit Indicator components -->
+        <n-divider title-placement="left">Digit Indicator components</n-divider>
 
         <div class="component-container">
           <component :is="digitIndicatorComponent" ref="digitIndicatorRef" :card="cardData" />
         </div>
 
-        <!-- 当前显示值 -->
-        <n-divider title-placement="left">当前显示值</n-divider>
+        <!-- Current display value -->
+        <n-divider title-placement="left">Current display value</n-divider>
 
         <n-card size="small">
           <div>detail.value: {{ currentDetailValue }}</div>
           <div>unit.value: {{ currentUnitValue }}</div>
         </n-card>
 
-        <!-- 日志 -->
-        <n-divider title-placement="left">处理日志</n-divider>
+        <!-- log -->
+        <n-divider title-placement="left">Processing logs</n-divider>
 
         <n-card size="small" class="log-card">
           <div class="log-content">
@@ -51,7 +51,7 @@ import { ref, computed } from 'vue'
 import { NCard, NSpace, NDivider, NButton, NAlert } from 'naive-ui'
 import digitIndicatorComponent from './component.vue'
 
-// 卡片数据
+// card data
 const cardData = ref({
   config: {
     color: '#1890ff',
@@ -63,26 +63,26 @@ const cardData = ref({
       {
         deviceId: 'test_device_001',
         metricsId: 'test_metric',
-        metricsName: '测试指标',
+        metricsName: 'Test indicators',
         metricsType: 'telemetry'
       }
     ]
   }
 })
 
-// 组件引用
+// component reference
 const digitIndicatorRef = ref<any>(null)
 
-// 日志
+// log
 const logs = ref<Array<{ timestamp: string; message: string }>>([])
 
-// 当前显示值（通过计算属性获取）
+// Current display value（Get via computed property）
 const currentDetailValue = computed(() => {
-  return digitIndicatorRef.value?.detail || '未设置'
+  return digitIndicatorRef.value?.detail || 'not set'
 })
 
 const currentUnitValue = computed(() => {
-  return digitIndicatorRef.value?.unit || '未设置'
+  return digitIndicatorRef.value?.unit || 'not set'
 })
 
 const addLog = (message: string) => {
@@ -96,10 +96,10 @@ const formatTime = (timestamp: string) => {
   return new Date(timestamp).toLocaleTimeString()
 }
 
-// 测试数据发送
+// Test data sending
 const sendSimpleArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -108,12 +108,12 @@ const sendSimpleArray = () => {
   }
 
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送简单数组: ${JSON.stringify(data)}`)
+  addLog(`Send simple array: ${JSON.stringify(data)}`)
 }
 
 const sendObjectArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -122,7 +122,7 @@ const sendObjectArray = () => {
   }
 
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送对象数组: ${JSON.stringify(data)}`)
+  addLog(`Send array of objects: ${JSON.stringify(data)}`)
 }
 </script>
 

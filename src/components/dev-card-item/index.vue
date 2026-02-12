@@ -2,26 +2,26 @@
 import { computed, getCurrentInstance } from 'vue'
 
 interface Props {
-  /** 卡片主标题 */
+  /** Card main title */
   title: string
-  /** 卡片副标题，可选，支持两行显示 */
+  /** card subtitle，Optional，Support two lines of display */
   subtitle?: string
-  /** 状态点是否激活，undefined时不显示状态点 */
+  /** Is the status point activated?，undefinedStatus points are not displayed when */
   statusActive?: boolean
   isStatus?: boolean
-  /** 状态点类型，影响激活时的颜色 */
+  /** Status point type，Affects the color when activated */
   statusType?: 'success' | 'warning' | 'error' | 'info' | 'default'
-  /** 底部右侧显示的文本，可以是时间戳或其他文本 */
+  /** The text shown on the bottom right，Can be a timestamp or other text */
   footerText?: string
-  /** 是否显示边框 */
+  /** Whether to display borders */
   bordered?: boolean
-  /** 是否支持悬停效果 */
+  /** Whether to support hover effect */
   hoverable?: boolean
-  /** 告警状态，用于右上角图标 */
+  /** Alarm status，Used for upper right corner icon */
   warnStatus?: string
-  /** 设备ID，用于跳转 */
+  /** equipmentID，used to jump */
   deviceId?: string
-  /** 设备配置ID，用于副标题跳转 */
+  /** Device configurationID，Used for subtitle jump */
   deviceConfigId?: string
   hideFooterLeft?: boolean
 }
@@ -33,25 +33,25 @@ const props = withDefaults(defineProps<Props>(), {
   isStatus: true
 })
 
-// 定义组件事件
+// Define component events
 const emit = defineEmits<{
-  /** 点击整个卡片时触发 */
+  /** Fires when the entire card is clicked */
   'click-card': []
-  /** 点击标题区域时触发 */
+  /** Fires when the title area is clicked */
   'click-title': []
-  /** 点击副标题区域时触发 */
+  /** Triggered when the subtitle area is clicked */
   'click-subtitle': []
-  /** 点击告警图标时触发 */
+  /** Triggered when the alert icon is clicked */
   'click-warning': []
-  /** 点击右上角图标时触发 */
+  /** Triggered when the icon in the upper right corner is clicked */
   'click-top-right-icon': []
 }>()
 
-// 计算状态点颜色
+// Calculate status point color
 const statusColor = computed(() => {
   if (props.statusActive === undefined) return undefined
 
-  // 根据状态类型和激活状态返回对应颜色
+  // Return the corresponding color according to the state type and activation state
   const colorMap = {
     success: props.statusActive ? '#52c41a' : '#d9d9d9',
     warning: props.statusActive ? '#faad14' : '#d9d9d9',
@@ -63,48 +63,48 @@ const statusColor = computed(() => {
   return colorMap[props.statusType]
 })
 
-// 检查是否有监听器的工具函数
+// Utility function to check if there is a listener
 const hasListener = (eventName: string) => {
   const listeners = getCurrentInstance()?.vnode.props
   return listeners && `on${eventName.charAt(0).toUpperCase() + eventName.slice(1)}` in listeners
 }
 
-// 检查是否应该处理标题点击
+// Check if title clicks should be handled
 const shouldHandleTitleClick = computed(() => {
   return hasListener('click-title') || props.deviceId
 })
 
-// 检查是否应该处理副标题点击
+// Check if subtitle clicks should be handled
 const shouldHandleSubtitleClick = computed(() => {
   return hasListener('click-subtitle') || props.deviceConfigId
 })
 
-// 检查是否应该处理右上角图标点击
+// Check if top right icon click should be handled
 const shouldHandleTopRightIconClick = computed(() => {
   return hasListener('click-top-right-icon') || props.warnStatus
 })
 
-// 点击事件处理函数
+// Click event handler function
 const handleCardClick = () => {
   emit('click-card')
 }
 
 const handleTitleClick = () => {
-  // 只有在需要处理点击时才阻止冒泡
+  // Only prevent bubbling if clicks need to be processed
   if (shouldHandleTitleClick.value) {
     emit('click-title')
   }
 }
 
 const handleSubtitleClick = () => {
-  // 只有在需要处理点击时才阻止冒泡
+  // Only prevent bubbling if clicks need to be processed
   if (shouldHandleSubtitleClick.value) {
     emit('click-subtitle')
   }
 }
 
 const handleTopRightIconClick = () => {
-  // 只有在需要处理点击时才阻止冒泡
+  // Only prevent bubbling if clicks need to be processed
   if (shouldHandleTopRightIconClick.value) {
     emit('click-top-right-icon')
   }
@@ -119,73 +119,73 @@ const handleTopRightIconClick = () => {
     class="item-card"
     @click="handleCardClick"
   >
-    <!-- 卡片内容容器 -->
+    <!-- card content container -->
     <div class="card-container">
-      <!-- 卡片头部：包含标题、副标题和右侧指示器 -->
+      <!-- card header：Contains title、Subtitle and right indicator -->
       <div class="card-header">
-        <!-- 左侧标题区域 -->
+        <!-- Left title area -->
         <div class="title-section">
-          <!-- 主标题行：标题文本 + 状态点 -->
+          <!-- Main title line：title text + status point -->
           <div class="title-row" :class="{ clickable: shouldHandleTitleClick }" @click="handleTitleClick">
             <div class="title-content">
-              <!-- 主标题，支持单行省略 -->
+              <!-- main title，Support single line omission -->
               <NEllipsis :tooltip="true">
                 <template #tooltip>{{ title }}</template>
                 <span class="card-title">{{ title }}</span>
               </NEllipsis>
 
-              <!-- 状态点，紧跟标题显示 -->
+              <!-- status point，Follow title display -->
 
               <div v-if="isStatus" class="status-dot" :style="{ backgroundColor: statusColor }" />
             </div>
           </div>
 
-          <!-- 副标题行：图标 + 副标题文本 -->
+          <!-- subtitle line：icon + subtitle text -->
           <div
             v-if="subtitle || $slots['subtitle-icon']"
             class="subtitle-row"
             :class="{ clickable: shouldHandleSubtitleClick }"
             @click="handleSubtitleClick"
           >
-            <!-- 副标题图标插槽，顶部对齐 -->
+            <!-- Subtitle Icon Slot，top aligned -->
             <div v-if="$slots['subtitle-icon']" class="subtitle-icon-container">
               <slot name="subtitle-icon" />
             </div>
-            <!-- 副标题文本，支持两行省略 -->
+            <!-- subtitle text，Supports two-line omission -->
             <div v-if="subtitle" class="subtitle-text-container">
               {{ subtitle }}
             </div>
           </div>
         </div>
 
-        <!-- 右上角图标区域 - 支持插槽自定义 -->
+        <!-- Icon area in the upper right corner - Support slot customization -->
         <div class="indicator-section">
           <div
             class="top-right-icon-container"
             :class="{ clickable: shouldHandleTopRightIconClick }"
             @click="handleTopRightIconClick"
           >
-            <!-- 右上角图标插槽 -->
+            <!-- Icon slot in the upper right corner -->
             <slot name="top-right-icon"></slot>
           </div>
         </div>
       </div>
 
-      <!-- 卡片内容区域：自定义内容插槽 - 这个区域会自动填充剩余空间 -->
+      <!-- Card content area：Custom content slot - This area will automatically fill the remaining space -->
       <div class="card-content">
         <NEllipsis v-if="$slots.default" :line-clamp="2" :tooltip="true">
           <slot />
         </NEllipsis>
       </div>
 
-      <!-- 卡片底部 - 固定在底部 -->
+      <!-- card bottom - fixed at bottom -->
       <div v-if="footerText || $slots['footer-icon'] || $slots.footer" class="card-footer">
-        <!-- 底部左侧：图标 + 自定义内容 -->
+        <!-- bottom left：icon + Custom content -->
         <div v-if="!props.hideFooterLeft" class="footer-left">
           <div class="footer-icon-container">
-            <!-- 如果没有提供footer-icon插槽，显示默认设备图标 -->
+            <!-- if not providedfooter-iconslot，Show default device icon -->
             <slot name="footer-icon">
-              <!-- 默认设备图标 SVG -->
+              <!-- Default device icon SVG -->
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#666" class="default-device-icon">
                 <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
               </svg>
@@ -193,7 +193,7 @@ const handleTopRightIconClick = () => {
           </div>
         </div>
         <div class="footer-right"><slot name="footer" /></div>
-        <!-- 底部右侧：文本内容（可以是时间戳或其他文本） -->
+        <!-- bottom right：text content（Can be a timestamp or other text） -->
         <div v-if="footerText" class="footer-right">
           <NEllipsis class="footer-text" :tooltip="false">
             {{ footerText }}
@@ -215,18 +215,18 @@ const handleTopRightIconClick = () => {
   transition: all 0.3s ease;
 }
 
-/* 悬停效果 - 调整为与用户提供的HTML示例一致 (无特定transform, box-shadow, border-color变化) */
+/* hover effect - adjusted to match the user-suppliedHTMLExample consistent (No specifictransform, box-shadow, border-colorchange) */
 .item-card:hover {
   border-color: #646cff;
 }
 
-/* 点击时的动画 - kept subtle, can be removed if not desired */
+/* Animation on click - kept subtle, can be removed if not desired */
 .item-card:active {
   transform: translateY(2px) translateX(2px);
   transition: all 0.1s ease;
 }
 
-/* 卡片内容容器，使用flexbox布局 */
+/* card content container，useflexboxlayout */
 .card-container {
   padding: 20px 20px 10px;
   height: 100%;
@@ -256,7 +256,7 @@ const handleTopRightIconClick = () => {
   transition: transform 0.2s ease;
 }
 
-/* 只有可点击的标题才显示指针和悬停效果 */
+/* Only clickable titles show pointer and hover effects */
 .title-row.clickable {
   cursor: pointer;
 }
@@ -300,7 +300,7 @@ const handleTopRightIconClick = () => {
   transition: transform 0.2s ease;
 }
 
-/* 只有可点击的副标题才显示指针和悬停效果 */
+/* Only clickable subtitles show pointer and hover effects */
 .subtitle-row.clickable {
   cursor: pointer;
 }
@@ -323,7 +323,7 @@ const handleTopRightIconClick = () => {
   font-size: 14px;
   flex-shrink: 0;
 
-  /** 设备图标 */
+  /** device icon */
   .device-icon {
     width: 28px;
     height: 28px;
@@ -358,7 +358,7 @@ const handleTopRightIconClick = () => {
     background-color 0.2s ease;
 }
 
-/* 只有可点击的右上角图标才显示指针和悬停效果 */
+/* Only clickable top right icons show pointer and hover effects */
 .top-right-icon-container.clickable {
   cursor: pointer;
 }

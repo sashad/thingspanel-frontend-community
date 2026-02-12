@@ -1,7 +1,7 @@
 <!--
-  基础渲染器模板
-  适用于简单的自定义布局需求
-  复制此文件并根据需要修改
+  Basic renderer template
+  Suitable for simple custom layout needs
+  Copy this file and modify it as needed
 -->
 <template>
   <BaseRendererComponent
@@ -20,7 +20,7 @@
       }"
       @click="handleCanvasClick"
     >
-      <!-- 渲染所有节点 -->
+      <!-- Render all nodes -->
       <div
         v-for="node in nodes"
         :key="node.id"
@@ -32,12 +32,12 @@
         :style="getNodeStyle(node)"
         @click.stop="handleNodeClick(node.id)"
       >
-        <!-- 节点标题 -->
+        <!-- Node title -->
         <div v-if="showWidgetTitles && !readonly" class="node-title">
           {{ node.label || node.type }}
         </div>
 
-        <!-- 节点内容 -->
+        <!-- Node content -->
         <div class="node-content">
           <Card2Wrapper
             v-if="isCard2Component(node.type)"
@@ -62,13 +62,13 @@ import { globalPreviewMode } from '@/components/visual-editor/hooks/usePreviewMo
 import BaseRendererComponent from '@/components/visual-editor/renderers/base/BaseRendererComponent.vue'
 import { Card2Wrapper } from '@/components/visual-editor/renderers/base'
 
-// 组件 Props
+// components Props
 interface Props {
   readonly?: boolean
   config?: {
     showGrid?: boolean
     backgroundColor?: string
-    // 在这里添加您的配置选项
+    // Add your configuration options here
   }
   showWidgetTitles?: boolean
 }
@@ -82,7 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
   showWidgetTitles: false
 })
 
-// 组件 Emits
+// components Emits
 interface Emits {
   (e: 'ready'): void
   (e: 'error', error: Error): void
@@ -92,12 +92,12 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 使用原始 store
+// Use original store
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
 const { isPreviewMode } = globalPreviewMode
 
-// 适配旧接口
+// Adapt to old interface
 const nodes = computed(() => editorStore.nodes || [])
 const selectedIds = computed(() => widgetStore.selectedNodeIds || [])
 
@@ -110,11 +110,11 @@ const selectNode = (nodeId: string) => {
 }
 
 const isCard2Component = (type: string) => {
-  // 简单的Card2组件检测
+  // simpleCard2Component detection
   return type.includes('card2') || type.includes('Card2')
 }
 
-// 事件处理器
+// event handler
 const onRendererReady = () => {
   emit('ready')
 }
@@ -133,7 +133,7 @@ const onCanvasClick = (event?: MouseEvent) => {
 
 const handleCanvasClick = () => {
   if (!isPreviewMode.value) {
-    // 清除选择
+    // Clear selection
     stateManager.clearSelection()
   }
 }
@@ -150,9 +150,9 @@ const handleComponentError = (error: Error) => {
   emit('error', error)
 }
 
-// 样式计算
+// style calculation
 const getNodeStyle = (node: any) => {
-  // 基础的绝对定位布局
+  // Basic absolute positioning layout
   return {
     position: 'absolute' as const,
     left: `${node.x}px`,
@@ -163,13 +163,13 @@ const getNodeStyle = (node: any) => {
   }
 }
 
-// 组件获取 - 根据需要扩展
+// Component acquisition - Expand as needed
 const getWidgetComponent = (type: string) => {
-  // 在这里添加您的自定义组件映射
+  // Add your custom component mapping here
   const components: Record<string, any> = {
     // 'text': TextWidget,
     // 'image': ImageWidget,
-    // 添加更多组件
+    // Add more components
   }
   return components[type]
 }
@@ -232,7 +232,7 @@ const getWidgetComponent = (type: string) => {
   overflow: hidden;
 }
 
-/* 预览模式样式 */
+/* Preview mode style */
 .basic-renderer.preview-mode .renderer-node {
   cursor: default;
 }
@@ -242,7 +242,7 @@ const getWidgetComponent = (type: string) => {
   box-shadow: none;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 768px) {
   .basic-renderer {
     min-height: 400px;

@@ -532,7 +532,7 @@ const buttonExample: ButtonExample[] = [
         icon: 'ic:baseline-color-lens'
       }
     ],
-    desc: '这两个颜色看起来像毒蘑菇。'
+    desc: 'These two colors look like poisonous mushrooms。'
   }
 ]
 </script>

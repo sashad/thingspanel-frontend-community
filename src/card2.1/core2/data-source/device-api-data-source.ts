@@ -1,6 +1,6 @@
 /**
- * 设备API数据源实现
- * 支持telemetryDataCurrentKeys等设备API的调用
+ * equipmentAPIData source implementation
+ * supporttelemetryDataCurrentKeysand other equipmentAPIcall
  */
 
 import { telemetryDataCurrentKeys } from '@/service/api/device'
@@ -9,13 +9,13 @@ export interface DeviceApiDataSourceConfig {
   id: string
   type: 'device-api'
   name?: string
-  apiType: 'telemetryDataCurrentKeys' // 目前只支持这一个API
+  apiType: 'telemetryDataCurrentKeys' // Currently only this one is supportedAPI
   parameters: {
     device_id: string
     keys: string
   }
   fieldMappings: {
-    [componentField: string]: string // 数据路径，如 'data[0].value'
+    [componentField: string]: string // data path，like 'data[0].value'
   }
 }
 
@@ -29,7 +29,7 @@ export interface DeviceApiResponse {
 }
 
 /**
- * 设备API数据源处理器
+ * equipmentAPIdata source processor
  */
 export class DeviceApiDataSource {
   private config: DeviceApiDataSourceConfig
@@ -41,42 +41,42 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 获取数据源ID
+   * Get data sourceID
    */
   getId(): string {
     return this.config.id
   }
 
   /**
-   * 获取数据源类型
+   * Get data source type
    */
   getType(): string {
     return this.config.type
   }
 
   /**
-   * 获取API类型
+   * GetAPItype
    */
   getApiType(): string {
     return this.config.apiType
   }
 
   /**
-   * 获取API参数
+   * GetAPIparameter
    */
   getParameters(): any {
     return this.config.parameters
   }
 
   /**
-   * 获取字段映射配置
+   * Get field mapping configuration
    */
   getFieldMappings(): Record<string, string> {
     return this.config.fieldMappings
   }
 
   /**
-   * 调用设备API获取数据
+   * call deviceAPIGet data
    */
   async fetchData(): Promise<DeviceApiResponse> {
     let response: any
@@ -89,7 +89,7 @@ export class DeviceApiDataSource {
         })
         break
       default:
-        throw new Error(`不支持的API类型: ${this.config.apiType}`)
+        throw new Error(`Not supportedAPItype: ${this.config.apiType}`)
     }
 
     this.lastResponse = response
@@ -98,10 +98,10 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 根据映射配置提取数据
+   * Extract data based on mapping configuration
    */
   async getValue(): Promise<Record<string, any>> {
-    // 获取最新数据
+    // Get the latest data
     const response = await this.fetchData()
     const result: Record<string, any> = {}
 
@@ -118,14 +118,14 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 根据路径提取值（支持数组索引）
+   * Extract value based on path（Supports array indexing）
    */
   private extractValueByPath(data: any, path: string): any {
     if (!path || path === '') {
       return data
     }
 
-    // 解析路径，支持 'data[0].value' 格式
+    // parse path，support 'data[0].value' Format
     const pathParts = this.parsePath(path)
     let current = data
 
@@ -135,14 +135,14 @@ export class DeviceApiDataSource {
       }
 
       if (typeof part === 'number') {
-        // 数组索引
+        // array index
         if (Array.isArray(current)) {
           current = current[part]
         } else {
           return undefined
         }
       } else {
-        // 对象属性
+        // Object properties
         if (typeof current === 'object' && part in current) {
           current = current[part]
         } else {
@@ -155,7 +155,7 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 解析路径字符串，支持数组索引
+   * Parse path string，Supports array indexing
    */
   private parsePath(path: string): (string | number)[] {
     const parts: (string | number)[] = []
@@ -206,11 +206,11 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 验证数据路径是否有效
+   * Verify that the data path is valid
    */
   async validatePath(path: string): Promise<boolean> {
     try {
-      // 使用缓存的响应或获取新数据
+      // Use a cached response or get new data
       const response = this.lastResponse || (await this.fetchData())
       const value = this.extractValueByPath(response, path)
       return value !== undefined
@@ -220,11 +220,11 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 获取可用的数据路径
+   * Get available data paths
    */
   async getAvailablePaths(): Promise<Array<{ path: string; type: string; value: any }>> {
     try {
-      // 使用缓存的响应或获取新数据
+      // Use a cached response or get new data
       const response = this.lastResponse || (await this.fetchData())
       const paths: Array<{ path: string; type: string; value: any }> = []
 
@@ -237,7 +237,7 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 递归收集所有可用路径
+   * Recursively collect all available paths
    */
   private collectPaths(obj: any, currentPath: string, paths: Array<{ path: string; type: string; value: any }>) {
     if (obj === null || obj === undefined) {
@@ -245,7 +245,7 @@ export class DeviceApiDataSource {
     }
 
     if (Array.isArray(obj)) {
-      // 数组：只处理前几个元素避免路径过多
+      // array：Only process the first few elements to avoid too many paths
       const maxItems = Math.min(obj.length, 3)
       for (let i = 0; i < maxItems; i++) {
         const newPath = currentPath ? `${currentPath}[${i}]` : `[${i}]`
@@ -257,13 +257,13 @@ export class DeviceApiDataSource {
           value: item
         })
 
-        // 如果数组元素是对象，继续递归
+        // If the array element is an object，continue recursion
         if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
           this.collectPaths(item, newPath, paths)
         }
       }
     } else if (typeof obj === 'object') {
-      // 对象
+      // object
       for (const [key, value] of Object.entries(obj)) {
         const newPath = currentPath ? `${currentPath}.${key}` : key
 
@@ -273,7 +273,7 @@ export class DeviceApiDataSource {
           value: value
         })
 
-        // 如果值是对象或数组，继续递归
+        // If value is an object or array，continue recursion
         if (typeof value === 'object' && value !== null) {
           this.collectPaths(value, newPath, paths)
         }
@@ -282,7 +282,7 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 预览字段映射结果
+   * Preview field mapping results
    */
   async previewMapping(fieldMappings: Record<string, string>): Promise<Record<string, any>> {
     try {
@@ -304,24 +304,24 @@ export class DeviceApiDataSource {
   }
 
   /**
-   * 更新配置
+   * Update configuration
    */
   updateConfig(newConfig: Partial<DeviceApiDataSourceConfig>) {
     this.config = { ...this.config, ...newConfig }
-    // 清除缓存，强制重新获取数据
+    // clear cache，Force data retrieval
     this.lastResponse = null
     this.lastFetchTime = null
   }
 
   /**
-   * 获取最后获取数据的时间
+   * Get the last time data was obtained
    */
   getLastFetchTime(): Date | null {
     return this.lastFetchTime
   }
 
   /**
-   * 导出配置
+   * Export configuration
    */
   exportConfig(): DeviceApiDataSourceConfig {
     return { ...this.config }
@@ -329,18 +329,18 @@ export class DeviceApiDataSource {
 }
 
 /**
- * 设备API数据源工厂
+ * equipmentAPIdata source factory
  */
 export class DeviceApiDataSourceFactory {
   /**
-   * 创建设备API数据源
+   * Create deviceAPIdata source
    */
   static create(config: DeviceApiDataSourceConfig): DeviceApiDataSource {
     return new DeviceApiDataSource(config)
   }
 
   /**
-   * 创建telemetryDataCurrentKeys数据源
+   * createtelemetryDataCurrentKeysdata source
    */
   static createTelemetryDataSource(
     id: string,
@@ -351,7 +351,7 @@ export class DeviceApiDataSourceFactory {
     return new DeviceApiDataSource({
       id,
       type: 'device-api',
-      name: `设备${deviceId}遥测数据`,
+      name: `equipment${deviceId}telemetry data`,
       apiType: 'telemetryDataCurrentKeys',
       parameters: {
         device_id: deviceId,
@@ -362,13 +362,13 @@ export class DeviceApiDataSourceFactory {
   }
 
   /**
-   * 创建示例设备API数据源
+   * Create a sample deviceAPIdata source
    */
   static createSample(id: string): DeviceApiDataSource {
     return new DeviceApiDataSource({
       id,
       type: 'device-api',
-      name: '示例设备API',
+      name: 'Example deviceAPI',
       apiType: 'telemetryDataCurrentKeys',
       parameters: {
         device_id: 'sample-device-001',

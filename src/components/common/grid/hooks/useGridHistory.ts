@@ -1,6 +1,6 @@
 /**
- * Grid 历史记录管理 Hook
- * 提供撤销/重做功能和历史记录管理
+ * Grid History management Hook
+ * Provide revocation/Redo functionality and history management
  */
 
 import { ref, computed } from 'vue'
@@ -8,41 +8,41 @@ import type { GridLayoutPlusItem } from '../gridLayoutPlusTypes'
 import { cloneLayout } from '../gridLayoutPlusUtils'
 
 export interface UseGridHistoryOptions {
-  /** 是否启用历史记录 */
+  /** Whether to enable history */
   enabled?: boolean
-  /** 历史记录最大长度 */
+  /** Maximum length of history */
   maxLength?: number
-  /** 自动保存时间间隔(ms) */
+  /** Auto save time interval(ms) */
   autoSaveInterval?: number
 }
 
 /**
- * 网格历史记录管理Hook
- * 提供完整的撤销/重做功能
+ * Grid history managementHook
+ * Provide full revocation/redo function
  */
 export function useGridHistory(options: UseGridHistoryOptions = {}) {
   const {
     enabled = true,
     maxLength = 50,
-    autoSaveInterval = 0 // 0表示禁用自动保存
+    autoSaveInterval = 0 // 0Indicates disabling auto-save
   } = options
 
-  // 历史记录状态
+  // history status
   const history = ref<GridLayoutPlusItem[][]>([])
   const historyIndex = ref(-1)
   const isRecording = ref(true)
 
-  // 自动保存定时器
+  // Auto save timer
   let autoSaveTimer: NodeJS.Timeout | null = null
 
-  // 计算属性
+  // Computed properties
   const canUndo = computed(() => enabled && historyIndex.value > 0)
   const canRedo = computed(() => enabled && historyIndex.value < history.value.length - 1)
   const historyLength = computed(() => history.value.length)
   const currentHistoryIndex = computed(() => historyIndex.value)
 
   /**
-   * 保存布局到历史记录
+   * Save layout to history
    */
   const saveToHistory = (layout: GridLayoutPlusItem[]) => {
     if (!enabled || !isRecording.value || layout.length === 0) return
@@ -50,24 +50,24 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
     try {
       const currentLayout = cloneLayout(layout)
 
-      // 检查是否与当前历史记录相同
+      // Check if it is the same as the current history
       if (history.value.length > 0) {
         const lastHistoryLayout = history.value[historyIndex.value]
         if (lastHistoryLayout && JSON.stringify(lastHistoryLayout) === JSON.stringify(currentLayout)) {
-          return // 布局没有变化，不保存
+          return // The layout has not changed，Don't save
         }
       }
 
-      // 如果当前不在历史记录末尾，删除后面的记录
+      // If you are not currently at the end of the history，Delete subsequent records
       if (historyIndex.value < history.value.length - 1) {
         history.value = history.value.slice(0, historyIndex.value + 1)
       }
 
-      // 添加新记录
+      // Add new record
       history.value.push(currentLayout)
       historyIndex.value = history.value.length - 1
 
-      // 限制历史记录长度
+      // Limit history length
       if (history.value.length > maxLength) {
         history.value.shift()
         historyIndex.value = history.value.length - 1
@@ -80,7 +80,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 撤销到上一个状态
+   * Undo to previous state
    */
   const undo = (): GridLayoutPlusItem[] | null => {
     if (!canUndo.value) {
@@ -100,7 +100,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 重做到下一个状态
+   * Redo to next state
    */
   const redo = (): GridLayoutPlusItem[] | null => {
     if (!canRedo.value) {
@@ -120,7 +120,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 跳转到指定历史记录
+   * Jump to the specified history record
    */
   const jumpToHistory = (index: number): GridLayoutPlusItem[] | null => {
     if (!enabled || index < 0 || index >= history.value.length) {
@@ -140,19 +140,19 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 获取历史记录摘要
+   * Get history summary
    */
   const getHistorySummary = () => {
     return history.value.map((layout, index) => ({
       index,
-      timestamp: Date.now(), // 简化版，实际应该存储真实时间戳
+      timestamp: Date.now(), // Simplified version，Actually the real timestamp should be stored
       itemCount: layout.length,
       isCurrent: index === historyIndex.value
     }))
   }
 
   /**
-   * 清空历史记录
+   * Clear history
    */
   const clearHistory = () => {
     history.value = []
@@ -161,7 +161,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 暂停历史记录
+   * Pause history
    */
   const pauseRecording = () => {
     isRecording.value = false
@@ -169,7 +169,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 恢复历史记录
+   * restore history
    */
   const resumeRecording = () => {
     isRecording.value = true
@@ -177,12 +177,12 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 开始自动保存
+   * Start automatic saving
    */
   const startAutoSave = (layoutRef: { value: GridLayoutPlusItem[] }) => {
     if (autoSaveInterval <= 0 || !enabled) return
 
-    stopAutoSave() // 停止之前的定时器
+    stopAutoSave() // Stop the previous timer
 
     autoSaveTimer = setInterval(() => {
       if (isRecording.value && layoutRef.value.length > 0) {
@@ -194,7 +194,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 停止自动保存
+   * Stop autosave
    */
   const stopAutoSave = () => {
     if (autoSaveTimer) {
@@ -205,7 +205,7 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   /**
-   * 初始化历史记录
+   * Initialize history
    */
   const initHistory = (initialLayout: GridLayoutPlusItem[]) => {
     if (!enabled || initialLayout.length === 0) return
@@ -216,14 +216,14 @@ export function useGridHistory(options: UseGridHistoryOptions = {}) {
   }
 
   return {
-    // 状态
+    // state
     canUndo,
     canRedo,
     historyLength,
     currentHistoryIndex,
     isRecording,
 
-    // 方法
+    // method
     saveToHistory,
     undo,
     redo,

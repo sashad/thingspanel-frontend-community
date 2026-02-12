@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 步骤5：发布完成
- * 显示完整的模板JSON数据，支持复制
+ * step5：Release completed
+ * Show full templateJSONdata，Support copying
  */
 
 import { ref, onMounted } from 'vue'
@@ -19,39 +19,39 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modalVisible', 'update:stepCurrent'])
 
-// JSON代码
+// JSONcode
 const code = ref<string>('')
 
 /**
- * 加载完整模板数据
+ * Load complete template data
  */
 const getTemplate = async () => {
   const { data, error } = await getTemplat(props.deviceTemplateId)
   if (!error && data) {
-    // 解析JSON字段
+    // parseJSONField
     try {
       data.app_chart_config = JSON.parse(data.app_chart_config)
     } catch (e) {
-      // 如果解析失败，保持原样
+      // If parsing fails，stay as is
     }
     try {
       data.web_chart_config = JSON.parse(data.web_chart_config)
     } catch (e) {
-      // 如果解析失败，保持原样
+      // If parsing fails，stay as is
     }
     code.value = JSON.stringify(data, null, 2)
   }
 }
 
 /**
- * 上一步
+ * Previous step
  */
 const back: () => void = async () => {
   emit('update:stepCurrent', 4)
 }
 
 /**
- * 复制JSON到剪贴板
+ * copyJSONto clipboard
  */
 const copyText = (): void => {
   const textElement = document.getElementById('text-to-copy')

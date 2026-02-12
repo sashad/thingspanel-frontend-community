@@ -107,18 +107,18 @@ const option = ref<EChartsOption>({
     }
   },
   dataZoom: [
-    // 1.横向使用滚动条
+    // 1.Using scroll bars horizontally
     {
-      type: 'slider', // 有单独的滑动条，用户在滑动条上进行缩放或漫游。inside是直接可以是在内部拖动显示
-      show: true, // 是否显示 组件。如果设置为 false，不会显示，但是数据过滤的功能还存在。
-      start: 0, // 数据窗口范围的起始百分比0-100
-      end: 100, // 数据窗口范围的结束百分比0-100
-      xAxisIndex: [0], // 此处表示控制第一个xAxis，设置 dataZoom-slider 组件控制的 x轴 可是已数组[0,2]表示控制第一，三个；xAxisIndex: 2 ，表示控制第二个。yAxisIndex属性同理
-      bottom: 20 // 距离底部的距离
+      type: 'slider', // There is a separate slider，User zooms or roams on the slider。insideIt can be displayed directly by dragging it internally.
+      show: true, // Whether to display components。If set to false，will not be displayed，But the data filtering function still exists。
+      start: 0, // Starting percentage of data window range0-100
+      end: 100, // The end percentage of the data window range0-100
+      xAxisIndex: [0], // This means controlling the first onexAxis，set up dataZoom-slider component controlled xaxis But already arrayed[0,2]Indicates control first，three；xAxisIndex: 2 ，Indicates control of the second。yAxisIndexSimilar attributes
+      bottom: 20 // distance from bottom
     },
-    // 2.在内部可以横向拖动
+    // 2.Can be dragged horizontally inside
     {
-      type: 'inside', // 内置于坐标系中
+      type: 'inside', // Built into the coordinate system
       start: 0,
       end: 30,
       xAxisIndex: [0]
@@ -153,11 +153,11 @@ const option = ref<EChartsOption>({
 })
 const updateLegendColor = () => {
   if (chartContainer.value) {
-    // @ts-ignore // 或者使用 as any
+    // @ts-ignore // Or use as any
     const computedStyle = window.getComputedStyle(chartContainer.value as Element)
     legendColor.value = computedStyle.color
 
-    // 使用 as any 来绕过 legend/axisLabel 的类型检查
+    // use as any to bypass legend/axisLabel type checking
     const legendOption = option.value.legend as any
     if (legendOption && legendOption.textStyle) {
       legendOption.textStyle.color = legendColor.value
@@ -175,7 +175,7 @@ const updateLegendColor = () => {
   }
 }
 const d_end_time = new Date().getTime()
-// 获取1小时前的时间
+// Get1hours ago
 const d_start_time = d_end_time - 3600000
 const params = reactive({
   start_time: d_start_time,
@@ -226,7 +226,7 @@ const aggregateOptions: SelectOption[] = [
   { label: $t('common.hours6'), value: '6h', disabled: false },
   { label: $t('common.days1'), value: '1d', disabled: false },
   { label: $t('common.days7'), value: '7d', disabled: false },
-  { label: '1月', value: '1mo', disabled: false }
+  { label: '1moon', value: '1mo', disabled: false }
 ]
 const aggregateOptionsValue = ref<string>('')
 const aggregateFunctionOptions: SelectOption[] = [
@@ -250,31 +250,31 @@ const updateAggregate = (v: string) => {
 }
 const updateDisabledOptions = (timeFrame: string) => {
   const disableBeforeIndex: { [key: string]: number } = {
-    最近3小时: 1, // 30秒
-    最近6小时: 2, // 1分钟
-    最近12小时: 3, // 2分钟
-    最近24小时: 4, // 5分钟
-    最近3天: 5, // 10分钟
-    最近7天: 6, // 30分钟
-    最近15天: 7, // 1小时
-    最近30天: 7, // 1小时
-    最近60天: 8, // 3小时
-    最近90天: 9, // 6小时
-    最近6个月: 9, // 6小时
-    最近1年: 12, // 1月
-    今天: 4, // 5分钟
-    昨天: 4, // 5分钟
-    前天: 4, // 5分钟
-    上周今日: 4, // 5分钟
-    本周: 6, // 30分钟
-    上周: 6, // 30分钟
-    本月: 7, // 1小时
-    上个月: 7, // 1小时
-    今年: 12, // 1月
-    去年: 12 // 1月
+    recent3Hour: 1, // 30Second
+    recent6Hour: 2, // 1minute
+    recent12Hour: 3, // 2minute
+    recent24Hour: 4, // 5minute
+    recent3sky: 5, // 10minute
+    recent7sky: 6, // 30minute
+    recent15sky: 7, // 1Hour
+    recent30sky: 7, // 1Hour
+    recent60sky: 8, // 3Hour
+    recent90sky: 9, // 6Hour
+    recent6months: 9, // 6Hour
+    recent1Year: 12, // 1moon
+    today: 4, // 5minute
+    yesterday: 4, // 5minute
+    theDayBeforeYesterday: 4, // 5minute
+    lastWeekToday: 4, // 5minute
+    thisWeek: 6, // 30minute
+    lastWeek: 6, // 30minute
+    thisMonth: 7, // 1Hour
+    lastMonth: 7, // 1Hour
+    thisYear: 12, // 1moon
+    lastYear: 12 // 1moon
   }
 
-  // 默认不禁用"不聚合"，根据时间范围禁用其余选项
+  // Not disabled by default"No aggregation"，Disable remaining options based on time range
   aggregateOptions.forEach((item, index, array) => {
     if (!disableBeforeIndex[timeFrame]) {
       item.disabled = false
@@ -305,7 +305,7 @@ const updateTime = (v: number, o: SelectOption) => {
       return
     case $t('common.today'):
       start_time = new Date(now.setHours(0, 0, 0, 0))
-      now = new Date() // 重新获取当前时间，避免修改
+      now = new Date() // Retrieve the current time，avoid modification
       end_time = new Date(now.setHours(23, 59, 59, 999))
       break
     case $t('common.yesterday'):
@@ -317,24 +317,24 @@ const updateTime = (v: number, o: SelectOption) => {
       break
     case $t('common.dayBeforeYesterday'):
       start_time = new Date()
-      start_time.setDate(start_time.getDate() - 2) // 设置为两天前的日期
-      start_time.setHours(0, 0, 0, 0) // 那一天的开始
+      start_time.setDate(start_time.getDate() - 2) // Set to a date two days ago
+      start_time.setHours(0, 0, 0, 0) // the beginning of that day
       end_time = new Date(start_time)
-      end_time.setHours(23, 59, 59, 999) // 那一天的结束一天的结束
+      end_time.setHours(23, 59, 59, 999) // The end of the day The end of the day
       break
     case $t('common.thisWeek'):
       // eslint-disable-next-line no-case-declarations
-      const currentDayOfWeek = now.getDay() // 当前是周几，周日为0
+      const currentDayOfWeek = now.getDay() // What day of the week is it now?，Sunday is0
       // eslint-disable-next-line no-case-declarations
-      const distanceToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek // 计算到周一需要回退的天数
+      const distanceToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek // Calculate the number of days to go back to Monday
       start_time = new Date()
-      start_time.setDate(now.getDate() + distanceToMonday) // 设置为本周一
-      start_time.setHours(0, 0, 0, 0) // 本周一的开始
-      end_time = new Date() // 本周的当前时间
+      start_time.setDate(now.getDate() + distanceToMonday) // Set to this Monday
+      start_time.setHours(0, 0, 0, 0) // start of this monday
+      end_time = new Date() // current time this week
       break
     case $t('common.lastWeek'):
       // eslint-disable-next-line no-case-declarations
-      const daysToLastMonday = now.getDay() === 0 ? -6 : 1 // 如果今天是周日，则上周一是6天前
+      const daysToLastMonday = now.getDay() === 0 ? -6 : 1 // if today is sunday，Then last Monday was6days ago
       start_time = new Date()
       start_time.setDate(now.getDate() - now.getDay() - daysToLastMonday)
       start_time.setHours(0, 0, 0, 0)
@@ -444,7 +444,7 @@ const getTelemetryData = async (device_id, key, index, metricName) => {
 
     return sampleObj
   } catch (error) {
-    // 如果发生错误，返回默认数据
+    // if an error occurs，Return to default data
     return sampleObj
   }
 }
@@ -465,24 +465,24 @@ const setSeries = async dataSource => {
   if (querDetail.device_id && querDetail.keys) {
     detail.value = await telemetryDataCurrentKeys(querDetail)
   } else {
-    // window.$message?.error("查询不到设备");
+    // window.$message?.error("Unable to find device");
   }
 
-  // 收集所有系列数据的Promise
+  // Collect all series of dataPromise
   const seriesPromises = deviceSource.slice(0, deviceCount).map((item, index) => {
     const metricName = item.metricsName || item.metricsId || ''
     name.value = metricName
     // legendData.value.push(metricName); // Don't push to the old ref here
     newLegendData.push(metricName) // Build the new legend array
 
-    // 返回一个Promise，包含系列配置和数据
+    // Return aPromise，Contains series configuration and data
     return getTelemetryData(item.deviceId, item.metricsId, index, metricName)
   })
 
-  // 等待所有系列数据获取完成
+  // Wait for all series data acquisition to be completed
   const seriesData = await Promise.all(seriesPromises)
 
-  // 一次性赋值给option.value.series 和 option.value.legend.data
+  // One-time assignment tooption.value.series and option.value.legend.data
   if (option.value.legend) {
     // Ensure legend object exists
     option.value.legend.data = newLegendData // Assign new legend data directly
@@ -509,7 +509,7 @@ defineExpose({
       const timestamp = new Date(data.systime).getTime()
       if (seriesData.length === 0 || timestamp !== seriesData[seriesData.length - 1][0]) {
         const len = seriesData?.push([timestamp, value])
-        // 如果长度大于100且第一个数据和最后一个数据的间隔时间大于采样周期则删除最后一个元素
+        // If the length is greater than100If the interval between the first data and the last data is greater than the sampling period, the last element will be deleted.
         if (len >= 100) {
           seriesData.shift()
         }
@@ -580,14 +580,14 @@ onMounted(() => {
   initDateTimeRange()
   setSeries(props?.card?.dataSource)
 
-  updateLegendColor() // 初始设置
+  updateLegendColor() // Initial setup
 
   const resizeObserver = new ResizeObserver(() => {
     updateLegendColor()
   })
 
   if (chartContainer.value) {
-    // @ts-ignore // 或者使用 as any
+    // @ts-ignore // Or use as any
     resizeObserver.observe(chartContainer.value as Element)
   }
 
@@ -665,7 +665,7 @@ onUnmounted(() => {
   font-size: 18px;
 }
 .chart-container {
-  color: var(--chart-legend-color); /* 使用 CSS 变量 */
+  color: var(--chart-legend-color); /* use CSS variable */
 }
 .button-container {
   z-index: 99;

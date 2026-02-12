@@ -10,7 +10,7 @@ declare namespace Panel {
     description?: string
     remark?: string
     menu_flag?: string
-    /** 可视化类型（例如：new_board） */
+    /** Visualization type（For example：new_board） */
     vis_type?: string
   }
 
@@ -30,7 +30,7 @@ declare namespace Panel {
     name?: string
     page: number
     page_size: number
-    /** 可视化类型（例如：new_board） */
+    /** Visualization type（For example：new_board） */
     vis_type?: string
   }
 }

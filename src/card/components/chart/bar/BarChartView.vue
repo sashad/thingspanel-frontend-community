@@ -1,32 +1,32 @@
 <template>
   <div class="bar-chart-container" :class="containerClass">
-    <!-- 图表标题 -->
+    <!-- Chart title -->
     <div v-if="config.title" class="chart-title">
       {{ config.title }}
     </div>
 
-    <!-- 加载状态 -->
+    <!-- Loading status -->
     <div v-if="loading" class="chart-loading">
       <div class="loading-spinner"></div>
-      <span>加载中...</span>
+      <span>loading...</span>
     </div>
 
-    <!-- 错误状态 -->
+    <!-- error status -->
     <div v-else-if="error" class="chart-error">
       <div class="error-icon">⚠️</div>
       <div class="error-message">{{ error.message }}</div>
-      <button class="retry-button" @click="handleRetry">重试</button>
+      <button class="retry-button" @click="handleRetry">Try again</button>
     </div>
 
-    <!-- 无数据状态 -->
+    <!-- No data status -->
     <div v-else-if="!chartData || chartData.length === 0" class="chart-empty">
       <div class="empty-icon">📊</div>
-      <div class="empty-message">暂无数据</div>
+      <div class="empty-message">No data yet</div>
     </div>
 
-    <!-- 图表内容 -->
+    <!-- Chart content -->
     <div v-else ref="chartContainer" class="chart-content">
-      <!-- 这里使用简化的SVG实现，实际项目中可以集成ECharts等图表库 -->
+      <!-- Here we use a simplifiedSVGaccomplish，Can be integrated in actual projectsEChartsOther chart libraries -->
       <svg
         :width="chartWidth"
         :height="chartHeight"
@@ -34,7 +34,7 @@
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
       >
-        <!-- 背景网格 -->
+        <!-- background grid -->
         <g v-if="config.chart.showGrid !== false" class="grid">
           <line
             v-for="i in gridLines"
@@ -48,7 +48,7 @@
           />
         </g>
 
-        <!-- Y轴标签 -->
+        <!-- Yaxis labels -->
         <g class="y-axis">
           <text
             v-for="(label, i) in yAxisLabels"
@@ -67,7 +67,7 @@
           </text>
         </g>
 
-        <!-- 柱状图 -->
+        <!-- bar chart -->
         <g class="bars">
           <rect
             v-for="(item, index) in chartData"
@@ -82,7 +82,7 @@
             @mouseleave="handleBarLeave"
             @click="handleBarClick(item)"
           >
-            <!-- 动画效果 -->
+            <!-- Animation effects -->
             <animate
               v-if="config.chart.animation"
               attributeName="height"
@@ -102,7 +102,7 @@
           </rect>
         </g>
 
-        <!-- X轴标签 -->
+        <!-- Xaxis labels -->
         <g class="x-axis">
           <text
             v-for="(item, index) in chartData"
@@ -116,7 +116,7 @@
           </text>
         </g>
 
-        <!-- 数值标签 -->
+        <!-- Numeric labels -->
         <g v-if="config.chart.showValues !== false" class="value-labels">
           <text
             v-for="(item, index) in chartData"
@@ -131,18 +131,18 @@
         </g>
       </svg>
 
-      <!-- 工具提示 -->
+      <!-- tooltip -->
       <div v-if="tooltip.visible" class="chart-tooltip" :style="tooltipStyle">
         <div class="tooltip-title">{{ tooltip.data?.name }}</div>
         <div class="tooltip-value">
-          值: {{ formatValue(tooltip.data?.value) }}
+          value: {{ formatValue(tooltip.data?.value) }}
           <span v-if="tooltip.data?.unit">{{ tooltip.data.unit }}</span>
         </div>
-        <div v-if="tooltip.data?.count" class="tooltip-count">数量: {{ tooltip.data.count }}</div>
+        <div v-if="tooltip.data?.count" class="tooltip-count">quantity: {{ tooltip.data.count }}</div>
       </div>
     </div>
 
-    <!-- 图例 -->
+    <!-- legend -->
     <div v-if="config.chart.showLegend !== false && chartData.length > 0" class="chart-legend">
       <div v-for="(item, index) in chartData.slice(0, 5)" :key="`legend-${index}`" class="legend-item">
         <span class="legend-color" :style="{ backgroundColor: getBarColor(index) }"></span>
@@ -155,7 +155,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
-// Props定义
+// Propsdefinition
 interface Props {
   data: any[]
   config: any
@@ -168,7 +168,7 @@ const props = withDefaults(defineProps<Props>(), {
   error: null
 })
 
-// Emits定义
+// Emitsdefinition
 const emit = defineEmits<{
   updateData: [data: any]
   updateConfig: [config: any]
@@ -176,7 +176,7 @@ const emit = defineEmits<{
   barHover: [item: any]
 }>()
 
-// 响应式数据
+// Responsive data
 const chartContainer = ref<HTMLElement>()
 const chartWidth = ref(400)
 const chartHeight = ref(300)
@@ -188,7 +188,7 @@ const tooltip = ref({
   data: null as any
 })
 
-// 图表配置
+// Chart configuration
 const chartPadding = {
   top: 20,
   right: 20,
@@ -198,7 +198,7 @@ const chartPadding = {
 
 const gridLines = 5
 
-// 计算属性
+// Computed properties
 const containerClass = computed(() => ({
   'chart-dark': props.config.chart?.theme === 'dark',
   'chart-light': props.config.chart?.theme === 'light'
@@ -212,7 +212,7 @@ const chartData = computed(() => {
 const maxValue = computed(() => {
   if (chartData.value.length === 0) return 100
   const max = Math.max(...chartData.value.map(item => item.value))
-  return max > 0 ? max * 1.1 : 100 // 增加10%的空间
+  return max > 0 ? max * 1.1 : 100 // Increase10%space
 })
 
 const minValue = computed(() => {
@@ -243,7 +243,7 @@ const tooltipStyle = computed(() => ({
   top: `${tooltip.value.y}px`
 }))
 
-// 方法
+// method
 const getBarX = (index: number): number => {
   const availableWidth = chartWidth.value - chartPadding.left - chartPadding.right
   const barCount = chartData.value.length
@@ -292,7 +292,7 @@ const updateChartSize = () => {
 }
 
 const handleMouseMove = (event: MouseEvent) => {
-  // 更新工具提示位置
+  // Update tooltip position
   if (tooltip.value.visible) {
     tooltip.value.x = event.offsetX + 10
     tooltip.value.y = event.offsetY - 10
@@ -316,7 +316,7 @@ const handleBarHover = (index: number, item: any) => {
 }
 
 const handleBarLeave = () => {
-  // 延迟隐藏工具提示，避免闪烁
+  // Delay hiding tooltips，avoid flickering
   setTimeout(() => {
     if (hoveredIndex.value === -1) {
       tooltip.value.visible = false
@@ -332,7 +332,7 @@ const handleRetry = () => {
   emit('updateData', props.data)
 }
 
-// 生命周期
+// life cycle
 onMounted(() => {
   nextTick(() => {
     updateChartSize()
@@ -345,7 +345,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateChartSize)
 })
 
-// 监听配置变化
+// Listen for configuration changes
 watch(
   () => props.config,
   newConfig => {
@@ -355,7 +355,7 @@ watch(
   { deep: true }
 )
 
-// 监听数据变化
+// Monitor data changes
 watch(
   () => props.data,
   newData => {
@@ -363,7 +363,7 @@ watch(
   { deep: true }
 )
 
-// 暴露方法给父组件
+// Expose methods to parent component
 defineExpose({
   updateData: (newData: any) => emit('updateData', newData),
   updateConfig: (newConfig: any) => emit('updateConfig', newConfig),
@@ -552,7 +552,7 @@ defineExpose({
   white-space: nowrap;
 }
 
-/* 深色主题 */
+/* dark theme */
 .chart-dark {
   background: #1f1f1f;
   color: #fff;
@@ -579,13 +579,13 @@ defineExpose({
   color: #d9d9d9;
 }
 
-/* 浅色主题 */
+/* light theme */
 .chart-light {
   background: #ffffff;
   border: 1px solid #e8e8e8;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .chart-title {
     font-size: 14px;

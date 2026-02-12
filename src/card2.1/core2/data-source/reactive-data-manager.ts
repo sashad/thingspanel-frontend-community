@@ -1,6 +1,6 @@
 /**
- * 响应式数据管理器
- * 支持轮询更新、实时订阅等响应式数据获取
+ * Responsive data manager
+ * Support polling updates、Responsive data acquisition such as real-time subscription
  */
 
 import type { StaticDataSource } from './static-data-source'
@@ -12,7 +12,7 @@ type DataSource = StaticDataSource | DeviceApiDataSource
 export interface ReactiveDataSourceConfig {
   dataSourceId: string
   updateStrategy: 'static' | 'polling' | 'realtime'
-  updateInterval?: number // 轮询间隔，单位：毫秒
+  updateInterval?: number // Polling interval，unit：millisecond
   autoStart?: boolean
 }
 
@@ -27,7 +27,7 @@ export interface ReactiveSubscription {
 }
 
 /**
- * 响应式数据管理器
+ * Responsive data manager
  */
 export class ReactiveDataManager {
   private subscriptions = new Map<string, ReactiveSubscription>()
@@ -35,17 +35,17 @@ export class ReactiveDataManager {
   private dataSources = new Map<string, DataSource>()
 
   /**
-   * 注册数据源
+   * Register data source
    */
   registerDataSource(dataSource: DataSource) {
     this.dataSources.set(dataSource.getId(), dataSource)
   }
 
   /**
-   * 移除数据源
+   * Remove data source
    */
   removeDataSource(dataSourceId: string) {
-    // 停止相关订阅
+    // Stop related subscriptions
     const subscriptionsToRemove: string[] = []
     for (const [subId, subscription] of this.subscriptions.entries()) {
       if (subscription.dataSourceId === dataSourceId) {
@@ -61,7 +61,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 创建响应式订阅
+   * Create a responsive subscription
    */
   subscribe(
     dataSourceId: string,
@@ -81,7 +81,7 @@ export class ReactiveDataManager {
 
     this.subscriptions.set(subscriptionId, subscription)
 
-    // 如果配置为自动启动，立即开始
+    // If configured to start automatically，Start now
     if (config.autoStart !== false) {
       this.startSubscription(subscriptionId)
     }
@@ -90,7 +90,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 取消订阅
+   * Unsubscribe
    */
   unsubscribe(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -101,7 +101,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 启动订阅
+   * Start subscription
    */
   startSubscription(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -116,17 +116,17 @@ export class ReactiveDataManager {
 
     switch (subscription.config.updateStrategy) {
       case 'static':
-        // 静态数据：只获取一次
+        // static data：Get only once
         this.fetchDataOnce(subscriptionId)
         break
 
       case 'polling':
-        // 轮询更新：按间隔定期获取
+        // Poll for updates：Obtain at regular intervals
         this.startPolling(subscriptionId)
         break
 
       case 'realtime':
-        // 实时更新：WebSocket等（暂未实现）
+        // real time updates：WebSocketwait（Not yet implemented）
         this.fetchDataOnce(subscriptionId)
         break
 
@@ -135,7 +135,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 停止订阅
+   * Stop subscription
    */
   stopSubscription(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -143,7 +143,7 @@ export class ReactiveDataManager {
 
     subscription.isActive = false
 
-    // 清除轮询定时器
+    // Clear polling timer
     const timer = this.pollingTimers.get(subscriptionId)
     if (timer) {
       clearInterval(timer)
@@ -152,7 +152,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 获取单次数据
+   * Get single data
    */
   private async fetchDataOnce(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -166,33 +166,33 @@ export class ReactiveDataManager {
       subscription.lastUpdate = new Date()
       subscription.errorCount = 0
 
-      // 触发回调
+      // trigger callback
       subscription.callback(data)
     } catch (error) {
       subscription.errorCount++
-      // 如果错误次数过多，暂停订阅
+      // If there are too many errors，Pause subscription
       if (subscription.errorCount >= 3) {
         this.stopSubscription(subscriptionId)
       }
 
-      // 触发回调，传递错误信息
-      subscription.callback({ error: error instanceof Error ? error.message : '数据获取失败' })
+      // trigger callback，pass error message
+      subscription.callback({ error: error instanceof Error ? error.message : 'Data acquisition failed' })
     }
   }
 
   /**
-   * 开始轮询
+   * Start polling
    */
   private startPolling(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
     if (!subscription) return
 
-    const interval = subscription.config.updateInterval || 5000 // 默认5秒
+    const interval = subscription.config.updateInterval || 5000 // default5Second
 
-    // 立即获取一次数据
+    // Get data immediately
     this.fetchDataOnce(subscriptionId)
 
-    // 设置定时器
+    // Set timer
     const timer = setInterval(() => {
       if (subscription.isActive) {
         this.fetchDataOnce(subscriptionId)
@@ -203,7 +203,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 更新订阅配置
+   * Update subscription configuration
    */
   updateSubscriptionConfig(subscriptionId: string, newConfig: Partial<ReactiveDataSourceConfig>) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -211,22 +211,22 @@ export class ReactiveDataManager {
 
     const wasActive = subscription.isActive
 
-    // 停止当前订阅
+    // Stop current subscription
     if (wasActive) {
       this.stopSubscription(subscriptionId)
     }
 
-    // 更新配置
+    // Update configuration
     subscription.config = { ...subscription.config, ...newConfig }
 
-    // 如果之前是活跃的，重新启动
+    // if it was active before，Restart
     if (wasActive) {
       this.startSubscription(subscriptionId)
     }
   }
 
   /**
-   * 手动刷新订阅数据
+   * Manually refresh subscription data
    */
   async refreshSubscription(subscriptionId: string) {
     const subscription = this.subscriptions.get(subscriptionId)
@@ -236,21 +236,21 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 获取订阅状态
+   * Get subscription status
    */
   getSubscriptionStatus(subscriptionId: string): ReactiveSubscription | undefined {
     return this.subscriptions.get(subscriptionId)
   }
 
   /**
-   * 获取所有订阅
+   * Get all subscriptions
    */
   getAllSubscriptions(): ReactiveSubscription[] {
     return Array.from(this.subscriptions.values())
   }
 
   /**
-   * 暂停所有订阅
+   * Pause all subscriptions
    */
   pauseAll() {
     for (const subscriptionId of this.subscriptions.keys()) {
@@ -259,7 +259,7 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 恢复所有订阅
+   * Restore all subscriptions
    */
   resumeAll() {
     for (const subscriptionId of this.subscriptions.keys()) {
@@ -268,19 +268,19 @@ export class ReactiveDataManager {
   }
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   dispose() {
-    // 停止所有订阅
+    // Stop all subscriptions
     for (const subscriptionId of this.subscriptions.keys()) {
       this.unsubscribe(subscriptionId)
     }
 
-    // 清理数据源
+    // Clean data source
     this.dataSources.clear()
   }
 }
 
-// 导出单例
+// Export singleton
 export const reactiveDataManager = new ReactiveDataManager()
 export default reactiveDataManager

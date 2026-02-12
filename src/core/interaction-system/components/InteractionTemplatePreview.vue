@@ -1,6 +1,6 @@
 <template>
   <div class="interaction-template-preview">
-    <!-- 模板信息 -->
+    <!-- Template information -->
     <div class="template-info">
       <div class="template-header">
         <n-icon :color="template.color" size="32">
@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <!-- 模板统计 -->
+      <!-- Template statistics -->
       <div class="template-stats">
         <n-space size="large">
           <div class="stat-item">
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <!-- 配置详情 -->
+    <!-- Configuration details -->
     <div class="config-details">
       <h4 class="section-title">{{ t('interaction.template.configDetails') }}</h4>
 
@@ -55,7 +55,7 @@
             </div>
           </template>
 
-          <!-- 响应动作列表 -->
+          <!-- Response action list -->
           <div class="responses-list">
             <div
               v-for="(response, responseIndex) in config.responses"
@@ -88,7 +88,7 @@
       </div>
     </div>
 
-    <!-- 预览演示 -->
+    <!-- Preview demo -->
     <div class="preview-demo">
       <h4 class="section-title">{{ t('interaction.template.effectPreview') }}</h4>
 
@@ -129,7 +129,7 @@
       </div>
     </div>
 
-    <!-- 操作按钮 -->
+    <!-- Action button -->
     <div class="template-actions">
       <n-space justify="space-between">
         <n-button @click="$emit('close')">{{ t('interaction.cancel') }}</n-button>
@@ -156,8 +156,8 @@
 
 <script setup lang="ts">
 /**
- * 交互模板预览组件
- * 展示模板的详细信息和效果预览
+ * Interactive template preview component
+ * Display template details and effect preview
  */
 
 import { ref, computed, onMounted } from 'vue'
@@ -197,17 +197,17 @@ const emit = defineEmits<Emits>()
 const message = useMessage()
 const { t } = useI18n()
 
-// 响应式状态
+// Responsive state
 const demoElement = ref<HTMLElement>()
 const demoElementText = ref('')
 
-// 初始化文本
+// initialization text
 onMounted(() => {
   demoElementText.value = t('interaction.template.clickTest')
 })
 const originalDemoStyles = ref<any>({})
 
-// 计算属性
+// Computed properties
 const getTotalActionsCount = () => {
   return props.template.config.reduce((total, config) => total + config.responses.length, 0)
 }
@@ -217,7 +217,7 @@ const getUniqueEventsCount = () => {
   return events.size
 }
 
-// 工具方法
+// Tool method
 const getEventTagType = (event: InteractionEventType) => {
   const typeMap = {
     click: 'success',
@@ -290,13 +290,13 @@ const formatResponseValue = (response: InteractionResponse) => {
   }
 }
 
-// 演示相关方法
+// Demonstration related methods
 const handleDemoEvent = (eventType: InteractionEventType) => {
   const matchingConfigs = props.template.config.filter(config => config.event === eventType && config.enabled)
 
   if (matchingConfigs.length === 0) return
 
-  // 按优先级排序
+  // Sort by priority
   matchingConfigs.sort((a, b) => (b.priority || 0) - (a.priority || 0))
 
   matchingConfigs.forEach(config => {
@@ -315,7 +315,7 @@ const executeDemoResponse = (response: InteractionResponse) => {
   const element = demoElement.value
   const { action, value, duration = 300, easing = 'ease' } = response
 
-  // 设置过渡效果
+  // Set transition effects
   element.style.transition = `all ${duration}ms ${easing}`
 
   switch (action) {
@@ -347,15 +347,15 @@ const executeDemoResponse = (response: InteractionResponse) => {
       demoElementText.value = String(value)
       break
     case 'triggerAnimation':
-      // 移除之前的动画
+      // Remove previous animation
       element.style.animation = ''
-      // 强制重排
+      // force rearrangement
       element.offsetHeight
-      // 应用新动画
+      // Apply new animation
       element.style.animation = `${value} ${duration}ms ${easing}`
       break
     case 'custom':
-      // 自定义动作，尝试应用为样式对象
+      // Custom action，Try applying as style object
       if (typeof value === 'object' && value) {
         Object.assign(element.style, value)
       }
@@ -368,17 +368,17 @@ const resetDemoElement = () => {
 
   const element = demoElement.value
 
-  // 重置所有样式
+  // Reset all styles
   element.style.cssText = ''
   element.className = 'demo-element'
   demoElementText.value = t('interaction.template.clickTest')
 
-  // 恢复原始样式
+  // Restore original style
   Object.assign(element.style, originalDemoStyles.value)
 }
 
 const runAllDemoInteractions = () => {
-  // 依次触发所有事件类型
+  // Trigger all event types in sequence
   const eventTypes: InteractionEventType[] = ['click', 'hover', 'focus', 'blur', 'custom']
   let delay = 0
 
@@ -388,17 +388,17 @@ const runAllDemoInteractions = () => {
       setTimeout(() => {
         handleDemoEvent(eventType)
       }, delay)
-      delay += 1000 // 每个事件间隔1秒
+      delay += 1000 // every event interval1Second
     }
   })
 
-  // 最后重置
+  // final reset
   setTimeout(() => {
     resetDemoElement()
   }, delay + 1000)
 }
 
-// 操作方法
+// How to operate
 const selectTemplate = () => {
   emit('select', props.template)
   message.success(t('interaction.messages.templateApplied'))
@@ -433,10 +433,10 @@ const exportTemplate = () => {
   }
 }
 
-// 生命周期
+// life cycle
 onMounted(() => {
   if (demoElement.value) {
-    // 保存原始样式
+    // Save original style
     const computedStyles = window.getComputedStyle(demoElement.value)
     originalDemoStyles.value = {
       backgroundColor: computedStyles.backgroundColor,
@@ -631,7 +631,7 @@ onMounted(() => {
   border-top: 1px solid var(--border-color);
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .template-header {
     flex-direction: column;
@@ -654,7 +654,7 @@ onMounted(() => {
   }
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .interaction-template-preview::-webkit-scrollbar,
 .config-list::-webkit-scrollbar {
   width: 6px;
@@ -677,7 +677,7 @@ onMounted(() => {
   background: var(--text-color-3);
 }
 
-/* 动画效果 */
+/* Animation effects */
 .config-card {
   animation: slideIn 0.3s ease-out;
 }

@@ -27,10 +27,10 @@ interface ImportMeta {
 }
 
 declare namespace Common2 {
-  /** 策略模式 [状态, 为true时执行的回调函数] */
+  /** strategy pattern [state, fortruecallback function executed when] */
   type StrategyAction = [boolean, () => void]
 
-  /** 选项数据 */
+  /** option data */
   type OptionWithKey<K> = { value: K; label: string }
 }
 

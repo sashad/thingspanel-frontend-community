@@ -1,24 +1,24 @@
 /**
- * 脚本引擎类型定义
+ * Script engine type definition
  */
 
-// 脚本执行结果
+// Script execution result
 export interface ScriptExecutionResult<T = any> {
-  /** 执行是否成功 */
+  /** Whether the execution was successful */
   success: boolean
-  /** 执行结果数据 */
+  /** Execution result data */
   data?: T
-  /** 错误信息 */
+  /** error message */
   error?: Error
-  /** 执行时间（毫秒） */
+  /** Execution time（millisecond） */
   executionTime: number
-  /** 执行上下文快照 */
+  /** Execution context snapshot */
   contextSnapshot?: Record<string, any>
-  /** 日志输出 */
+  /** Log output */
   logs: ScriptLog[]
 }
 
-// 脚本日志
+// Script log
 export interface ScriptLog {
   level: 'log' | 'warn' | 'error' | 'info' | 'debug'
   message: string
@@ -26,79 +26,79 @@ export interface ScriptLog {
   args?: any[]
 }
 
-// 脚本配置
+// Script configuration
 export interface ScriptConfig {
-  /** 脚本代码 */
+  /** script code */
   code: string
-  /** 执行超时时间（毫秒） */
+  /** Execution timeout（millisecond） */
   timeout?: number
-  /** 是否启用严格模式 */
+  /** Whether to enable strict mode */
   strictMode?: boolean
-  /** 是否启用异步支持 */
+  /** Whether to enable asynchronous support */
   asyncSupport?: boolean
-  /** 最大内存使用量（字节） */
+  /** Maximum memory usage（byte） */
   maxMemory?: number
-  /** 自定义全局变量 */
+  /** Custom global variables */
   globals?: Record<string, any>
-  /** 是否允许网络请求 */
+  /** Whether to allow network requests */
   allowNetworkAccess?: boolean
-  /** 是否允许文件系统访问 */
+  /** Whether to allow file system access */
   allowFileSystemAccess?: boolean
 }
 
-// 脚本执行上下文
+// script execution context
 export interface ScriptExecutionContext {
-  /** 上下文ID */
+  /** contextID */
   id: string
-  /** 上下文名称 */
+  /** context name */
   name: string
-  /** 上下文变量 */
+  /** context variables */
   variables: Record<string, any>
-  /** 内置函数 */
+  /** built-in functions */
   functions: Record<string, Function>
-  /** 上下文创建时间 */
+  /** Context creation time */
   createdAt: number
-  /** 上下文最后更新时间 */
+  /** Context last updated time */
   updatedAt: number
 }
 
-// 脚本模板
+// script template
 export interface ScriptTemplate {
-  /** 模板ID */
+  /** templateID */
   id: string
-  /** 模板名称 */
+  /** Template name */
   name: string
-  /** 模板描述 */
+  /** Template description */
   description?: string
-  /** 模板分类 */
+  /** Template classification */
   category: string
-  /** 模板代码 */
+  /** template code */
   code: string
-  /** 模板参数 */
+  /** template parameters */
   parameters: ScriptTemplateParameter[]
-  /** 示例用法 */
+  /** Example usage */
   example?: string
-  /** 是否为系统模板 */
+  /** Is it a system template? */
   isSystem?: boolean
-  /** 创建时间 */
+  /** creation time */
   createdAt: number
-  /** 更新时间 */
+  /** Update time */
   updatedAt: number
 }
 
-// 脚本模板参数
+// Script template parameters
 export interface ScriptTemplateParameter {
-  /** 参数名称 */
+  /** Parameter name */
   name: string
-  /** 参数类型 */
+  /** Parameter type */
   type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'function'
-  /** 参数描述 */
+  /** Parameter description */
   description?: string
-  /** 是否必需 */
+  /** Is it necessary */
   required: boolean
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
-  /** 参数验证规则 */
+  /** Parameter validation rules */
   validation?: {
     min?: number
     max?: number
@@ -107,138 +107,138 @@ export interface ScriptTemplateParameter {
   }
 }
 
-// 沙箱配置
+// Sandbox configuration
 export interface SandboxConfig {
-  /** 是否启用沙箱 */
+  /** Whether to enable sandbox */
   enabled: boolean
-  /** 允许的全局对象 */
+  /** Allowed global objects */
   allowedGlobals: string[]
-  /** 禁止的全局对象 */
+  /** Forbidden global objects */
   blockedGlobals: string[]
-  /** 是否允许eval */
+  /** Is it allowed?eval */
   allowEval: boolean
-  /** 是否允许Function构造器 */
+  /** Is it allowed?FunctionConstructor */
   allowFunction: boolean
-  /** 是否允许原型污染 */
+  /** Whether prototype contamination is allowed */
   allowPrototypePollution: boolean
-  /** 自定义安全策略 */
+  /** Custom security policy */
   customSecurityPolicy?: (code: string) => boolean
 }
 
-// 脚本引擎配置
+// Script engine configuration
 export interface ScriptEngineConfig {
-  /** 默认脚本配置 */
+  /** Default script configuration */
   defaultScriptConfig: ScriptConfig
-  /** 沙箱配置 */
+  /** Sandbox configuration */
   sandboxConfig: SandboxConfig
-  /** 是否启用缓存 */
+  /** Whether to enable caching */
   enableCache: boolean
-  /** 缓存TTL（毫秒） */
+  /** cacheTTL（millisecond） */
   cacheTTL: number
-  /** 最大并发执行数 */
+  /** Maximum number of concurrent executions */
   maxConcurrentExecutions: number
-  /** 是否启用性能监控 */
+  /** Whether to enable performance monitoring */
   enablePerformanceMonitoring: boolean
 }
 
-// 脚本执行器接口
+// Script Executor Interface
 export interface IScriptExecutor {
-  /** 执行脚本 */
+  /** Execute script */
   execute<T = any>(config: ScriptConfig, context?: ScriptExecutionContext): Promise<ScriptExecutionResult<T>>
-  /** 验证脚本语法 */
+  /** Verify script syntax */
   validateSyntax(code: string): { valid: boolean; error?: string }
-  /** 获取执行统计 */
+  /** Get execution statistics */
   getExecutionStats(): ExecutionStats
 }
 
-// 脚本沙箱接口
+// Script sandbox interface
 export interface IScriptSandbox {
-  /** 创建沙箱环境 */
+  /** Create a sandbox environment */
   createSandbox(config: SandboxConfig): any
-  /** 执行沙箱代码 */
+  /** Execute sandbox code */
   executeInSandbox(code: string, sandbox: any, timeout?: number): Promise<any>
-  /** 销毁沙箱 */
+  /** Destroy sandbox */
   destroySandbox(sandbox: any): void
-  /** 检查代码安全性 */
+  /** Check code security */
   checkCodeSecurity(code: string): { safe: boolean; issues: string[] }
 }
 
-// 脚本模板管理器接口
+// Script template manager interface
 export interface IScriptTemplateManager {
-  /** 获取所有模板 */
+  /** Get all templates */
   getAllTemplates(): ScriptTemplate[]
-  /** 根据分类获取模板 */
+  /** Get templates by category */
   getTemplatesByCategory(category: string): ScriptTemplate[]
-  /** 获取指定模板 */
+  /** Get the specified template */
   getTemplate(id: string): ScriptTemplate | null
-  /** 创建模板 */
+  /** Create template */
   createTemplate(template: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>): ScriptTemplate
-  /** 更新模板 */
+  /** Update template */
   updateTemplate(id: string, updates: Partial<ScriptTemplate>): boolean
-  /** 删除模板 */
+  /** Delete template */
   deleteTemplate(id: string): boolean
-  /** 根据模板生成代码 */
+  /** Generate code based on template */
   generateCode(templateId: string, parameters: Record<string, any>): string
 }
 
-// 上下文管理器接口
+// Context manager interface
 export interface IScriptContextManager {
-  /** 创建执行上下文 */
+  /** Create execution context */
   createContext(name: string, variables?: Record<string, any>): ScriptExecutionContext
-  /** 获取上下文 */
+  /** Get context */
   getContext(id: string): ScriptExecutionContext | null
-  /** 更新上下文 */
+  /** update context */
   updateContext(id: string, updates: Partial<ScriptExecutionContext>): boolean
-  /** 删除上下文 */
+  /** Remove context */
   deleteContext(id: string): boolean
-  /** 克隆上下文 */
+  /** Clone context */
   cloneContext(id: string, newName: string): ScriptExecutionContext | null
-  /** 合并上下文 */
+  /** merge context */
   mergeContexts(sourceId: string, targetId: string): boolean
 }
 
-// 脚本引擎主接口
+// Script engine main interface
 export interface IScriptEngine {
-  /** 脚本执行器 */
+  /** script executor */
   executor: IScriptExecutor
-  /** 脚本沙箱 */
+  /** Script sandbox */
   sandbox: IScriptSandbox
-  /** 模板管理器 */
+  /** Template manager */
   templateManager: IScriptTemplateManager
-  /** 上下文管理器 */
+  /** context manager */
   contextManager: IScriptContextManager
 
-  /** 快速执行脚本 */
+  /** Quickly execute scripts */
   execute<T = any>(code: string, context?: Record<string, any>): Promise<ScriptExecutionResult<T>>
-  /** 使用模板执行 */
+  /** Execute using template */
   executeTemplate<T = any>(templateId: string, parameters: Record<string, any>): Promise<ScriptExecutionResult<T>>
-  /** 获取引擎配置 */
+  /** Get engine configuration */
   getConfig(): ScriptEngineConfig
-  /** 更新引擎配置 */
+  /** Update engine configuration */
   updateConfig(config: Partial<ScriptEngineConfig>): void
 }
 
-// 执行统计
+// Execution statistics
 export interface ExecutionStats {
-  /** 总执行次数 */
+  /** Total execution times */
   totalExecutions: number
-  /** 成功执行次数 */
+  /** Number of successful executions */
   successfulExecutions: number
-  /** 失败执行次数 */
+  /** Number of failed executions */
   failedExecutions: number
-  /** 平均执行时间（毫秒） */
+  /** average execution time（millisecond） */
   averageExecutionTime: number
-  /** 最长执行时间（毫秒） */
+  /** Maximum execution time（millisecond） */
   maxExecutionTime: number
-  /** 最短执行时间（毫秒） */
+  /** Minimum execution time（millisecond） */
   minExecutionTime: number
-  /** 当前并发执行数 */
+  /** Current number of concurrent executions */
   currentConcurrentExecutions: number
 }
 
-// 内置工具函数类型
+// Built-in utility function types
 export interface BuiltinUtilities {
-  /** 数据生成工具 */
+  /** Data generation tools */
   mockData: {
     randomNumber: (min?: number, max?: number) => number
     randomString: (length?: number) => string
@@ -248,7 +248,7 @@ export interface BuiltinUtilities {
     randomObject: (template: Record<string, any>) => any
   }
 
-  /** 数据处理工具 */
+  /** data processing tools */
   dataUtils: {
     deepClone: <T>(obj: T) => T
     merge: (...objects: any[]) => any
@@ -258,7 +258,7 @@ export interface BuiltinUtilities {
     sortBy: <T>(array: T[], key: keyof T | ((item: T) => any)) => T[]
   }
 
-  /** 时间工具 */
+  /** time tool */
   timeUtils: {
     now: () => number
     format: (date: Date | number, format: string) => string
@@ -268,7 +268,7 @@ export interface BuiltinUtilities {
     endOfDay: (date: Date) => Date
   }
 
-  /** 网络工具 */
+  /** Network tools */
   networkUtils: {
     httpGet: (url: string, options?: RequestInit) => Promise<any>
     httpPost: (url: string, data: any, options?: RequestInit) => Promise<any>
@@ -276,7 +276,7 @@ export interface BuiltinUtilities {
     httpDelete: (url: string, options?: RequestInit) => Promise<any>
   }
 
-  /** 日志工具 */
+  /** Logging tool */
   logger: {
     log: (...args: any[]) => void
     warn: (...args: any[]) => void
@@ -286,7 +286,7 @@ export interface BuiltinUtilities {
   }
 }
 
-// 预定义模板分类
+// Predefined template categories
 export enum TemplateCategory {
   DATA_GENERATION = 'data-generation',
   DATA_PROCESSING = 'data-processing',

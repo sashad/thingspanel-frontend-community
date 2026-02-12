@@ -6,8 +6,8 @@
 
 <script setup lang="ts">
 /**
- * 饼图组件
- * 使用 ECharts 实现饼图可视化
+ * Pie chart component
+ * use ECharts Implement pie chart visualization
  */
 
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 🔥 关键：使用 computed 包装 props.data
+// 🔥 key：use computed Package props.data
 const { unifiedConfig, displayData } = useCard2Props({
   config: props.config,
   data: computed(() => props.data),
@@ -44,17 +44,17 @@ const chartRef = ref<HTMLElement>()
 const chartContainerRef = ref<HTMLElement>()
 let chartInstance: echarts.ECharts | null = null
 
-// 计算显示数据
+// Calculate display data
 const displayPieData = computed(() => {
   const dataSourceData = displayData.value?.main?.data?.data
   return Array.isArray(dataSourceData)
     ? dataSourceData
     : [
-        { name: '类别A', value: 335 },
-        { name: '类别B', value: 234 },
-        { name: '类别C', value: 154 },
-        { name: '类别D', value: 135 },
-        { name: '类别E', value: 105 }
+        { name: 'categoryA', value: 335 },
+        { name: 'categoryB', value: 234 },
+        { name: 'categoryC', value: 154 },
+        { name: 'categoryD', value: 135 },
+        { name: 'categoryE', value: 105 }
       ]
 })
 
@@ -74,7 +74,7 @@ const updateChart = () => {
 
   const config = unifiedConfig.value.component || {}
 
-  // 计算半径
+  // Calculate radius
   let radius: string | string[]
   if (config.isDonut) {
     const outer = config.radius || '70%'
@@ -86,7 +86,7 @@ const updateChart = () => {
 
   const option: EChartsOption = {
     title: {
-      text: config.title || '数据分布',
+      text: config.title || 'Data distribution',
       left: 'center',
       textStyle: {
         color: 'var(--text-color-1, #333)',
@@ -107,7 +107,7 @@ const updateChart = () => {
     },
     series: [
       {
-        name: config.title || '数据',
+        name: config.title || 'data',
         type: 'pie',
         radius: radius,
         center: ['50%', '55%'],

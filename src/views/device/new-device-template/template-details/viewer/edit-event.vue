@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 事件编辑组件
- * 从 src/views/device/template/components/step/add-edit-events.vue 复制
+ * Event editing component
+ * from src/views/device/template/components/step/add-edit-events.vue copy
  */
 
 import type { Ref } from 'vue'
@@ -37,7 +37,7 @@ const props = defineProps({
 const deviceTemplateId = ref<string>(props.deviceTemplateId)
 const objItem = reactive<any>(props.editItem)
 
-// 添加参数配置
+// Add parameter configuration
 let addParameterFrom: any = reactive({
   data_name: '',
   data_identifier: '',
@@ -63,7 +63,7 @@ const addParameterRules: any = reactive({
   }
 })
 
-// 编辑
+// edit
 const addFlag: Ref<boolean> = ref(true)
 const edit: (row: any) => void = row => {
   addParameter.value = true
@@ -71,13 +71,13 @@ const edit: (row: any) => void = row => {
   addParameterFrom = reactive({ ...row })
 }
 
-// 删除
+// delete
 const del: (id: string) => void = async id => {
   const index: number = eventsData.findIndex(item => item.id === id)
   eventsData.splice(index, 1)
 }
 
-// 表格配置
+// Table configuration
 const col: Ref<DataTableColumns<any>> = ref([
   {
     key: 'data_name',
@@ -126,7 +126,7 @@ const col: Ref<DataTableColumns<any>> = ref([
   }
 ])
 
-// 提交表单
+// Submit form
 const formRef: any = ref(null)
 const formRefs: any = ref(null)
 
@@ -138,7 +138,7 @@ let addFrom: any = reactive({
   params: ''
 })
 
-// 监听一下父组件传递过来的编辑数据
+// Listen to the editing data passed by the parent component
 watch(
   objItem,
   newVal => {
@@ -189,7 +189,7 @@ const addParams: () => void = () => {
   addParameter.value = true
 }
 
-// 确定按钮
+// OK button
 const submit: () => void = async () => {
   await formRef.value?.validate()
   addFrom.params = JSON.stringify(eventsData)
@@ -208,7 +208,7 @@ const submit: () => void = async () => {
   }
 }
 
-// 取消按钮
+// Cancel button
 const clear: () => void = () => {
   emit('cancel')
 }
@@ -223,7 +223,7 @@ const addParameterClone: () => void = () => {
   })
 }
 
-// 新增确定参数的按钮
+// Added button to confirm parameters
 const parameterSubmit: () => void = async () => {
   await formRefs.value?.validate()
   if (addFlag.value) {

@@ -1,4 +1,4 @@
-/** 用于恢复页面参数 */
+/** Used to restore page parameters */
 import { useRoute } from 'vue-router'
 
 const queryCache = new Map<string, Record<string, any>>()

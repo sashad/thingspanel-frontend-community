@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useEditorStore } from './editor'
 
-// 从旧的 StateManager 迁移过来的状态
+// from old StateManager Migrated status
 interface WidgetState {
   selectedIds: string[]
 }
@@ -17,14 +17,14 @@ export const useWidgetStore = defineStore('widget', {
     }
   },
   actions: {
-    // 选择操作
+    // Select action
     selectNodes(ids: string[]) {
       this.selectedIds = [...ids]
     },
     clearSelection() {
       this.selectedIds = []
     },
-    // 当节点被删除时，也需要更新选中状态
+    // when node is deleted，It is also necessary to update the selected status
     removeNodeFromSelection(id: string) {
       this.selectedIds = this.selectedIds.filter(selectedId => selectedId !== id)
     },

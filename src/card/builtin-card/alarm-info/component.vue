@@ -2,10 +2,10 @@
   <div class="p-4 h-full bg-white dark:bg-gray-800 rounded-lg shadow-md flex flex-col">
     <div class="flex justify-between items-center mb-3 flex-shrink-0">
       <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100">
-        {{ $t('card.alarmInfo.title', '告警信息') }}
+        {{ $t('card.alarmInfo.title', 'Alarm information') }}
       </h3>
       <NButton text size="small" type="primary" @click="viewAllAlarms">
-        {{ $t('card.alarmInfo.viewAll', '查看全部') }}
+        {{ $t('card.alarmInfo.viewAll', 'View all') }}
       </NButton>
     </div>
     <div class="flex-grow overflow-auto relative">

@@ -2,21 +2,21 @@ import type { ComponentDefinition } from '@/card2.1/core2'
 import component from './component.vue'
 
 /**
- * 告警信息组件定义
- * 显示最新的告警信息列表，支持查看详情和状态展示
+ * Alarm information component definition
+ * Display the latest alarm information list，Support viewing details and status display
  */
 export default {
   type: 'alarm-info',
-  name: 'components.alarmInfo', // 存储翻译键，而不是调用$t()
-  description: '显示最新的告警信息列表，包含告警名称、状态、内容和时间',
+  name: 'components.alarmInfo', // Store translation keys，instead of calling$t()
+  description: 'Display the latest alarm information list，Contains the alarm name、state、content and time',
   icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
   component,
   version: '2.1.0',
-  tags: ['告警', '信息展示', '状态监控', '交互'],
-  dataDriven: false, // 这是一个纯交互性组件，不依赖外部数据源驱动
+  tags: ['Alarm', 'Information display', 'status monitoring', 'interaction'],
+  dataDriven: false, // This is a purely interactive component，Does not rely on external data source drivers
   interactionCapabilities: {
-    // 声明组件支持点击事件和导航功能
+    // Declare the component to support click events and navigation functions
     supportedEvents: ['click', 'navigate'],
   },
-  permission: '不限'
+  permission: 'NO_LIMIT'
 } as ComponentDefinition

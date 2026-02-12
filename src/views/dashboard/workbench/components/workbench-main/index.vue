@@ -19,7 +19,7 @@ const technology: Technology[] = [
     id: 0,
     name: 'Vue',
     description: $t('card.vueDesc'),
-    author: '尤雨溪 - Evan You',
+    author: 'You Yuxi - Evan You',
     site: 'https://v3.cn.vuejs.org/',
     icon: 'logos:vue'
   },
@@ -27,7 +27,7 @@ const technology: Technology[] = [
     id: 1,
     name: 'TypeScript',
     description: $t('card.typeScriptDesc'),
-    author: '微软 - Microsoft',
+    author: 'Microsoft - Microsoft',
     site: 'https://www.typescriptlang.org/',
     icon: 'logos:typescript-icon'
   },
@@ -35,7 +35,7 @@ const technology: Technology[] = [
     id: 2,
     name: 'Vite',
     description: $t('card.viteDesc'),
-    author: '尤雨溪 - Evan You',
+    author: 'You Yuxi - Evan You',
     site: 'https://vitejs.cn/',
     icon: 'logos:vitejs'
   },
@@ -43,7 +43,7 @@ const technology: Technology[] = [
     id: 3,
     name: 'NaiveUI',
     description: $t('card.naviewUIDesc'),
-    author: '图森未来 - TuSimple',
+    author: 'TuSimple - TuSimple',
     site: 'https://www.naiveui.com/zh-CN/os-theme',
     icon: 'logos:naiveui'
   },
@@ -74,27 +74,27 @@ interface Activity {
 const activity: Activity[] = [
   {
     id: 4,
-    content: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！',
+    content: 'Soybean I just wrote some random things on the workbench page.，It is okay to watch！',
     time: '2021-11-07 22:45:32'
   },
   {
     id: 3,
-    content: 'Soybean 正在忙于为soybean-admin写项目说明文档！',
+    content: 'Soybean are busy working onsoybean-adminWrite project documentation！',
     time: '2021-11-03 20:33:31'
   },
   {
     id: 2,
-    content: 'Soybean 准备为soybean-admin 1.0的发布做充分的准备工作！',
+    content: 'Soybean Prepare forsoybean-admin 1.0Make adequate preparations for the release of！',
     time: '2021-10-31 22:43:12'
   },
   {
     id: 1,
-    content: '@yanbowe 向soybean-admin提交了一个bug，多标签栏不会自适应。',
+    content: '@yanbowe Towardssoybean-adminsubmitted abug，Multi-tab bar will not adapt。',
     time: '2021-10-27 10:24:54'
   },
   {
     id: 0,
-    content: 'Soybean 在2021年5月28日创建了开源项目soybean-admin！',
+    content: 'Soybean exist2021Year5moon28Open source project created in Japansoybean-admin！',
     time: '2021-05-28 22:22:22'
   }
 ]
@@ -109,25 +109,25 @@ interface Shortcuts {
 const shortcuts: Shortcuts[] = [
   {
     id: 0,
-    label: '主控台',
+    label: 'main console',
     icon: 'mdi:desktop-mac-dashboard',
     iconColor: '#409eff'
   },
   {
     id: 1,
-    label: '系统管理',
+    label: 'System management',
     icon: 'ic:outline-settings',
     iconColor: '#7238d1'
   },
-  { id: 2, label: '权限管理', icon: 'mdi:family-tree', iconColor: '#f56c6c' },
+  { id: 2, label: 'Permission management', icon: 'mdi:family-tree', iconColor: '#f56c6c' },
   {
     id: 3,
-    label: '组件',
+    label: 'components',
     icon: 'fluent:app-store-24-filled',
     iconColor: '#19a2f1'
   },
-  { id: 4, label: '表格', icon: 'mdi:table-large', iconColor: '#fab251' },
-  { id: 5, label: '图表', icon: 'mdi:chart-areaspline', iconColor: '#8aca6b' }
+  { id: 4, label: 'sheet', icon: 'mdi:table-large', iconColor: '#fab251' },
+  { id: 5, label: 'chart', icon: 'mdi:chart-areaspline', iconColor: '#8aca6b' }
 ]
 </script>
 

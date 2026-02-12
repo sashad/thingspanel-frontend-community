@@ -1,6 +1,6 @@
 /**
- * Card 2.1 组件树形结构 Hook
- * 提供组件分类、筛选和树形结构生成功能
+ * Card 2.1 Component tree structure Hook
+ * Provide component classification、Filtering and tree structure generation functions
  */
 
 import { ref, computed, onMounted, onUnmounted, shallowRef, readonly } from 'vue'
@@ -14,7 +14,7 @@ import type { ComponentDefinition } from '@/card2.1/types'
 import type { ComponentTree, ComponentCategory } from '@/card2.1/core2/registry'
 import { permissionWatcher } from '@/card2.1/core2/utils'
 
-// 🔥 全局共享状态，确保多个实例同步
+// 🔥 Global shared state，Ensure multiple instances are in sync
 let globalComponentTree = shallowRef<ComponentTree>({ categories: [], components: [], totalCount: 0 })
 let globalIsLoading = ref(false)
 let globalError = ref<string | null>(null)
@@ -39,21 +39,21 @@ export interface FilteredComponentTree extends ComponentTree {
 export function useComponentTree(options: ComponentTreeOptions = {}) {
   const { autoInit = true, filter, sortBy = 'name', sortOrder = 'asc' } = options
 
-  // 🔥 修复：使用全局共享状态，确保多个实例同步
+  // 🔥 repair：Use global shared state，Ensure multiple instances are in sync
   const isLoading = globalIsLoading
   const error = globalError
   const componentTree = globalComponentTree
 
-  // 筛选状态
+  // filter status
   const searchQuery = ref('')
   const selectedMainCategory = ref<string>('')
   const selectedSubCategory = ref<string>('')
 
   /**
-   * 初始化组件树
+   * Initialize component tree
    */
   const initialize = async () => {
-    // 🔥 修复：避免重复初始化
+    // 🔥 repair：Avoid repeated initialization
     if (globalInitialized && componentTree.value.totalCount > 0) {
       return
     }
@@ -70,17 +70,17 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
 
       const tree = await getComponentTree()
 
-      // 🔥 调试：打印获取到的组件树数据
-      console.group('🔥 [useComponentTree] 获取到的组件树数据')
-      console.log('组件树:', tree)
-      console.log('分类数量:', tree.categories?.length)
-      console.log('组件数量:', tree.components?.length)
-      console.log('分类详情:', tree.categories?.map(cat => ({
+      // 🔥 debug：Print the obtained component tree data
+      console.group('🔥 [useComponentTree] Obtained component tree data')
+      console.log('component tree:', tree)
+      console.log('Number of categories:', tree.categories?.length)
+      console.log('Number of components:', tree.components?.length)
+      console.log('Classification details:', tree.categories?.map(cat => ({
         name: cat.name,
         children: cat.children?.length || 0
       })))
-      console.log('组件分类统计:', tree.components?.reduce((acc, comp) => {
-        const mainCat = comp.mainCategory || '未知'
+      console.log('Component classification statistics:', tree.components?.reduce((acc, comp) => {
+        const mainCat = comp.mainCategory || 'unknown'
         acc[mainCat] = (acc[mainCat] || 0) + 1
         return acc
       }, {} as Record<string, number>))
@@ -88,32 +88,32 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
 
       componentTree.value = tree
 
-      // 🔥 修复：强制触发响应性更新
+      // 🔥 repair：Force triggering of responsive updates
       componentTree.value = { ...tree }
 
-      // 🔥 修复：标记全局初始化完成
+      // 🔥 repair：Mark global initialization complete
       globalInitialized = true
 
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '初始化失败'
-      console.error('❌ [useComponentTree] 初始化失败:', err)
+      error.value = err instanceof Error ? err.message : 'Initialization failed'
+      console.error('❌ [useComponentTree] Initialization failed:', err)
     } finally {
       isLoading.value = false
     }
   }
 
   /**
-   * 筛选组件
+   * Filter components
    */
   const filteredComponents = computed(() => {
     let components = componentTree.value.components
 
-    // 应用自定义筛选器
+    // Apply custom filters
     if (filter) {
       components = components.filter(filter)
     }
 
-    // 应用搜索筛选
+    // Apply search filters
     if (searchQuery.value) {
       const query = searchQuery.value.toLowerCase()
       components = components.filter(
@@ -124,7 +124,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
       )
     }
 
-    // 应用分类筛选
+    // Apply category filter
     if (selectedMainCategory.value) {
       components = components.filter(comp => comp.mainCategory === selectedMainCategory.value)
     }
@@ -133,7 +133,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
       components = components.filter(comp => comp.subCategory === selectedSubCategory.value)
     }
 
-    // 排序
+    // sort
     components.sort((a, b) => {
       let aValue: string
       let bValue: string
@@ -156,7 +156,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
           bValue = b.name || ''
       }
 
-      // 确保值不为undefined，防止localeCompare报错
+      // Make sure the value is notundefined，preventlocaleCompareReport an error
       const safeAValue = String(aValue || '')
       const safeBValue = String(bValue || '')
 
@@ -168,7 +168,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   })
 
   /**
-   * 获取筛选后的组件树
+   * Get the filtered component tree
    */
   const getFilteredTree = computed((): FilteredComponentTree => {
     return {
@@ -183,20 +183,20 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   })
 
   /**
-   * 按分类获取组件
+   * Get components by category
    */
   const getComponentsByCategory = async (mainCategory?: string, subCategory?: string) => {
     return await getComponentsByCategoryFromIndex(mainCategory, subCategory)
   }
 
   /**
-   * 获取所有分类
+   * Get all categories
    */
   const categories = computed(() => {
-    // 如果未初始化，返回空数组
+    // if not initialized，Return empty array
     if (!globalInitialized) return []
     try {
-      // 从已加载的组件树中获取分类信息，避免异步调用
+      // Get classification information from loaded component tree，Avoid asynchronous calls
       return componentTree.value.categories?.map(cat => cat.name) || []
     } catch {
       return []
@@ -204,7 +204,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   })
 
   /**
-   * 获取可用的主分类
+   * Get available main categories
    */
   const availableMainCategories = computed(() => {
     const categories = new Set<string>()
@@ -217,7 +217,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   })
 
   /**
-   * 获取可用的子分类
+   * Get available subcategories
    */
   const availableSubCategories = computed(() => {
     const categories = new Set<string>()
@@ -230,7 +230,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   })
 
   /**
-   * 清除筛选条件
+   * Clear filters
    */
   const clearFilters = () => {
     searchQuery.value = ''
@@ -239,7 +239,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   }
 
   /**
-   * 重置到初始状态
+   * Reset to initial state
    */
   const reset = () => {
     clearFilters()
@@ -248,39 +248,39 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   }
 
   /**
-   * 🔥 关键修复：获取指定类型的组件实例
-   * Card2Wrapper 需要此方法来加载实际的 Vue 组件
+   * 🔥 critical fix：Get a component instance of a specified type
+   * Card2Wrapper This method is needed to load the actual Vue components
    */
   const getComponent = async (componentType: string) => {
-    // 🔥 修复死循环：移除强制重新初始化，避免与Card2Wrapper循环调用
+    // 🔥 Fix infinite loop：Remove forced reinitialization，avoid withCard2WrapperLoop call
     if (filteredComponents.value.length === 0) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn(`⚠️ [useComponentTree] 没有可用组件，等待系统初始化完成`)
+        console.warn(`⚠️ [useComponentTree] No components available，Wait for system initialization to complete`)
       }
       return null
     }
 
-    // 从已注册的组件中查找
+    // Find from registered components
     const componentDefinition = filteredComponents.value.find(comp => comp.type === componentType)
 
     if (!componentDefinition) {
-      console.error(`❌ [useComponentTree] 组件类型未找到: ${componentType}`)
+      console.error(`❌ [useComponentTree] Component type not found: ${componentType}`)
       return null
     }
 
-    // 返回组件实例
+    // Return component instance
     return componentDefinition.component
   }
 
-  // 权限变更监听
+  // Permission change monitoring
   let unsubscribePermissionWatcher: (() => void) | null = null
 
-  // 自动初始化
+  // automatic initialization
   if (autoInit) {
     onMounted(() => {
       initialize()
 
-      // 监听权限变更
+      // Monitor permission changes
       unsubscribePermissionWatcher = permissionWatcher.onPermissionChange((newAuthority, oldAuthority) => {
         globalInitialized = false
         initialize()
@@ -288,7 +288,7 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
     })
 
     onUnmounted(() => {
-      // 取消权限监听
+      // Cancel permission monitoring
       if (unsubscribePermissionWatcher) {
         unsubscribePermissionWatcher()
       }
@@ -296,24 +296,24 @@ export function useComponentTree(options: ComponentTreeOptions = {}) {
   }
 
   return {
-    // 状态
+    // state
     isLoading: readonly(isLoading),
     error: readonly(error),
     componentTree: readonly(componentTree),
 
-    // 筛选状态
+    // filter status
     searchQuery,
     selectedMainCategory,
     selectedSubCategory,
 
-    // 计算属性
+    // Computed properties
     filteredComponents,
     getFilteredTree,
     categories,
     availableMainCategories,
     availableSubCategories,
 
-    // 方法
+    // method
     initialize,
     getComponent,
     getComponentsByCategory,

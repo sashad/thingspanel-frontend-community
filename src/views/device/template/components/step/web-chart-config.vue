@@ -9,17 +9,17 @@ import templatePanel from '../card-select/template-panel.vue'
 const emit = defineEmits(['update:stepCurrent', 'update:modalVisible'])
 
 const props = defineProps({
-  // 当前的步骤
+  // current steps
   stepCurrent: {
     type: Number,
     required: true
   },
-  // 添加用的模态框状态
+  // Add modal box state
   modalVisible: {
     type: Boolean,
     required: true
   },
-  // 当前的设备模型id
+  // Current device modelid
   deviceTemplateId: {
     type: String,
     required: true
@@ -29,15 +29,15 @@ const props = defineProps({
 const web_chart_config = ref<ICardView[]>([])
 provide('web_chart_config', web_chart_config)
 
-// 取消
+// Cancel
 const cancellation: () => void = () => {
   emit('update:modalVisible')
 }
-// 上一步
+// Previous step
 const back: () => void = () => {
   emit('update:stepCurrent', 2)
 }
-// 下一步
+// Next step
 // eslint-disable-next-line consistent-return
 const next = async () => {
   let flag = false

@@ -1991,7 +1991,7 @@ declare namespace App {
         : K
       : never
 
-    // 将 I18nKey 定义为 string 来避免无限递归错误
+    // Will I18nKey defined as string to avoid infinite recursion errors
     type I18nKey = string
 
     type TranslateOptions<Locales extends string> = import('vue-i18n').TranslateOptions<Locales>
@@ -2058,21 +2058,21 @@ declare namespace App {
       result: T
     }
     /**
-     * 请求的错误类型：
+     * Requested error type：
      *
-     * - axios: axios错误：网络错误, 请求超时, 默认的兜底错误
-     * - http: 请求成功，响应的http状态码非200的错误
-     * - backend: 请求成功，响应的http状态码为200，由后端定义的业务错误
+     * - axios: axiosmistake：network error, Request timeout, 默认的兜底mistake
+     * - http: Request successful，responsivehttpStatus code is not200error
+     * - backend: Request successful，responsivehttpThe status code is200，Business errors defined by the backend
      */
     type RequestErrorType = 'axios' | 'http' | 'backend'
 
-    /** 请求错误 */
+    /** Request error */
     interface RequestError {
-      /** 请求服务的错误类型 */
+      /** Error type requesting service */
       type: RequestErrorType
-      /** 错误码 */
+      /** error code */
       code: string | number
-      /** 错误信息 */
+      /** error message */
       msg: string
     }
 
@@ -2087,38 +2087,38 @@ declare namespace App {
       data: T
     }
 
-    /** 后端接口返回的数据结构配置 */
+    /** Data structure configuration returned by the backend interface */
     interface BackendResultConfig {
-      /** 表示后端请求状态码的属性字段 */
+      /** Attribute field representing the backend request status code */
       codeKey: string
-      /** 表示后端请求数据的属性字段 */
+      /** Attribute fields representing backend request data */
       dataKey: string
-      /** 表示后端消息的属性字段 */
+      /** Represents the attribute fields of the backend message */
       msgKey: string
-      /** 后端业务上定义的成功请求的状态 */
+      /** The status of successful requests defined on the backend business */
       successCode: number | string
     }
 
-    /** 自定义的请求成功结果 */
+    /** Customized request success result */
     interface SuccessResult<T = any> {
-      /** 请求错误 */
+      /** Request error */
       error: null
-      /** 请求数据 */
+      /** Request data */
       data: T
     }
 
-    /** 自定义的请求失败结果 */
+    /** Customized request failure results */
     interface FailedResult {
-      /** 请求错误 */
+      /** Request error */
       error: RequestError
-      /** 请求数据 */
+      /** Request data */
       data: null
     }
 
-    /** 自定义的请求结果 */
+    /** Customized request results */
     type RequestResult<T = any> = SuccessResult<T> | FailedResult
 
-    /** 多个请求数据结果 */
+    /** Multiple request data results */
     type MultiRequestResult<T extends any[]> = T extends [infer First, ...infer Rest]
       ? [First] extends [any]
         ? Rest extends any[]
@@ -2129,20 +2129,20 @@ declare namespace App {
           : []
       : []
 
-    /** 请求结果的适配器函数 */
+    /** Adapter function to request results */
     type ServiceAdapter<T = any, A extends any[] = any> = (...args: A) => T
 
-    /** mock示例接口类型：后端接口返回的数据的类型 */
+    /** mockExample interface type：The type of data returned by the backend interface */
     interface MockServiceResult<T = any> {
-      /** 状态码 */
+      /** status code */
       code: string | number
-      /** 接口数据 */
+      /** interface data */
       data: T
-      /** 接口消息 */
+      /** interface message */
       message: string
     }
 
-    /** mock的响应option */
+    /** mockresponseoption */
     interface MockOption {
       url: Record<string, any>
       body: Record<string, any>

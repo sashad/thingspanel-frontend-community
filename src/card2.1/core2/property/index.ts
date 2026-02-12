@@ -1,9 +1,9 @@
 /**
- * 属性系统导出
+ * Attribute system export
  */
 
 export * from './property-exposure'
 export * from './whitelist'
 
-// 默认导出属性暴露管理器实例
+// Default export property exposure manager instance
 export { propertyExposureManager } from './property-exposure'

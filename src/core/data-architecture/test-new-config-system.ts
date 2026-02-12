@@ -1,12 +1,12 @@
 /**
- * 新配置管理系统测试脚本
- * 验证ConfigurationStateManager和ConfigurationIntegrationBridge的工作效果
+ * New configuration management system test script
+ * verifyConfigurationStateManagerandConfigurationIntegrationBridgework effect
  *
- * 测试场景：
- * 1. 模拟添加第二个数据项的场景（原本会导致无限循环）
- * 2. 验证内容哈希去重机制
- * 3. 验证循环检测机制
- * 4. 验证配置版本控制
+ * test scenario：
+ * 1. Simulate the scenario of adding a second data item（Would have resulted in an infinite loop）
+ * 2. Verify content hash deduplication mechanism
+ * 3. Verification loop detection mechanism
+ * 4. Verify configuration version control
  */
 
 import { configurationStateManager } from '@/components/visual-editor/configuration/ConfigurationStateManager'
@@ -14,12 +14,12 @@ import { configurationIntegrationBridge } from '@/components/visual-editor/confi
 import type { WidgetConfiguration } from '@/components/visual-editor/configuration/types'
 
 /**
- * 测试配置内容哈希去重机制
+ * Test configuration content hash deduplication mechanism
  */
 async function testContentHashDeduplication() {
   const testComponentId = 'test-component-hash'
 
-  // 初始化组件配置
+  // Initialize component configuration
   configurationStateManager.initializeConfiguration(testComponentId)
 
   const testConfig: WidgetConfiguration = {
@@ -50,30 +50,30 @@ async function testContentHashDeduplication() {
     }
   }
 
-  // 第一次设置配置
+  // Setting up configuration for the first time
   const result1 = configurationStateManager.setConfiguration(testComponentId, testConfig, 'user')
 
-  // 第二次设置相同配置（应该被去重）
+  // Set the same configuration for the second time（should be deduplicated）
   const result2 = configurationStateManager.setConfiguration(testComponentId, testConfig, 'user')
 
-  // 第三次设置稍微不同的配置
+  // Set up a slightly different configuration the third time
   const modifiedConfig = {
     ...testConfig,
     base: { ...testConfig.base, title: 'Modified Test Component' }
   }
   const result3 = configurationStateManager.setConfiguration(testComponentId, modifiedConfig, 'user')
 
-  // 获取配置版本信息
+  // Get configuration version information
   const version = configurationStateManager.getConfigurationVersion(testComponentId)
 }
 
 /**
- * 测试配置分节更新的循环检测
+ * Test loop detection for section-by-section update of configuration
  */
 async function testSectionUpdateCircularDetection() {
   const testComponentId = 'test-component-circular'
 
-  // 初始化组件配置
+  // Initialize component configuration
   configurationStateManager.initializeConfiguration(testComponentId)
 
   const dataSourceConfig = {
@@ -106,7 +106,7 @@ async function testSectionUpdateCircularDetection() {
     'user'
   )
 
-  // 模拟快速连续更新（测试循环检测）
+  // Simulate rapid continuous updates（Test loop detection）
   setTimeout(() => {
     const result3 = configurationStateManager.updateConfigurationSection(
       testComponentId,
@@ -127,15 +127,15 @@ async function testSectionUpdateCircularDetection() {
 }
 
 /**
- * 测试添加第二个数据项的场景（原始问题场景）
+ * Test the scenario of adding a second data item（Original problem scenario）
  */
 async function testAddSecondDataItemScenario() {
   const testComponentId = 'test-component-second-item'
 
-  // 初始化组件配置
+  // Initialize component configuration
   configurationStateManager.initializeConfiguration(testComponentId)
 
-  // 模拟第一个数据项
+  // Simulate the first data item
   const firstItemConfig = {
     componentId: testComponentId,
     dataSources: [
@@ -165,10 +165,10 @@ async function testAddSecondDataItemScenario() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 等待防抖处理
+  // Waiting for anti-shake processing
   await new Promise(resolve => setTimeout(resolve, 100))
 
-  // 模拟第二个数据项（这是原本导致无限循环的场景）
+  // Simulate the second data item（This is the scenario that originally resulted in an infinite loop）
   const secondItemConfig = {
     componentId: testComponentId,
     dataSources: [
@@ -184,7 +184,7 @@ async function testAddSecondDataItemScenario() {
             processing: { filterPath: '$' }
           }
         ],
-        mergeStrategy: { type: 'object' } // 这里会触发合并策略选择器显示
+        mergeStrategy: { type: 'object' } // This will trigger the display of the merge strategy selector
       }
     ],
     createdAt: Date.now(),
@@ -202,10 +202,10 @@ async function testAddSecondDataItemScenario() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 等待防抖处理
+  // Waiting for anti-shake processing
   await new Promise(resolve => setTimeout(resolve, 100))
 
-  // 模拟合并策略更新
+  // Simulate merge strategy updates
   const strategyUpdateConfig = {
     ...secondItemConfig,
     dataSources: [
@@ -227,7 +227,7 @@ async function testAddSecondDataItemScenario() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 获取最终状态
+  // Get final status
   const finalConfig = configurationStateManager.getConfiguration(testComponentId)
   const finalVersion = configurationStateManager.getConfigurationVersion(testComponentId)
 
@@ -236,28 +236,28 @@ async function testAddSecondDataItemScenario() {
 }
 
 /**
- * 测试配置集成桥接器的兼容性
+ * Test Configuring Integrated Bridge Compatibility
  */
 async function testIntegrationBridgeCompatibility() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 初始化桥接器
+  // Initialize the bridge
   await configurationIntegrationBridge.initialize()
 
   const testComponentId = 'test-component-bridge'
 
-  // 测试初始化配置
+  // Test initialization configuration
   if (process.env.NODE_ENV === 'development') {
   }
   configurationIntegrationBridge.initializeConfiguration(testComponentId)
 
-  // 测试获取配置
+  // Test to get configuration
   const config = configurationIntegrationBridge.getConfiguration(testComponentId)
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 测试更新配置
+  // Test updated configuration
   const updateConfig = {
     componentId: testComponentId,
     dataSources: [
@@ -280,7 +280,7 @@ async function testIntegrationBridgeCompatibility() {
   }
   configurationIntegrationBridge.updateConfiguration(testComponentId, 'dataSource', updateConfig)
 
-  // 等待处理
+  // Waiting for processing
   await new Promise(resolve => setTimeout(resolve, 100))
 
   const updatedConfig = configurationIntegrationBridge.getConfiguration(testComponentId)
@@ -289,7 +289,7 @@ async function testIntegrationBridgeCompatibility() {
 }
 
 /**
- * 主测试函数
+ * Main test function
  */
 export async function runNewConfigSystemTests() {
 
@@ -304,11 +304,11 @@ export async function runNewConfigSystemTests() {
     if (process.env.NODE_ENV === 'development') {
     }
   } catch (error) {
-    console.error('❌ 测试过程中发生错误:', error)
+    console.error('❌ An error occurred during testing:', error)
   }
 }
 
-// 在浏览器环境中暴露测试函数
+// Expose test functions in a browser environment
 if (typeof window !== 'undefined') {
   ;(window as any).testNewConfigSystem = runNewConfigSystemTests
   if (process.env.NODE_ENV === 'development') {

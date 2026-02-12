@@ -4,9 +4,9 @@
     <div class="flex items-center justify-center space-x-4 mb-4">
       <img :src="download_app" alt="QR Code" class="w-24 h-24" />
       <div class="flex flex-col space-y-2">
-        <!-- 你可能需要替换为实际的 App Store 图标 -->
+        <!-- You may need to replace the actual App Store icon -->
         <img :src="app_store" alt="App Store" class="h-10 cursor-pointer" />
-        <!-- 你可能需要替换为实际的 Google Play 图标 -->
+        <!-- You may need to replace the actual Google Play icon -->
         <img :src="google_pla" alt="Google Play" class="h-10 cursor-pointer" />
       </div>
     </div>
@@ -28,9 +28,9 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 在这里添加组件的样式 */
+/* Add the style of the component here */
 img {
-  /* 防止图片被拉伸 */
+  /* Prevent images from being stretched */
   object-fit: contain;
 }
 </style>

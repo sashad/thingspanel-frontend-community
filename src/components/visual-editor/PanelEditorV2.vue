@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * PanelEditor V2 - 基于 PanelLayout 的新一代可视化编辑器
+ * PanelEditor V2 - based on PanelLayout A new generation of visual editor
  *
- * 实现真实的工具栏和渲染器切换功能
+ * Implement real toolbar and renderer switching functions
  */
 
 import { ref, computed, onMounted, onUnmounted, watch, toRaw, provide, nextTick } from 'vue'
@@ -11,7 +11,7 @@ import PanelLayout from '@/components/visual-editor/components/PanelLayout.vue'
 import { VisualEditorToolbar } from '@/components/visual-editor/components/toolbar'
 import WidgetLibrary from '@/components/visual-editor/components/WidgetLibrary/WidgetLibrary.vue'
 import { CanvasRenderer, GridstackRenderer } from '@/components/visual-editor/renderers'
-// TODO: FabricCanvasRenderer 已被删除，需要重新实现或使用 CanvasRenderer 替代
+// TODO: FabricCanvasRenderer has been deleted，Need to be reimplemented or used CanvasRenderer substitute
 import { createEditor } from '@/components/visual-editor/hooks'
 import { ConfigurationPanel } from '@/components/visual-editor/configuration'
 import { usePreviewMode } from '@/components/visual-editor/hooks/usePreviewMode'
@@ -19,29 +19,29 @@ import type { RendererType } from '@/components/visual-editor/types'
 import { useMessage, useDialog } from 'naive-ui'
 import { smartDeepClone } from '@/utils/deep-clone'
 
-// 🔥 轮询系统导入
+// 🔥 Polling system import
 import { useGlobalPollingManager } from '@/components/visual-editor/core/GlobalPollingManager'
 import { usePanelPollingManager } from '@/components/visual-editor/hooks/usePanelPollingManager'
 import { configurationIntegrationBridge as configurationManager } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 import PollingController from '@/components/visual-editor/components/PollingController.vue'
 
-// 🔥 关键修复：导入配置事件总线和数据源触发器
+// 🔥 critical fix：Import configuration event bus and data source triggers
 import { registerDataExecutionTrigger, type ConfigChangeEvent } from '@/core/data-architecture/ConfigEventBus'
 
-// 🔥 导入Card2.1组件注册系统，用于恢复完整的组件定义（使用统一入口）
+// 🔥 importCard2.1Component registration system，Used to restore complete component definitions（Use unified entrance）
 import { getAllComponents } from '@/card2.1/index'
 
-// 🔥 组件缓存 - 避免重复调用 getAllComponents()
+// 🔥 Component caching - Avoid repeated calls getAllComponents()
 let componentCache: any[] | null = null
 let cachePromise: Promise<any[]> | null = null
 
 const getComponentDefinition = async (componentType: string) => {
-  // 使用缓存避免重复调用
+  // Use caching to avoid repeated calls
   if (componentCache) {
     return componentCache.find(comp => comp.type === componentType)
   }
 
-  // 防止并发调用
+  // Prevent concurrent calls
   if (!cachePromise) {
     cachePromise = getAllComponents()
   }
@@ -51,19 +51,19 @@ const getComponentDefinition = async (componentType: string) => {
   return allComponents.find(comp => comp.type === componentType)
 }
 
-// 🔥 接收测试页面的配置props
+// 🔥 Receive configuration for test pageprops
 interface Props {
-  panelId: string // 仅作为编辑器标识符
-  initialConfig?: { widgets: any[]; config: any } // 🔥 父组件传递的初始编辑器配置
+  panelId: string // Only as editor identifier
+  initialConfig?: { widgets: any[]; config: any } // 🔥 Initial editor configuration passed by the parent component
   showToolbar?: boolean
   showPageHeader?: boolean
   enableHeaderArea?: boolean
   enableToolbarArea?: boolean
   enableFooterArea?: boolean
   customLayoutClass?: string
-  defaultRenderer?: RendererType // 🔥 默认渲染器类型
-  customSaveHandler?: (state: any) => Promise<void> // 🔥 父组件实现的保存函数
-  mode?: 'template' | 'dashboard' // 🔥 WidgetLibrary模式：template=模板配置，dashboard=看板编辑
+  defaultRenderer?: RendererType // 🔥 Default renderer type
+  customSaveHandler?: (state: any) => Promise<void> // 🔥 Save function implemented by parent component
+  mode?: 'template' | 'dashboard' // 🔥 WidgetLibrarymodel：template=Template configuration，dashboard=Kanban board editor
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -73,38 +73,38 @@ const props = withDefaults(defineProps<Props>(), {
   enableToolbarArea: true,
   enableFooterArea: false,
   customLayoutClass: '',
-  defaultRenderer: 'gridstack', // 🔥 默认使用GridStack渲染器
-  mode: 'dashboard' // 🔥 默认为看板模式
+  defaultRenderer: 'gridstack', // 🔥 Used by defaultGridStackRenderer
+  mode: 'dashboard' // 🔥 Default is kanban mode
 })
 
 const message = useMessage()
 const dialog = useDialog()
 
-// 🔥 定义emit事件
+// 🔥 definitionemitevent
 const emit = defineEmits<{
   'state-manager-ready': [stateManager: any]
   'widget-added': [widget: any]
   'node-select': [nodeId: string]
   'editor-ready': [editor: any]
-  'save': [state: any] // 保存事件，传递当前状态
-  'save-success': [] // 保存成功事件
-  'save-error': [error: any] // 保存失败事件
-  'config-loaded': [] // 🔥 配置加载完成事件
-  'load-error': [error: any] // 🔥 配置加载失败事件
+  'save': [state: any] // save event，Pass current status
+  'save-success': [] // Save successful event
+  'save-error': [error: any] // Save failure event
+  'config-loaded': [] // 🔥 Configure loading completion event
+  'load-error': [error: any] // 🔥 Configure loading failure event
 }>()
 
-// 🔥 移除 panelData 内部状态，不再由编辑器管理业务数据
+// 🔥 Remove panelData internal state，Editors no longer manage business data
 const preEditorConfig = ref<any>(null)
 
-// 基础状态
+// base state
 const isEditing = ref(true)
-const leftCollapsed = ref(true) // 🔥 左侧默认关闭，只有点击添加组件按钮才打开
-const rightCollapsed = ref(true) // 🔥 右侧默认关闭
+const leftCollapsed = ref(true) // 🔥 The left side is closed by default，Only opens when clicking the Add Component button
+const rightCollapsed = ref(true) // 🔥 The right side is closed by default
 
-// 🔥 编辑器核心功能
+// 🔥 Editor core functions
 const currentRenderer = ref<RendererType>(props.defaultRenderer)
 
-// 🔥 监听props.defaultRenderer的变化，实现响应式渲染器切换
+// 🔥 monitorprops.defaultRendererchanges，Implement responsive renderer switching
 watch(
   () => props.defaultRenderer,
   newRenderer => {
@@ -119,35 +119,35 @@ watch(
 const showWidgetTitles = ref(true)
 const isSaving = ref(false)
 const hasChanges = ref(false)
-const dataFetched = ref(false) // 简化版，直接设为true
+const dataFetched = ref(false) // Simplified version，Set directly totrue
 const isUnmounted = ref(false)
 
-// 🔥 拖拽状态管理
+// 🔥 Drag and drop state management
 const isDragging = ref(false)
 const isDragOver = ref(false)
 const draggedComponent = ref<string | null>(null)
 const selectedNodeId = ref<string>('')
 
-// 🔥 底部显示状态管理
-const showFooter = ref(false) // 预览模式的触发状态
+// 🔥 Status management shown at the bottom
+const showFooter = ref(false) // Trigger status of preview mode
 
-// 🔥 计算实际的footer显示状态
+// 🔥 Calculate the actualfooterShow status
 const actualFooterShow = computed(() => {
   if (isEditing.value) {
-    // 编辑模式：按外部传入的enableFooterArea决定
+    // edit mode：According to the external incomingenableFooterAreaDecide
     return props.enableFooterArea
   } else {
-    // 预览模式：通过触发器控制，且必须enableFooterArea为true
+    // preview mode：Controlled by triggers，and mustenableFooterAreafortrue
     return props.enableFooterArea && showFooter.value
   }
 })
 
-// 创建编辑器上下文
+// Create editor context
 const editorContext = createEditor()
 const { stateManager, addWidget, updateNode, selectNode } = editorContext
 const { setPreviewMode, isPreviewMode } = usePreviewMode()
 
-// 🔥 监听全局预览模式变化，同步到组件内部状态
+// 🔥 Monitor global preview mode changes，Synchronize to component internal state
 watch(
   () => isPreviewMode.value,
   (newPreviewMode) => {
@@ -155,18 +155,18 @@ watch(
     if (isEditing.value !== shouldBeEditing) {
       isEditing.value = shouldBeEditing
       if (!shouldBeEditing) {
-        // 切换到预览模式
+        // Switch to preview mode
         showFooter.value = false
         leftCollapsed.value = true
         rightCollapsed.value = true
-        // 启动轮询（需要等待组件完全初始化）
+        // Start polling（Need to wait for the component to be fully initialized）
         nextTick(() => {
           if (typeof initializePollingTasksAndEnable === 'function') {
             initializePollingTasksAndEnable()
           }
         })
       } else {
-        // 切换到编辑模式
+        // Switch to edit mode
         if (pollingManager) {
           pollingManager.disableGlobalPolling()
         }
@@ -176,17 +176,17 @@ watch(
   { immediate: true }
 )
 
-// 🔥 轮询管理器实例
+// 🔥 Poll manager instance
 const pollingManager = useGlobalPollingManager()
 
-// 🔥 组件执行器注册表
+// 🔥 Component Executor Registry
 const componentExecutorRegistry = ref(new Map<string, () => Promise<void>>())
 
-// 🔥 关键修复：数据执行触发器 - 处理配置变更事件并触发数据源重新执行
+// 🔥 critical fix：Data execution trigger - Handle configuration change events and trigger data source re-execution
 const handleDataExecutionTrigger = async (event: ConfigChangeEvent) => {
 
 
-  // 检查是否需要触发数据执行
+  // Check if data execution needs to be triggered
   if (!event.context?.shouldTriggerExecution) {
     return
   }
@@ -197,40 +197,40 @@ const handleDataExecutionTrigger = async (event: ConfigChangeEvent) => {
       await executor()
     } catch (error) {
 
-        console.error(`组件数据源执行失败: ${event.componentId}`, error)
+        console.error(`Component data source execution failed: ${event.componentId}`, error)
     }
   } else {
 
-    // 🔥 新增：直接调用核心数据架构系统来执行数据源
+    // 🔥 New：Directly call the core data architecture system to execute the data source
     try {
       const { SimpleDataBridge } = await import('@/core/data-architecture/SimpleDataBridge')
       const dataBridge = new SimpleDataBridge()
 
-      // 获取组件的完整配置
+      // Get the complete configuration of a component
       const fullConfig = configurationManager.getConfiguration(event.componentId)
       if (fullConfig && fullConfig.dataSource) {
-        // 🔥 性能优化：减少日志输出，避免366条重复日志
+        // 🔥 Performance optimization：Reduce log output，avoid366duplicate logs
 
-        // 🔥 关键修复：执行前强制清理所有缓存，确保发送真实请求
+        // 🔥 critical fix：Force all caches to be cleared before execution，Make sure to send a real request
         dataBridge.clearComponentCache(event.componentId)
 
-        // 🔥 同时清理 DataWarehouse 缓存
+        // 🔥 Also clean up DataWarehouse cache
         const { dataWarehouse } = await import('@/core/data-architecture/DataWarehouse')
         dataWarehouse.clearComponentCache(event.componentId)
 
-        // 构建数据需求并执行
+        // Build data requirements and execute
         const dataRequirement = {
           componentId: event.componentId,
           dataSourceBindings: fullConfig.dataSource,
-          // 保持兼容性，如果没有dataSourceBindings则使用原配置
+          // Maintain compatibility，if notdataSourceBindingsthen use the original configuration
           dataSources: fullConfig.dataSource.dataSources || [fullConfig.dataSource]
         }
 
         const result = await dataBridge.executeComponent(dataRequirement)
 
-        // 🔥 修复：通过Card2Wrapper的数据更新机制来传递数据
+        // 🔥 repair：passCard2WrapperData update mechanism to transfer data
         if (result.success && result.data) {
-          // 触发组件数据更新事件，让Card2Wrapper接收到新数据
+          // Trigger component data update event，letCard2Wrappernew data received
           const dataUpdateEvent = new CustomEvent('componentDataUpdate', {
             detail: {
               componentId: event.componentId,
@@ -241,33 +241,33 @@ const handleDataExecutionTrigger = async (event: ConfigChangeEvent) => {
             bubbles: true
           })
 
-          // 查找目标组件元素并分发事件
+          // Find the target component element and dispatch the event
           const targetElement = document.querySelector(`[data-component-id="${event.componentId}"]`)
           if (targetElement) {
             targetElement.dispatchEvent(dataUpdateEvent)
-            // 🔥 性能优化：只在调试模式下输出事件分发成功日志
+            // 🔥 Performance optimization：Only output event distribution success log in debug mode
           } else {
-            // 🔥 性能优化：组件元素未找到通常是正常的（组件可能还未渲染），只在调试时输出
+            // 🔥 Performance optimization：It is usually normal for component elements not to be found（Component may not be rendered yet），Only output when debugging
           }
         }
       } else {
-        // 🔥 性能优化：组件没有数据源配置是正常状态，不需要警告
+        // 🔥 Performance optimization：It is normal for the component to have no data source configuration.，no warning needed
       }
     } catch (error) {
-      console.error(`❌ [PanelEditorV2] 数据源执行异常: ${event.componentId}`, error)
+      console.error(`❌ [PanelEditorV2] Data source execution exception: ${event.componentId}`, error)
     }
   }
 }
 
-// 数据执行触发器清理函数
+// Data execution trigger cleaning function
 let dataExecutionTriggerCleanup: (() => void) | null = null
 
-// 🔥 提供管理器给子组件使用 (已移除 EditorDataSourceManager)
-// 🔥 关键修复：提供 editorContext 给所有子组件，确保配置能真正同步
+// 🔥 Provide managers for use by subcomponents (Removed EditorDataSourceManager)
+// 🔥 critical fix：supply editorContext to all child components，Ensure configurations are truly synchronized
 provide('editorContext', editorContext)
 provide('componentExecutorRegistry', componentExecutorRegistry.value)
 
-// 🔥 轮询管理组合式函数 (已迁移到核心数据架构系统)
+// 🔥 Poll management combined functions (Migrated to core data architecture system)
 const pollingManagerDependencies = {
   pollingManager,
   stateManager,
@@ -280,18 +280,18 @@ const {
   handlePollingDisabled: handlePollingDisabledFromManager
 } = usePanelPollingManager(pollingManagerDependencies)
 
-// 🔥 全局轮询状态
+// 🔥 Global polling status
 const globalPollingEnabled = computed(() => pollingManager.isGlobalPollingEnabled())
 const pollingStats = computed(() => pollingManager.getStatistics())
 
-// 🔥 计算选中的组件对象 - 从老版本移植
+// 🔥 Calculate selected component objects - Migrate from old version
 const selectedWidget = computed(() => {
   if (!selectedNodeId.value) return null
   const node = stateManager.nodes.find(n => n.id === selectedNodeId.value)
   return node || null
 })
 
-// 编辑器配置
+// Editor configuration
 const editorConfig = ref({
   gridConfig: {},
   canvasConfig: {}
@@ -303,19 +303,19 @@ const getState = () => {
   }
 
   const widgets = toRaw(stateManager.nodes).map(widget => {
-    // 🔥 统一配置架构：优先从 ConfigurationManager 获取最新配置
+    // 🔥 Unified configuration architecture：Prioritize from ConfigurationManager Get the latest configuration
     let unifiedConfig = widget.metadata?.unifiedConfig
 
-    // 🔥 关键修复：总是尝试从ConfigurationManager获取最新配置（作为真实数据源）
+    // 🔥 critical fix：always try to start fromConfigurationManagerGet the latest configuration（as a source of truth）
     const configFromManager = configurationManager.getConfiguration(widget.id)
     if (configFromManager) {
-      // 使用 ConfigurationManager 中的最新配置
+      // use ConfigurationManager The latest configuration in
       unifiedConfig = configFromManager
     }
     const dataSourceConfig = unifiedConfig?.dataSource || {}
 
-    // 🔥 数据优化：只保存必要的数据，移除冗余的metadata
-    // 🔥 关键修复：移除重复的 dataSource 字段，只保留在 unifiedConfig 中
+    // 🔥 Data optimization：Only save necessary data，Remove redundantmetadata
+    // 🔥 critical fix：Remove duplicates dataSource Field，only remain in unifiedConfig middle
     const optimizedWidget = {
       id: widget.id,
       type: widget.type,
@@ -328,23 +328,23 @@ const getState = () => {
       properties: widget.properties,
       renderer: widget.renderer,
       layout: widget.layout,
-      // 🔥 移除重复的 dataSource 字段，避免配置结构重复问题
-      // dataSource: dataSourceConfig, // 已移除，只保留在 unifiedConfig 中
-      // 🔥 统一配置架构：保留完整的统一配置信息
+      // 🔥 Remove duplicates dataSource Field，Avoid duplication of configuration structures
+      // dataSource: dataSourceConfig, // Removed，only remain in unifiedConfig middle
+      // 🔥 Unified configuration architecture：Keep complete unified configuration information
       metadata: {
         version: widget.metadata?.version || '2.0.0',
         createdAt: widget.metadata?.createdAt,
         updatedAt: Date.now(),
         isCard2Component: widget.metadata?.isCard2Component,
         card2ComponentId: widget.metadata?.card2ComponentId,
-        // 🔥 关键修复：使用最新的统一配置，优先从ConfigurationManager获取
+        // 🔥 critical fix：Use the latest unified configuration，Prioritize fromConfigurationManagerGet
         unifiedConfig: unifiedConfig || {
           base: {},
           component: widget.properties || {},
           dataSource: {},
           interaction: {}
         },
-        // 🔥 兼容性：保留数据源基本定义信息
+        // 🔥 compatibility：Keep basic definition information of data source
         card2Definition: widget.metadata?.card2Definition ? {
           type: widget.metadata.card2Definition.type,
           name: widget.metadata.card2Definition.name,
@@ -382,27 +382,27 @@ const setState = async (state: any) => {
   }
 
   if (Array.isArray(widgets)) {
-    // 🔥 处理组件数据，恢复数据源配置和必要的metadata
+    // 🔥 Process component data，Restore data source configuration and necessarymetadata
     const processedWidgets = []
 
     for (const widget of widgets) {
-      // 🔥 统一配置架构：恢复统一配置到组件元数据
+      // 🔥 Unified configuration architecture：Restore unified configuration to component metadata
 
 
       if (widget.metadata?.unifiedConfig) {
 
-        // 使用ConfigurationIntegrationBridge的setConfiguration一次性设置完整配置
+        // useConfigurationIntegrationBridgeofsetConfigurationSet up complete configuration in one go
         configurationManager.setConfiguration(widget.id, widget.metadata.unifiedConfig, widget.type)
-        // 🔍 验证配置是否真的更新了
+        // 🔍 Verify that the configuration is actually updated
       } else if (widget.dataSource) {
-        // 🔥 兼容性：回退到传统配置恢复方式
+        // 🔥 compatibility：Falling back to traditional configuration recovery methods
         configurationManager.updateConfiguration(widget.id, 'dataSource', widget.dataSource)
       }
 
-      // 🔥 关键修复：从Card2.1组件注册系统恢复完整的组件定义
+      // 🔥 critical fix：fromCard2.1Component registration system restores complete component definitions
       let fullCard2Definition = widget.metadata?.card2Definition
 
-      // 如果保存的定义不完整（缺少configComponent），从注册系统恢复
+      // If the saved definition is incomplete（LackconfigComponent），Restore from registered system
       if (fullCard2Definition && !fullCard2Definition.configComponent) {
         try {
           const registeredDefinition = await getComponentDefinition(widget.type)
@@ -410,11 +410,11 @@ const setState = async (state: any) => {
             fullCard2Definition = registeredDefinition
           }
         } catch (error) {
-          console.error(`❌ [setState] 恢复组件定义失败: ${widget.type}`, error)
+          console.error(`❌ [setState] Restoring component definition failed: ${widget.type}`, error)
         }
       }
 
-      // 🔥 确保组件有完整的运行时metadata
+      // 🔥 Make sure the component has a complete runtimemetadata
       const processedWidget = {
         ...widget,
         metadata: {
@@ -422,9 +422,9 @@ const setState = async (state: any) => {
           isCard2Component: true,
           card2ComponentId: widget.type,
           card2Definition: fullCard2Definition,
-          // 🔥 标记是否需要后续刷新（当组件系统就绪时）
+          // 🔥 Whether the mark requires subsequent refreshes（When the component system is ready）
           needsCard2Refresh: !fullCard2Definition?.configComponent,
-          // 🔥 统一配置架构：使用ConfigurationManager中的最新配置
+          // 🔥 Unified configuration architecture：useConfigurationManagerThe latest configuration in
           unifiedConfig: (() => {
             const latestConfig = configurationManager.getConfiguration(widget.id)
             if (latestConfig) {
@@ -455,29 +455,29 @@ const setState = async (state: any) => {
 }
 
 /**
- * 🔥 初始化编辑器配置
- * 从父组件传递的 initialConfig 加载配置，不再内部调用 API
+ * 🔥 Initialize editor configuration
+ * passed from parent component initialConfig Load configuration，No longer called internally API
  */
 const initializeEditorConfig = async () => {
   try {
     dataFetched.value = false
 
-    // 如果父组件提供了初始配置，直接使用
+    // If the parent component provides initial configuration，Use directly
     if (props.initialConfig) {
       const config = props.initialConfig
 
       if (config.widgets !== undefined || config.config !== undefined) {
-        // 标准格式：{widgets: [...], config: {...}}
+        // standard format：{widgets: [...], config: {...}}
         await setState(config)
         preEditorConfig.value = smartDeepClone(config)
       } else {
-        // 空配置
+        // Empty configuration
         const emptyState = { widgets: [], config: { gridConfig: {}, canvasConfig: {} } }
         await setState(emptyState)
         preEditorConfig.value = emptyState
       }
     } else {
-      // 没有提供初始配置，使用空状态
+      // No initial configuration provided，Use empty state
       const emptyState = { widgets: [], config: { gridConfig: {}, canvasConfig: {} } }
       await setState(emptyState)
       preEditorConfig.value = emptyState
@@ -486,25 +486,25 @@ const initializeEditorConfig = async () => {
     dataFetched.value = true
     emit('config-loaded')
   } catch (error) {
-    console.error('❌ 初始化编辑器配置失败:', error)
-    message.error($t('common.loadFailed') || '加载配置失败')
+    console.error('❌ Failed to initialize editor configuration:', error)
+    message.error($t('common.loadFailed') || 'Failed to load configuration')
     emit('load-error', error)
-    dataFetched.value = true // 即使失败也设置为 true，显示空编辑器
+    dataFetched.value = true // Even if it fails, it is set to true，Show empty editor
   }
 }
 
-// 处理组件系统就绪事件
+// Handling component system ready events
 const handleCard2SystemReady = () => {
   refreshCard2Definitions()
 }
 
-// 组件系统就绪检查（后备机制）
+// Component System Readiness Check（backup mechanism）
 let card2SystemCheckInterval: number | null = null
 const startCard2SystemCheck = () => {
-  // 每2秒检查一次组件系统是否就绪
+  // Every2Check once every second whether the component system is ready
   card2SystemCheckInterval = window.setInterval(async () => {
     try {
-      // 尝试获取一个组件定义来测试系统是否就绪
+      // Try to get a component definition to test whether the system is ready
       const testDefinition = await getComponentDefinition('alert-status')
       if (testDefinition && testDefinition.configComponent) {
         if (card2SystemCheckInterval) {
@@ -514,11 +514,11 @@ const startCard2SystemCheck = () => {
         refreshCard2Definitions()
       }
     } catch (error) {
-      // 系统未就绪，继续等待
+      // System is not ready，Keep waiting
     }
   }, 2000)
 
-  // 30秒后自动停止检查
+  // 30Automatically stop checking after seconds
   setTimeout(() => {
     if (card2SystemCheckInterval) {
       clearInterval(card2SystemCheckInterval)
@@ -528,60 +528,60 @@ const startCard2SystemCheck = () => {
 }
 
 onMounted(async () => {
-  // 🔥 关键修复：先初始化管理器和设置注册表，再加载配置
+  // 🔥 critical fix：First initialize the manager and set up the registry，Reload configuration
   try {
     await configurationManager.initialize()
 
-    // 🔥 关键修复：注册数据执行触发器，用于处理配置变更事件
+    // 🔥 critical fix：Register data execution trigger，Used to handle configuration change events
     dataExecutionTriggerCleanup = registerDataExecutionTrigger(handleDataExecutionTrigger)
 
-    // 🔥 已迁移：数据源管理现在通过核心数据架构系统处理
-    // 组件执行器注册表现在由 Card2Wrapper 自行管理
+    // 🔥 Migrated：Data source management is now handled through the Core Data Architecture system
+    // The component executor registry is now represented by Card2Wrapper self-management
 
   } catch (error) {
-    console.error('初始化管理器失败:', error)
+    console.error('Initialization manager failed:', error)
   }
 
-  await nextTick() // 确保DOM更新完成
+  await nextTick() // make sureDOMUpdate completed
 
-  // 🔥 从父组件提供的 initialConfig 加载配置
+  // 🔥 provided from parent component initialConfig Load configuration
   await initializeEditorConfig()
 
-  // 其他初始化
+  // Other initialization
   try {
-    // 监听组件系统就绪事件
+    // Listen for component system ready events
     window.addEventListener('card2-system-ready', handleCard2SystemReady)
 
-    // 启动组件系统就绪检查（后备机制）
+    // Start component system readiness check（backup mechanism）
     startCard2SystemCheck()
   } catch (error) {
-    console.error('初始化管理器失败:', error)
+    console.error('Initialization manager failed:', error)
   }
 
-  // 🔥 初始化轮询系统（仅在预览模式下）
+  // 🔥 Initialize the polling system（Only in preview mode）
   if (!isEditing.value && isPreviewMode.value) {
     initializePollingTasksAndEnable()
   }
 
-  // 初始化完成，无需全局监听
+  // Initialization completed，No need for global monitoring
 
-  // 🔥 触发state-manager-ready事件，让测试页面知道编辑器已准备好
+  // 🔥 triggerstate-manager-readyevent，Let the test page know the editor is ready
   emit('state-manager-ready', stateManager)
   emit('editor-ready', editorContext)
 })
 
-// 🔥 组件卸载时清理
+// 🔥 Cleanup when components are uninstalled
 onUnmounted(() => {
-  // 🔥 关键修复：清理数据执行触发器
+  // 🔥 critical fix：Clean data execution trigger
   if (dataExecutionTriggerCleanup) {
     dataExecutionTriggerCleanup()
     dataExecutionTriggerCleanup = null
   }
 
-  // 清理事件监听
+  // Clean up event listening
   window.removeEventListener('card2-system-ready', handleCard2SystemReady)
 
-  // 清理组件系统检查间隔
+  // Cleanup component system check interval
   if (card2SystemCheckInterval) {
     clearInterval(card2SystemCheckInterval)
     card2SystemCheckInterval = null
@@ -609,23 +609,23 @@ watch(
   { deep: true }
 )
 
-// 渲染器选项
+// Renderer options
 const rendererOptions = computed(() => [
   { label: $t('visualEditor.canvas'), value: 'canvas' as RendererType },
   { label: $t('visualEditor.gridstack'), value: 'gridstack' as RendererType }
 ])
 
-// 🔥 轮询事件处理函数（使用真正的处理逻辑）
+// 🔥 Polling event handler function（Use real processing logic）
 const handlePollingToggle = handlePollingToggleFromManager
 const handlePollingEnabled = handlePollingEnabledFromManager
 const handlePollingDisabled = handlePollingDisabledFromManager
 
-// 🔥 初始化轮询任务并启用（使用真正的轮询逻辑）
+// 🔥 Initialize the polling task and enable it（Use real polling logic）
 const initializePollingTasksAndEnable = () => {
   initializePollingTasksAndEnableFromManager()
 }
 
-// 🔥 Footer 轮询切换函数
+// 🔥 Footer Polling switching function
 const toggleFooterPolling = () => {
   const wasEnabled = globalPollingEnabled.value
 
@@ -642,7 +642,7 @@ const toggleFooterPolling = () => {
   handlePollingToggle(!wasEnabled)
 }
 
-// 🔥 右下角触发器交互
+// 🔥 Trigger interaction in the lower right corner
 const handleTriggerHover = () => {
   showFooter.value = true
 }
@@ -651,22 +651,22 @@ const handleFooterMouseLeave = () => {
   showFooter.value = false
 }
 
-// 🔥 工具栏事件处理
+// 🔥 Toolbar event handling
 const handleModeChange = (mode: 'edit' | 'preview') => {
   const editMode = mode === 'edit'
   isEditing.value = editMode
   setPreviewMode(!editMode)
 
   if (editMode) {
-    // 🔴 关闭全局轮询（编辑模式）
+    // 🔴 Turn off global polling（edit mode）
     pollingManager.disableGlobalPolling()
 
-    // 编辑模式不需要控制showFooter，由actualFooterShow自动处理
+    // No control required in edit modeshowFooter，Depend onactualFooterShowAutomatic processing
   } else {
-    // 🔛 自动启动全局轮询（预览模式默认开启）
+    // 🔛 Automatically start global polling（Preview mode is enabled by default）
     initializePollingTasksAndEnable()
 
-    // 🔥 预览模式：重置footer状态为隐藏
+    // 🔥 preview mode：resetfooterStatus is hidden
     showFooter.value = false
 
     leftCollapsed.value = true
@@ -683,34 +683,34 @@ const handleSave = async () => {
   try {
     const currentState = getState()
 
-    // 🔥 必须由父组件提供保存函数
+    // 🔥 The save function must be provided by the parent component
     if (props.customSaveHandler) {
-      // 使用父组件提供的自定义保存函数
+      // Use a custom save function provided by the parent component
       await props.customSaveHandler(currentState)
     } else {
-      // 🔥 没有提供保存函数，抛出错误
+      // 🔥 No save function provided，throw error
       throw new Error('customSaveHandler is required')
     }
 
-    // 🔥 触发保存成功事件
+    // 🔥 Trigger save success event
     emit('save', currentState)
     emit('save-success')
 
-    message.success($t('page.dataForward.saveSuccess') || '保存成功')
+    message.success($t('page.dataForward.saveSuccess') || 'Saved successfully')
     hasChanges.value = false
     preEditorConfig.value = smartDeepClone(currentState)
   } catch (error) {
-    console.error('❌ 保存失败:', error)
-    // 🔥 触发保存失败事件
+    console.error('❌ Save failed:', error)
+    // 🔥 Trigger save failure event
     emit('save-error', error)
 
-    message.error($t('page.dataForward.saveFailed') || '保存失败')
+    message.error($t('page.dataForward.saveFailed') || 'Save failed')
   } finally {
     isSaving.value = false
   }
 }
 
-// 🔥 拖拽事件处理 - 来自WidgetLibrary组件
+// 🔥 Drag event handling - fromWidgetLibrarycomponents
 const handleDragStart = (widget: any, event: DragEvent) => {
   isDragging.value = true
   draggedComponent.value = widget.type
@@ -721,7 +721,7 @@ const handleDragEnd = (widget: any, event: DragEvent) => {
   draggedComponent.value = null
 }
 
-// 🔥 拖放事件处理 - 支持从左侧面板拖拽添加组件
+// 🔥 Drag and drop event handling - Support dragging and adding components from the left panel
 const handleDragOver = (event: DragEvent) => {
   event.preventDefault()
   isDragOver.value = true
@@ -731,7 +731,7 @@ const handleDragOver = (event: DragEvent) => {
 }
 
 const handleDragLeave = (event: DragEvent) => {
-  // 只有当离开整个拖放区域时才取消高亮
+  // Highlighting is only canceled when leaving the entire drop area
   if (!event.currentTarget || !event.relatedTarget) {
     isDragOver.value = false
     return
@@ -763,27 +763,27 @@ const handleDrop = async (event: DragEvent) => {
       return
     }
 
-    // 复用现有的添加组件逻辑
+    // Reuse existing add component logic
     await handleAddWidget({ type: dragData.type })
-    message.success(`组件 "${dragData.type}" 添加成功`)
+    message.success(`components "${dragData.type}" Added successfully`)
   } catch (error) {
-    message.error('拖放添加组件失败')
+    message.error('Drag and drop to add component failed')
   }
 }
 
-// 🔥 组件操作处理
+// 🔥 Component operation processing
 const handleAddWidget = async (widget: { type: string }) => {
   try {
     await addWidget(widget.type)
     hasChanges.value = true
-    // 🔥 发射widget-added事件，通知测试页面
+    // 🔥 emissionwidget-addedevent，Notification test page
     emit('widget-added', { type: widget.type })
   } catch (error: any) {
-    console.error('❌ 添加组件失败:', widget.type, error)
+    console.error('❌ Failed to add component:', widget.type, error)
   }
 }
 
-// 其他占位事件处理
+// Other placeholder event handling
 const handleImportConfig = () => {
   const input = document.createElement('input')
   input.type = 'file'
@@ -798,9 +798,9 @@ const handleImportConfig = () => {
         const newConfig = JSON.parse(configStr)
         setState(newConfig)
         hasChanges.value = true
-        message.success($t('visualEditor.configImportSuccess', '配置导入成功'))
+        message.success($t('visualEditor.configImportSuccess', 'Configuration imported successfully'))
       } catch (error) {
-        message.error($t('visualEditor.configImportFailed', '配置文件解析失败'))
+        message.error($t('visualEditor.configImportFailed', 'Configuration file parsing failed'))
       }
     }
     reader.readAsText(file)
@@ -830,52 +830,52 @@ const handleRedo = () => {
 }
 const handleClearAll = () => {
   dialog.warning({
-    title: $t('visualEditor.confirmClearAll', '确认清空'),
-    content: $t('visualEditor.confirmClearAllContent', '此操作将清空所有组件且无法恢复，确定要继续吗？'),
+    title: $t('visualEditor.confirmClearAll', 'Confirm clearing'),
+    content: $t('visualEditor.confirmClearAllContent', 'This operation will clear all components and cannot be recovered，Are you sure you want to continue?？'),
     positiveText: $t('common.confirm'),
     negativeText: $t('common.cancel'),
     onPositiveClick: () => {
-      console.log('🗑️ [PanelEditorV2] 开始清空所有内容')
+      console.log('🗑️ [PanelEditorV2] Start clearing everything')
 
-      // 1. 清空状态管理器中的所有节点
+      // 1. Clear all nodes in the state manager
       stateManager.reset()
-      console.log('✅ [PanelEditorV2] 已清空 stateManager 节点')
+      console.log('✅ [PanelEditorV2] Cleared stateManager node')
 
-      // 2. 清空编辑器配置
+      // 2. Clear editor configuration
       editorConfig.value = { gridConfig: {}, canvasConfig: {} }
-      console.log('✅ [PanelEditorV2] 已清空 editorConfig')
+      console.log('✅ [PanelEditorV2] Cleared editorConfig')
 
-      // 3. 清空ConfigurationManager中的所有配置
+      // 3. ClearConfigurationManagerAll configurations in
       try {
         configurationManager.clearAll()
-        console.log('✅ [PanelEditorV2] 已清空 ConfigurationManager')
+        console.log('✅ [PanelEditorV2] Cleared ConfigurationManager')
       } catch (error) {
-        console.warn('⚠️ [PanelEditorV2] 清空 ConfigurationManager 失败:', error)
+        console.warn('⚠️ [PanelEditorV2] Clear ConfigurationManager fail:', error)
       }
 
-      // 4. 清空组件执行器注册表
+      // 4. Clear component executor registry
       componentExecutorRegistry.value.clear()
-      console.log('✅ [PanelEditorV2] 已清空组件执行器注册表')
+      console.log('✅ [PanelEditorV2] Component executor registry cleared')
 
-      // 5. 清空轮询管理器（如果有活动任务）
+      // 5. Clear poll manager（If there are active tasks）
       try {
         if (pollingManager) {
           pollingManager.clearAll()
-          console.log('✅ [PanelEditorV2] 已清空轮询管理器')
+          console.log('✅ [PanelEditorV2] Poll manager cleared')
         }
       } catch (error) {
-        console.warn('⚠️ [PanelEditorV2] 清空轮询管理器失败:', error)
+        console.warn('⚠️ [PanelEditorV2] Failed to clear poll manager:', error)
       }
 
-      // 6. 清空选中状态
+      // 6. Clear selection
       selectedNodeId.value = ''
       selectNode('')
 
-      // 7. 标记有变更
+      // 7. Marked with changes
       hasChanges.value = true
 
-      console.log('✅ [PanelEditorV2] 清空完成')
-      message.success($t('visualEditor.clearedSuccess', '已清空所有内容'))
+      console.log('✅ [PanelEditorV2] Clearing completed')
+      message.success($t('visualEditor.clearedSuccess', 'All content cleared'))
     }
   })
 }
@@ -907,7 +907,7 @@ const handleToggleLeftDrawer = () => {
 const handleToggleRightDrawer = () => {
   rightCollapsed.value = !rightCollapsed.value
 }
-// 🔥 网格配置变更处理 - 按照老版实现
+// 🔥 Grid configuration change processing - Implemented according to the old version
 const handleGridstackConfigChange = (config: Record<string, any>) => {
   editorConfig.value.gridConfig = { ...editorConfig.value.gridConfig, ...config }
   hasChanges.value = true
@@ -918,12 +918,12 @@ const handleCanvasConfigChange = (config: Record<string, any>) => {
   hasChanges.value = true
 }
 
-// 🔥 渲染器事件处理 - 简化版，移除不必要的中转
+// 🔥 Renderer event handling - Simplified version，Remove unnecessary transfers
 const handleNodeSelect = (nodeId: string) => {
   selectedNodeId.value = nodeId
   selectNode(nodeId)
 
-  // 🔥 发射node-select事件，通知测试页面
+  // 🔥 emissionnode-selectevent，Notification test page
   emit('node-select', nodeId)
 }
 
@@ -935,49 +935,49 @@ const handleCanvasClick = () => {
 const handleRequestSettings = (nodeId: string) => {
   selectedNodeId.value = nodeId
   selectNode(nodeId)
-  rightCollapsed.value = false // 只有右键菜单的"配置"才打开右侧面板
+  rightCollapsed.value = false // Only right-click menu"Configuration"Just open the right panel
 }
 
-// 🔥 数据源相关事件处理 - 简化版，主要用于ConfigurationPanel正常工作
+// 🔥 Data source related event processing - Simplified version，Mainly used forConfigurationPanelworking normally
 const handleDataSourceManagerUpdate = (updateData: any) => {
-  // 在新架构中，数据源更新直接通过ConfigEventBus处理
-  // 这里主要是为了让ConfigurationPanel正常工作，不做具体处理
-  // 数据源管理更新处理
+  // in new architecture，Data source updates directly throughConfigEventBusdeal with
+  // The main purpose here is to allowConfigurationPanelworking normally，No specific processing
+  // Data source management update processing
 }
 
 const handleMultiDataSourceUpdate = (componentId: string, data: any) => {
-  // 新架构中数据源直接通过GridstackRenderer管理
-  // 多数据源更新处理
+  // In the new architecture, data sources pass directly throughGridstackRenderermanage
+  // Multiple data source update processing
 }
 
 const handleMultiDataSourceConfigUpdate = (componentId: string, config: any) => {
-  // 新架构中配置更新通过ConfigEventBus处理
-  // 数据源配置更新处理
+  // Configuration update passed in new architectureConfigEventBusdeal with
+  // Data source configuration update processing
 }
 
 const handleRequestCurrentData = (componentId: string) => {
-  // 新架构中数据请求直接通过simpleDataBridge处理
-  // 请求当前数据处理
+  // In the new architecture, data requests go directly throughsimpleDataBridgedeal with
+  // Request current data processing
 }
 
 /**
- * 🔥 刷新所有需要Card2.1定义更新的组件
- * 当组件系统初始化完成后调用此函数
+ * 🔥 Refresh all neededCard2.1Define updated components
+ * This function is called when the component system is initialized.
  */
 const refreshCard2Definitions = async () => {
   try {
 
-    // 🔥 修复：从 stateManager.nodes 获取组件列表，而不是从 editorConfig.widgets
+    // 🔥 repair：from stateManager.nodes Get component list，而不是from editorConfig.widgets
     const currentWidgets = toRaw(stateManager.nodes)
     if (!currentWidgets || !Array.isArray(currentWidgets) || currentWidgets.length === 0) {
       return
     }
 
-    // 创建副本以进行修改
+    // Create a copy to make modifications
     const updatedWidgets = [...currentWidgets]
     let updated = false
 
-    // 检查每个组件是否需要刷新
+    // Check if each component needs to be refreshed
     for (let i = 0; i < updatedWidgets.length; i++) {
       const widget = updatedWidgets[i]
       if (widget.metadata?.needsCard2Refresh) {
@@ -985,7 +985,7 @@ const refreshCard2Definitions = async () => {
         try {
           const registeredDefinition = await getComponentDefinition(widget.type)
           if (registeredDefinition && registeredDefinition.configComponent) {
-            // 更新组件定义
+            // Update component definition
             updatedWidgets[i] = {
               ...widget,
               metadata: {
@@ -997,18 +997,18 @@ const refreshCard2Definitions = async () => {
             updated = true
           }
         } catch (error) {
-          console.error(`❌ [refreshCard2Definitions] 刷新组件失败: ${widget.type}`, error)
+          console.error(`❌ [refreshCard2Definitions] Refresh component failed: ${widget.type}`, error)
         }
       }
     }
 
-    // 如果有更新，重新设置状态
+    // If there is an update，reset status
     if (updated) {
-      // 直接更新 stateManager 中的节点，而不是通过 setState
+      // direct update stateManager nodes in，instead of passing setState
       stateManager.setNodes(updatedWidgets)
     }
   } catch (error) {
-    console.error('❌ [refreshCard2Definitions] 刷新失败:', error)
+    console.error('❌ [refreshCard2Definitions] Refresh failed:', error)
   }
 }
 </script>
@@ -1026,18 +1026,18 @@ const refreshCard2Definitions = async () => {
       @update:left-collapsed="leftCollapsed = $event"
       @update:right-collapsed="rightCollapsed = $event"
     >
-      <!-- 标题区域 -->
+      <!-- title area -->
       <template #header>
         <div class="panel-header">
-          <h1 class="panel-title">可视化面板编辑器 V2</h1>
+          <h1 class="panel-title">Visual panel editor V2</h1>
           <div class="panel-meta">
             <span class="panel-id">{{ props.panelId.slice(0, 8) }}...</span>
-            <span class="panel-version">基于多渲染器架构</span>
+            <span class="panel-version">Based on multi-renderer architecture</span>
           </div>
         </div>
       </template>
 
-      <!-- 🔥 真实工具栏 -->
+      <!-- 🔥 real toolbar -->
       <template #toolbar>
         <VisualEditorToolbar
           v-if="dataFetched && !isUnmounted"
@@ -1071,14 +1071,14 @@ const refreshCard2Definitions = async () => {
         />
       </template>
 
-      <!-- 🔥 真实的左侧组件库 -->
+      <!-- 🔥 Real left side component library -->
       <template #left>
         <WidgetLibrary :mode="props.mode" @add-widget="handleAddWidget" />
       </template>
 
-      <!-- 🔥 主内容区域 - 真实渲染器实现 -->
+      <!-- 🔥 main content area - Real renderer implementation -->
       <template #main>
-        <!-- 加载状态 -->
+        <!-- Loading status -->
         <div v-if="!dataFetched" class="h-full flex items-center justify-center w-full">
           <n-spin size="large">
             <template #description>
@@ -1087,9 +1087,9 @@ const refreshCard2Definitions = async () => {
           </n-spin>
         </div>
 
-        <!-- 渲染器区域 -->
+        <!-- renderer area -->
         <div v-else class="renderer-main-area w-full relative" @click="handleCanvasClick">
-          <!-- Canvas 渲染器 -->
+          <!-- Canvas Renderer -->
           <CanvasRenderer
             v-if="currentRenderer === 'canvas' && dataFetched && !isUnmounted"
             key="canvas-renderer-v2"
@@ -1101,7 +1101,7 @@ const refreshCard2Definitions = async () => {
             @request-settings="handleRequestSettings"
           />
 
-          <!-- Gridstack 渲染器 -->
+          <!-- Gridstack Renderer -->
           <GridstackRenderer
             v-else-if="currentRenderer === 'gridstack' && dataFetched && !isUnmounted"
             key="gridstack-renderer-v2"
@@ -1116,7 +1116,7 @@ const refreshCard2Definitions = async () => {
         </div>
       </template>
 
-      <!-- 🔥 右侧配置面板 -->
+      <!-- 🔥 Right configuration panel -->
       <template #right>
         <ConfigurationPanel
           :selected-widget="selectedWidget"
@@ -1131,24 +1131,24 @@ const refreshCard2Definitions = async () => {
         />
       </template>
 
-      <!-- 底部状态栏 -->
+      <!-- bottom status bar -->
       <template #footer>
         <div class="panel-footer auto-hide-footer" @mouseleave="handleFooterMouseLeave">
           <div class="status-section">
-            <span class="status-text">渲染器: {{ currentRenderer }}</span>
-            <span class="status-text">组件数: {{ stateManager.nodes.length }}</span>
-            <span v-if="hasChanges" class="status-text">有未保存更改</span>
+            <span class="status-text">Renderer: {{ currentRenderer }}</span>
+            <span class="status-text">Number of components: {{ stateManager.nodes.length }}</span>
+            <span v-if="hasChanges" class="status-text">There are unsaved changes</span>
 
-            <!-- 🔥 轮询状态显示 -->
+            <!-- 🔥 Polling status display -->
             <span v-if="!isEditing" class="status-text polling-status">
-              轮询: {{ globalPollingEnabled ? '运行中' : '已暂停' }}
+              polling: {{ globalPollingEnabled ? 'Running' : 'Suspended' }}
               <span class="polling-stats">({{ pollingStats.activeTasks }}/{{ pollingStats.totalTasks }})</span>
             </span>
           </div>
           <div class="info-section">
-            <span class="info-text">{{ $t('visualEditor.ready', 'V2 编辑器已就绪') }}</span>
+            <span class="info-text">{{ $t('visualEditor.ready', 'V2 Editor is ready') }}</span>
 
-            <!-- 🔥 内置轮询控制器 - 仅在预览模式下显示 -->
+            <!-- 🔥 Built-in polling controller - Only shown in preview mode -->
             <div v-if="!isEditing && dataFetched" class="footer-polling-controller">
               <n-button
                 :type="globalPollingEnabled ? 'success' : 'default'"
@@ -1168,13 +1168,13 @@ const refreshCard2Definitions = async () => {
       </template>
     </PanelLayout>
 
-    <!-- 🔥 右下角触发器 - 仅在预览模式显示 -->
+    <!-- 🔥 lower right corner trigger - Only shown in preview mode -->
     <div v-if="props.enableFooterArea && !isEditing" class="footer-trigger" @mouseenter="handleTriggerHover"></div>
   </div>
 </template>
 
 <style scoped>
-/* 🔥 编辑器包装器 */
+/* 🔥 Editor wrapper */
 .panel-editor-wrapper {
   position: relative;
   width: 100%;
@@ -1182,7 +1182,7 @@ const refreshCard2Definitions = async () => {
   background: var(--body-color);
 }
 
-/* 🔥 全屏模式样式 */
+/* 🔥 Full screen mode style */
 .panel-editor-wrapper:fullscreen {
   background: var(--body-color);
   display: flex;
@@ -1190,7 +1190,7 @@ const refreshCard2Definitions = async () => {
   z-index: 9999;
 }
 
-/* Safari 支持 */
+/* Safari support */
 .panel-editor-wrapper:-webkit-full-screen {
   background: var(--body-color);
   display: flex;
@@ -1198,7 +1198,7 @@ const refreshCard2Definitions = async () => {
   z-index: 9999;
 }
 
-/* Firefox 支持 */
+/* Firefox support */
 .panel-editor-wrapper:-moz-full-screen {
   background: var(--body-color);
   display: flex;
@@ -1206,7 +1206,7 @@ const refreshCard2Definitions = async () => {
   z-index: 9999;
 }
 
-/* IE11 支持 */
+/* IE11 support */
 .panel-editor-wrapper:-ms-fullscreen {
   background: var(--body-color);
   display: flex;
@@ -1214,7 +1214,7 @@ const refreshCard2Definitions = async () => {
   z-index: 9999;
 }
 
-/* 🔥 头部和底部样式 */
+/* 🔥 Header and bottom styles */
 .panel-header {
   display: flex;
   align-items: center;
@@ -1260,7 +1260,7 @@ const refreshCard2Definitions = async () => {
   border-top: 1px solid var(--border-color);
 }
 
-/* 🔥 自动隐藏 Footer 动画样式 */
+/* 🔥 auto-hide Footer animation style */
 .auto-hide-footer {
   transform: translateY(0);
   opacity: 1;
@@ -1268,19 +1268,19 @@ const refreshCard2Definitions = async () => {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 🔥 Footer 隐藏状态 - 通过 PanelLayout 的 v-show 控制 */
+/* 🔥 Footer Hidden state - pass PanelLayout of v-show control */
 .panel-layout[data-footer-hidden='true'] .auto-hide-footer {
   transform: translateY(100%);
   opacity: 0;
 }
 
-/* 🔥 Footer 悬浮时的增强样式 */
+/* 🔥 Footer Enhanced styles when hovering */
 .auto-hide-footer:hover {
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
   background: var(--card-color);
 }
 
-/* 🔥 暗色主题适配 */
+/* 🔥 Dark theme adaptation */
 [data-theme='dark'] .auto-hide-footer {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -1289,7 +1289,7 @@ const refreshCard2Definitions = async () => {
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* 🔥 右下角触发器样式 */
+/* 🔥 Lower right corner trigger style */
 .footer-trigger {
   position: absolute;
   bottom: 0;
@@ -1301,7 +1301,7 @@ const refreshCard2Definitions = async () => {
   cursor: pointer;
 }
 
-/* 🔥 触发器悬浮提示（可选） */
+/* 🔥 Trigger floating prompt（Optional） */
 .footer-trigger::before {
   content: '';
   position: absolute;
@@ -1321,7 +1321,7 @@ const refreshCard2Definitions = async () => {
   transform: scale(1.2);
 }
 
-/* 暗色主题适配 */
+/* Dark theme adaptation */
 [data-theme='dark'] .footer-trigger::before {
   background: rgba(16, 185, 129, 0.6);
 }
@@ -1341,7 +1341,7 @@ const refreshCard2Definitions = async () => {
   color: var(--text-color-2);
 }
 
-/* 🔥 轮询状态特殊样式 */
+/* 🔥 Poll status special style */
 .status-text.polling-status {
   color: var(--success-color);
   font-weight: 500;
@@ -1366,7 +1366,7 @@ const refreshCard2Definitions = async () => {
   font-weight: 500;
 }
 
-/* 🔥 Footer 轮询控制器样式 */
+/* 🔥 Footer Polling controller style */
 .footer-polling-controller {
   display: flex;
   align-items: center;
@@ -1390,7 +1390,7 @@ const refreshCard2Definitions = async () => {
   line-height: 1;
 }
 
-/* 🔥 渲染器容器样式 - 避免双滚动条但保持功能 */
+/* 🔥 Renderer container style - Avoid double scrollbars but keep functionality */
 .renderer-main-area {
   position: relative;
   background-color: var(--body-color, #f8fafc);
@@ -1404,20 +1404,20 @@ const refreshCard2Definitions = async () => {
 
 .renderer-container {
   width: 100%;
-  position: relative; /* 🔥 改为relative，避免绝对定位限制 */
+  position: relative; /* 🔥 Change torelative，Avoid absolute positioning restrictions */
   flex: 1;
   min-height: 0;
   overflow: auto;
 }
 
-/* 🔥 拖拽状态样式 */
+/* 🔥 Drag state style */
 .renderer-main-area.dragging {
   border: 2px dashed var(--primary-color, #1890ff);
   background-color: var(--primary-color-hover, rgba(24, 144, 255, 0.1));
 }
 
 .renderer-main-area.dragging::before {
-  content: '拖拽组件到此处';
+  content: 'Drag the component here';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1429,7 +1429,7 @@ const refreshCard2Definitions = async () => {
   pointer-events: none;
 }
 
-/* 🔥 拖放悬停状态样式 */
+/* 🔥 Drag and drop hover state styles */
 .renderer-main-area.drag-over {
   border: 2px solid var(--success-color, #52c41a);
   background-color: rgba(82, 196, 26, 0.1);
@@ -1437,7 +1437,7 @@ const refreshCard2Definitions = async () => {
 }
 
 .renderer-main-area.drag-over::before {
-  content: '松开鼠标添加组件';
+  content: 'Release the mouse to add the component';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1449,7 +1449,7 @@ const refreshCard2Definitions = async () => {
   pointer-events: none;
 }
 
-/* 🔥 主题适配 */
+/* 🔥 Theme adaptation */
 [data-theme='dark'] .renderer-main-area {
   background-color: var(--body-color, #1f1f1f);
 }
@@ -1472,7 +1472,7 @@ const refreshCard2Definitions = async () => {
   color: var(--success-color, #10b981);
 }
 
-/* 🔥 全屏拖放接收覆盖层 - 整洁清晰 */
+/* 🔥 Full screen drag and drop receiving overlay - Neat and clear */
 .drag-drop-overlay {
   position: fixed;
   top: 0;
@@ -1485,7 +1485,7 @@ const refreshCard2Definitions = async () => {
 }
 
 .drag-drop-overlay::before {
-  content: '松开添加';
+  content: 'loosen add';
   position: fixed;
   top: 50%;
   left: 50%;

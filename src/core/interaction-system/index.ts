@@ -1,21 +1,21 @@
 /**
- * 核心交互系统统一导出
+ * Unified export of core interactive systems
  *
- * 该模块提供了完整的组件交互配置和管理功能，包括：
- * - 交互配置组件
- * - 配置管理器
- * - 统一的API接口
+ * This module provides complete component interactive configuration and management functions，include：
+ * - Interactive configuration components
+ * - configuration manager
+ * - unifiedAPIinterface
  */
 
-// 导出交互配置组件
+// Export interactive configuration components
 export { default as InteractionCardWizard } from '@/core/interaction-system/components/InteractionCardWizard.vue'
 export { default as InteractionTemplateSelector } from '@/core/interaction-system/components/InteractionTemplateSelector.vue'
 export { default as InteractionPreview } from '@/core/interaction-system/components/InteractionPreview.vue'
 
-// 导出配置管理器
+// Export configuration manager
 export { configRegistry, default as ConfigRegistry } from '@/core/interaction-system/managers/ConfigRegistry'
 
-// 向后兼容的导出（为了保持现有代码正常工作）
+// Backwards compatible export（To keep existing code working）
 export const initializeSettings = () => {
-  // TODO: 在这里可以添加交互系统的初始化逻辑
+  // TODO: Here you can add the initialization logic of the interactive system
 }

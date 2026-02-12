@@ -1,10 +1,10 @@
 <script setup lang="ts">
-// 导入Vue核心功能、Naive UI组件和状态管理
+// importVueCore functions、Naive UIComponent and state management
 import { computed, useSlots } from 'vue'
 import { NDrawer, NDrawerContent } from 'naive-ui'
 import { useThemeStore } from '@/store/modules/theme'
 
-// 定义组件的Props
+// Define componentsProps
 interface Props {
   mode?: 'edit' | 'preview'
   leftCollapsed?: boolean
@@ -21,7 +21,7 @@ interface Props {
   customClass?: string
 }
 
-// 设置Props的默认值
+// set upPropsThe default value of
 const props = withDefaults(defineProps<Props>(), {
   mode: 'edit',
   leftCollapsed: false,
@@ -38,13 +38,13 @@ const props = withDefaults(defineProps<Props>(), {
   customClass: ''
 })
 
-// 定义组件的Emits
+// Define componentsEmits
 const emit = defineEmits<{
   'update:leftCollapsed': [value: boolean]
   'update:rightCollapsed': [value: boolean]
 }>()
 
-// 处理侧边栏抽屉的关闭事件
+// Handling the close event of the sidebar drawer
 const handleLeftDrawerClose = (show: boolean) => {
   if (!show) emit('update:leftCollapsed', true)
 }
@@ -52,12 +52,12 @@ const handleRightDrawerClose = (show: boolean) => {
   if (!show) emit('update:rightCollapsed', true)
 }
 
-// 获取插槽和主题状态
+// Get slot and topic status
 const slots = useSlots()
 const themeStore = useThemeStore()
 const isEditMode = computed(() => props.mode === 'edit')
 
-// 动态计算主题颜色
+// Dynamically calculate theme colors
 const themeColors = computed(() => {
   const isDark = themeStore.darkMode
   return {
@@ -69,21 +69,21 @@ const themeColors = computed(() => {
   }
 })
 
-// 检查各个插槽是否存在
+// Check if each slot exists
 const hasHeader = computed(() => !!slots.header)
 const hasToolbar = computed(() => !!slots.toolbar)
 const hasLeft = computed(() => !!slots.left)
 const hasRight = computed(() => !!slots.right)
 const hasFooter = computed(() => !!slots.footer)
 
-// 根据Props和插槽情况决定是否显示各个区域
+// according toPropsand slot conditions determine whether to display each area
 const displayHeader = computed(() => props.showHeader && hasHeader.value)
 const displayToolbar = computed(() => props.showToolbar && hasToolbar.value)
 const displayLeft = computed(() => isEditMode.value && hasLeft.value && !props.leftCollapsed)
 const displayRight = computed(() => isEditMode.value && hasRight.value && !props.rightCollapsed)
 const displayFooter = computed(() => props.showFooter && hasFooter.value)
 
-// 动态计算CSS变量
+// Dynamic calculationCSSvariable
 const cssVariables = computed(() => ({
   ...themeColors.value,
   '--header-height': displayHeader.value ? `${props.headerHeight}px` : '0px',
@@ -91,7 +91,7 @@ const cssVariables = computed(() => ({
   '--footer-height': displayFooter.value ? `${props.footerHeight}px` : '0px'
 }))
 
-// 暴露给父组件的API
+// Exposed to parent componentAPI
 defineExpose({
   toggleLeft: () => emit('update:leftCollapsed', !props.leftCollapsed),
   toggleRight: () => emit('update:rightCollapsed', !props.rightCollapsed),
@@ -108,24 +108,24 @@ defineExpose({
     :class="[props.customClass, { 'no-animations': !props.enableAnimations }]"
     :style="cssVariables"
   >
-    <!-- 页面标题区域 -->
+    <!-- Page title area -->
     <div v-if="displayHeader" class="header-area" :style="{ height: 'var(--header-height)' }">
       <slot name="header" :mode="props.mode" :isEditMode="isEditMode" />
     </div>
 
-    <!-- 工具栏区域 -->
+    <!-- toolbar area -->
     <div v-if="displayToolbar" class="toolbar-area" :style="{ height: 'var(--toolbar-height)' }">
       <slot name="toolbar" :mode="props.mode" :isEditMode="isEditMode" />
     </div>
 
-    <!-- 主内容区域 -->
+    <!-- main content area -->
     <div class="main-content">
-      <!-- 中央主区域 -->
+      <!-- central main area -->
       <div ref="mainAreaRef" class="main-area">
         <slot name="main" :mode="props.mode" :isEditMode="isEditMode" />
       </div>
 
-      <!-- 左侧抽屉 -->
+      <!-- left drawer -->
       <NDrawer
         v-model:show="displayLeft"
         :width="props.leftWidth"
@@ -136,12 +136,12 @@ defineExpose({
         :mask-closable="true"
         @update:show="handleLeftDrawerClose"
       >
-        <NDrawerContent title="组件库" closable @close="() => handleLeftDrawerClose(false)">
+        <NDrawerContent title="Component library" closable @close="() => handleLeftDrawerClose(false)">
           <slot name="left" :mode="props.mode" :isEditMode="isEditMode" />
         </NDrawerContent>
       </NDrawer>
 
-      <!-- 右侧抽屉 -->
+      <!-- right drawer -->
       <NDrawer
         v-model:show="displayRight"
         :width="props.rightWidth"
@@ -152,13 +152,13 @@ defineExpose({
         :mask-closable="true"
         @update:show="handleRightDrawerClose"
       >
-        <NDrawerContent title="属性配置" closable @close="() => handleRightDrawerClose(false)">
+        <NDrawerContent title="Property configuration" closable @close="() => handleRightDrawerClose(false)">
           <slot name="right" :mode="props.mode" :isEditMode="isEditMode" />
         </NDrawerContent>
       </NDrawer>
     </div>
 
-    <!-- 底部区域 -->
+    <!-- bottom area -->
     <div v-if="displayFooter" class="footer-area" :style="{ height: 'var(--footer-height)' }">
       <slot name="footer" :mode="props.mode" :isEditMode="isEditMode" />
     </div>
@@ -166,7 +166,7 @@ defineExpose({
 </template>
 
 <style scoped>
-/* 基础布局: 使用Flexbox实现垂直布局 */
+/* basic layout: useFlexboxImplement vertical layout */
 .panel-layout {
   display: flex;
   flex-direction: column;
@@ -175,12 +175,12 @@ defineExpose({
   background-color: var(--panel-bg);
 }
 
-/* 禁用动画 */
+/* Disable animation */
 .panel-layout.no-animations * {
   transition: none !important;
 }
 
-/* 头部、工具栏、底部区域: 固定高度，不收缩 */
+/* head、Toolbar、bottom area: fixed height，Does not shrink */
 .header-area,
 .toolbar-area,
 .footer-area {
@@ -201,23 +201,23 @@ defineExpose({
   border-bottom: none;
 }
 
-/* 主内容区: 占据剩余所有空间 */
+/* Main content area: Take up all remaining space */
 .main-content {
   flex: 1;
   position: relative;
   display: flex;
-  min-height: 0; /* flex布局关键属性，防止内容溢出时容器不收缩 */
+  min-height: 0; /* flexLayout key attributes，Prevent the container from shrinking when the content overflows */
 }
 
-/* 中央主区域: 占据主内容区的全部空间，并提供滚动 */
+/* central main area: Take up all the space in the main content area，and provide scrolling */
 .main-area {
   flex: 1;
   min-width: 0;
-  overflow: auto; /* 关键：滚动条在这里处理 */
+  overflow: auto; /* key：Scroll bars are handled here */
   background-color: var(--panel-bg);
 }
 
-/* 自定义滚动条样式 */
+/* Custom scroll bar style */
 .main-area::-webkit-scrollbar {
   width: 6px;
   height: 6px;

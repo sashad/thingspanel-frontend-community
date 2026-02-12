@@ -1,23 +1,23 @@
 /**
- * Core2 系统适配器
- * 提供从旧 core 系统到新 core2 系统的平滑切换
- * 保持向后兼容性，不删除原有 core 系统
+ * Core2 system adapter
+ * Provided from old core system to new core2 Smooth switching of the system
+ * Maintain backward compatibility，Do not delete the original core system
  */
 
 import { ComponentRegistry, AutoRegistry, componentRegistry } from './core2'
 import { LegacyAdapter } from './core2/compatibility'
 
-// ========== Core2 系统初始化 ==========
+// ========== Core2 System initialization ==========
 
-// 创建新的自动注册系统
+// Create a new automatic registration system
 const core2AutoRegistry = new AutoRegistry(componentRegistry)
 
-// 初始化状态
+// initialization state
 let core2Initialized = false
 let core2InitializationPromise: Promise<void> | null = null
 
 /**
- * 初始化 Core2 系统
+ * initialization Core2 system
  */
 export async function initializeCore2System() {
   if (core2Initialized) return
@@ -29,18 +29,18 @@ export async function initializeCore2System() {
   core2InitializationPromise = (async () => {
     try {
 
-      // 扫描组件
+      // Scan components
       const allComponentModules = import.meta.glob('@/card2.1/components/**/index.ts', { eager: true })
 
-      // 排除 components/index.ts 本身避免冲突
+      // exclude components/index.ts Avoid conflict itself
       const componentModules = Object.fromEntries(
         Object.entries(allComponentModules).filter(([path]) => path !== '@/card2.1/components/index.ts')
       )
 
-      // 调用 Core2 自动注册系统
+      // call Core2 Automatic registration system
       await core2AutoRegistry.autoRegister(componentModules)
 
-      // 初始化向后兼容性
+      // Initialize backwards compatibility
       LegacyAdapter.initialize()
 
       core2Initialized = true
@@ -55,14 +55,14 @@ export async function initializeCore2System() {
 }
 
 /**
- * 获取 Core2 组件注册表
+ * Get Core2 component registry
  */
 export function getCore2ComponentRegistry() {
   return componentRegistry
 }
 
 /**
- * 获取 Core2 组件树形结构
+ * Get Core2 Component tree structure
  */
 export function getCore2ComponentTree() {
   if (!core2Initialized) {
@@ -70,16 +70,16 @@ export function getCore2ComponentTree() {
   }
   const tree = core2AutoRegistry.getComponentTree()
 
-  console.log('🔥 [Core2] 组件树结果:')
-  console.log('总组件数:', tree.totalCount)
-  console.log('分类数:', tree.categories.length)
-  console.log('组件数:', tree.components.length)
+  console.log('🔥 [Core2] Component tree results:')
+  console.log('Total number of components:', tree.totalCount)
+  console.log('Number of categories:', tree.categories.length)
+  console.log('Number of components:', tree.components.length)
 
   return tree
 }
 
 /**
- * 按分类获取 Core2 组件
+ * Get by category Core2 components
  */
 export async function getCore2ComponentsByCategory(mainCategory?: string, subCategory?: string) {
   if (!core2Initialized) {
@@ -89,7 +89,7 @@ export async function getCore2ComponentsByCategory(mainCategory?: string, subCat
 }
 
 /**
- * 获取 Core2 所有分类
+ * Get Core2 All categories
  */
 export function getCore2Categories() {
   if (!core2Initialized) {
@@ -99,7 +99,7 @@ export function getCore2Categories() {
 }
 
 /**
- * 获取 Core2 系统初始化状态
+ * Get Core2 System initialization state
  */
 export function getCore2InitializationState() {
   return {
@@ -111,14 +111,14 @@ export function getCore2InitializationState() {
 }
 
 /**
- * 检查 Core2 系统是否可用
+ * examine Core2 Is the system available?
  */
 export function isCore2Available() {
   return core2Initialized
 }
 
 /**
- * 获取 Core2 系统统计信息
+ * Get Core2 System statistics
  */
 export function getCore2Stats() {
   if (!core2Initialized) {
@@ -127,37 +127,37 @@ export function getCore2Stats() {
   return componentRegistry.getStats()
 }
 
-// ========== 向后兼容桥接 ==========
+// ========== backward compatibility bridging ==========
 
 /**
- * 向后兼容桥接 - 提供与旧系统相同的接口
+ * backward compatibility bridging - Provides the same interface as the old system
  */
 export const core2Bridge = {
-  // 组件注册相关
+  // Component registration related
   getComponentRegistry: getCore2ComponentRegistry,
   getComponentTree: getCore2ComponentTree,
   getComponentsByCategory: getCore2ComponentsByCategory,
   getCategories: getCore2Categories,
 
-  // 系统状态相关
+  // System status related
   getInitializationState: getCore2InitializationState,
   isInitialized: () => core2Initialized,
 
-  // 工具方法
+  // Tool method
   initialize: initializeCore2System,
   clearCache: () => {
     core2Initialized = false
     core2InitializationPromise = null
   },
 
-  // 迁移状态
+  // Migration status
   getMigrationStatus: LegacyAdapter.getMigrationStatus,
   getCompatibilityWarnings: LegacyAdapter.getCompatibilityWarnings,
   performMigrationCheck: LegacyAdapter.performMigrationCheck
 }
 
 /**
- * 全局导出 Core2 系统（仅在开发环境中）
+ * global export Core2 system（Only in development environment）
  */
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   const win = window as any
@@ -169,5 +169,5 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   }
 }
 
-// 默认导出桥接对象
+// Bridge objects are exported by default
 export default core2Bridge

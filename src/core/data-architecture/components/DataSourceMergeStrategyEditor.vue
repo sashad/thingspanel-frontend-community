@@ -1,26 +1,26 @@
 <script setup lang="ts">
 /**
- * 数据源合并策略编辑器
- * 用于配置数据源内多个数据项的合并方式
+ * Data Source Merge Strategy Editor
+ * Used to configure the merging method of multiple data items in the data source
  */
 
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// 合并策略类型定义
+// Merge strategy type definition
 interface MergeStrategy {
   type: 'object' | 'array' | 'script' | 'condition'
   script?: string
   description?: string
 }
 
-// Props 接口定义
+// Props Interface definition
 interface Props {
-  /** 数据源ID */
+  /** data sourceID */
   dataSourceId: string
-  /** 当前合并策略 */
+  /** Current merge strategy */
   modelValue?: MergeStrategy
-  /** 数据项数量（用于显示预期效果） */
+  /** Number of data items（Used to show expected effects） */
   dataItemCount?: number
 }
 
@@ -33,55 +33,55 @@ const emit = defineEmits<{
   'update:modelValue': [value: MergeStrategy]
 }>()
 
-// 国际化
+// internationalization
 const { t } = useI18n()
 
-// 响应式数据
+// Responsive data
 const currentStrategy = ref<MergeStrategy>({ ...props.modelValue })
 const showCustomScript = ref(false)
 
-// 预制合并策略选项
+// Pre-made merge strategy options
 const mergeStrategyOptions = [
   {
     value: 'object',
-    label: '对象浅合并',
-    description: 'Object.assign({}, item1, item2, ...) - 将所有数据项的属性合并到一个对象中',
+    label: 'Shallow merge of objects',
+    description: 'Object.assign({}, item1, item2, ...) - Combine the properties of all data items into one object',
     example: '{ ...item1, ...item2, ...item3 }',
     icon: '🔗'
   },
   {
     value: 'array',
-    label: '组成数组',
-    description: '[item1, item2, item3] - 将所有数据项组成一个数组',
+    label: 'form an array',
+    description: '[item1, item2, item3] - Group all data items into an array',
     example: '[data1, data2, data3]',
     icon: '📝'
   },
   {
     value: 'condition',
-    label: '条件选择',
-    description: '根据预设条件选择合适的数据项',
-    example: '选择第一个可用 / 选择最大数据集',
+    label: 'Condition selection',
+    description: 'Select appropriate data items based on preset conditions',
+    example: 'Select the first available / Select the largest data set',
     icon: '⚖️'
   },
   {
     value: 'script',
-    label: '自定义脚本',
-    description: '使用自定义JavaScript脚本处理合并逻辑',
+    label: 'custom script',
+    description: 'Use customJavaScriptScript handling merge logic',
     example: 'return items.filter(...).map(...)',
     icon: '⚙️'
   }
 ]
 
-// 条件选择策略选项
+// Conditional selection strategy options
 const conditionStrategyOptions = [
   {
     value: 'first-available',
-    label: '选择第一个可用',
+    label: 'Select the first available',
     script: 'return items.find(item => item !== null && item !== undefined) || {}'
   },
   {
     value: 'largest-dataset',
-    label: '选择最大数据集',
+    label: 'Select the largest data set',
     script: `return items.reduce((largest, current) => {
   const currentSize = Array.isArray(current) ? current.length : Object.keys(current || {}).length
   const largestSize = Array.isArray(largest) ? largest.length : Object.keys(largest || {}).length
@@ -90,7 +90,7 @@ const conditionStrategyOptions = [
   },
   {
     value: 'merge-arrays',
-    label: '数组展开合并',
+    label: 'Array expansion and merging',
     script: `return items.reduce((result, item) => {
   if (Array.isArray(item)) {
     return [...result, ...item]
@@ -102,30 +102,30 @@ const conditionStrategyOptions = [
   }
 ]
 
-// 计算属性
+// Computed properties
 const isScriptStrategy = computed(() => currentStrategy.value.type === 'script' || showCustomScript.value)
 
 const previewText = computed(() => {
   const count = props.dataItemCount
   if (count <= 1) {
-    return '单个数据项，无需合并'
+    return 'single data item，No need to merge'
   }
 
   switch (currentStrategy.value.type) {
     case 'object':
-      return `合并 ${count} 个数据项的属性到一个对象`
+      return `merge ${count} attributes of a data item to an object`
     case 'array':
-      return `将 ${count} 个数据项组成数组`
+      return `Will ${count} data items form an array`
     case 'condition':
-      return `根据条件从 ${count} 个数据项中选择`
+      return `According to the conditions from ${count} Select from data items`
     case 'script':
-      return `使用自定义脚本处理 ${count} 个数据项`
+      return `Use custom script processing ${count} data items`
     default:
       return ''
   }
 })
 
-// 监听变化并通知父组件
+// Listen for changes and notify the parent component
 watch(
   currentStrategy,
   newValue => {
@@ -134,29 +134,29 @@ watch(
   { deep: true }
 )
 
-// 选择预制合并策略
+// Choose a pre-made merge strategy
 const selectMergeStrategy = (strategyType: string) => {
   currentStrategy.value.type = strategyType as any
 
   if (strategyType === 'script') {
     showCustomScript.value = true
-    currentStrategy.value.script = currentStrategy.value.script || '// 自定义合并逻辑\nreturn items[0] || {}'
+    currentStrategy.value.script = currentStrategy.value.script || '// Custom merge logic\nreturn items[0] || {}'
   } else {
     showCustomScript.value = false
     currentStrategy.value.script = undefined
   }
 }
 
-// 选择条件策略
+// Select condition strategy
 const selectConditionStrategy = (option: any) => {
   currentStrategy.value.type = 'script'
   currentStrategy.value.script = option.script
   currentStrategy.value.description = option.label
 }
 
-// 预览合并效果
+// Preview merge effect
 const previewMergeResult = () => {
-  // 模拟数据项
+  // simulated data items
   const mockItems = [
     { name: 'data1', value: 100 },
     { name: 'data2', value: 200 },
@@ -177,7 +177,7 @@ const previewMergeResult = () => {
         break
     }
   } catch (error) {
-    return `脚本执行错误: ${error.message}`
+    return `Script execution error: ${error.message}`
   }
 
   return mockItems[0]
@@ -186,30 +186,30 @@ const previewMergeResult = () => {
 
 <template>
   <div class="data-source-merge-strategy-editor">
-    <!-- 标题和说明 -->
+    <!-- title and description -->
     <div class="strategy-header">
       <n-space align="center" justify="space-between">
         <div>
-          <n-text strong>{{ dataSourceId }} 合并策略</n-text>
+          <n-text strong>{{ dataSourceId }} merge strategy</n-text>
           <n-text depth="3" style="margin-left: 8px">
             {{ previewText }}
           </n-text>
         </div>
-        <n-tag v-if="dataItemCount > 1" type="info" size="small">{{ dataItemCount }} 个数据项</n-tag>
+        <n-tag v-if="dataItemCount > 1" type="info" size="small">{{ dataItemCount }} data items</n-tag>
       </n-space>
     </div>
 
-    <!-- 合并策略选择 -->
+    <!-- Merge strategy selection -->
     <n-card size="small" style="margin-top: 16px">
       <template #header>
         <n-space align="center">
           <span>⚙️</span>
-          <span>合并策略选择</span>
+          <span>Merge strategy selection</span>
         </n-space>
       </template>
 
       <n-space vertical size="large">
-        <!-- 策略选项 -->
+        <!-- Strategy options -->
         <n-radio-group :value="currentStrategy.type" size="large" @update:value="selectMergeStrategy">
           <n-space vertical size="medium">
             <div
@@ -232,9 +232,9 @@ const previewMergeResult = () => {
           </n-space>
         </n-radio-group>
 
-        <!-- 条件选择策略详细配置 -->
+        <!-- Detailed configuration of conditional selection strategy -->
         <div v-if="currentStrategy.type === 'condition'" class="condition-strategies">
-          <n-divider>条件选择详细配置</n-divider>
+          <n-divider>Condition selection detailed configuration</n-divider>
           <n-space vertical>
             <div v-for="option in conditionStrategyOptions" :key="option.value" class="condition-option">
               <n-button
@@ -252,25 +252,25 @@ const previewMergeResult = () => {
           </n-space>
         </div>
 
-        <!-- 自定义脚本编辑 -->
+        <!-- Custom script editing -->
         <div v-if="isScriptStrategy" class="custom-script-section">
-          <n-divider>自定义脚本编辑</n-divider>
+          <n-divider>Custom script editing</n-divider>
 
           <n-space vertical>
             <n-alert type="info" :show-icon="false">
               <template #icon><span>💡</span></template>
               <div>
-                <strong>脚本说明</strong>
+                <strong>Script description</strong>
                 <ul style="margin: 8px 0; padding-left: 20px">
                   <li>
                     <code>items</code>
-                    : 数据项数组，包含所有处理后的数据项
+                    : array of data items，Contains all processed data items
                   </li>
                   <li>
                     <code>return</code>
-                    : 返回合并后的最终数据
+                    : Return the final merged data
                   </li>
-                  <li>支持所有JavaScript语法和常用方法</li>
+                  <li>Support allJavaScriptSyntax and common methods</li>
                 </ul>
               </div>
             </n-alert>
@@ -278,13 +278,13 @@ const previewMergeResult = () => {
             <n-input
               v-model:value="currentStrategy.script"
               type="textarea"
-              placeholder="// 自定义合并逻辑&#10;// items 参数包含所有数据项&#10;return items[0] || {}"
+              placeholder="// Custom merge logic&#10;// items Parameters contain all data items&#10;return items[0] || {}"
               :rows="8"
               style="font-family: 'Consolas', 'Monaco', monospace"
             />
 
-            <!-- 脚本预览 -->
-            <n-card size="small" title="🔍 预览效果">
+            <!-- Script preview -->
+            <n-card size="small" title="🔍 Preview effect">
               <n-code
                 :code="JSON.stringify(previewMergeResult(), null, 2)"
                 language="json"
@@ -296,10 +296,10 @@ const previewMergeResult = () => {
       </n-space>
     </n-card>
 
-    <!-- 操作按钮 -->
+    <!-- Action button -->
     <n-space justify="end" style="margin-top: 16px">
-      <n-button @click="previewMergeResult">🔍 预览效果</n-button>
-      <n-button type="primary" @click="$emit('update:modelValue', currentStrategy)">✅ 确认策略</n-button>
+      <n-button @click="previewMergeResult">🔍 Preview effect</n-button>
+      <n-button type="primary" @click="$emit('update:modelValue', currentStrategy)">✅ Confirm strategy</n-button>
     </n-space>
   </div>
 </template>

@@ -1,11 +1,11 @@
 /**
- * 多层级执行器链测试用例
+ * Multi-level executor chain test cases
  */
 
 import { MultiLayerExecutorChain, DataSourceConfiguration } from '@/core/data-architecture/executors/MultiLayerExecutorChain'
 
 /**
- * JSON数据项示例配置
+ * JSONData item example configuration
  */
 const createJsonExampleConfig = (): DataSourceConfiguration => {
   return {
@@ -19,7 +19,7 @@ const createJsonExampleConfig = (): DataSourceConfiguration => {
               type: 'json',
               config: {
                 jsonString: JSON.stringify({
-                  user: { name: '张三', age: 25, hobbies: ['读书', '游泳'] },
+                  user: { name: 'Zhang San', age: 25, hobbies: ['read', 'swim'] },
                   stats: { score: 95, level: 'A' }
                 })
               }
@@ -34,8 +34,8 @@ const createJsonExampleConfig = (): DataSourceConfiguration => {
               type: 'json',
               config: {
                 jsonString: JSON.stringify({
-                  product: { name: '商品A', price: 199 },
-                  categories: ['电子', '数码']
+                  product: { name: 'commodityA', price: 199 },
+                  categories: ['electronic', 'digital']
                 })
               }
             },
@@ -57,14 +57,14 @@ const createJsonExampleConfig = (): DataSourceConfiguration => {
               type: 'json',
               config: {
                 jsonString: JSON.stringify([
-                  { id: 1, name: '项目1' },
-                  { id: 2, name: '项目2' },
-                  { id: 3, name: '项目3' }
+                  { id: 1, name: 'project1' },
+                  { id: 2, name: 'project2' },
+                  { id: 3, name: 'project3' }
                 ])
               }
             },
             processing: {
-              filterPath: '$[0]', // 获取第一个元素
+              filterPath: '$[0]', // Get the first element
               defaultValue: {}
             }
           }
@@ -80,7 +80,7 @@ const createJsonExampleConfig = (): DataSourceConfiguration => {
 }
 
 /**
- * HTTP数据项示例配置
+ * HTTPData item example configuration
  */
 const createHttpExampleConfig = (): DataSourceConfiguration => {
   return {
@@ -100,7 +100,7 @@ const createHttpExampleConfig = (): DataSourceConfiguration => {
             },
             processing: {
               filterPath: '$.title',
-              defaultValue: '默认标题'
+              defaultValue: 'default title'
             }
           }
         ],
@@ -115,7 +115,7 @@ const createHttpExampleConfig = (): DataSourceConfiguration => {
 }
 
 /**
- * 自定义脚本合并示例配置
+ * Custom script merge example configuration
  */
 const createScriptMergeExampleConfig = (): DataSourceConfiguration => {
   return {
@@ -128,13 +128,13 @@ const createScriptMergeExampleConfig = (): DataSourceConfiguration => {
             item: {
               type: 'json',
               config: {
-                jsonString: JSON.stringify({ count: 10, name: '测试数据' })
+                jsonString: JSON.stringify({ count: 10, name: 'test data' })
               }
             },
             processing: {
               filterPath: '$',
               customScript: `
-                // 对数据进行自定义处理
+                // Custom processing of data
                 return {
                   ...data,
                   processedAt: new Date().toISOString(),
@@ -160,7 +160,7 @@ const createScriptMergeExampleConfig = (): DataSourceConfiguration => {
         mergeStrategy: {
           type: 'script',
           script: `
-            // 自定义合并逻辑
+            // Custom merge logic
             const result = {
               merged: true,
               totalValue: 0,
@@ -184,34 +184,34 @@ const createScriptMergeExampleConfig = (): DataSourceConfiguration => {
 }
 
 /**
- * 测试执行器链功能
+ * Test actuator chain functionality
  */
 async function testExecutorChain() {
   const executorChain = new MultiLayerExecutorChain()
 
-  // 测试1: JSON数据处理
+  // test1: JSONData processing
   try {
     const config1 = createJsonExampleConfig()
     const result1 = await executorChain.executeDataProcessingChain(config1, true)
   } catch (error) {}
 
-  // 测试2: HTTP数据处理 (可能网络失败)
+  // test2: HTTPData processing (Possible network failure)
   try {
     const config2 = createHttpExampleConfig()
     const result2 = await executorChain.executeDataProcessingChain(config2, true)
   } catch (error) {}
 
-  // 测试3: 自定义脚本处理
+  // test3: Custom script processing
   try {
     const config3 = createScriptMergeExampleConfig()
     const result3 = await executorChain.executeDataProcessingChain(config3, true)
   } catch (error) {}
 
-  // 测试4: 执行器链统计信息
+  // test4: Executor chain statistics
   const statistics = executorChain.getChainStatistics()
 }
 
-// 如果直接运行此文件，执行测试
+// If you run this file directly，Execute tests
 if (require.main === module) {
   testExecutorChain().catch(console.error)
 }

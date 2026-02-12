@@ -1,6 +1,6 @@
 /**
- * 增强版类型系统单元测试
- * 验证泛型配置类型和适配器的正确性
+ * Enhanced type system unit testing
+ * Verify the correctness of generic configuration types and adapters
  */
 
 import { describe, test, expect } from 'vitest'
@@ -25,10 +25,10 @@ import type {
   HttpDataItemConfig as LegacyHttpDataItemConfig
 } from '../executors'
 
-describe('增强版类型系统测试', () => {
-  // ==================== 类型系统基础测试 ====================
+describe('Enhanced type system testing', () => {
+  // ==================== Type system basic testing ====================
 
-  test('泛型DataItemConfig类型检查', () => {
+  test('GenericsDataItemConfigtype checking', () => {
     const jsonDataItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
       type: 'json',
       id: 'json-test-1',
@@ -40,7 +40,7 @@ describe('增强版类型系统测试', () => {
         }
       },
       metadata: {
-        displayName: 'JSON测试数据',
+        displayName: 'JSONtest data',
         enabled: true
       }
     }
@@ -48,10 +48,10 @@ describe('增强版类型系统测试', () => {
     expect(jsonDataItem.type).toBe('json')
     expect(jsonDataItem.id).toBe('json-test-1')
     expect(jsonDataItem.config.jsonData).toBe('{"test": "data"}')
-    expect(jsonDataItem.metadata?.displayName).toBe('JSON测试数据')
+    expect(jsonDataItem.metadata?.displayName).toBe('JSONtest data')
   })
 
-  test('增强版HTTP配置类型检查', () => {
+  test('Enhanced versionHTTPConfiguration type checking', () => {
     const httpConfig: EnhancedHttpDataItemConfig = {
       url: 'https://api.example.com/data?id={{deviceId}}',
       method: 'GET',
@@ -87,13 +87,13 @@ describe('增强版类型系统测试', () => {
     expect(httpConfig.params[0].isDynamic).toBe(true)
   })
 
-  test('动态参数类型检查', () => {
+  test('Dynamic parameter type checking', () => {
     const dynamicParam: DynamicParam = {
       name: 'deviceId',
       type: 'string',
       currentValue: 'device001',
       exampleValue: 'device123',
-      description: '设备ID参数',
+      description: 'equipmentIDparameter',
       required: true,
       validation: {
         pattern: '^device\\d{3}$',
@@ -108,12 +108,12 @@ describe('增强版类型系统测试', () => {
     expect(dynamicParam.validation?.pattern).toBe('^device\\d{3}$')
   })
 
-  // ==================== 配置适配器测试 ====================
+  // ==================== Configure adapter testing ====================
 
-  describe('配置版本检测', () => {
+  describe('Configuration version detection', () => {
     const adapter = createConfigurationAdapter()
 
-    test('检测v1.0配置', () => {
+    test('Detectionv1.0Configuration', () => {
       const v1Config: LegacyDataSourceConfiguration = {
         componentId: 'test-component',
         dataSources: [
@@ -139,7 +139,7 @@ describe('增强版类型系统测试', () => {
       expect(detectConfigVersion(v1Config)).toBe('v1.0')
     })
 
-    test('检测v2.0配置', () => {
+    test('Detectionv2.0Configuration', () => {
       const v2Config: EnhancedDataSourceConfiguration = {
         componentId: 'test-component',
         version: '2.0.0',
@@ -170,8 +170,8 @@ describe('增强版类型系统测试', () => {
     })
   })
 
-  describe('配置升级测试', () => {
-    test('v1升级到v2（JSON数据项）', () => {
+  describe('Configuration upgrade test', () => {
+    test('v1upgrade tov2（JSONdata item）', () => {
       const v1Config: LegacyDataSourceConfiguration = {
         componentId: 'test-component',
         dataSources: [
@@ -198,30 +198,30 @@ describe('增强版类型系统测试', () => {
 
       const v2Config = upgradeToV2(v1Config)
 
-      // 检查基本字段保持不变
+      // Check that basic fields remain unchanged
       expect(v2Config.componentId).toBe('test-component')
       expect(v2Config.dataSources).toHaveLength(1)
       expect(v2Config.createdAt).toBe(1692000000000)
 
-      // 检查新增字段
+      // Check new fields
       expect(v2Config.version).toBe('2.0.0')
       expect(v2Config.dynamicParams).toEqual([])
       expect(v2Config.enhancedFeatures).toBeDefined()
       expect(v2Config.metadata).toBeDefined()
 
-      // 检查数据项升级
+      // Check data item upgrade
       const dataItem = v2Config.dataSources[0].dataItems[0].item as DataItemConfig
       expect(dataItem.id).toBeDefined()
       expect(dataItem.type).toBe('json')
       expect(dataItem.metadata).toBeDefined()
 
-      // 检查JSON配置字段重命名
+      // examineJSONConfiguration field rename
       const jsonConfig = dataItem.config as EnhancedJsonDataItemConfig
       expect(jsonConfig.jsonData).toBe('{"sensor": "temperature", "value": 25.6}')
       expect(jsonConfig.validation).toBeDefined()
     })
 
-    test('v1升级到v2（HTTP数据项）', () => {
+    test('v1upgrade tov2（HTTPdata item）', () => {
       const v1Config: LegacyDataSourceConfiguration = {
         componentId: 'test-component',
         dataSources: [
@@ -255,14 +255,14 @@ describe('增强版类型系统测试', () => {
       const dataItem = v2Config.dataSources[0].dataItems[0].item as DataItemConfig
       const httpConfig = dataItem.config as EnhancedHttpDataItemConfig
 
-      // 检查HTTP配置升级
+      // examineHTTPConfiguration upgrade
       expect(httpConfig.url).toBe('https://api.example.com/sensors')
       expect(httpConfig.method).toBe('GET')
       expect(httpConfig.headers).toHaveLength(2)
       expect(httpConfig.params).toEqual([])
       expect(httpConfig.retry).toBeDefined()
 
-      // 检查headers格式转换
+      // examineheadersformat conversion
       expect(httpConfig.headers[0].key).toBe('Authorization')
       expect(httpConfig.headers[0].value).toBe('Bearer token123')
       expect(httpConfig.headers[0].enabled).toBe(true)
@@ -271,8 +271,8 @@ describe('增强版类型系统测试', () => {
     })
   })
 
-  describe('配置降级测试', () => {
-    test('v2降级到v1（JSON数据项）', () => {
+  describe('Configure downgrade testing', () => {
+    test('v2downgrade tov1（JSONdata item）', () => {
       const v2Config: EnhancedDataSourceConfiguration = {
         componentId: 'test-component',
         version: '2.0.0',
@@ -289,7 +289,7 @@ describe('增强版类型系统测试', () => {
                     validation: { enableFormat: true, enableStructure: false },
                     preprocessing: { removeComments: true, formatOutput: false }
                   },
-                  metadata: { displayName: '温度传感器数据', enabled: true }
+                  metadata: { displayName: 'Temperature sensor data', enabled: true }
                 },
                 processing: { filterPath: '$.temperature' }
               }
@@ -300,8 +300,8 @@ describe('增强版类型系统测试', () => {
         dynamicParams: [],
         enhancedFeatures: DEFAULT_ENHANCED_FEATURES,
         metadata: {
-          name: '温度监控配置',
-          description: '温度传感器数据采集配置'
+          name: 'Temperature monitoring configuration',
+          description: 'Temperature sensor data collection configuration'
         },
         createdAt: Date.now(),
         updatedAt: Date.now()
@@ -309,24 +309,24 @@ describe('增强版类型系统测试', () => {
 
       const v1Config = downgradeToV1(v2Config)
 
-      // 检查基本字段保持
+      // Check basic fields to keep
       expect(v1Config.componentId).toBe('test-component')
       expect(v1Config.dataSources).toHaveLength(1)
 
-      // 检查数据项降级
+      // Check for data item degradation
       const dataItem = v1Config.dataSources[0].dataItems[0].item
       expect(dataItem.type).toBe('json')
 
       const jsonConfig = dataItem.config as LegacyJsonDataItemConfig
       expect(jsonConfig.jsonString).toBe('{"temperature": 26.5}')
 
-      // 检查v2字段被移除
+      // examinev2Field removed
       expect((v1Config as any).version).toBeUndefined()
       expect((v1Config as any).dynamicParams).toBeUndefined()
       expect((v1Config as any).enhancedFeatures).toBeUndefined()
     })
 
-    test('v2降级到v1（HTTP数据项）', () => {
+    test('v2downgrade tov1（HTTPdata item）', () => {
       const v2Config: EnhancedDataSourceConfiguration = {
         componentId: 'test-component',
         version: '2.0.0',
@@ -368,23 +368,23 @@ describe('增强版类型系统测试', () => {
       const dataItem = v1Config.dataSources[0].dataItems[0].item
       const httpConfig = dataItem.config as LegacyHttpDataItemConfig
 
-      // 检查HTTP配置降级
+      // examineHTTPConfiguration downgrade
       expect(httpConfig.url).toBe('https://api.example.com/data')
       expect(httpConfig.method).toBe('POST')
       expect(httpConfig.timeout).toBe(10000)
       expect(httpConfig.body).toEqual({ query: 'test' })
 
-      // 检查headers格式转换（只包含enabled的headers）
+      // examineheadersformat conversion（Contains onlyenabledofheaders）
       expect(httpConfig.headers).toEqual({
         Authorization: 'Bearer token',
         'Content-Type': 'application/json'
-        // X-Debug被过滤掉因为enabled: false
+        // X-Debugfiltered out becauseenabled: false
       })
     })
   })
 
-  describe('转换一致性验证', () => {
-    test('往返转换一致性', () => {
+  describe('Conversion consistency verification', () => {
+    test('Round trip consistency', () => {
       const adapter = createConfigurationAdapter()
 
       const originalV1: LegacyDataSourceConfiguration = {
@@ -408,16 +408,16 @@ describe('增强版类型系统测试', () => {
         updatedAt: Date.now()
       }
 
-      // v1 -> v2 -> v1 往返转换
+      // v1 -> v2 -> v1 round trip conversion
       const upgradedV2 = adapter.upgradeV1ToV2(originalV1)
       const downgradedV1 = adapter.downgradeV2ToV1(upgradedV2)
 
-      // 验证核心字段一致性
+      // Verify core field consistency
       expect(downgradedV1.componentId).toBe(originalV1.componentId)
       expect(downgradedV1.dataSources.length).toBe(originalV1.dataSources.length)
       expect(downgradedV1.dataSources[0].sourceId).toBe(originalV1.dataSources[0].sourceId)
 
-      // 验证数据项类型和配置一致性
+      // Verify data item type and configuration consistency
       const originalItem = originalV1.dataSources[0].dataItems[0].item
       const convertedItem = downgradedV1.dataSources[0].dataItems[0].item
       expect(convertedItem.type).toBe(originalItem.type)
@@ -427,7 +427,7 @@ describe('增强版类型系统测试', () => {
       expect(convertedJsonConfig.jsonString).toBe(originalJsonConfig.jsonString)
     })
 
-    test('使用适配器验证转换一致性', () => {
+    test('Use adapter to verify conversion consistency', () => {
       const adapter = createConfigurationAdapter()
 
       const original: LegacyDataSourceConfiguration = {
@@ -458,8 +458,8 @@ describe('增强版类型系统测试', () => {
     })
   })
 
-  describe('批量转换测试', () => {
-    test('批量转换多个配置', () => {
+  describe('Batch conversion test', () => {
+    test('Convert multiple configurations in batches', () => {
       const adapter = createConfigurationAdapter()
 
       const configs: LegacyDataSourceConfiguration[] = [

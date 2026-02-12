@@ -1,6 +1,6 @@
 /**
- * 面板编辑器数据管理组合式函数
- * 负责面板数据加载、状态管理、配置存储
+ * Panel editor data management combined functions
+ * Responsible for panel data loading、Status management、Configuration storage
  */
 
 import { ref } from 'vue'
@@ -12,7 +12,7 @@ import { usePanelConfigManager } from '@/components/visual-editor/hooks/usePanel
 import type { Panel } from '#/entity'
 
 /**
- * 数据管理相关函数集合
+ * Collection of data management related functions
  */
 export function usePanelDataManager(
   props: { panelId: string },
@@ -26,52 +26,52 @@ export function usePanelDataManager(
   const message = useMessage()
   const { parseConfig, getDefaultConfig } = usePanelConfigManager()
 
-  // 面板数据状态
+  // Panel data status
   const panelData = ref<Panel.Board>()
   const dataFetched = ref(false)
   const editorConfig = ref<any>({})
   const preEditorConfig = ref<any>({})
 
   /**
-   * 恢复编辑器状态
-   * 从配置对象中恢复编辑器的完整状态
+   * Restore editor state
+   * Restore the complete state of the editor from the configuration object
    */
   const setState = (config: any) => {
-    // 重置状态
+    // reset state
     dependencies.stateManager.reset()
 
-    // 🔥 统一字段名：处理 widgets 而不是 nodes
+    // 🔥 Unified field name：deal with widgets instead of nodes
     if (config.widgets && Array.isArray(config.widgets)) {
       config.widgets.forEach((node: any) => {
         dependencies.stateManager.addNode(node)
       })
     }
 
-    // 加载视口设置
+    // Load viewport settings
     if (config.viewport) {
       dependencies.stateManager.updateViewport(config.viewport)
     }
 
-    // 🔥 关键修复：恢复所有组件的配置数据
+    // 🔥 critical fix：Restore configuration data for all components
     if (config.componentConfigurations) {
       try {
-        // 恢复每个组件的配置
+        // Restore the configuration of each component
         for (const [nodeId, nodeConfig] of Object.entries(config.componentConfigurations)) {
           if (nodeConfig && typeof nodeConfig === 'object') {
             try {
-              // 🔥 关键修复：分离和恢复 multiDataSourceConfigStore 数据
+              // 🔥 critical fix：separation and recovery multiDataSourceConfigStore data
               const typedConfig = nodeConfig as any
 
-              // 检查是否有数据源配置需要恢复
+              // Check whether any data source configuration needs to be restored
               if (typedConfig.dataSource?.type === 'data-mapping' && typedConfig.dataSource?.config) {
-                // 恢复到 multiDataSourceConfigStore
+                // Revert to multiDataSourceConfigStore
                 dependencies.multiDataSourceConfigStore.value[nodeId] = typedConfig.dataSource.config
               }
 
-              // 🔥 修复：保留完整配置，不删除 dataSource 字段
+              // 🔥 repair：Keep full configuration，Do not delete dataSource Field
               dependencies.configurationManager.setConfiguration(nodeId, typedConfig)
             } catch (configError) {
-              // 配置恢复失败不应阻止整个状态恢复过程
+              // Configuration recovery failure should not prevent the entire state recovery process
             }
           }
         }
@@ -81,23 +81,23 @@ export function usePanelDataManager(
   }
 
   /**
-   * 获取当前编辑器状态
-   * 收集所有组件配置和编辑器状态用于保存
+   * Get the current editor status
+   * Collect all component configuration and editor state for saving
    */
   const getState = () => {
-    // 收集所有组件的配置数据
+    // Collect configuration data for all components
     const componentConfigurations: Record<string, any> = {}
     try {
-      // 遍历所有节点，收集它们的配置
+      // Traverse all nodes，Collect their configurations
       for (const node of dependencies.stateManager.nodes) {
         const config = dependencies.configurationManager.getConfiguration(node.id)
         if (config) {
-          // 🔥 关键修复：集成 multiDataSourceConfigStore 的数据
+          // 🔥 critical fix：integrated multiDataSourceConfigStore data
           const nodeId = node.id
           const multiDataSourceConfig = dependencies.multiDataSourceConfigStore.value[nodeId]
 
           if (multiDataSourceConfig) {
-            // 将多数据源配置合并到 dataSource 字段中
+            // Consolidate multiple data source configurations into dataSource in field
             const enhancedConfig = {
               ...config,
               dataSource: {
@@ -120,27 +120,27 @@ export function usePanelDataManager(
     } catch (error) {}
 
     const finalState = {
-      widgets: dependencies.stateManager.nodes, // 🔥 统一字段名：使用 widgets
+      widgets: dependencies.stateManager.nodes, // 🔥 Unified field name：use widgets
       config: {
         canvasConfig: editorConfig.value.canvasConfig || {},
         gridConfig: editorConfig.value.gridConfig || {}
       },
       viewport: dependencies.stateManager.viewport,
       mode: dependencies.stateManager.mode,
-      // 🔥 关键修复：包含所有组件的配置数据
+      // 🔥 critical fix：Contains configuration data for all components
       componentConfigurations: componentConfigurations
     }
     return finalState
   }
 
   /**
-   * 获取面板数据并初始化编辑器
-   * 从API加载面板数据，解析配置，并恢复编辑器状态
+   * Get panel data and initialize the editor
+   * fromAPILoad panel data，Parse configuration，and restore the editor state
    */
   const fetchBoard = async () => {
     try {
       const { data } = await getBoard(props.panelId)
-      // 检查组件是否已经卸载
+      // Check if the component has been uninstalled
       if (dependencies.isUnmounted.value) {
         return
       }
@@ -150,10 +150,10 @@ export function usePanelDataManager(
         if (data.config) {
           const config = parseConfig(data.config)
           editorConfig.value = config.visualEditor || getDefaultConfig()
-          // 🔥 智能深拷贝：使用优化的smartDeepClone
+          // 🔥 Smart deep copy：Use optimizedsmartDeepClone
           preEditorConfig.value = smartDeepClone(editorConfig.value)
 
-          // 加载到编辑器
+          // Load into editor
           setState(editorConfig.value)
         } else {
           editorConfig.value = getDefaultConfig()
@@ -169,7 +169,7 @@ export function usePanelDataManager(
           message.warning($t('visualEditor.warning'))
         }
 
-        // 即使没有数据也要初始化默认配置
+        // Initialize default configuration even if there is no data
         editorConfig.value = getDefaultConfig()
         preEditorConfig.value = smartDeepClone(editorConfig.value)
         setState(editorConfig.value)
@@ -182,9 +182,9 @@ export function usePanelDataManager(
         message.warning($t('visualEditor.warning'))
       }
 
-      // 出错时也要初始化默认配置，让编辑器能正常工作
+      // Also initialize the default configuration when an error occurs，Make the editor work properly
       editorConfig.value = getDefaultConfig()
-      // 🔥 智能深拷贝：使用优化的smartDeepClone
+      // 🔥 Smart deep copy：Use optimizedsmartDeepClone
       preEditorConfig.value = smartDeepClone(editorConfig.value)
       setState(editorConfig.value)
       if (!dependencies.isUnmounted.value) {
@@ -194,22 +194,22 @@ export function usePanelDataManager(
   }
 
   /**
-   * 初始化面板数据和相关配置
-   * 加载面板数据并完成基本初始化
+   * Initialize panel data and related configurations
+   * Load panel data and complete basic initialization
    */
   const initializePanelData = async () => {
-    // 加载面板数据
+    // Load panel data
     await fetchBoard()
   }
 
   return {
-    // 状态变量
+    // state variables
     panelData,
     dataFetched,
     editorConfig,
     preEditorConfig,
 
-    // 数据管理函数
+    // data management functions
     setState,
     getState,
     fetchBoard,

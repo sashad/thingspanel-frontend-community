@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 模板编辑表单 - 基本信息
- * 从 step-template-info.vue 提取的表单逻辑
+ * Template edit form - Basic information
+ * from step-template-info.vue Extracted form logic
  */
 
 import { ref, onMounted } from 'vue'
@@ -22,7 +22,7 @@ const props = defineProps<{
 
 const formRef = ref<any>(null)
 
-// 表单数据
+// form data
 interface FormData {
   name: string
   templateTage: string[]
@@ -44,7 +44,7 @@ const formData = ref<FormData>({
   label: ''
 })
 
-// 表单验证规则
+// form validation rules
 const formRules = {
   name: {
     required: true,
@@ -53,7 +53,7 @@ const formRules = {
   }
 }
 
-// 图片上传
+// Image upload
 const isHttpProxy = import.meta.env.VITE_HTTP_PROXY === 'Y'
 const uploadUrl = isHttpProxy ? createProxyPattern() : getDemoServerUrl()
 const url = ref(uploadUrl)
@@ -67,7 +67,7 @@ const handleUploadFinish = ({ event }: { file: UploadFileInfo; event?: ProgressE
 
   if (response.data && response.data.path) {
     formData.value.path = response.data.path
-    // 显示图片时使用服务器域名，去掉 /api/v1 路径
+    // Use server domain name when displaying images，remove /api/v1 path
     const serverUrl = getDemoServerUrl().replace('/api/v1', '')
     iconPreviewUrl.value = serverUrl + response.data.path.substring(1)
   }
@@ -78,7 +78,7 @@ const uploadHeaders = {
 }
 
 /**
- * 加载模板数据
+ * Load template data
  */
 const loadTemplateData = async () => {
   if (!props.templateId) return
@@ -98,25 +98,25 @@ const loadTemplateData = async () => {
         label: data.label || ''
       }
 
-      // 设置图标预览
+      // Set icon preview
       if (data.path) {
         const serverUrl = getDemoServerUrl().replace('/api/v1', '')
         iconPreviewUrl.value = serverUrl + data.path.substring(1)
       }
     }
   } catch (error) {
-    console.error('加载模板数据失败:', error)
+    console.error('Failed to load template data:', error)
   }
 }
 
 /**
- * 保存
+ * save
  */
 const handleSave = async () => {
   try {
     await formRef.value?.validate()
 
-    // 将templateTage数组转换为逗号分隔的字符串
+    // WilltemplateTageConvert array to comma separated string
     formData.value.label = formData.value.templateTage.join(',')
 
     const response = await putTemplat(formData.value)
@@ -128,12 +128,12 @@ const handleSave = async () => {
       window.$message?.error(response.error || $t('common.saveFailed'))
     }
   } catch (error) {
-    console.error('保存模板信息失败:', error)
+    console.error('Failed to save template information:', error)
   }
 }
 
 /**
- * 取消
+ * Cancel
  */
 const handleCancel = () => {
   emit('cancel')
@@ -147,27 +147,27 @@ onMounted(() => {
 <template>
   <div class="template-edit-form">
     <NForm ref="formRef" :model="formData" :rules="formRules" label-placement="left" label-width="100">
-      <!-- 模板名称 -->
+      <!-- Template name -->
       <NFormItem :label="$t('device_template.table_header.templateName')" path="name">
         <NInput v-model:value="formData.name" :placeholder="$t('device_template.enterTemplateName')" />
       </NFormItem>
 
-      <!-- 版本 -->
+      <!-- Version -->
       <NFormItem :label="$t('device_template.version')">
         <NInput v-model:value="formData.version" :placeholder="$t('device_template.enterTemplateVersion')" />
       </NFormItem>
 
-      <!-- 作者 -->
+      <!-- author -->
       <NFormItem :label="$t('device_template.author')">
         <NInput v-model:value="formData.author" :placeholder="$t('device_template.enterTemplateAuthor')" />
       </NFormItem>
 
-      <!-- 标签 -->
+      <!-- Label -->
       <NFormItem :label="$t('generate.labels')">
         <NDynamicTags v-model:value="formData.templateTage" />
       </NFormItem>
 
-      <!-- 封面图标 -->
+      <!-- cover icon -->
       <NFormItem :label="$t('device_template.cover')">
         <NUpload
           :action="url + '/file/up'"
@@ -189,7 +189,7 @@ onMounted(() => {
         </NUpload>
       </NFormItem>
 
-      <!-- 描述 -->
+      <!-- describe -->
       <NFormItem :label="$t('device_template.table_header.description')">
         <NInput
           v-model:value="formData.description"
@@ -199,7 +199,7 @@ onMounted(() => {
         />
       </NFormItem>
 
-      <!-- 操作按钮 -->
+      <!-- Action button -->
       <NFormItem>
         <NSpace>
           <NButton @click="handleCancel">{{ $t('common.cancel') }}</NButton>

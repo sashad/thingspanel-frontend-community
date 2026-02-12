@@ -39,8 +39,8 @@ import GenericCard from '@/card2.1/components/common/generic-card/component.vue'
 import { createLogger } from '@/utils/logger';
 
 /**
- * @description CPU 使用率组件
- * @summary 显示系统 CPU 使用率百分比，每30秒自动刷新
+ * @description CPU Usage component
+ * @summary display system CPU Utilization percentage，Every30Automatically refresh in seconds
  */
 
 const logger = createLogger('CpuUsageCard');
@@ -53,13 +53,13 @@ const unit = ref<string>('');
 let intervalId: number | null = null;
 
 /**
- * 获取系统指标数据
+ * Get system indicator data
  */
 const fetchData = async () => {
   startLoading();
   try {
     const response = await getSystemMetricsCurrent();
-    logger.info('System Metrics Response:', response); // 与原版保持1:1一致
+    logger.info('System Metrics Response:', response); // Keep with the original1:1consistent
 
     const cpuUsagePercent = response?.data?.cpu_usage;
 
@@ -67,12 +67,12 @@ const fetchData = async () => {
       value.value = parseFloat(cpuUsagePercent.toFixed(1)); // Keep one decimal place
       unit.value = '%'; // Set unit to percentage
     } else {
-      logger.warn('CPU usage percentage not found or not a number in response:', response); // 与原版保持一致
+      logger.warn('CPU usage percentage not found or not a number in response:', response); // Stay consistent with the original
       value.value = null;
       unit.value = '';
     }
   } catch (error) {
-    logger.error('Error fetching system metrics:', error); // 与原版保持一致
+    logger.error('Error fetching system metrics:', error); // Stay consistent with the original
     value.value = null;
     unit.value = '';
   } finally {

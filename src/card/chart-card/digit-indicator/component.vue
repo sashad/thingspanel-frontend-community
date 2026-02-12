@@ -18,16 +18,16 @@ const fontSize = ref('14px')
 const cardRef = ref(null)
 let resizeObserver: ResizeObserver | null = null
 
-// 简化的数组数据处理
+// Simplified array data handling
 const processWebSocketData = (data: any) => {
   if (!data) return null
 
-  // 如果数据是数组，直接取第一个元素
+  // If the data is an array，Get the first element directly
   if (Array.isArray(data)) {
     return data.length > 0 ? data[0] : null
   }
 
-  // 直接返回数据
+  // Return data directly
   return data
 }
 
@@ -92,24 +92,24 @@ defineExpose({
       return
     }
 
-    // 处理 WebSocket 数据
+    // deal with WebSocket data
     const processedData = processWebSocketData(data[metricsId])
 
     if (processedData) {
-      // 如果处理后的数据是对象，提取 value 和 unit
+      // If the processed data is an object，extract value and unit
       if (typeof processedData === 'object' && processedData !== null) {
-        // 检查是否有value属性
+        // Check if there isvalueproperty
         if (processedData.value !== undefined) {
           detail.value = processedData.value
           if (processedData.unit) {
             unit.value = processedData.unit
           }
         } else {
-          // 直接使用处理后的数据
+          // Use processed data directly
           detail.value = processedData
         }
       } else {
-        // 直接使用处理后的数据
+        // Use processed data directly
         detail.value = processedData
       }
 

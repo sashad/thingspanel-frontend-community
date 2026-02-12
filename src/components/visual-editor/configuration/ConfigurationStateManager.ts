@@ -1,13 +1,13 @@
 /**
- * 全新的配置状态管理器
- * 基于配置版本控制和内容哈希去重机制，彻底解决无限循环问题
+ * Brand new configuration state manager
+ * Based on configuration version control and content hash deduplication mechanism，Completely solve the infinite loop problem
  *
- * 核心设计原理：
- * 1. 配置版本控制 - 每个配置都有唯一的版本号和内容哈希
- * 2. 内容去重机制 - 相同内容不会触发更新，即使对象引用不同
- * 3. 单向数据流 - 严格的数据流向，避免双向绑定混乱
- * 4. 批量更新机制 - 防抖处理，避免频繁更新
- * 5. 事件去重过滤 - 同一配置变更只触发一次执行
+ * Core design principles：
+ * 1. Configure version control - Each configuration has a unique version number and content hash
+ * 2. Content deduplication mechanism - Identical content will not trigger updates，Even if the object references are different
+ * 3. One-way data flow - Strict data flow，Avoid two-way binding confusion
+ * 4. Batch update mechanism - Anti-shake processing，Avoid frequent updates
+ * 5. Event deduplication filtering - The same configuration change only triggers execution once
  */
 
 import { ref, reactive, computed, nextTick } from 'vue'
@@ -20,31 +20,31 @@ import type {
   InteractionConfiguration
 } from './types'
 
-// 配置版本信息
+// Configure version information
 export interface ConfigurationVersion {
   version: number
   contentHash: string
   timestamp: number
   source: 'user' | 'system' | 'import' | 'restore'
   description?: string
-  author?: string // 版本作者
-  changeType?: 'major' | 'minor' | 'patch' | 'hotfix' // 变更类型
-  tags?: string[] // 版本标签
+  author?: string // version author
+  changeType?: 'major' | 'minor' | 'patch' | 'hotfix' // Change type
+  tags?: string[] // version label
 }
 
-// 配置状态项
+// Configure status items
 export interface ConfigurationState {
   componentId: string
   configuration: WidgetConfiguration
   version: ConfigurationVersion
   lastModified: number
   isDirty: boolean
-  isLocked: boolean // 防止循环更新的锁
-  versionHistory?: ConfigurationVersion[] // 版本历史记录
-  maxHistorySize?: number // 最大历史记录数量，默认50
+  isLocked: boolean // Locks to prevent cyclic updates
+  versionHistory?: ConfigurationVersion[] // Version history
+  maxHistorySize?: number // Maximum number of historical records，default50
 }
 
-// 配置更新事件
+// Configure update events
 export interface ConfigurationUpdateEvent {
   componentId: string
   section: keyof WidgetConfiguration
@@ -54,7 +54,7 @@ export interface ConfigurationUpdateEvent {
   shouldExecute: boolean
 }
 
-// 🆕 配置验证相关接口
+// 🆕 Configure verification related interfaces
 export interface ValidationResult {
   isValid: boolean
   errors: ValidationError[]
@@ -93,7 +93,7 @@ export interface ValidationContext {
   customRules?: ValidationRule[]
 }
 
-// 🆕 配置模板相关接口
+// 🆕 Configure template related interfaces
 export interface ConfigurationTemplate {
   id: string
   name: string
@@ -120,7 +120,7 @@ export interface TemplateParameter {
   description: string
   defaultValue?: any
   required: boolean
-  path: string // 在配置中的路径，如 'dataSource.url'
+  path: string // path in config，like 'dataSource.url'
   validation?: {
     min?: number
     max?: number
@@ -138,59 +138,59 @@ export interface TemplateApplication {
 }
 
 /**
- * 配置状态管理器
- * 使用版本控制和内容哈希彻底解决循环依赖问题
+ * Configure state manager
+ * Solving circular dependencies once and for all using versioning and content hashing
  */
 export class ConfigurationStateManager {
-  // 配置状态存储
+  // Configure state storage
   private configStates = reactive<Map<string, ConfigurationState>>(new Map())
 
-  // 版本计数器
+  // version counter
   private versionCounter = ref(0)
 
-  // 更新队列和防抖处理
+  // Update queue and anti-shake processing
   private updateQueue = new Map<string, NodeJS.Timeout>()
-  private readonly DEBOUNCE_DELAY = 50 // 50ms防抖
+  private readonly DEBOUNCE_DELAY = 50 // 50msAnti-shake
 
-  // 循环检测
+  // Cycle detection
   private readonly UPDATE_LOCKS = new Set<string>()
 
-  // 事件监听器
+  // event listener
   private eventListeners = new Map<string, Set<(event: ConfigurationUpdateEvent) => void>>()
 
-  // 🆕 版本历史管理
-  private readonly DEFAULT_MAX_HISTORY = 50 // 默认最大历史记录数
+  // 🆕 Version history management
+  private readonly DEFAULT_MAX_HISTORY = 50 // Default maximum number of history records
   private configurationSnapshots = new Map<string, Map<string, WidgetConfiguration>>() // componentId -> version -> config
 
-  // 🆕 配置验证系统
-  private validationRules = new Map<string, ValidationRule>() // 自定义验证规则
-  private validationCache = new Map<string, { result: ValidationResult; timestamp: number }>() // 验证结果缓存
-  private readonly VALIDATION_CACHE_TTL = 5000 // 验证缓存5秒有效期
-  private enableValidation = true // 启用验证开关
+  // 🆕 Configure verification system
+  private validationRules = new Map<string, ValidationRule>() // Custom validation rules
+  private validationCache = new Map<string, { result: ValidationResult; timestamp: number }>() // Verification result cache
+  private readonly VALIDATION_CACHE_TTL = 5000 // Verify cache5Validity in seconds
+  private enableValidation = true // Enable verification switch
 
-  // 🆕 配置模板系统
-  private configurationTemplates = new Map<string, ConfigurationTemplate>() // 模板存储
-  private templateApplications = new Map<string, TemplateApplication[]>() // 组件应用模板记录
-  private builtInTemplatesLoaded = false // 内置模板是否已加载
+  // 🆕 Configure template system
+  private configurationTemplates = new Map<string, ConfigurationTemplate>() // Template storage
+  private templateApplications = new Map<string, TemplateApplication[]>() // Component application template record
+  private builtInTemplatesLoaded = false // Whether the built-in template has been loaded
 
   constructor() {
-    // 🔥 配置完全依赖统一配置中心，无需localStorage
+    // 🔥 Configuration completely relies on the unified configuration center，No needlocalStorage
   }
 
   /**
-   * 获取组件配置
+   * Get component configuration
    */
   getConfiguration(componentId: string): WidgetConfiguration | null {
     const state = this.configStates.get(componentId)
     if (!state) {
       return null
     }
-    // 返回配置的深拷贝，避免外部修改
+    // Returns a deep copy of the configuration，Avoid external modifications
     return this.deepClone(state.configuration)
   }
 
   /**
-   * 设置完整配置
+   * Set up complete configuration
    */
   setConfiguration(
     componentId: string,
@@ -200,12 +200,12 @@ export class ConfigurationStateManager {
     changeType?: 'major' | 'minor' | 'patch' | 'hotfix',
     skipValidation = false
   ): boolean {
-    // 🆕 配置验证（可选）
+    // 🆕 Configuration verification（Optional）
     if (this.enableValidation && !skipValidation) {
       const validationResult = this.validateConfiguration(configuration)
       if (!validationResult.isValid) {
-        console.error(`配置验证失败 [${componentId}]:`, validationResult.errors)
-        // 在严格模式下阻止无效配置
+        console.error(`Configuration verification failed [${componentId}]:`, validationResult.errors)
+        // Prevent invalid configurations in strict mode
         if (validationResult.errors.some(e => e.severity === 'error')) {
           return false
         }
@@ -215,12 +215,12 @@ export class ConfigurationStateManager {
     const contentHash = this.calculateContentHash(configuration)
     const currentState = this.configStates.get(componentId)
 
-    // 🔥 内容去重检查：如果内容哈希相同，直接返回不处理
+    // 🔥 Content deduplication check：If the content hashes are the same，Return directly without processing
     if (currentState && currentState.version.contentHash === contentHash) {
       return false
     }
 
-    // 🔒 循环检测：如果组件正在更新中，直接返回避免循环
+    // 🔒 Cycle detection：If the component is being updated，Return directly to avoid loops
     if (this.UPDATE_LOCKS.has(componentId)) {
       return false
     }
@@ -235,7 +235,7 @@ export class ConfigurationStateManager {
       changeType
     }
 
-    // 🆕 保存当前版本配置到快照存储
+    // 🆕 Save the current version configuration to snapshot storage
     if (currentState) {
       this.saveConfigurationSnapshot(componentId, currentState.version, currentState.configuration)
     }
@@ -253,40 +253,40 @@ export class ConfigurationStateManager {
 
     const oldVersion = currentState?.version
     this.configStates.set(componentId, newState)
-    // 🔥 配置保存完成，无需localStorage持久化
+    // 🔥 Configuration saving completed，No needlocalStoragepersistence
 
-    // 异步触发事件，避免阻塞
+    // Asynchronous trigger event，avoid blocking
     this.scheduleEventEmission(componentId, 'complete', oldVersion, newVersion, configuration)
 
     return true
   }
 
   /**
-   * 更新配置的某个部分 - 核心修复方法
+   * Update some part of the configuration - Core repair methods
    */
   updateConfigurationSection<K extends keyof WidgetConfiguration>(
     componentId: string,
     section: K,
     sectionConfig: WidgetConfiguration[K],
     source: ConfigurationVersion['source'] = 'user',
-    forceUpdate = false  // 🔥 新增：强制更新标志，用于跨组件交互
+    forceUpdate = false  // 🔥 New：Force update flag，for cross-component interaction
   ): boolean {
     const lockKey = `${componentId}_${section}`
 
-    // 🔒 修复：使用组件+节区的复合锁，避免不同节区互相阻塞
+    // 🔒 repair：Use components+Composite lock of section area，Prevent different sections from blocking each other
     if (this.UPDATE_LOCKS.has(lockKey)) {
       return false
     }
 
     let currentState = this.configStates.get(componentId)
 
-    // 如果配置不存在，创建默认配置
+    // If the configuration does not exist，Create default configuration
     if (!currentState) {
       this.initializeConfiguration(componentId)
       currentState = this.configStates.get(componentId)!
     }
 
-    // 构建更新后的配置
+    // Build the updated configuration
     const updatedConfiguration = {
       ...currentState.configuration,
       [section]: this.deepClone(sectionConfig),
@@ -296,22 +296,22 @@ export class ConfigurationStateManager {
       }
     }
 
-    // 🔥 内容哈希去重检查 - 但跨组件交互时强制触发
+    // 🔥 Content hash deduplication - But it is forced to trigger when interacting across components
     const newContentHash = this.calculateContentHash(updatedConfiguration)
     if (currentState.version.contentHash === newContentHash && !forceUpdate) {
       return false
     }
 
-    // 🔥 强制更新时的特殊处理
+    // 🔥 Special handling when forcing updates
     if (forceUpdate && currentState.version.contentHash === newContentHash) {
-      // 为强制更新添加时间戳，确保哈希不同
+      // Add timestamp for forced updates，Make sure the hashes are different
       updatedConfiguration.metadata = {
         ...updatedConfiguration.metadata,
         forceUpdateTimestamp: Date.now()
       }
     }
 
-    // 🔒 设置更新锁（使用复合键）
+    // 🔒 Set update lock（Use composite keys）
     this.UPDATE_LOCKS.add(lockKey)
 
     const newVersion: ConfigurationVersion = {
@@ -331,14 +331,14 @@ export class ConfigurationStateManager {
     }
 
     this.configStates.set(componentId, newState)
-    // 🆕 持久化到 localStorage
-    // this.saveToStorage() - 禁用localStorage
+    // 🆕 persist to localStorage
+    // this.saveToStorage() - DisablelocalStorage
 
-    // 异步触发事件和解锁
+    // Asynchronously triggering events and unlocking
     this.scheduleEventEmission(componentId, section, currentState.version, newVersion, {
       [section]: sectionConfig
     }).finally(() => {
-      // 🔓 释放更新锁（使用复合键）
+      // 🔓 Release update lock（Use composite keys）
       this.UPDATE_LOCKS.delete(lockKey)
     })
 
@@ -346,7 +346,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 初始化组件配置
+   * Initialize component configuration
    */
   initializeConfiguration(componentId: string): void {
     if (this.configStates.has(componentId)) {
@@ -386,11 +386,11 @@ export class ConfigurationStateManager {
 
     this.configStates.set(componentId, state)
 
-    // 🔥 配置保存完成，无需localStorage持久化
+    // 🔥 Configuration saving completed，No needlocalStoragepersistence
   }
 
   /**
-   * 获取配置版本信息
+   * Get configuration version information
    */
   getConfigurationVersion(componentId: string): ConfigurationVersion | null {
     const state = this.configStates.get(componentId)
@@ -398,7 +398,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 检查配置是否存在且为最新版本
+   * Check if the configuration exists and is the latest version
    */
   isConfigurationUpToDate(componentId: string, expectedHash?: string): boolean {
     const state = this.configStates.get(componentId)
@@ -412,14 +412,14 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 获取所有配置状态
+   * Get all configuration status
    */
   getAllConfigurationStates(): Map<string, ConfigurationState> {
     return new Map(this.configStates)
   }
 
   /**
-   * 清理指定组件配置
+   * Clean the specified component configuration
    */
   removeConfiguration(componentId: string): boolean {
     const exists = this.configStates.has(componentId)
@@ -428,7 +428,7 @@ export class ConfigurationStateManager {
       this.eventListeners.delete(componentId)
       this.UPDATE_LOCKS.delete(componentId)
 
-      // 清理更新队列
+      // Clear update queue
       const timeout = this.updateQueue.get(componentId)
       if (timeout) {
         clearTimeout(timeout)
@@ -439,7 +439,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 订阅配置更新事件
+   * Subscribe to configuration update events
    */
   onConfigurationUpdate(componentId: string, listener: (event: ConfigurationUpdateEvent) => void): () => void {
     if (!this.eventListeners.has(componentId)) {
@@ -448,7 +448,7 @@ export class ConfigurationStateManager {
 
     this.eventListeners.get(componentId)!.add(listener)
 
-    // 返回取消订阅函数
+    // Return unsubscribe function
     return () => {
       const listeners = this.eventListeners.get(componentId)
       if (listeners) {
@@ -460,10 +460,10 @@ export class ConfigurationStateManager {
     }
   }
 
-  // ========== 🆕 版本历史管理方法 ==========
+  // ========== 🆕 Version history management method ==========
 
   /**
-   * 获取组件版本历史列表
+   * Get component version history list
    */
   getVersionHistory(componentId: string): ConfigurationVersion[] {
     const state = this.configStates.get(componentId)
@@ -471,40 +471,40 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 根据版本号恢复配置
+   * Restore configuration based on version number
    */
   async restoreToVersion(componentId: string, targetVersion: number): Promise<boolean> {
     const state = this.configStates.get(componentId)
     if (!state) {
-      console.error(`组件 ${componentId} 不存在`)
+      console.error(`components ${componentId} does not exist`)
       return false
     }
 
-    // 查找目标版本的配置快照
+    // Find the configuration snapshot for the target version
     const snapshots = this.configurationSnapshots.get(componentId)
     if (!snapshots) {
-      console.error(`组件 ${componentId} 没有配置快照`)
+      console.error(`components ${componentId} No configuration snapshot`)
       return false
     }
 
     const targetVersionStr = targetVersion.toString()
     const targetConfig = snapshots.get(targetVersionStr)
     if (!targetConfig) {
-      console.error(`版本 ${targetVersion} 的配置快照不存在`)
+      console.error(`Version ${targetVersion} The configuration snapshot does not exist`)
       return false
     }
 
-    // 创建恢复版本
+    // Create a recovery version
     const restoreVersion: ConfigurationVersion = {
       version: ++this.versionCounter.value,
       contentHash: this.calculateContentHash(targetConfig),
       timestamp: Date.now(),
       source: 'restore',
-      description: `恢复到版本 ${targetVersion}`,
+      description: `Revert to version ${targetVersion}`,
       changeType: 'patch'
     }
 
-    // 更新配置状态
+    // Update configuration status
     const newState: ConfigurationState = {
       ...state,
       configuration: this.deepClone(targetConfig),
@@ -516,14 +516,14 @@ export class ConfigurationStateManager {
 
     this.configStates.set(componentId, newState)
 
-    // 触发配置更新事件
+    // Trigger configuration update event
     await this.scheduleEventEmission(componentId, 'complete', state.version, restoreVersion, targetConfig)
 
     return true
   }
 
   /**
-   * 比较两个版本的配置差异
+   * Compare the configuration differences between the two versions
    */
   compareVersions(componentId: string, version1: number, version2: number): Record<string, any> | null {
     const snapshots = this.configurationSnapshots.get(componentId)
@@ -538,7 +538,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 清理历史版本（保留最近N个版本）
+   * Clean up historical versions（keep recentNversions）
    */
   cleanupVersionHistory(componentId: string, keepCount: number = this.DEFAULT_MAX_HISTORY): number {
     const state = this.configStates.get(componentId)
@@ -547,15 +547,15 @@ export class ConfigurationStateManager {
     const historyLength = state.versionHistory.length
     if (historyLength <= keepCount) return 0
 
-    // 排序版本历史（最新的在前）
+    // Sort version history（latest first）
     const sortedHistory = [...state.versionHistory].sort((a, b) => b.timestamp - a.timestamp)
     const toKeep = sortedHistory.slice(0, keepCount)
     const toRemove = sortedHistory.slice(keepCount)
 
-    // 更新版本历史
+    // Update version history
     state.versionHistory = toKeep
 
-    // 清理配置快照
+    // Clean configuration snapshot
     const snapshots = this.configurationSnapshots.get(componentId)
     if (snapshots) {
       toRemove.forEach(version => {
@@ -566,15 +566,15 @@ export class ConfigurationStateManager {
     return toRemove.length
   }
 
-  // ========== 🆕 配置验证管理方法 ==========
+  // ========== 🆕 Configure authentication management methods ==========
 
   /**
-   * 验证配置
+   * Verify configuration
    */
   validateConfiguration(configuration: WidgetConfiguration, context?: ValidationContext): ValidationResult {
     const startTime = performance.now()
 
-    // 检查缓存
+    // Check cache
     const cacheKey = this.generateValidationCacheKey(configuration, context)
     const cached = this.validationCache.get(cacheKey)
     if (cached && (Date.now() - cached.timestamp) < this.VALIDATION_CACHE_TTL) {
@@ -584,12 +584,12 @@ export class ConfigurationStateManager {
     const errors: ValidationError[] = []
     const warnings: ValidationWarning[] = []
 
-    // 基础结构验证
+    // Infrastructure verification
     const structureStart = performance.now()
     this.validateBasicStructure(configuration, errors)
     const structureTime = performance.now() - structureStart
 
-    // 自定义规则验证
+    // Custom rule verification
     const customRulesStart = performance.now()
     this.validateWithCustomRules(configuration, context, errors, warnings)
     const customRulesTime = performance.now() - customRulesStart
@@ -607,7 +607,7 @@ export class ConfigurationStateManager {
       }
     }
 
-    // 缓存结果
+    // cache results
     this.validationCache.set(cacheKey, {
       result,
       timestamp: Date.now()
@@ -617,28 +617,28 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 注册自定义验证规则
+   * Register custom validation rules
    */
   registerValidationRule(rule: ValidationRule): void {
     this.validationRules.set(rule.name, rule)
   }
 
   /**
-   * 移除验证规则
+   * Remove validation rule
    */
   removeValidationRule(ruleName: string): boolean {
     return this.validationRules.delete(ruleName)
   }
 
   /**
-   * 获取所有验证规则
+   * Get all validation rules
    */
   getValidationRules(): ValidationRule[] {
     return Array.from(this.validationRules.values()).sort((a, b) => b.priority - a.priority)
   }
 
   /**
-   * 启用/禁用验证
+   * enable/Disable verification
    */
   setValidationEnabled(enabled: boolean): void {
     this.enableValidation = enabled
@@ -648,43 +648,43 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 清除验证缓存
+   * Clear verification cache
    */
   clearValidationCache(): void {
     this.validationCache.clear()
   }
 
-  // ========== 🆕 配置模板管理方法 ==========
+  // ========== 🆕 Configuration template management method ==========
 
   /**
-   * 注册配置模板
+   * Register configuration template
    */
   registerTemplate(template: ConfigurationTemplate): boolean {
     try {
-      // 验证模板配置
+      // Verify template configuration
       const validationResult = this.validateConfiguration(template.configuration)
       if (!validationResult.isValid) {
-        console.error(`模板配置验证失败 [${template.id}]:`, validationResult.errors)
+        console.error(`Template configuration verification failed [${template.id}]:`, validationResult.errors)
         return false
       }
 
       this.configurationTemplates.set(template.id, template)
       return true
     } catch (error) {
-      console.error(`注册模板失败 [${template.id}]:`, error)
+      console.error(`Failed to register template [${template.id}]:`, error)
       return false
     }
   }
 
   /**
-   * 获取配置模板
+   * Get configuration template
    */
   getTemplate(templateId: string): ConfigurationTemplate | null {
     return this.configurationTemplates.get(templateId) || null
   }
 
   /**
-   * 获取所有模板（支持筛选）
+   * Get all templates（Support filtering）
    */
   getTemplates(filter?: {
     category?: string
@@ -717,7 +717,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 应用配置模板到组件
+   * Apply configuration template to component
    */
   async applyTemplate(
     templateId: string,
@@ -727,15 +727,15 @@ export class ConfigurationStateManager {
   ): Promise<boolean> {
     const template = this.getTemplate(templateId)
     if (!template) {
-      console.error(`模板不存在: ${templateId}`)
+      console.error(`Template does not exist: ${templateId}`)
       return false
     }
 
     try {
-      // 生成应用了参数的配置
+      // Generate configuration with parameters applied
       const appliedConfig = this.applyTemplateParameters(template, parameters)
 
-      // 记录模板应用
+      // Record template application
       const application: TemplateApplication = {
         templateId,
         componentId,
@@ -749,14 +749,14 @@ export class ConfigurationStateManager {
       }
       this.templateApplications.get(componentId)!.push(application)
 
-      // 应用配置到组件
+      // Apply configuration to component
       const success = this.setConfiguration(
         componentId,
         appliedConfig,
         'user',
         author,
         'minor',
-        false // 不跳过验证
+        false // Don't skip verification
       )
 
       if (success) {
@@ -764,13 +764,13 @@ export class ConfigurationStateManager {
 
       return success
     } catch (error) {
-      console.error(`应用模板失败 [${templateId} -> ${componentId}]:`, error)
+      console.error(`Apply template failed [${templateId} -> ${componentId}]:`, error)
       return false
     }
   }
 
   /**
-   * 创建模板（从现有配置）
+   * Create template（from existing configuration）
    */
   createTemplateFromConfiguration(
     componentId: string,
@@ -785,7 +785,7 @@ export class ConfigurationStateManager {
   ): ConfigurationTemplate | null {
     const configuration = this.getConfiguration(componentId)
     if (!configuration) {
-      console.error(`组件配置不存在: ${componentId}`)
+      console.error(`Component configuration does not exist: ${componentId}`)
       return null
     }
 
@@ -814,7 +814,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 删除模板
+   * Delete template
    */
   removeTemplate(templateId: string): boolean {
     const template = this.getTemplate(templateId)
@@ -823,7 +823,7 @@ export class ConfigurationStateManager {
     }
 
     if (template.metadata.isBuiltIn) {
-      console.warn(`不能删除内置模板: ${templateId}`)
+      console.warn(`Cannot delete built-in templates: ${templateId}`)
       return false
     }
 
@@ -831,16 +831,16 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 获取组件的模板应用历史
+   * Get the template application history of the component
    */
   getTemplateApplicationHistory(componentId: string): TemplateApplication[] {
     return this.templateApplications.get(componentId) || []
   }
 
-  // ========== 私有方法 ==========
+  // ========== private method ==========
 
   /**
-   * 计算配置内容哈希
+   * Compute configuration content hash
    */
   private calculateContentHash(configuration: WidgetConfiguration): string {
     const normalizedConfig = this.normalizeConfiguration(configuration)
@@ -849,23 +849,23 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 规范化配置对象，确保哈希计算的一致性
+   * Standardized configuration objects，Ensure consistency of hash calculations
    */
   private normalizeConfiguration(config: WidgetConfiguration): any {
     const normalized = { ...config }
 
-    // 忽略时间戳字段，避免无意义的哈希变化
+    // Ignore timestamp field，Avoid meaningless hash changes
     if (normalized.metadata) {
       const { updatedAt, createdAt, ...metadataWithoutTimestamp } = normalized.metadata
       normalized.metadata = metadataWithoutTimestamp
     }
 
-    // 递归排序对象键，确保哈希一致性
+    // Recursively sort object keys，Ensure hash consistency
     return this.sortObjectKeys(normalized)
   }
 
   /**
-   * 递归排序对象键
+   * Recursively sort object keys
    */
   private sortObjectKeys(obj: any): any {
     if (obj === null || typeof obj !== 'object') {
@@ -886,20 +886,20 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 简单哈希函数
+   * Simple hash function
    */
   private simpleHash(str: string): string {
     let hash = 0
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i)
       hash = (hash << 5) - hash + char
-      hash = hash & hash // 转换为32位整数
+      hash = hash & hash // Convert to32bit integer
     }
     return Math.abs(hash).toString(36)
   }
 
   /**
-   * 深克隆对象
+   * deep clone object
    */
   private deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== 'object') return obj
@@ -916,7 +916,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 调度事件发射（防抖处理）
+   * Scheduling event emission（Anti-shake processing）
    */
   private async scheduleEventEmission(
     componentId: string,
@@ -925,7 +925,7 @@ export class ConfigurationStateManager {
     newVersion: ConfigurationVersion,
     changes: Record<string, any>
   ): Promise<void> {
-    // 清除之前的调度
+    // Clear previous schedule
     const existingTimeout = this.updateQueue.get(componentId)
     if (existingTimeout) {
       clearTimeout(existingTimeout)
@@ -941,7 +941,7 @@ export class ConfigurationStateManager {
           oldVersion: oldVersion || newVersion,
           newVersion,
           changes,
-          shouldExecute: section === 'dataSource' // 只有数据源变更才需要执行
+          shouldExecute: section === 'dataSource' // Only data source changes need to be executed
         }
 
         await this.emitConfigurationUpdate(event)
@@ -953,7 +953,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 发射配置更新事件
+   * Emit configuration update event
    */
   private async emitConfigurationUpdate(event: ConfigurationUpdateEvent): Promise<void> {
     const listeners = this.eventListeners.get(event.componentId)
@@ -961,7 +961,7 @@ export class ConfigurationStateManager {
       return
     }
 
-    // 并行执行所有监听器
+    // Execute all listeners in parallel
     const promises = Array.from(listeners).map(async listener => {
       try {
         await listener(event)
@@ -972,7 +972,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 保存配置快照到内存存储
+   * Save configuration snapshot to memory storage
    */
   private saveConfigurationSnapshot(componentId: string, version: ConfigurationVersion, configuration: WidgetConfiguration): void {
     if (!this.configurationSnapshots.has(componentId)) {
@@ -982,7 +982,7 @@ export class ConfigurationStateManager {
     const snapshots = this.configurationSnapshots.get(componentId)!
     snapshots.set(version.version.toString(), this.deepClone(configuration))
 
-    // 限制快照数量，防止内存溢出
+    // Limit the number of snapshots，Prevent memory overflow
     if (snapshots.size > this.DEFAULT_MAX_HISTORY * 2) {
       const versions = Array.from(snapshots.keys()).map(Number).sort((a, b) => a - b)
       const toDelete = versions.slice(0, versions.length - this.DEFAULT_MAX_HISTORY)
@@ -991,25 +991,25 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 更新版本历史记录
+   * Update version history
    */
   private updateVersionHistory(currentHistory: ConfigurationVersion[], newVersion: ConfigurationVersion): ConfigurationVersion[] {
     const updatedHistory = [...currentHistory, newVersion]
 
-    // 按时间戳排序（最新的在前）
+    // Sort by timestamp（latest first）
     updatedHistory.sort((a, b) => b.timestamp - a.timestamp)
 
-    // 限制历史记录数量
+    // Limit the number of history records
     return updatedHistory.slice(0, this.DEFAULT_MAX_HISTORY)
   }
 
   /**
-   * 计算两个配置之间的差异
+   * Calculate the difference between two configurations
    */
   private calculateConfigurationDiff(config1: WidgetConfiguration, config2: WidgetConfiguration): Record<string, any> {
     const diff: Record<string, any> = {}
 
-    // 比较每个配置节
+    // Compare each configuration section
     const sections: (keyof WidgetConfiguration)[] = ['base', 'component', 'dataSource', 'interaction', 'metadata']
 
     sections.forEach(section => {
@@ -1026,12 +1026,12 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 深度对象差异比较
+   * Depth object difference comparison
    */
   private deepObjectDiff(obj1: any, obj2: any): Record<string, any> {
     const diff: Record<string, any> = {}
 
-    // 获取所有键
+    // Get all keys
     const keys = new Set([...Object.keys(obj1 || {}), ...Object.keys(obj2 || {})])
 
     keys.forEach(key => {
@@ -1054,7 +1054,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 生成验证缓存键
+   * Generate validation cache key
    */
   private generateValidationCacheKey(configuration: WidgetConfiguration, context?: ValidationContext): string {
     const configHash = this.calculateContentHash(configuration)
@@ -1063,49 +1063,49 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 基础结构验证
+   * Infrastructure verification
    */
   private validateBasicStructure(configuration: WidgetConfiguration, errors: ValidationError[]): void {
-    // 验证必需的配置节
+    // Verify required configuration sections
     const requiredSections: (keyof WidgetConfiguration)[] = ['base', 'component', 'dataSource', 'interaction']
 
     requiredSections.forEach(section => {
       if (!configuration[section]) {
         errors.push({
           code: 'MISSING_SECTION',
-          message: `缺少必需的配置节: ${section}`,
+          message: `Missing required configuration section: ${section}`,
           path: section,
           severity: 'error'
         })
       }
     })
 
-    // 验证metadata结构
+    // verifymetadatastructure
     if (configuration.metadata) {
       if (!configuration.metadata.version) {
         errors.push({
           code: 'MISSING_VERSION',
-          message: '配置元数据缺少版本信息',
+          message: 'Configuration metadata is missing version information',
           path: 'metadata.version',
           severity: 'warning'
         })
       }
     }
 
-    // 验证数据源配置
+    // Verify data source configuration
     if (configuration.dataSource) {
       this.validateDataSourceStructure(configuration.dataSource as any, errors)
     }
   }
 
   /**
-   * 数据源结构验证
+   * Data source structure verification
    */
   private validateDataSourceStructure(dataSource: any, errors: ValidationError[]): void {
     if (dataSource.type && !['static', 'api', 'websocket', 'device'].includes(dataSource.type)) {
       errors.push({
         code: 'INVALID_DATASOURCE_TYPE',
-        message: `不支持的数据源类型: ${dataSource.type}`,
+        message: `Unsupported data source type: ${dataSource.type}`,
         path: 'dataSource.type',
         severity: 'error'
       })
@@ -1114,7 +1114,7 @@ export class ConfigurationStateManager {
     if (dataSource.type === 'api' && !dataSource.url) {
       errors.push({
         code: 'MISSING_API_URL',
-        message: 'API数据源缺少URL配置',
+        message: 'APIData source missingURLConfiguration',
         path: 'dataSource.url',
         severity: 'error'
       })
@@ -1122,7 +1122,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 自定义规则验证
+   * Custom rule verification
    */
   private validateWithCustomRules(
     configuration: WidgetConfiguration,
@@ -1132,7 +1132,7 @@ export class ConfigurationStateManager {
   ): void {
     const rules = this.getValidationRules()
 
-    // 合并上下文中的自定义规则
+    // Merge custom rules in context
     if (context?.customRules) {
       rules.push(...context.customRules)
       rules.sort((a, b) => b.priority - a.priority)
@@ -1151,7 +1151,7 @@ export class ConfigurationStateManager {
       } catch (validationError) {
         errors.push({
           code: 'VALIDATION_RULE_ERROR',
-          message: `验证规则"${rule.name}"执行失败: ${validationError}`,
+          message: `Validation rules"${rule.name}"Execution failed: ${validationError}`,
           path: 'validation',
           severity: 'error',
           data: { ruleName: rule.name, error: validationError }
@@ -1161,32 +1161,32 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 确保内置模板已加载
+   * Make sure the built-in template is loaded
    */
   private ensureBuiltInTemplatesLoaded(): void {
     if (this.builtInTemplatesLoaded) return
 
-    // 加载内置模板
+    // Load built-in templates
     this.loadBuiltInTemplates()
     this.builtInTemplatesLoaded = true
   }
 
   /**
-   * 加载内置模板
+   * Load built-in templates
    */
   private loadBuiltInTemplates(): void {
     const builtInTemplates: ConfigurationTemplate[] = [
-      // 基础数字显示模板
+      // Basic digital display template
       {
         id: 'builtin_digit_display_basic',
-        name: '基础数字显示',
-        description: '简单的数字显示组件模板',
+        name: 'Basic digital display',
+        description: 'Simple digital display component template',
         category: 'statistics',
         componentType: 'digit-indicator',
         configuration: {
           base: { width: 200, height: 100, x: 0, y: 0 },
           component: {
-            title: '数值显示',
+            title: 'Numerical display',
             unit: '',
             fontSize: 24,
             color: '#1890ff'
@@ -1200,22 +1200,22 @@ export class ConfigurationStateManager {
             version: '1.0.0',
             createdAt: Date.now(),
             updatedAt: Date.now(),
-            description: '内置基础数字显示模板'
+            description: 'Built-in basic digital display template'
           }
         },
         parameters: [
           {
             name: 'title',
             type: 'string',
-            description: '显示标题',
-            defaultValue: '数值显示',
+            description: 'show title',
+            defaultValue: 'Numerical display',
             required: true,
             path: 'component.title'
           },
           {
             name: 'unit',
             type: 'string',
-            description: '数值单位',
+            description: 'numerical unit',
             defaultValue: '',
             required: false,
             path: 'component.unit'
@@ -1226,23 +1226,23 @@ export class ConfigurationStateManager {
           author: 'ThingsPanel',
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          tags: ['数字', '统计', '基础'],
+          tags: ['number', 'statistics', 'Base'],
           isBuiltIn: true
         }
       },
-      // 基础图表模板
+      // Basic chart template
       {
         id: 'builtin_line_chart_basic',
-        name: '基础折线图',
-        description: '简单的折线图组件模板',
+        name: 'Basic line chart',
+        description: 'Simple line chart component template',
         category: 'chart',
         componentType: 'line-chart',
         configuration: {
           base: { width: 400, height: 300, x: 0, y: 0 },
           component: {
-            title: '数据趋势',
-            xAxisLabel: '时间',
-            yAxisLabel: '数值'
+            title: 'Data trends',
+            xAxisLabel: 'time',
+            yAxisLabel: 'numerical value'
           },
           dataSource: {
             type: 'api',
@@ -1254,22 +1254,22 @@ export class ConfigurationStateManager {
             version: '1.0.0',
             createdAt: Date.now(),
             updatedAt: Date.now(),
-            description: '内置基础折线图模板'
+            description: 'Built-in basic line chart template'
           }
         },
         parameters: [
           {
             name: 'title',
             type: 'string',
-            description: '图表标题',
-            defaultValue: '数据趋势',
+            description: 'Chart title',
+            defaultValue: 'Data trends',
             required: true,
             path: 'component.title'
           },
           {
             name: 'apiUrl',
             type: 'string',
-            description: 'API接口地址',
+            description: 'APIinterface address',
             defaultValue: '/api/chart-data',
             required: true,
             path: 'dataSource.url'
@@ -1280,7 +1280,7 @@ export class ConfigurationStateManager {
           author: 'ThingsPanel',
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          tags: ['图表', '折线图', '基础'],
+          tags: ['chart', 'Line chart', 'Base'],
           isBuiltIn: true
         }
       }
@@ -1293,7 +1293,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 应用模板参数到配置
+   * Apply template parameters to configuration
    */
   private applyTemplateParameters(template: ConfigurationTemplate, parameters: Record<string, any>): WidgetConfiguration {
     const config = this.deepClone(template.configuration)
@@ -1314,7 +1314,7 @@ export class ConfigurationStateManager {
   }
 
   /**
-   * 根据路径设置配置值
+   * Set configuration value based on path
    */
   private setValueByPath(obj: any, path: string, value: any): void {
     const parts = path.split('.')
@@ -1332,7 +1332,7 @@ export class ConfigurationStateManager {
   }
 }
 
-// 全局单例
+// Global singleton
 export const configurationStateManager = new ConfigurationStateManager()
 
 // Vue Composable
@@ -1340,7 +1340,7 @@ export function useConfigurationState() {
   return {
     manager: configurationStateManager,
 
-    // 基础配置操作
+    // Basic configuration operations
     getConfig: (componentId: string) => configurationStateManager.getConfiguration(componentId),
     setConfig: (
       componentId: string,
@@ -1355,15 +1355,15 @@ export function useConfigurationState() {
       section: K,
       sectionConfig: WidgetConfiguration[K],
       source?: ConfigurationVersion['source'],
-      forceUpdate?: boolean  // 🔥 新增：强制更新参数
+      forceUpdate?: boolean  // 🔥 New：Force update parameters
     ) => configurationStateManager.updateConfigurationSection(componentId, section, sectionConfig, source, forceUpdate),
 
-    // 版本信息
+    // Version information
     getVersion: (componentId: string) => configurationStateManager.getConfigurationVersion(componentId),
     isUpToDate: (componentId: string, expectedHash?: string) =>
       configurationStateManager.isConfigurationUpToDate(componentId, expectedHash),
 
-    // 🆕 版本历史管理
+    // 🆕 Version history management
     getVersionHistory: (componentId: string) => configurationStateManager.getVersionHistory(componentId),
     restoreToVersion: (componentId: string, targetVersion: number) =>
       configurationStateManager.restoreToVersion(componentId, targetVersion),
@@ -1372,7 +1372,7 @@ export function useConfigurationState() {
     cleanupHistory: (componentId: string, keepCount?: number) =>
       configurationStateManager.cleanupVersionHistory(componentId, keepCount),
 
-    // 🆕 配置验证
+    // 🆕 Configuration verification
     validateConfig: (config: WidgetConfiguration, context?: ValidationContext) =>
       configurationStateManager.validateConfiguration(config, context),
     registerValidationRule: (rule: ValidationRule) =>
@@ -1384,7 +1384,7 @@ export function useConfigurationState() {
       configurationStateManager.setValidationEnabled(enabled),
     clearValidationCache: () => configurationStateManager.clearValidationCache(),
 
-    // 🆕 配置模板管理
+    // 🆕 Configure template management
     registerTemplate: (template: ConfigurationTemplate) =>
       configurationStateManager.registerTemplate(template),
     getTemplate: (templateId: string) => configurationStateManager.getTemplate(templateId),
@@ -1408,7 +1408,7 @@ export function useConfigurationState() {
     getTemplateApplicationHistory: (componentId: string) =>
       configurationStateManager.getTemplateApplicationHistory(componentId),
 
-    // 事件系统
+    // event system
     subscribe: (componentId: string, listener: (event: ConfigurationUpdateEvent) => void) =>
       configurationStateManager.onConfigurationUpdate(componentId, listener)
   }

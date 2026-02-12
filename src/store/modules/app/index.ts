@@ -49,7 +49,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
 
   const localeOptions: App.I18n.LangOption[] = [
     {
-      label: '中文',
+      label: 'Chinese',
       key: 'zh-CN'
     },
     {
@@ -62,7 +62,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     locale.value = lang
     setLocale(lang)
     localStg.set('lang', lang)
-    message.success('语言切换成功')
+    message.success('Language switch successful')
     // Force reload page to ensure all components update with new locale
     reloadPage(100)
   }

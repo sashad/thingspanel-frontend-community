@@ -1,12 +1,12 @@
 /**
- * 数字指示器组件定义 - Card 2.1 版本
+ * Digital indicator component definition - Card 2.1 Version
  *
- * 功能描述：
- * - 显示设备的遥测数据或属性数据
- * - 支持自定义图标、颜色和单位
- * - 响应式字体大小调整
- * - 支持 WebSocket 实时数据更新
- * - 完全兼容主题系统和国际化
+ * Function description：
+ * - Display telemetry or property data for a device
+ * - Support custom icons、Colors and units
+ * - Responsive font sizing
+ * - support WebSocket Real-time data updates
+ * - Fully compatible with theme systems and internationalization
  */
 
 import DigitIndicator from './DigitIndicator.vue'
@@ -16,17 +16,17 @@ import { customConfig, digitIndicatorSettingConfig } from './settingConfig'
 import { createPropertyWhitelist } from '@/card2.1/core2/property'
 
 const digitIndicatorDefinition: ComponentDefinition = {
-  // ===== 核心标识信息 =====
+  // ===== Core identification information =====
   type: 'digit-indicator',
-  name: '数字指示器',
-  description: '用于显示设备数据的数字指示器组件，支持图标、数值、单位和指标名称显示',
+  name: 'digital indicator',
+  description: 'Numeric indicator component for displaying device data，support icon、numerical value、Unit and indicator name display',
   icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1H5C3.89,1 3,1.89 3,3V21A2,2 0 0,0 5,23H19A2,2 0 0,0 21,21V9M19,9H14V4L19,9Z" /></svg>',
   version: '2.1.0',
   author: 'ThingsPanel',
   component: DigitIndicator,
   configComponent: DigitIndicatorSetting,
 
-  // ===== 默认配置 =====
+  // ===== Default configuration =====
   defaultConfig: {
     type: 'digit-indicator',
     root: {
@@ -49,7 +49,7 @@ const digitIndicatorDefinition: ComponentDefinition = {
     customize: customConfig
   },
 
-  // ===== 布局配置 =====
+  // ===== layout configuration =====
   defaultLayout: {
     gridstack: {
       w: 2,
@@ -70,40 +70,40 @@ const digitIndicatorDefinition: ComponentDefinition = {
     resizable: true
   },
 
-  // ===== 权限控制 =====
-  permission: '不限',
+  // ===== Permission control =====
+  permission: 'NO_LIMIT',
 
-  // ===== 分类信息 =====
-  tags: ['数据', '指示器', '设备', '遥测', '数值显示', '图标'],
+  // ===== Classified information =====
+  tags: ['data', 'indicator', 'equipment', 'telemetry', 'Numerical display', 'icon'],
 
-  // ===== 功能特性 =====
+  // ===== Features =====
   features: {
     realtime: true,
     dataBinding: true,
     configurable: true
   },
 
-  // ===== 数据源需求声明 =====
+  // ===== Data source requirement statement =====
   dataSources: [
     {
       key: 'main',
-      name: '数据源',
-      description: '数字指示器的主要数据源，包含数值、单位和指标名称',
+      name: 'data source',
+      description: 'Primary data source for digital indicators，Contains numeric values、Unit and indicator name',
       supportedTypes: ['static', 'api', 'websocket'],
       required: false,
       example: {
         value: 45,
         unit: '%',
-        metricsName: '湿度',
+        metricsName: 'humidity',
         timestamp: '2025-09-28T02:18:46.567Z'
       }
     }
   ],
 
-  // ===== 设置配置 =====
+  // ===== Set configuration =====
   settingConfig: digitIndicatorSettingConfig,
 
-  // ===== 交互能力声明 =====
+  // ===== Interactive capability statement =====
   interactionCapabilities: {
     supportedEvents: ['click', 'hover', 'dataChange'],
     availableActions: [
@@ -113,27 +113,27 @@ const digitIndicatorDefinition: ComponentDefinition = {
     watchableProperties: {
       'value': {
         type: 'string',
-        description: '当前显示的数值',
+        description: 'Currently displayed value',
         defaultValue: '45'
       },
       'unit': {
         type: 'string',
-        description: '数值单位',
+        description: 'numerical unit',
         defaultValue: '%'
       },
       'metricsName': {
         type: 'string',
-        description: '指标名称/标题',
-        defaultValue: '湿度'
+        description: 'Indicator name/title',
+        defaultValue: 'humidity'
       },
       'iconColor': {
         type: 'string',
-        description: '图标颜色',
+        description: 'icon color',
         defaultValue: '#1890ff'
       },
       'iconName': {
         type: 'string',
-        description: '图标名称',
+        description: 'Icon name',
         defaultValue: 'Water'
       }
     },
@@ -144,25 +144,25 @@ const digitIndicatorDefinition: ComponentDefinition = {
           {
             action: 'showNotification',
             delay: 0,
-            name: '数值更新通知',
+            name: 'Value update notification',
             enabled: false
           }
         ],
         enabled: false,
-        name: '数值变化响应',
+        name: 'Numerical change response',
         watchedProperty: 'value'
       }
     ]
   },
 
-  // ===== 属性暴露白名单配置 =====
-  // 只暴露核心业务属性，不暴露样式配置属性
+  // ===== Attribute exposure whitelist configuration =====
+  // Expose only core business attributes，Do not expose style configuration properties
   propertyWhitelist: createPropertyWhitelist({
-    // 核心业务属性 - 数据相关
+    // core business attributes - Data related
     value: {
       level: 'public',
       type: 'string',
-      description: '当前显示的数值',
+      description: 'Currently displayed value',
       defaultValue: '45',
       visibleInInteraction: true,
       visibleInDebug: true
@@ -170,7 +170,7 @@ const digitIndicatorDefinition: ComponentDefinition = {
     unit: {
       level: 'public',
       type: 'string',
-      description: '数值单位',
+      description: 'numerical unit',
       defaultValue: '%',
       visibleInInteraction: true,
       visibleInDebug: true
@@ -178,13 +178,13 @@ const digitIndicatorDefinition: ComponentDefinition = {
     metricsName: {
       level: 'public',
       type: 'string',
-      description: '指标名称/标题',
-      defaultValue: '湿度',
+      description: 'Indicator name/title',
+      defaultValue: 'humidity',
       visibleInInteraction: true,
       visibleInDebug: true
     }
-    // 注意：样式属性（iconColor、iconSize、valueColor 等）不在白名单中
-    // 这些属性只能通过配置面板修改，不能被其他组件访问或交互系统绑定
+    // Notice：style properties（iconColor、iconSize、valueColor wait）Not in the whitelist
+    // These properties can only be modified via the configuration panel，Cannot be accessed by other components or bound by interactive systems
   }, {
     enabled: true,
     defaultLevel: 'public',

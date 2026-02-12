@@ -1,11 +1,11 @@
 <!--
-  HTTP配置第4步 - 请求前脚本配置组件
-  使用SimpleScriptEditor配置请求前处理脚本
+  HTTPConfiguration section4step - Pre-request script configuration component
+  useSimpleScriptEditorConfigure pre-request processing script
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep4 - HTTP请求前脚本配置步骤
- * 用于在发送请求前动态修改URL、请求头和参数
+ * HttpConfigStep4 - HTTPPre-request script configuration steps
+ * Used to modify dynamically before sending the requestURL、Request headers and parameters
  */
 
 import { useI18n } from 'vue-i18n'
@@ -13,9 +13,9 @@ import type { HttpConfig } from '@/core/data-architecture/types/http-config'
 import SimpleScriptEditor from '@/core/script-engine/components/SimpleScriptEditor.vue'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 当前组件ID，用于属性绑定（预留） */
+  /** current componentID，for property binding（reserved） */
   componentId?: string
 }
 
@@ -28,7 +28,7 @@ const emit = defineEmits<Emits>()
 const { t } = useI18n()
 
 /**
- * 更新请求前脚本
+ * Update pre-request script
  */
 const updatePreRequestScript = (script: string) => {
   emit('update:modelValue', {
@@ -44,7 +44,7 @@ const updatePreRequestScript = (script: string) => {
       <SimpleScriptEditor
         :model-value="modelValue.preRequestScript || ''"
         template-category="http-pre-request"
-        placeholder="请求前处理脚本"
+        placeholder="Pre-request processing script"
         height="300px"
         @update:model-value="updatePreRequestScript"
       />

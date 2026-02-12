@@ -1,15 +1,15 @@
 import { defineAsyncComponent } from 'vue'
-import type { ICardDefine } from '@/components/panel/card' // 导入正确的类型
-import { $t } from '@/locales' // 导入 $t
-import poster from './image.png' // 假设 poster 图片存在或稍后添加
+import type { ICardDefine } from '@/components/panel/card' // Import the correct type
+import { $t } from '@/locales' // import $t
+import poster from './image.png' // hypothesis poster Image exists or will be added later
 
 export default {
-  id: 'recently-visited', // 使用小写连字符 ID
-  type: 'builtin', // 添加 type
+  id: 'recently-visited', // Use lowercase hyphens ID
+  type: 'builtin', // Add to type
   component: defineAsyncComponent(() => import('./component.vue')),
   poster,
-  title: $t('card.recentlyVisited.title'), // 使用 $t
-  description: $t('card.recentlyVisited.description'), // 使用 $t
+  title: $t('card.recentlyVisited.title'), // use $t
+  description: $t('card.recentlyVisited.description'), // use $t
   preset: {
     iCardViewDefault: {
       w: 3,

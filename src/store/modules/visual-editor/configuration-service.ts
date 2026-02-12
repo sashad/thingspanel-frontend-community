@@ -1,6 +1,6 @@
 /**
- * 统一配置服务类
- * 替代原有的ConfigurationManager，提供清晰的配置管理API
+ * Unified configuration service class
+ * replace the originalConfigurationManager，Provide clear configuration managementAPI
  */
 
 import { useUnifiedEditorStore } from '@/store/modules/visual-editor/unified-editor'
@@ -13,7 +13,7 @@ import type {
 } from './unified-editor'
 
 /**
- * 配置变更事件类型
+ * Configuration change event type
  */
 export interface ConfigurationChangeEvent {
   widgetId: string
@@ -24,7 +24,7 @@ export interface ConfigurationChangeEvent {
 }
 
 /**
- * 配置验证结果
+ * Configuration verification results
  */
 export interface ConfigurationValidationResult {
   valid: boolean
@@ -33,7 +33,7 @@ export interface ConfigurationValidationResult {
 }
 
 /**
- * 配置迁移信息
+ * Configure migration information
  */
 export interface ConfigurationMigration {
   fromVersion: string
@@ -42,26 +42,26 @@ export interface ConfigurationMigration {
 }
 
 /**
- * 统一配置服务类
- * 🔥 这是配置管理的唯一入口，替代所有分散的配置管理逻辑
+ * Unified configuration service class
+ * 🔥 This is the only entrance to configuration management，Replaces all fragmented configuration management logic
  */
 export class ConfigurationService {
   private store = useUnifiedEditorStore()
   private eventBus = new EventTarget()
   private migrations: ConfigurationMigration[] = []
 
-  // ==================== 核心配置操作 ====================
+  // ==================== Core configuration operations ====================
 
   /**
-   * 获取完整的组件配置
-   * 🔥 唯一的配置获取入口
+   * Get complete component configuration
+   * 🔥 The only entry for configuration acquisition
    */
   getConfiguration(widgetId: string): WidgetConfiguration {
     return this.store.getFullConfiguration(widgetId)
   }
 
   /**
-   * 获取特定部分的配置
+   * Get a specific part of the configuration
    */
   getConfigurationSection<T extends keyof WidgetConfiguration>(widgetId: string, section: T): WidgetConfiguration[T] {
     const fullConfig = this.getConfiguration(widgetId)
@@ -69,19 +69,19 @@ export class ConfigurationService {
   }
 
   /**
-   * 设置完整的组件配置
+   * Set up complete component configuration
    */
   setConfiguration(widgetId: string, configuration: WidgetConfiguration): void {
-    // 验证配置
+    // Verify configuration
     const validation = this.validateConfiguration(configuration)
     if (!validation.valid) {
-      throw new Error(`配置验证失败: ${validation.errors.join(', ')}`)
+      throw new Error(`Configuration verification failed: ${validation.errors.join(', ')}`)
     }
 
-    // 获取旧配置用于事件
+    // Get old configuration for event
     const oldConfig = this.getConfiguration(widgetId)
 
-    // 分别设置各个部分
+    // Set up each part separately
     if (configuration.base) {
       this.store.setBaseConfiguration(widgetId, configuration.base)
     }
@@ -95,23 +95,23 @@ export class ConfigurationService {
       this.store.setInteractionConfiguration(widgetId, configuration.interaction)
     }
 
-    // 触发全局配置变更事件
+    // Trigger global configuration change event
     this.emitConfigurationChange(widgetId, 'full', oldConfig, configuration)
   }
 
   /**
-   * 更新特定部分的配置
-   * 🔥 类型安全的配置更新
+   * Update a specific part of the configuration
+   * 🔥 Type-safe configuration updates
    */
   updateConfigurationSection<T extends keyof WidgetConfiguration>(
     widgetId: string,
     section: T,
     data: WidgetConfiguration[T]
   ): void {
-    // 获取旧值用于事件
+    // Get old value for event
     const oldValue = this.getConfigurationSection(widgetId, section)
 
-    // 根据section类型分别处理
+    // according tosectionTypes are handled separately
     switch (section) {
       case 'base':
         this.store.setBaseConfiguration(widgetId, data as BaseConfiguration)
@@ -129,12 +129,12 @@ export class ConfigurationService {
         return
     }
 
-    // 触发配置变更事件
+    // Trigger configuration change event
     this.emitConfigurationChange(widgetId, section, oldValue, data)
   }
 
   /**
-   * 批量更新配置
+   * Batch update configuration
    */
   batchUpdateConfiguration(
     updates: Array<{
@@ -148,33 +148,33 @@ export class ConfigurationService {
     })
   }
 
-  // ==================== 数据源管理 ====================
+  // ==================== Data source management ====================
 
   /**
-   * 专门的数据源配置管理
-   * 🔥 解决数据源配置混乱问题
+   * Dedicated data source configuration management
+   * 🔥 Solve the problem of confusing data source configuration
    */
   setDataSourceConfig(widgetId: string, config: DataSourceConfiguration): void {
-    // 验证数据源配置
+    // Verify data source configuration
     const validation = this.validateDataSourceConfig(config)
     if (!validation.valid) {
-      throw new Error(`数据源配置验证失败: ${validation.errors.join(', ')}`)
+      throw new Error(`Data source configuration verification failed: ${validation.errors.join(', ')}`)
     }
 
-    // 更新配置
+    // Update configuration
     this.updateConfigurationSection(widgetId, 'dataSource', config)
 
-    // 处理数据源相关的副作用
+    // Handling data source related side effects
     this.handleDataSourceSideEffects(widgetId, config)
   }
 
   /**
-   * 更新数据源绑定
+   * Update data source binding
    */
   updateDataSourceBindings(widgetId: string, bindings: Record<string, any>): void {
     const currentConfig = this.getConfigurationSection(widgetId, 'dataSource')
     if (!currentConfig) {
-      throw new Error(`组件 ${widgetId} 没有数据源配置`)
+      throw new Error(`components ${widgetId} No data source configuration`)
     }
 
     const updatedConfig: DataSourceConfiguration = {
@@ -186,32 +186,32 @@ export class ConfigurationService {
   }
 
   /**
-   * 设置运行时数据
+   * Set runtime data
    */
   setRuntimeData(widgetId: string, data: any): void {
     this.store.setRuntimeData(widgetId, data)
 
-    // 触发运行时数据变更事件
+    // Trigger runtime data change events
     this.emitRuntimeDataChange(widgetId, data)
   }
 
   /**
-   * 获取运行时数据
+   * Get runtime data
    */
   getRuntimeData(widgetId: string): any {
     return this.store.getRuntimeData(widgetId)
   }
 
-  // ==================== 配置持久化 ====================
+  // ==================== Configure persistence ====================
 
   /**
-   * 保存配置到本地存储
+   * Save configuration to local storage
    */
   async saveConfiguration(widgetId: string): Promise<void> {
     const config = this.getConfiguration(widgetId)
 
     try {
-      // 保存到localStorage（后续可以扩展到服务器）
+      // save tolocalStorage（Can be expanded to the server later）
       const storageKey = `widget_config_${widgetId}`
       localStorage.setItem(storageKey, JSON.stringify(config))
     } catch (error) {
@@ -220,7 +220,7 @@ export class ConfigurationService {
   }
 
   /**
-   * 从本地存储加载配置
+   * Load configuration from local storage
    */
   async loadConfiguration(widgetId: string): Promise<WidgetConfiguration | null> {
     try {
@@ -233,10 +233,10 @@ export class ConfigurationService {
 
       const config = JSON.parse(savedData)
 
-      // 配置迁移处理
+      // Configure migration processing
       const migratedConfig = this.migrateConfiguration(config)
 
-      // 验证加载的配置
+      // Verify loaded configuration
       const validation = this.validateConfiguration(migratedConfig)
       if (!validation.valid) {
         return null
@@ -248,7 +248,7 @@ export class ConfigurationService {
   }
 
   /**
-   * 批量保存所有配置
+   * Save all configurations in batches
    */
   async saveAllConfigurations(): Promise<void> {
     const nodeIds = this.store.nodes.map(node => node.id)
@@ -258,23 +258,23 @@ export class ConfigurationService {
     this.store.markSaved()
   }
 
-  // ==================== 配置验证 ====================
+  // ==================== Configuration verification ====================
 
   /**
-   * 验证完整配置
+   * Verify complete configuration
    */
   private validateConfiguration(config: WidgetConfiguration): ConfigurationValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
-    // 基础配置验证
+    // Basic configuration verification
     if (config.base) {
       if (typeof config.base.opacity !== 'undefined' && (config.base.opacity < 0 || config.base.opacity > 1)) {
-        errors.push('透明度必须在0-1之间')
+        errors.push('Transparency must be in0-1between')
       }
     }
 
-    // 数据源配置验证
+    // Data source configuration verification
     if (config.dataSource) {
       const dsValidation = this.validateDataSourceConfig(config.dataSource)
       errors.push(...dsValidation.errors)
@@ -289,33 +289,33 @@ export class ConfigurationService {
   }
 
   /**
-   * 验证数据源配置
+   * Verify data source configuration
    */
   private validateDataSourceConfig(config: DataSourceConfiguration): ConfigurationValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
-    // 检查数据源类型
+    // Check data source type
     const validTypes = ['static', 'api', 'websocket', 'device', 'script']
     if (!validTypes.includes(config.type)) {
-      errors.push(`无效的数据源类型: ${config.type}`)
+      errors.push(`Invalid data source type: ${config.type}`)
     }
 
-    // 类型特定验证
+    // type specific validation
     switch (config.type) {
       case 'api':
         if (!config.config.url) {
-          errors.push('API数据源必须提供URL')
+          errors.push('APIData source must be providedURL')
         }
         break
       case 'websocket':
         if (!config.config.url) {
-          errors.push('WebSocket数据源必须提供URL')
+          errors.push('WebSocketData source must be providedURL')
         }
         break
       case 'device':
         if (!config.config.deviceId) {
-          errors.push('设备数据源必须提供设备ID')
+          errors.push('The device data source must provide the deviceID')
         }
         break
     }
@@ -323,17 +323,17 @@ export class ConfigurationService {
     return { valid: errors.length === 0, errors, warnings }
   }
 
-  // ==================== 配置迁移 ====================
+  // ==================== Configuration migration ====================
 
   /**
-   * 注册配置迁移
+   * Register configuration migration
    */
   registerMigration(migration: ConfigurationMigration): void {
     this.migrations.push(migration)
   }
 
   /**
-   * 执行配置迁移
+   * Perform configuration migration
    */
   private migrateConfiguration(config: any): WidgetConfiguration {
     let migratedConfig = { ...config }
@@ -347,10 +347,10 @@ export class ConfigurationService {
     return migratedConfig
   }
 
-  // ==================== 事件系统 ====================
+  // ==================== event system ====================
 
   /**
-   * 监听配置变更事件
+   * Listen for configuration change events
    */
   onConfigurationChange(callback: (event: ConfigurationChangeEvent) => void): () => void {
     const handler = (event: CustomEvent<ConfigurationChangeEvent>) => {
@@ -359,14 +359,14 @@ export class ConfigurationService {
 
     this.eventBus.addEventListener('configuration-change', handler as EventListener)
 
-    // 返回取消监听函数
+    // Return to cancel listening function
     return () => {
       this.eventBus.removeEventListener('configuration-change', handler as EventListener)
     }
   }
 
   /**
-   * 触发配置变更事件
+   * Trigger configuration change event
    */
   private emitConfigurationChange(
     widgetId: string,
@@ -386,7 +386,7 @@ export class ConfigurationService {
   }
 
   /**
-   * 触发运行时数据变更事件
+   * Trigger runtime data change events
    */
   private emitRuntimeDataChange(widgetId: string, data: any): void {
     this.eventBus.dispatchEvent(
@@ -396,21 +396,21 @@ export class ConfigurationService {
     )
   }
 
-  // ==================== 数据源副作用处理 ====================
+  // ==================== Data source side effects processing ====================
 
   /**
-   * 处理数据源配置的副作用
+   * Handling side effects of data source configuration
    */
   private handleDataSourceSideEffects(widgetId: string, config: DataSourceConfiguration): void {
-    // 如果是Card2.1组件，触发数据绑定更新
+    // in the case ofCard2.1components，Trigger data binding updates
     if (this.store.card2Components.has(widgetId)) {
       this.store.updateDataBinding(widgetId)
     }
 
-    // 清理旧的运行时数据
+    // Clean old runtime data
     this.store.setRuntimeData(widgetId, null)
 
-    // 根据数据源类型触发相应的数据获取逻辑
+    // Trigger corresponding data acquisition logic based on data source type
     switch (config.type) {
       case 'static':
         this.handleStaticDataSource(widgetId, config)
@@ -418,12 +418,12 @@ export class ConfigurationService {
       case 'api':
         this.handleApiDataSource(widgetId, config)
         break
-      // 其他类型的处理...
+      // Other types of processing...
     }
   }
 
   /**
-   * 处理静态数据源
+   * Working with static data sources
    */
   private handleStaticDataSource(widgetId: string, config: DataSourceConfiguration): void {
     if (config.config.data) {
@@ -432,19 +432,19 @@ export class ConfigurationService {
   }
 
   /**
-   * 处理API数据源
+   * deal withAPIdata source
    */
   private handleApiDataSource(widgetId: string, config: DataSourceConfiguration): void {
-    // TODO: 实现API数据获取逻辑
+    // TODO: accomplishAPIData acquisition logic
   }
 }
 
-// ==================== 单例模式 ====================
+// ==================== Singleton pattern ====================
 
 let configurationServiceInstance: ConfigurationService | null = null
 
 /**
- * 获取配置服务实例（单例）
+ * Get configuration service instance（Singleton）
  */
 export function useConfigurationService(): ConfigurationService {
   if (!configurationServiceInstance) {
@@ -455,7 +455,7 @@ export function useConfigurationService(): ConfigurationService {
 }
 
 /**
- * 重置配置服务实例（测试用）
+ * Reset configuration service instance（for testing）
  */
 export function resetConfigurationService(): void {
   configurationServiceInstance = null

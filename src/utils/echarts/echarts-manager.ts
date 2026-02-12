@@ -1,6 +1,6 @@
 /**
- * ECharts 全局管理器
- * 解决 ECharts 组件重复注册问题
+ * ECharts global manager
+ * solve ECharts Component duplicate registration problem
  */
 
 import * as echarts from 'echarts/core'
@@ -12,7 +12,7 @@ import {
   PieChart,
   RadarChart,
   ScatterChart,
-  // 添加更多图表类型
+  // Add more chart types
   FunnelChart,
   SankeyChart,
   TreeChart,
@@ -41,7 +41,7 @@ import {
   TimelineComponent,
   CalendarComponent,
   GraphicComponent,
-  // 添加更多组件
+  // Add more components
   PolarComponent,
   RadarComponent,
   GeoComponent,
@@ -56,17 +56,17 @@ import {
 import { LabelLayout, UniversalTransition } from 'echarts/features'
 import { CanvasRenderer, SVGRenderer } from 'echarts/renderers'
 
-// 全局标识，确保只注册一次
+// global identity，Make sure you only register once
 let isEChartsRegistered = false
 
-// 基础必需组件 - 首次加载时注册
+// Basic required components - Register on first load
 const BASIC_COMPONENTS = [
-  // 最常用的图表类型
+  // Most commonly used chart types
   BarChart,
   LineChart,
   PieChart,
 
-  // 基础组件
+  // Basic components
   TitleComponent,
   LegendComponent,
   TooltipComponent,
@@ -74,15 +74,15 @@ const BASIC_COMPONENTS = [
   DatasetComponent,
   TransformComponent,
 
-  // 基础功能
+  // Basic functions
   LabelLayout,
   UniversalTransition,
 
-  // 渲染器
+  // Renderer
   CanvasRenderer
 ]
 
-// 扩展组件映射表 - 按需加载
+// Extended component mapping table - Load on demand
 const EXTENDED_COMPONENTS_MAP: Record<string, any[]> = {
   scatter: [ScatterChart],
   gauge: [GaugeChart, PolarComponent],
@@ -116,12 +116,12 @@ const EXTENDED_COMPONENTS_MAP: Record<string, any[]> = {
   svg: [SVGRenderer]
 }
 
-// 已注册的扩展组件
+// Registered extension
 const registeredExtensions = new Set<string>()
 
 /**
- * 初始化 ECharts 基础组件注册
- * 只注册最常用的组件，减少初始内存占用
+ * initialization ECharts Basic component registration
+ * Register only the most commonly used components，Reduce initial memory footprint
  */
 export function initEChartsComponents() {
   if (isEChartsRegistered) {
@@ -133,7 +133,7 @@ export function initEChartsComponents() {
 
     isEChartsRegistered = true
   } catch (error) {
-    // 捕获重复注册错误，但不影响程序执行
+    // Catching duplicate registration errors，But it does not affect program execution
     if (error instanceof Error && error.message.includes('exists')) {
       isEChartsRegistered = true
     } else {
@@ -143,8 +143,8 @@ export function initEChartsComponents() {
 }
 
 /**
- * 按需注册扩展组件
- * @param componentTypes 需要注册的组件类型数组
+ * Register extensions on demand
+ * @param componentTypes Array of component types that need to be registered
  */
 export function registerEChartsExtensions(componentTypes: string[]) {
   const newComponents: any[] = []
@@ -164,14 +164,14 @@ export function registerEChartsExtensions(componentTypes: string[]) {
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error('⚠️ ECharts 扩展组件注册警告:', error)
+      console.error('⚠️ ECharts Extension registration warning:', error)
     }
   }
 }
 
 /**
- * 获取 ECharts 实例
- * 确保组件已注册后再创建实例
+ * Get ECharts Example
+ * Make sure the component is registered before creating an instance
  */
 export function createEChartsInstance(
   dom: HTMLElement,
@@ -188,19 +188,19 @@ export function createEChartsInstance(
     locale?: string
   }
 ): echarts.ECharts {
-  // 确保组件已注册
+  // Make sure the component is registered
   initEChartsComponents()
 
-  // 创建实例
+  // Create instance
   return echarts.init(dom, theme, opts)
 }
 
 /**
- * 安全地使用 ECharts
- * 提供统一的 ECharts 访问接口
+ * safe to use ECharts
+ * Provide a unified ECharts Access interface
  */
 export function useEChartsInstance() {
-  // 确保组件已注册
+  // Make sure the component is registered
   initEChartsComponents()
 
   return {
@@ -211,7 +211,7 @@ export function useEChartsInstance() {
 }
 
 /**
- * 重置注册状态（仅用于测试）
+ * Reset registration status（Only for testing）
  */
 export function resetEChartsRegistration() {
   isEChartsRegistered = false
@@ -219,8 +219,8 @@ export function resetEChartsRegistration() {
   }
 }
 
-// 移除自动初始化，改为延迟加载
-// 注释掉自动初始化以减少启动时的内存占用
+// Remove automatic initialization，Change to lazy loading
+// Comment out automatic initialization to reduce memory footprint at startup
 // if (typeof window !== 'undefined') {
 //   initEChartsComponents()
 // }

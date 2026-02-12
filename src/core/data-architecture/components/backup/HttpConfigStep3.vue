@@ -1,11 +1,11 @@
 <!--
-  HTTP配置第3步 - 参数配置组件
-  配置查询参数和路径参数
+  HTTPConfiguration section3step - Parameter configuration component
+  Configure query parameters and path parameters
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep3 - HTTP参数配置步骤
- * 包含查询参数和路径参数的配置
+ * HttpConfigStep3 - HTTPParameter configuration steps
+ * Configuration containing query parameters and path parameters
  */
 
 import { NText } from 'naive-ui'
@@ -14,11 +14,11 @@ import type { EnhancedParameter } from '@/core/data-architecture/types/parameter
 import DynamicParameterEditor from '@/core/data-architecture/components/common/DynamicParameterEditor.vue'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 当前选择的内部接口信息 */
+  /** Currently selected internal interface information */
   currentApiInfo?: any
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
@@ -32,14 +32,14 @@ const emit = defineEmits<Emits>()
 
 <template>
   <div class="http-config-step3">
-    <!-- 查询参数配置 -->
+    <!-- Query parameter configuration -->
     <DynamicParameterEditor
       :model-value="modelValue.params || []"
       parameter-type="query"
-      title="查询参数配置"
-      add-button-text="添加查询参数"
-      key-placeholder="参数名（如：deviceId）"
-      value-placeholder="参数值（如：DEV001）"
+      title="Query parameter configuration"
+      add-button-text="Add query parameters"
+      key-placeholder="Parameter name（like：deviceId）"
+      value-placeholder="Parameter value（like：DEV001）"
       :current-api-info="currentApiInfo"
       :current-component-id="componentId"
       @update:model-value="
@@ -49,10 +49,10 @@ const emit = defineEmits<Emits>()
       "
     />
 
-    <!-- 提示信息 -->
+    <!-- Prompt message -->
     <div style="margin-top: 16px; padding: 12px; background: var(--info-color-suppl); border-radius: 6px">
       <n-text depth="3" style="font-size: 12px">
-        💡 提示：选择内部接口后，可在上方"添加查询参数"下拉菜单中点击"✨ 应用接口模板"自动导入预制参数
+        💡 hint：After selecting the internal interface，available above"Add query parameters"Click on the drop-down menu"✨ Application interface template"Automatically import prefabricated parameters
       </n-text>
     </div>
   </div>

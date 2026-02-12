@@ -19,9 +19,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-// 定义组件的 props
+// Define components props
 const props = defineProps({
-  // 颜色属性，用于设置背景渐变
+  // color properties，Used to set background gradient
   startColor: {
     type: String,
     default: '#409eff'
@@ -32,18 +32,18 @@ const props = defineProps({
   }
 });
 
-// 计算样式，根据传入的颜色 props 生成背景渐变
+// calculation style，Based on the color passed in props Generate background gradient
 const cardStyle = computed(() => ({
   backgroundImage: `linear-gradient(45deg, ${props.startColor} 0%, ${props.endColor} 25%, ${props.startColor} 50%, ${props.endColor} 75%, ${props.startColor} 100%)`,
-  backgroundSize: '400% 400%', // 确保动效所需的背景尺寸
-  animation: 'dazzling-gradient 10s ease-in-out infinite' // 确保动画不被覆盖
+  backgroundSize: '400% 400%', // Ensure the background size required for animation
+  animation: 'dazzling-gradient 10s ease-in-out infinite' // Make sure the animation is not overwritten
 }));
 </script>
 
 <style lang="scss" scoped>
 /*
-  定义渐变动画的关键帧
-  通过改变背景位置实现扫光效果
+  Define keyframes for gradient animation
+  Achieve sweeping effect by changing background position
 */
 @keyframes dazzling-gradient {
   0% {
@@ -63,7 +63,7 @@ const cardStyle = computed(() => ({
   }
 }
 
-/* 卡片容器的基础样式 */
+/* Basic styles for card containers */
 .card-container {
   width: 100%;
   height: 100%;
@@ -72,15 +72,15 @@ const cardStyle = computed(() => ({
   display: flex;
   padding: 16px;
   box-sizing: border-box;
-  color: white; /* 设置文字颜色为白色以获得更好的对比度 */
+  color: white; /* Set text color to white for better contrast */
 
   /*
-    动画效果现在通过 JavaScript 计算样式设置
-    这样可以确保自定义颜色和动效同时生效
+    Animation effects now pass JavaScript Calculation style settings
+    This ensures that custom colors and animations take effect at the same time
   */
 }
 
-/* 内容包装器，用于居中 */
+/* content wrapper，for centering */
 .content-wrapper {
   display: flex;
   flex-direction: column;
@@ -95,34 +95,34 @@ const cardStyle = computed(() => ({
   width: 100%;
 }
 
-/* 图标样式 */
+/* icon style */
 .icon :deep(svg) {
   width: 44px;
   height: 44px;
   opacity: 0.9;
-  color: white; /* 确保图标是白色的 */
+  color: white; /* Make sure the icon is white */
 }
 
-/* 标题样式 */
+/* Title style */
 .title {
   font-size: 20px;
   font-weight: 500;
-  color: white; /* 确保标题是白色的 */
+  color: white; /* Make sure the title is white */
 }
 
-/* 数值样式 */
+/* Numeric style */
 .value {
   font-size: 44px;
   font-weight: bold;
-  color: white; /* 确保数值是白色的 */
+  color: white; /* Make sure the value is white */
   text-align: left;
   width: 100%;
 }
 
-/* 暗黑模式样式 */
+/* dark mode style */
 :global(.dark) .card-container {
   /*
-    为暗黑模式协调的深蓝绿色渐变
+    Dark teal gradient coordinated for dark mode
   */
   background-image: linear-gradient(
     45deg,

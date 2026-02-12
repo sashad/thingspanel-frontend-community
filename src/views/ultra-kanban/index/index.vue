@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Ultra看板页面
- * 集成visual-editor组件的全新看板实现
+ * UltraKanban page
+ * integratedvisual-editorA new Kanban implementation for components
  */
 
 import { computed, getCurrentInstance, onMounted, reactive, ref } from 'vue'
@@ -29,25 +29,25 @@ import { $t } from '@/locales'
 import { useThemeStore } from '@/store/modules/theme'
 import ItemCard from '@/components/dev-card-item/index.vue'
 
-// 路由和消息管理
+// Routing and message management
 const { routerPushByKey } = useRouterPush()
 const message = useMessage()
 
-// 主题系统集成
+// Theme system integration
 const themeStore = useThemeStore()
 
-// 搜索和分页状态
+// Search and paging status
 const nameSearch = ref('')
 const currentPage = ref(1)
 const pageSize = ref(12)
 const total = ref(0)
 const boards = ref<Panel.Board[]>([])
 
-// 模态框状态
+// Modal state
 const showModal = ref<boolean>(false)
 const isEditMode = ref(false)
 
-// 表单数据
+// form data
 const formData = reactive({
   id: '',
   name: '',
@@ -56,15 +56,15 @@ const formData = reactive({
 })
 
 /**
- * 设置表单数据
- * @param data 表单数据对象
+ * Set form data
+ * @param data form data object
  */
 const setFormData = (data: any) => {
   Object.assign(formData, data)
 }
 
 /**
- * 清除表单数据并重置编辑状态
+ * Clear form data and reset editing status
  */
 const clearFormData = () => {
   setFormData({ id: '', name: '', home_flag: 'N', description: '' })
@@ -72,15 +72,15 @@ const clearFormData = () => {
 }
 
 /**
- * 设置看板数据
- * @param v 看板列表
+ * Set up Kanban data
+ * @param v Kanban list
  */
 const setupData = (v: Panel.Board[]) => {
   boards.value = v
 }
 
 /**
- * 获取看板列表数据
+ * Get Kanban list data
  */
 const fetchBoards = async () => {
   try {
@@ -88,13 +88,13 @@ const fetchBoards = async () => {
       page: currentPage.value,
       page_size: pageSize.value,
       name: nameSearch.value,
-      // 仅列表请求：携带可视化类型参数
+      // List requests only：Carrying visualization type parameters
       vis_type: 'new_board'
     })
     if (data && data.list) {
       const filtered = (data.list as Panel.Board[]).filter(item => item?.vis_type === 'new_board')
       setupData(filtered)
-      // 使用过滤后的数量，避免展示非 new_board 的条目数量
+      // Use filtered quantity，Avoid showing non- new_board number of entries
       total.value = filtered.length
     }
   } catch (error) {
@@ -103,7 +103,7 @@ const fetchBoards = async () => {
 }
 
 /**
- * 提交表单数据（新建或编辑看板）
+ * Submit form data（Create or edit a Kanban board）
  */
 const submitForm = async () => {
   if (!formData.name) {
@@ -116,7 +116,7 @@ const submitForm = async () => {
       await PutBoard(formData)
       message.success($t('common.updateSuccess'))
     } else {
-      // 新增时传递可视化类型参数
+      // Pass visualization type parameters when adding
       await PostBoard({ ...formData, vis_type: 'new_board' })
       message.success($t('common.addSuccess'))
     }
@@ -130,8 +130,8 @@ const submitForm = async () => {
 }
 
 /**
- * 编辑看板
- * @param board 要编辑的看板对象
+ * Edit Kanban
+ * @param board Kanban object to edit
  */
 const editBoard = (board: Panel.Board) => {
   setFormData({ ...board })
@@ -140,8 +140,8 @@ const editBoard = (board: Panel.Board) => {
 }
 
 /**
- * 删除看板
- * @param id 看板ID
+ * Delete Kanban board
+ * @param id KanbanID
  */
 const deleteBoard = async (id: string) => {
   try {
@@ -154,7 +154,7 @@ const deleteBoard = async (id: string) => {
 }
 
 /**
- * 取消操作并关闭模态框
+ * Cancel the operation and close the modal
  */
 const handleCancel = () => {
   showModal.value = false
@@ -162,37 +162,37 @@ const handleCancel = () => {
 }
 
 /**
- * 路由跳转到看板详情页
- * @param name 路由名称
- * @param id 看板ID
+ * Route to jump to the Kanban details page
+ * @param name Route name
+ * @param id KanbanID
  */
 const goRouter = (name: LastLevelRouteKey, id: string) => {
   routerPushByKey(name, { query: { id } })
 }
 
 /**
- * 获取平台类型（用于响应式设计）
+ * Get platform type（for responsive design）
  */
 const getPlatform = computed(() => {
   const { proxy }: any = getCurrentInstance()
   return proxy.getPlatform()
 })
 
-// 页面初始化
+// Page initialization
 onMounted(fetchBoards)
 </script>
 
 <template>
   <div class="ultra-kanban-container">
     <NCard>
-      <!-- 操作工具栏 -->
+      <!-- Action toolbar -->
       <div class="m-b-20px flex flex-wrap items-center gap-15px">
-        <!-- 新建按钮区域 -->
+        <!-- Create new button area -->
         <div class="flex-1">
           <NButton type="primary" @click="showModal = true">+{{ $t('dashboard_panel.addKanBan') }}</NButton>
         </div>
 
-        <!-- 搜索操作区域 -->
+        <!-- Search operating area -->
         <div class="flex items-center gap-20px">
           <NInput
             v-model:value="nameSearch"
@@ -211,7 +211,7 @@ onMounted(fetchBoards)
         </div>
       </div>
 
-      <!-- 看板网格列表 -->
+      <!-- Kanban grid list -->
       <NGrid x-gap="24" y-gap="16" cols="1 s:2 m:3 l:4" responsive="screen">
         <NGridItem v-for="board in boards" :key="board.id">
           <ItemCard
@@ -250,7 +250,7 @@ onMounted(fetchBoards)
         </NGridItem>
       </NGrid>
 
-      <!-- 分页器 -->
+      <!-- Paginator -->
       <div class="mt-4 h-60px w-full">
         <NFlex justify="end">
           <NPagination
@@ -263,7 +263,7 @@ onMounted(fetchBoards)
       </div>
     </NCard>
 
-    <!-- 新建/编辑看板模态框 -->
+    <!-- New/Edit Kanban modal box -->
     <NModal
       v-model:show="showModal"
       :title="isEditMode ? $t('dashboard_panel.editKanban') : $t('dashboard_panel.addKanBan')"
@@ -271,12 +271,12 @@ onMounted(fetchBoards)
     >
       <NCard bordered>
         <NForm :model="formData" class="flex-1">
-          <!-- 看板名称 -->
+          <!-- Kanban name -->
           <NFormItem :label="$t('generate.dashboard-name')" path="name">
             <NInput v-model:value="formData.name" :placeholder="$t('generate.enter-dashboard-name')" />
           </NFormItem>
 
-          <!-- 是否首页 -->
+          <!-- Is it the home page? -->
           <NFormItem :label="$t('generate.is-homepage')">
             <NSelect
               v-model:value="formData.home_flag"
@@ -287,7 +287,7 @@ onMounted(fetchBoards)
             />
           </NFormItem>
 
-          <!-- 描述信息 -->
+          <!-- Description information -->
           <NFormItem :label="$t('device_template.table_header.description')">
             <NInput
               v-model:value="formData.description"
@@ -297,14 +297,14 @@ onMounted(fetchBoards)
           </NFormItem>
         </NForm>
 
-        <!-- 模态框底部操作按钮 -->
+        <!-- Action button at the bottom of the modal box -->
         <template #footer>
           <div class="flex justify-end gap-2">
             <NButton type="default" @click="handleCancel">
               {{ $t('generate.cancel') }}
             </NButton>
 
-            <!-- 设为首页时的确认提示 -->
+            <!-- Confirmation prompt when setting as homepage -->
             <NPopconfirm v-if="formData.home_flag === 'Y'" @positive-click="submitForm">
               <template #trigger>
                 <NButton type="primary">{{ $t('common.save') }}</NButton>
@@ -312,7 +312,7 @@ onMounted(fetchBoards)
               {{ $t('custom.visualization.onlyOneHomepage') }}
             </NPopconfirm>
 
-            <!-- 普通保存按钮 -->
+            <!-- Normal save button -->
             <NButton v-if="formData.home_flag === 'N'" type="primary" @click="submitForm">
               {{ $t('common.save') }}
             </NButton>
@@ -324,13 +324,13 @@ onMounted(fetchBoards)
 </template>
 
 <style scoped>
-/* Ultra看板容器样式 */
+/* UltraKanban container style */
 .ultra-kanban-container {
   width: 100%;
   height: 100%;
 }
 
-/* 看板卡片样式 */
+/* Kanban card style */
 .ultra-kanban-card {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -342,7 +342,7 @@ onMounted(fetchBoards)
   border-color: var(--primary-color);
 }
 
-/* 首页标识徽章 */
+/* Home logo badge */
 .home-badge {
   display: flex;
   align-items: center;
@@ -360,7 +360,7 @@ onMounted(fetchBoards)
   background-color: var(--card-color);
 }
 
-/* 描述文本样式 */
+/* Describe text style */
 .description-text {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -373,12 +373,12 @@ onMounted(fetchBoards)
   font-size: 14px;
 }
 
-/* 主要文本颜色 */
+/* Main text color */
 .text-primary {
   color: var(--primary-color);
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .ultra-kanban-card {
   background-color: var(--card-color);
 }

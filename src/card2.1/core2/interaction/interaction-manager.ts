@@ -1,7 +1,7 @@
 /**
- * 交互管理器
- * 简化的交互管理系统，专注于核心交互功能
- * 大幅简化原有的2700+行复杂实现
+ * Interaction Manager
+ * Simplified interaction management system，Focus on core interactive features
+ * Significantly simplify the original2700+Complex implementation
  */
 
 import type {
@@ -17,7 +17,7 @@ import type {
 } from './types'
 
 /**
- * 交互管理器类
+ * Interaction manager class
  */
 export class InteractionManager {
   private static instance: InteractionManager
@@ -27,7 +27,7 @@ export class InteractionManager {
   private state: InteractionState
 
   /**
-   * 私有构造函数
+   * private constructor
    */
   private constructor(config: InteractionManagerConfig = {}) {
     this.config = {
@@ -46,12 +46,12 @@ export class InteractionManager {
       eventHistory: []
     }
 
-    // 注册默认处理器
+    // Register default handler
     this.registerDefaultHandlers()
   }
 
   /**
-   * 获取单例实例
+   * Get singleton instance
    */
   static getInstance(config?: InteractionManagerConfig): InteractionManager {
     if (!InteractionManager.instance) {
@@ -61,7 +61,7 @@ export class InteractionManager {
   }
 
   /**
-   * 注册默认处理器
+   * Register default handler
    */
   private registerDefaultHandlers(): void {
     this.registerHandler({
@@ -90,43 +90,43 @@ export class InteractionManager {
   }
 
   /**
-   * 注册交互处理器
+   * Register interaction handler
    */
   registerHandler(registration: InteractionHandlerRegistration): void {
     const key = `${registration.type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     this.handlers.set(key, registration)
 
     if (this.config.enableLogging) {
-      console.log(`[InteractionManager] 注册处理器: ${registration.type} (${key})`)
+      console.log(`[InteractionManager] Register handler: ${registration.type} (${key})`)
     }
   }
 
   /**
-   * 注册组件交互配置
+   * Register component interaction configuration
    */
   registerComponentConfig(componentId: string, config: InteractionConfig): void {
     this.componentConfigs.set(componentId, config)
 
     if (this.config.enableLogging) {
-      console.log(`[InteractionManager] 注册组件交互配置: ${componentId}`, {
+      console.log(`[InteractionManager] Register component interaction configuration: ${componentId}`, {
         eventCount: Object.keys(config.events || {}).length
       })
     }
   }
 
   /**
-   * 移除组件交互配置
+   * Remove component interaction configuration
    */
   removeComponentConfig(componentId: string): void {
     this.componentConfigs.delete(componentId)
 
     if (this.config.enableLogging) {
-      console.log(`[InteractionManager] 移除组件交互配置: ${componentId}`)
+      console.log(`[InteractionManager] Remove component interaction configuration: ${componentId}`)
     }
   }
 
   /**
-   * 处理交互事件
+   * Handle interaction events
    */
   async handleEvent(
     event: Event,
@@ -145,19 +145,19 @@ export class InteractionManager {
 
     const interactionEvent = config.events[eventType]
 
-    // 记录事件历史
+    // Record event history
     this.state.eventHistory.push({
       event: eventType as any,
       target: componentId,
       timestamp: Date.now()
     })
 
-    // 限制历史记录数量
+    // Limit the number of history records
     if (this.state.eventHistory.length > 100) {
       this.state.eventHistory = this.state.eventHistory.slice(-100)
     }
 
-    // 执行事件处理
+    // Execute event handling
     if (interactionEvent.preventDefault !== false && this.config.defaultPreventDefault) {
       event.preventDefault()
     }
@@ -166,7 +166,7 @@ export class InteractionManager {
       event.stopPropagation()
     }
 
-    // 执行所有动作
+    // perform all actions
     for (const action of interactionEvent.actions) {
       await this.executeAction(event, context, action)
     }
@@ -175,7 +175,7 @@ export class InteractionManager {
   }
 
   /**
-   * 执行交互动作
+   * perform interactive actions
    */
   private async executeAction(
     event: Event,
@@ -183,34 +183,34 @@ export class InteractionManager {
     action: InteractionAction
   ): Promise<void> {
     try {
-      // 查找处理器
+      // Find processor
       const handlers = Array.from(this.handlers.values())
         .filter(registration => registration.type === action.type)
         .sort((a, b) => (b.priority || 0) - (a.priority || 0))
 
       if (handlers.length === 0) {
-        console.warn(`[InteractionManager] 未找到 ${action.type} 类型的处理器`)
+        console.warn(`[InteractionManager] not found ${action.type} type of processor`)
         return
       }
 
-      // 执行处理器
+      // execution processor
       for (const registration of handlers) {
         await registration.handler(event, context, action)
       }
 
       if (this.config.enableLogging) {
-        console.log(`[InteractionManager] 执行动作: ${action.type}`, {
+        console.log(`[InteractionManager] perform action: ${action.type}`, {
           componentId: context.componentId,
           componentType: context.componentType
         })
       }
     } catch (error) {
-      console.error(`[InteractionManager] 执行动作失败: ${action.type}`, error)
+      console.error(`[InteractionManager] Action failed: ${action.type}`, error)
     }
   }
 
   /**
-   * 导航处理器
+   * navigation processor
    */
   private async handleNavigate(
     event: Event,
@@ -218,44 +218,44 @@ export class InteractionManager {
     action: InteractionAction
   ): Promise<void> {
     if (!action.target) {
-      console.warn('[InteractionManager] 导航动作缺少目标路径')
+      console.warn('[InteractionManager] Navigation action is missing target path')
       return
     }
 
-    // 在实际项目中，这里应该使用路由系统
-    console.log(`[InteractionManager] 导航到: ${action.target}`, {
+    // in actual projects，A routing system should be used here
+    console.log(`[InteractionManager] Navigate to: ${action.target}`, {
       componentId: context.componentId
     })
 
-    // 模拟路由跳转
+    // Simulate route jump
     if (typeof window !== 'undefined') {
       window.location.hash = action.target
     }
   }
 
   /**
-   * 显示消息处理器
+   * Show message handler
    */
   private async handleShowMessage(
     event: Event,
     context: InteractionContext,
     action: InteractionAction
   ): Promise<void> {
-    const message = action.message || '交互消息'
+    const message = action.message || 'interactive messages'
 
-    // 在实际项目中，这里应该使用消息提示组件
-    console.log(`[InteractionManager] 显示消息: ${message}`, {
+    // in actual projects，The message prompt component should be used here
+    console.log(`[InteractionManager] show message: ${message}`, {
       componentId: context.componentId
     })
 
-    // 模拟消息提示
+    // Simulate message prompt
     if (typeof window !== 'undefined' && window.alert) {
       window.alert(message)
     }
   }
 
   /**
-   * 更新数据处理器
+   * Update data handler
    */
   private async handleUpdateData(
     event: Event,
@@ -263,21 +263,21 @@ export class InteractionManager {
     action: InteractionAction
   ): Promise<void> {
     if (!action.data) {
-      console.warn('[InteractionManager] 更新数据动作缺少数据')
+      console.warn('[InteractionManager] Update data action is missing data')
       return
     }
 
-    console.log(`[InteractionManager] 更新数据:`, {
+    console.log(`[InteractionManager] Update data:`, {
       componentId: context.componentId,
       data: action.data
     })
 
-    // 在实际项目中，这里应该更新组件数据或全局状态
-    // 例如：context.componentData = { ...context.componentData, ...action.data }
+    // in actual projects，Component data or global state should be updated here
+    // For example：context.componentData = { ...context.componentData, ...action.data }
   }
 
   /**
-   * 切换可见性处理器
+   * Toggle visibility handler
    */
   private async handleToggleVisibility(
     event: Event,
@@ -286,35 +286,35 @@ export class InteractionManager {
   ): Promise<void> {
     const visible = action.visible !== undefined ? action.visible : true
 
-    console.log(`[InteractionManager] 切换可见性: ${visible}`, {
+    console.log(`[InteractionManager] Toggle visibility: ${visible}`, {
       componentId: context.componentId,
       target: action.target
     })
 
-    // 在实际项目中，这里应该更新组件的可见性状态
-    // 例如：通过修改组件属性或全局状态来隐藏/显示组件
+    // in actual projects，This should update the visibility state of the component
+    // For example：Hide by modifying component properties or global state/display component
   }
 
   /**
-   * 启用/禁用交互管理器
+   * enable/Disable interaction manager
    */
   setEnabled(enabled: boolean): void {
     this.state.isEnabled = enabled
 
     if (this.config.enableLogging) {
-      console.log(`[InteractionManager] ${enabled ? '启用' : '禁用'}交互管理器`)
+      console.log(`[InteractionManager] ${enabled ? 'enable' : 'Disable'}Interaction Manager`)
     }
   }
 
   /**
-   * 获取交互状态
+   * Get interaction status
    */
   getState(): InteractionState {
     return { ...this.state }
   }
 
   /**
-   * 获取统计信息
+   * Get statistics
    */
   getStats(): InteractionStats {
     const eventDistribution: Record<string, number> = {}
@@ -331,18 +331,18 @@ export class InteractionManager {
   }
 
   /**
-   * 清空事件历史
+   * Clear event history
    */
   clearHistory(): void {
     this.state.eventHistory = []
 
     if (this.config.enableLogging) {
-      console.log('[InteractionManager] 清空事件历史')
+      console.log('[InteractionManager] Clear event history')
     }
   }
 
   /**
-   * 销毁管理器
+   * destroy manager
    */
   destroy(): void {
     this.handlers.clear()
@@ -352,17 +352,17 @@ export class InteractionManager {
     this.state.isEnabled = false
 
     if (this.config.enableLogging) {
-      console.log('[InteractionManager] 销毁管理器')
+      console.log('[InteractionManager] destroy manager')
     }
   }
 }
 
 /**
- * 全局交互管理器实例
+ * Global interaction manager instance
  */
 export const interactionManager = InteractionManager.getInstance()
 
 /**
- * 默认导出
+ * Default export
  */
 export default InteractionManager

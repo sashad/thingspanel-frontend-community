@@ -8,7 +8,7 @@
     }"
     :style="containerStyle"
   >
-    <!-- 图标区域 -->
+    <!-- icon area -->
     <div class="icon-section" :style="iconSectionStyle">
       <n-icon
         class="main-icon"
@@ -19,7 +19,7 @@
       </n-icon>
     </div>
 
-    <!-- 数值区域 -->
+    <!-- Numeric area -->
     <div class="value-section" :style="valueSectionStyle">
       <span class="value-text" :style="valueTextStyle">
         {{ displayValue }}
@@ -29,7 +29,7 @@
       </span>
     </div>
 
-    <!-- 标题区域 -->
+    <!-- title area -->
     <div
       v-if="displayTitle"
       class="title-section"
@@ -44,8 +44,8 @@
 
 <script setup lang="ts">
 /**
- * 数字指示器组件 - 职责清晰版本
- * 数据源负责业务数据，组件配置负责样式
+ * digital indicator component - Clear version of responsibilities
+ * The data source is responsible for business data，Component configuration is responsible for styling
  */
 
 import { computed, ref } from 'vue'
@@ -54,78 +54,78 @@ import { icons as iconOptions } from '@/components/common/icons'
 import { useCard2Props } from '@/card2.1/hooks/useCard2Props'
 import type { DigitIndicatorCustomize } from './settingConfig'
 
-// Props 接口
+// Props interface
 interface Props {
-  config: any                    // 配置数据
-  data?: Record<string, unknown> // 数据源执行结果
-  componentId?: string           // 组件唯一ID
+  config: any                    // Configuration data
+  data?: Record<string, unknown> // Data source execution results
+  componentId?: string           // Component uniqueID
 }
 
 const props = withDefaults(defineProps<Props>(), {
   data: () => ({})
 })
 
-// 使用统一配置管理
+// Use unified configuration management
 const { unifiedConfig } = useCard2Props({
   config: props.config,
   data: props.data,
   componentId: props.componentId
 })
 
-// 响应式变量
+// Reactive variables
 const containerRef = ref<HTMLElement>()
 
-// 开发环境标识
+// Development environment identification
 const isDev = computed(() => import.meta.env.DEV)
 
-// 获取样式配置（纯样式，不包含业务数据）
+// Get style configuration（pure style，Does not contain business data）
 const config = computed((): DigitIndicatorCustomize => {
   return {
-    // 图标样式配置
+    // Icon style configuration
     iconName: 'Water',
     iconColor: '#1890ff',
     iconSize: 48,
-    // 数值样式配置
+    // Numeric style configuration
     valueColor: 'var(--text-color)',
     valueSize: 32,
     valueFontWeight: 700,
-    // 单位样式配置
+    // Unit style configuration
     unitColor: 'var(--text-color-2)',
     unitSize: 16,
-    // 标题样式配置
+    // Title style configuration
     titleColor: 'var(--text-color-2)',
     titleSize: 14,
-    // 布局样式配置
+    // Layout style configuration
     padding: 16,
     backgroundColor: '',
     showGradient: true,
     enableHover: true,
-    // 合并用户样式配置
+    // Merge user style configuration
     ...unifiedConfig.value.component
   }
 })
 
-// 业务数据获取 - 正确的默认值逻辑：数据源优先，无数据时显示默认值
+// Business data acquisition - Correct default value logic：Data source first，Display default value when no data is available
 const displayValue = computed(() => {
-  // 添加调试信息
-  return props.data?.main?.data?.value || '45'  // 数据源优先，无数据时显示默认值
+  // Add debugging information
+  return props.data?.main?.data?.value || '45'  // Data source first，Display default value when no data is available
 })
 
 const displayUnit = computed(() => {
-  return props.data?.main?.data?.unit || '%'    // 数据源优先，无数据时显示默认值
+  return props.data?.main?.data?.unit || '%'    // Data source first，Display default value when no data is available
 })
 
 const displayTitle = computed(() => {
-  return props.data?.main?.data?.metricsName || '湿度'  // 数据源优先，无数据时显示默认值
+  return props.data?.main?.data?.metricsName || 'humidity'  // Data source first，Display default value when no data is available
 })
 
-// 计算图标组件
+// Calculation icon component
 const iconComponent = computed(() => {
   const iconName = config.value.iconName || 'Water'
   return iconOptions[iconName] || iconOptions.Water
 })
 
-// 样式计算
+// style calculation
 const containerStyle = computed(() => {
   return {
     padding: `${config.value.padding}px`,
@@ -176,7 +176,7 @@ const titleTextStyle = computed(() => {
 </script>
 
 <style scoped>
-/* 调试面板样式 */
+/* Debug panel style */
 .debug-panel {
   position: absolute;
   top: 4px;
@@ -218,7 +218,7 @@ const titleTextStyle = computed(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* 专业渐变背景效果 */
+/* Professional gradient background effects */
 .digit-indicator-container.gradient-bg {
   background: linear-gradient(145deg,
     rgba(255, 255, 255, 0.9) 0%,
@@ -229,7 +229,7 @@ const titleTextStyle = computed(() => {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* 专业Hover效果 */
+/* majorHoverEffect */
 .digit-indicator-container.hover-enabled:hover {
   transform: translateY(-3px);
   box-shadow:
@@ -246,7 +246,7 @@ const titleTextStyle = computed(() => {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 图标区域 */
+/* icon area */
 .icon-section {
   display: flex;
   justify-content: center;
@@ -264,7 +264,7 @@ const titleTextStyle = computed(() => {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
-/* 数值区域 */
+/* Numeric area */
 .value-section {
   display: flex;
   justify-content: center;
@@ -287,7 +287,7 @@ const titleTextStyle = computed(() => {
   opacity: 0.8;
 }
 
-/* 标题区域 */
+/* title area */
 .title-section {
   display: flex;
   justify-content: center;
@@ -307,7 +307,7 @@ const titleTextStyle = computed(() => {
   letter-spacing: 0.01em;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 480px) {
   .digit-indicator-container {
     padding: 8px !important;
@@ -331,7 +331,7 @@ const titleTextStyle = computed(() => {
   }
 }
 
-/* 平板适配 */
+/* Tablet adaptation */
 @media (max-width: 768px) and (min-width: 481px) {
   .digit-indicator-container {
     border-radius: 10px;
@@ -342,7 +342,7 @@ const titleTextStyle = computed(() => {
   }
 }
 
-/* 暗主题适配 */
+/* Dark theme adaptation */
 [data-theme="dark"] .digit-indicator-container {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -380,7 +380,7 @@ const titleTextStyle = computed(() => {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* 数值变化动画 */
+/* Value change animation */
 @keyframes valueChange {
   0% {
     transform: scale(1);
@@ -400,7 +400,7 @@ const titleTextStyle = computed(() => {
   animation: valueChange 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 加载状态 */
+/* Loading status */
 .digit-indicator-container.loading {
   opacity: 0.6;
 }
@@ -409,7 +409,7 @@ const titleTextStyle = computed(() => {
   color: var(--text-color-3);
 }
 
-/* 高级玻璃态效果（可选） */
+/* Advanced glassy effect（Optional） */
 .digit-indicator-container.glass-effect {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px) saturate(180%);

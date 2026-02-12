@@ -1,19 +1,19 @@
 <!--
-  基础渲染器 Vue 组件
-  为 Vue 组件形式的渲染器提供统一的基础结构
+  Basic renderer Vue components
+  for Vue Component-based renderers provide a unified infrastructure
 -->
 <script setup lang="ts" generic="TConfig extends Record<string, any> = Record<string, any>">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useThemeStore } from '@/store/modules/theme'
-import { useVisualEditor } from '@/store/modules/visual-editor' // 1. 导入统一架构
+import { useVisualEditor } from '@/store/modules/visual-editor' // 1. Import unified architecture
 
-// 基础 Props 接口
+// Base Props interface
 interface BaseRendererProps {
   readonly?: boolean
   config?: TConfig
 }
 
-// 基础 Emits 接口
+// Base Emits interface
 interface BaseRendererEmits {
   (e: 'ready'): void
   (e: 'error', error: Error): void
@@ -23,24 +23,24 @@ interface BaseRendererEmits {
   (e: 'state-change', state: string): void
 }
 
-// Props 定义
+// Props definition
 const props = withDefaults(defineProps<BaseRendererProps>(), {
   readonly: false,
   config: () => ({}) as TConfig
 })
 
-// Emits 定义
+// Emits definition
 const emit = defineEmits<BaseRendererEmits>()
 
-// 2. 🔥 使用新的统一架构
+// 2. 🔥 Use the new unified architecture
 const unifiedEditor = useVisualEditor()
 
 const addWidget = async (componentType: string, position?: { x: number; y: number }) => {
   try {
-    // 🔥 确保系统已初始化
+    // 🔥 Make sure the system is initialized
     await unifiedEditor.initialize()
 
-    // 创建新节点
+    // Create new node
     const newNode = {
       id: `${componentType}_${Date.now()}`,
       type: componentType,
@@ -53,29 +53,29 @@ const addWidget = async (componentType: string, position?: { x: number; y: numbe
 
     await unifiedEditor.addNode(newNode)
   } catch (error) {
-    // 重新抛出错误让上层处理
+    // Rethrow the error and let the upper layer handle it
     throw error
   }
 }
 
-// 渲染器状态
+// Renderer status
 const rendererState = ref<'idle' | 'initializing' | 'ready' | 'rendering' | 'error' | 'destroyed'>('idle')
 const rendererError = ref<Error | null>(null)
 const isInitialized = ref(false)
 
-// 主题支持
+// Theme support
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.darkMode)
 
-// 渲染器容器
+// renderer container
 const containerRef = ref<HTMLElement>()
 
-// 计算属性
+// Computed properties
 const isReady = computed(() => rendererState.value === 'ready')
 const hasError = computed(() => rendererState.value === 'error')
 const isReadonly = computed(() => props.readonly)
 
-// 状态管理
+// Status management
 const setState = (newState: typeof rendererState.value) => {
   if (rendererState.value !== newState) {
     const oldState = rendererState.value
@@ -84,14 +84,14 @@ const setState = (newState: typeof rendererState.value) => {
   }
 }
 
-// 错误处理
+// Error handling
 const handleError = (error: Error) => {
   rendererError.value = error
   setState('error')
   emit('error', error)
 }
 
-// 3. 实现统一的 handleDrop 逻辑
+// 3. achieve unified handleDrop logic
 const handleDrop = (event: DragEvent) => {
   event.preventDefault()
   if (isReadonly.value) return
@@ -110,7 +110,7 @@ const handleDrop = (event: DragEvent) => {
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
 
-      // 调用 addWidget 添加新组件
+      // call addWidget Add new component
       addWidget(type, { x, y }).catch(handleError)
     } catch (e) {
       handleError(new Error('Failed to parse dropped data.'))
@@ -129,7 +129,7 @@ const handleDrop = (event: DragEvent) => {
   }
 }
 
-// 初始化方法
+// Initialization method
 const initialize = async () => {
   if (isInitialized.value) return
 
@@ -150,7 +150,7 @@ const initialize = async () => {
   }
 }
 
-// 渲染方法
+// Rendering method
 const render = async () => {
   if (!isReady.value) return
 
@@ -163,7 +163,7 @@ const render = async () => {
   }
 }
 
-// 更新方法
+// Update method
 const update = async (changes: Partial<TConfig>) => {
   try {
     await onRendererUpdate(changes)
@@ -172,7 +172,7 @@ const update = async (changes: Partial<TConfig>) => {
   }
 }
 
-// 销毁方法
+// Destruction method
 const destroy = async () => {
   try {
     await onRendererDestroy()
@@ -181,7 +181,7 @@ const destroy = async () => {
   } catch (error) {}
 }
 
-// 事件处理方法
+// event handling method
 const handleNodeSelect = (nodeId: string) => {
   emit('node-select', nodeId)
   onNodeSelected(nodeId)
@@ -197,18 +197,18 @@ const handleCanvasClick = (event?: MouseEvent) => {
   onCanvasClicked(event)
 }
 
-// 生命周期钩子 - 子类需要实现这些方法
+// life cycle hooks - Subclasses need to implement these methods
 const onRendererInit = async (): Promise<void> => {}
 const onRendererRender = async (): Promise<void> => {}
 const onRendererUpdate = async (changes: Partial<TConfig>): Promise<void> => {}
 const onRendererDestroy = async (): Promise<void> => {}
 
-// 事件钩子 - 子类可以重写
+// event hook - Subclasses can override
 const onNodeSelected = (nodeId: string): void => {}
 const onNodeUpdated = (nodeId: string, updates: any): void => {}
 const onCanvasClicked = (event?: MouseEvent): void => {}
 
-// 监听配置变化
+// Listen for configuration changes
 watch(
   () => props.config,
   async (newConfig, oldConfig) => {
@@ -219,17 +219,17 @@ watch(
   { deep: true }
 )
 
-// 监听主题变化
+// Monitor theme changes
 watch(isDark, async () => {
   if (isReady.value) {
     await onThemeChange(isDark.value)
   }
 })
 
-// 主题变化钩子
+// theme change hook
 const onThemeChange = async (isDark: boolean): Promise<void> => {}
 
-// 组件生命周期
+// Component life cycle
 onMounted(async () => {
   await initialize()
 })
@@ -238,7 +238,7 @@ onUnmounted(async () => {
   await destroy()
 })
 
-// 暴露给父组件的方法和属性
+// Methods and properties exposed to the parent component
 defineExpose({
   isReady,
   hasError,
@@ -269,28 +269,28 @@ defineExpose({
     @drop="handleDrop"
     @dragover.prevent
   >
-    <!-- 加载状态 -->
+    <!-- Loading status -->
     <div v-if="rendererState === 'initializing'" class="renderer-loading">
       <n-spin size="large">
-        <template #description>初始化渲染器...</template>
+        <template #description>Initialize renderer...</template>
       </n-spin>
     </div>
 
-    <!-- 错误状态 -->
+    <!-- error status -->
     <div v-else-if="hasError" class="renderer-error-state">
-      <n-result status="error" title="渲染器错误" :description="rendererError?.message">
+      <n-result status="error" title="renderer error" :description="rendererError?.message">
         <template #footer>
-          <n-button @click="initialize">重试</n-button>
+          <n-button @click="initialize">Try again</n-button>
         </template>
       </n-result>
     </div>
 
-    <!-- 渲染器内容插槽 -->
+    <!-- Renderer content slot -->
     <slot v-else-if="isReady" />
 
-    <!-- 默认状态 -->
+    <!-- Default state -->
     <div v-else class="renderer-idle">
-      <n-empty description="渲染器未准备就绪" />
+      <n-empty description="Renderer not ready" />
     </div>
   </div>
 </template>
@@ -326,7 +326,7 @@ defineExpose({
   margin: 16px;
 }
 
-/* 主题适配 */
+/* Theme adaptation */
 .renderer-dark {
   --renderer-bg: #1a1a1a;
   --renderer-border: #404040;
@@ -339,7 +339,7 @@ defineExpose({
   --renderer-text: #000000;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .base-renderer {
     min-height: 300px;

@@ -1,6 +1,6 @@
 /**
- * 统一的 Visual Editor 状态管理
- * 解决双重状态存储问题，提供唯一数据源
+ * unified Visual Editor Status management
+ * Solve the dual state storage problem，Provide a single source of data
  */
 
 import { defineStore } from 'pinia'
@@ -14,7 +14,7 @@ import type {
 } from '@/components/visual-editor/types'
 
 export interface UnifiedEditorState {
-  // 编辑器核心状态
+  // Editor core status
   nodes: GraphData[]
   viewport: {
     x: number
@@ -24,29 +24,29 @@ export interface UnifiedEditorState {
   mode: EditorMode
   selectedIds: string[]
 
-  // 组件注册状态
+  // Component registration status
   widgets: Map<string, WidgetDefinition>
 
-  // 配置管理状态 - 分层存储
+  // Configuration management status - Tiered storage
   baseConfigs: Map<string, BaseConfiguration>
   componentConfigs: Map<string, ComponentConfiguration>
   dataSourceConfigs: Map<string, DataSourceConfiguration>
   interactionConfigs: Map<string, InteractionConfiguration>
 
-  // Card 2.1 集成状态
+  // Card 2.1 Integration status
   card2Components: Map<string, ComponentDefinition>
   dataBindings: Map<string, ReactiveDataBinding>
 
-  // 运行时数据
+  // runtime data
   runtimeData: Map<string, any>
 
-  // 系统状态
+  // System status
   isLoading: boolean
   isDirty: boolean
   lastSaved: Date | null
 }
 
-// 基础配置接口
+// Basic configuration interface
 export interface BaseConfiguration {
   title?: string
   opacity?: number
@@ -55,14 +55,14 @@ export interface BaseConfiguration {
   zIndex?: number
 }
 
-// 组件配置接口
+// Component configuration interface
 export interface ComponentConfiguration {
   properties: Record<string, any>
   style?: Record<string, any>
   events?: Record<string, any>
 }
 
-// 数据源配置接口
+// Data source configuration interface
 export interface DataSourceConfiguration {
   type: 'static' | 'api' | 'websocket' | 'device' | 'script'
   config: Record<string, any>
@@ -70,7 +70,7 @@ export interface DataSourceConfiguration {
   metadata?: Record<string, any>
 }
 
-// 交互配置接口
+// Interactive configuration interface
 export interface InteractionConfiguration {
   click?: any
   hover?: any
@@ -79,34 +79,34 @@ export interface InteractionConfiguration {
 }
 
 /**
- * 统一的 Visual Editor Store
- * 🔥 这是唯一的状态管理中心，替代所有分散的状态存储
+ * unified Visual Editor Store
+ * 🔥 This is the only status management center，Replace all decentralized state storage
  */
 export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
   state: (): UnifiedEditorState => ({
-    // 编辑器状态
+    // Editor status
     nodes: [],
     viewport: { x: 0, y: 0, zoom: 1 },
     mode: 'design',
     selectedIds: [],
 
-    // 组件状态
+    // Component status
     widgets: new Map(),
 
-    // 配置状态 - 分层管理
+    // configuration status - Hierarchical management
     baseConfigs: new Map(),
     componentConfigs: new Map(),
     dataSourceConfigs: new Map(),
     interactionConfigs: new Map(),
 
-    // Card 2.1 状态
+    // Card 2.1 state
     card2Components: new Map(),
     dataBindings: new Map(),
 
-    // 运行时状态
+    // runtime status
     runtimeData: new Map(),
 
-    // 系统状态
+    // System status
     isLoading: false,
     isDirty: false,
     lastSaved: null
@@ -114,15 +114,15 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
 
   getters: {
     /**
-     * 获取选中的节点
+     * Get selected node
      */
     selectedNodes(state): GraphData[] {
       return state.nodes.filter(node => state.selectedIds.includes(node.id))
     },
 
     /**
-     * 获取完整的组件配置
-     * 🔥 关键：统一的配置访问点
+     * Get complete component configuration
+     * 🔥 key：Unified configuration access point
      */
     getFullConfiguration:
       state =>
@@ -137,28 +137,28 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
       },
 
     /**
-     * 获取组件的运行时数据
+     * Get the runtime data of a component
      */
     getRuntimeData: state => (widgetId: string) => {
       return state.runtimeData.get(widgetId)
     },
 
     /**
-     * 检查组件是否有未保存的更改
+     * Check components for unsaved changes
      */
     hasUnsavedChanges(state): boolean {
       return state.isDirty
     },
 
     /**
-     * 获取所有已注册的组件
+     * Get all registered components
      */
     allWidgets(state): WidgetDefinition[] {
       return Array.from(state.widgets.values())
     },
 
     /**
-     * 获取Card2.1组件数量
+     * GetCard2.1Number of components
      */
     card2ComponentCount(state): number {
       return state.card2Components.size
@@ -166,23 +166,23 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
   },
 
   actions: {
-    // ==================== 节点操作 ====================
+    // ==================== Node operations ====================
 
     /**
-     * 添加节点到画布
+     * Add node to canvas
      */
     addNode(node: GraphData): void {
       this.nodes.push(node)
       this.markDirty()
 
-      // 初始化节点的基础配置
+      // Initialize the basic configuration of the node
       if (!this.baseConfigs.has(node.id)) {
         this.baseConfigs.set(node.id, createDefaultBaseConfig())
       }
     },
 
     /**
-     * 更新节点信息
+     * Update node information
      */
     updateNode(id: string, updates: Partial<GraphData>): void {
       const nodeIndex = this.nodes.findIndex(node => node.id === id)
@@ -193,36 +193,36 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
     },
 
     /**
-     * 删除节点及其所有配置
+     * Delete the node and all its configuration
      */
     removeNode(id: string): void {
-      // 移除节点
+      // Remove node
       this.nodes = this.nodes.filter(node => node.id !== id)
 
-      // 清理所有相关配置
+      // Clean all relevant configurations
       this.baseConfigs.delete(id)
       this.componentConfigs.delete(id)
       this.dataSourceConfigs.delete(id)
       this.interactionConfigs.delete(id)
       this.runtimeData.delete(id)
 
-      // 清理选中状态
+      // Clear selected state
       this.selectedIds = this.selectedIds.filter(selectedId => selectedId !== id)
 
       this.markDirty()
     },
 
     /**
-     * 选中节点
+     * Select node
      */
     selectNodes(ids: string[]): void {
       this.selectedIds = [...ids]
     },
 
-    // ==================== 配置操作 ====================
+    // ==================== Configuration operations ====================
 
     /**
-     * 设置基础配置
+     * Set up basic configuration
      */
     setBaseConfiguration(widgetId: string, config: BaseConfiguration): void {
       this.baseConfigs.set(widgetId, { ...config })
@@ -230,7 +230,7 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
     },
 
     /**
-     * 设置组件配置
+     * Set component configuration
      */
     setComponentConfiguration(widgetId: string, config: ComponentConfiguration): void {
       this.componentConfigs.set(widgetId, { ...config })
@@ -238,19 +238,19 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
     },
 
     /**
-     * 设置数据源配置
-     * 🔥 关键：统一的数据源配置管理
+     * Set data source configuration
+     * 🔥 key：Unified data source configuration management
      */
     setDataSourceConfiguration(widgetId: string, config: DataSourceConfiguration): void {
       this.dataSourceConfigs.set(widgetId, { ...config })
       this.markDirty()
 
-      // 触发数据绑定更新
+      // Trigger data binding updates
       this.updateDataBinding(widgetId)
     },
 
     /**
-     * 设置交互配置
+     * Set interaction configuration
      */
     setInteractionConfiguration(widgetId: string, config: InteractionConfiguration): void {
       this.interactionConfigs.set(widgetId, { ...config })
@@ -258,65 +258,65 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
     },
 
     /**
-     * 更新运行时数据
+     * Update runtime data
      */
     setRuntimeData(widgetId: string, data: any): void {
       this.runtimeData.set(widgetId, data)
     },
 
-    // ==================== 组件注册 ====================
+    // ==================== Component registration ====================
 
     /**
-     * 注册组件定义
+     * Register component definition
      */
     registerWidget(definition: WidgetDefinition): void {
       this.widgets.set(definition.type, definition)
     },
 
     /**
-     * 批量注册组件
+     * Register components in batches
      */
     registerWidgets(definitions: WidgetDefinition[]): void {
       definitions.forEach(def => this.registerWidget(def))
     },
 
-    // ==================== Card 2.1 集成 ====================
+    // ==================== Card 2.1 integrated ====================
 
     /**
-     * 注册Card2.1组件
+     * registerCard2.1components
      */
     registerCard2Component(definition: ComponentDefinition): void {
       this.card2Components.set(definition.type, definition)
     },
 
     /**
-     * 创建数据绑定
+     * Create data binding
      */
     createDataBinding(widgetId: string, binding: ReactiveDataBinding): void {
       this.dataBindings.set(widgetId, binding)
     },
 
     /**
-     * 更新数据绑定
+     * Update data binding
      */
     updateDataBinding(widgetId: string): void {
       const dataSourceConfig = this.dataSourceConfigs.get(widgetId)
       if (!dataSourceConfig) return
-      // TODO: 集成Card2.1数据绑定系统
-      // 这里将与Card2.1的数据绑定系统集成
+      // TODO: integratedCard2.1data binding system
+      // Here will be the same asCard2.1Data binding system integration
     },
 
-    // ==================== 系统操作 ====================
+    // ==================== System operation ====================
 
     /**
-     * 标记为脏状态
+     * Mark as dirty
      */
     markDirty(): void {
       this.isDirty = true
     },
 
     /**
-     * 标记为已保存
+     * Mark as saved
      */
     markSaved(): void {
       this.isDirty = false
@@ -324,37 +324,37 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
     },
 
     /**
-     * 设置加载状态
+     * Set loading status
      */
     setLoading(loading: boolean): void {
       this.isLoading = loading
     },
 
-    // ==================== 视图操作 ====================
+    // ==================== View operations ====================
 
     /**
-     * 更新视图端口
+     * Update view port
      */
     updateViewport(viewport: { x?: number; y?: number; zoom?: number }): void {
       this.viewport = { ...this.viewport, ...viewport }
     },
 
     /**
-     * 设置编辑器模式
+     * Set editor mode
      */
     setMode(mode: EditorMode): void {
       this.mode = mode
     },
 
     /**
-     * 重置视图端口
+     * reset view port
      */
     resetViewport(): void {
       this.viewport = { x: 0, y: 0, zoom: 1 }
     },
 
     /**
-     * 清理所有状态
+     * clear all status
      */
     clearAll(): void {
       this.nodes = []
@@ -375,10 +375,10 @@ export const useUnifiedEditorStore = defineStore('unified-visual-editor', {
   }
 })
 
-// ==================== 辅助函数 ====================
+// ==================== Helper function ====================
 
 /**
- * 创建默认基础配置
+ * Create a default base configuration
  */
 function createDefaultBaseConfig(): BaseConfiguration {
   return {
@@ -391,7 +391,7 @@ function createDefaultBaseConfig(): BaseConfiguration {
 }
 
 /**
- * 创建默认组件配置
+ * Create default component configuration
  */
 function createDefaultComponentConfig(): ComponentConfiguration {
   return {
@@ -402,7 +402,7 @@ function createDefaultComponentConfig(): ComponentConfiguration {
 }
 
 /**
- * 创建默认交互配置
+ * Create a default interaction configuration
  */
 function createDefaultInteractionConfig(): InteractionConfiguration {
   return {
@@ -414,7 +414,7 @@ function createDefaultInteractionConfig(): InteractionConfiguration {
 }
 
 /**
- * 生成配置元数据
+ * Generate configuration metadata
  */
 function generateConfigurationMetadata(widgetId: string, state: UnifiedEditorState): Record<string, any> {
   return {

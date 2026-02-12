@@ -1,17 +1,17 @@
-# Instrument Panel 组件 Card 2.1 迁移配置
+# Instrument Panel components Card 2.1 Migrate configuration
 
-## 📊 组件概述
+## 📊 Component overview
 
-**组件名称**: instrument-panel (仪表盘)  
-**分类**: dashboard (仪表盘)  
-**功能**: 显示单个数值的圆形仪表盘，支持自定义最小值、最大值和单位  
-**适用场景**: 温度、压力、速度等单一指标的可视化展示
+**Component name**: instrument-panel (Dashboard)
+**Classification**: dashboard (Dashboard)
+**Function**: Circular dashboard showing a single value，Support custom minimum value、Maximum value and unit
+**Applicable scenarios**: temperature、pressure、Visual display of single indicators such as speed
 
-## 🔄 当前实现分析
+## 🔄 Current implementation analysis
 
-### 原有配置结构
+### Original configuration structure
 ```typescript
-// 当前 chart-card 配置
+// current chart-card Configuration
 {
   id: 'instrument-panel',
   type: 'chart',
@@ -23,9 +23,9 @@
       deviceSource: [{}]
     },
     config: {
-      unit: '',      // 单位
-      min: 0,        // 最小值
-      max: 200       // 最大值
+      unit: '',      // unit
+      min: 0,        // minimum value
+      max: 200       // maximum value
     },
     iCardViewDefault: {
       w: 5, h: 3, minH: 1, minW: 2
@@ -34,14 +34,14 @@
 }
 ```
 
-### 数据获取方式
-- 通过 `telemetryDataCurrentKeys` API 获取设备遥测数据
-- 支持实时数据更新 (`updateData` 方法)
-- 数据格式: `{ [metricsId]: value, unit?: string }`
+### Data acquisition method
+- pass `telemetryDataCurrentKeys` API Get device telemetry data
+- Support real-time data updates (`updateData` method)
+- Data format: `{ [metricsId]: value, unit?: string }`
 
-## 🚀 Card 2.1 迁移配置
+## 🚀 Card 2.1 Migrate configuration
 
-### 1. 组件定义 (definition.ts)
+### 1. Component definition (definition.ts)
 
 ```typescript
 import type { ComponentDefinition } from '@/card2.1/types'
@@ -50,19 +50,19 @@ import InstrumentPanelComponent from './component.vue'
 import InstrumentPanelSetting from './setting.vue'
 
 export const instrumentPanelDefinition: ComponentDefinition = {
-  // 🏷️ 基础信息
+  // 🏷️ Basic information
   type: 'instrument-panel',
-  name: '📊 仪表盘',
-  description: '显示单个数值的圆形仪表盘，支持自定义最小值、最大值和单位',
+  name: '📊 Dashboard',
+  description: 'Circular dashboard showing a single value，Support custom minimum value、Maximum value and unit',
   icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" /></svg>',
   version: '2.1.0',
   author: 'ThingsPanel',
-  
-  // 🎨 组件实现
+
+  // 🎨 Component implementation
   component: InstrumentPanelComponent,
   configComponent: InstrumentPanelSetting,
-  
-  // 📐 布局配置
+
+  // 📐 layout configuration
   defaultLayout: {
     gridstack: { w: 5, h: 3, x: 0, y: 0, minW: 2, minH: 1, maxW: 8, maxH: 6 }
   },
@@ -72,87 +72,87 @@ export const instrumentPanelDefinition: ComponentDefinition = {
     maxSize: { width: 8, height: 6 },
     resizable: true
   },
-  
-  // 🔐 权限配置
-  permission: '不限',
-  
-  // 🏷️ 标签分类
-  tags: ['仪表盘', '数值显示', '监控', 'dashboard'],
+
+  // 🔐 Permission configuration
+  permission: 'NO_LIMIT',
+
+  // 🏷️ Tag classification
+  tags: ['Dashboard', 'Numerical display', 'monitor', 'dashboard'],
   category: 'dashboard',
-  
-  // ⚡ 功能特性
+
+  // ⚡ Features
   features: {
-    realtime: true,        // 支持实时数据
-    dataBinding: true,     // 支持数据绑定
-    configurable: true,    // 支持配置
-    responsive: true       // 响应式布局
+    realtime: true,        // Support real-time data
+    dataBinding: true,     // Support data binding
+    configurable: true,    // Support configuration
+    responsive: true       // Responsive layout
   },
 
-  // 📊 数据源需求
+  // 📊 Data source requirements
   dataSources: [
     {
       key: 'value',
-      name: '仪表盘数值',
-      description: '仪表盘显示的主要数值',
+      name: 'Dashboard values',
+      description: 'Main values ​​displayed on the dashboard',
       supportedTypes: ['static', 'api', 'websocket', 'mqtt'],
       required: true,
       example: 85.5
     },
     {
       key: 'unit',
-      name: '数值单位',
-      description: '数值的单位标识',
+      name: 'numerical unit',
+      description: 'The unit identifier of the value',
       supportedTypes: ['static', 'api', 'websocket'],
       required: false,
       example: '°C'
     }
   ],
 
-  // ⚙️ 静态参数配置
+  // ⚙️ Static parameter configuration
   staticParams: [
     {
       key: 'min',
-      name: '最小值',
+      name: 'minimum value',
       type: 'number',
-      description: '仪表盘的最小刻度值',
+      description: 'The minimum scale value of the dashboard',
       defaultValue: 0,
       required: false
     },
     {
       key: 'max',
-      name: '最大值',
+      name: 'maximum value',
       type: 'number',
-      description: '仪表盘的最大刻度值',
+      description: 'The maximum scale value of the dashboard',
       defaultValue: 100,
       required: false
     },
     {
       key: 'unit',
-      name: '单位',
+      name: 'unit',
       type: 'string',
-      description: '数值单位（静态配置，优先级低于数据源）',
+      description: 'numerical unit（static configuration，Lower priority than data source）',
       defaultValue: '',
       required: false
     },
     {
       key: 'title',
-      name: '标题',
+      name: 'title',
       type: 'string',
-      description: '仪表盘标题',
+      description: 'Dashboard title',
       defaultValue: '',
       required: false
     },
     {
       key: 'precision',
-      name: '精度',
+      name: 'Accuracy',
       type: 'number',
-      description: '数值显示的小数位数',
+      description: 'Number of decimal places for numerical display',
       defaultValue: 1,
       required: false
     }
   ],
 
-  // 🎯 交互能力声明
+  // 🎯 Interactive capability statement
   interactionCapabilities: {
     supportedEvents: ['click', 'hover', 'dataChange', 'thresholdExceeded'],
     availableActions: [
@@ -163,22 +163,22 @@ export const instrumentPanelDefinition: ComponentDefinition = {
     watchableProperties: {
       'value': {
         type: 'number',
-        description: '当前数值',
+        description: 'current value',
         defaultValue: 0
       },
       'percentage': {
         type: 'number',
-        description: '当前百分比（基于最小值和最大值计算）',
+        description: 'Current percentage（Calculated based on minimum and maximum values）',
         defaultValue: 0
       },
       'status': {
         type: 'string',
-        description: '状态（normal/warning/danger）',
+        description: 'state（normal/warning/danger）',
         defaultValue: 'normal'
       },
       'unit': {
         type: 'string',
-        description: '当前单位',
+        description: 'current unit',
         defaultValue: ''
       }
     },
@@ -189,30 +189,30 @@ export const instrumentPanelDefinition: ComponentDefinition = {
           {
             action: 'flashColor',
             delay: 0,
-            name: '阈值超限闪烁',
+            name: 'Threshold over limit flashing',
             enabled: true
           },
           {
             action: 'showNotification',
             delay: 500,
-            name: '阈值告警通知',
+            name: 'Threshold alarm notification',
             enabled: true
           }
         ],
         enabled: true,
-        name: '阈值超限告警',
+        name: 'Threshold exceedance alarm',
         watchedProperty: 'value'
       }
     ]
   },
 
-  // 🔒 属性暴露白名单
+  // 🔒 Attribute exposure whitelist
   propertyWhitelist: createPropertyWhitelist({
-    // 核心数据属性
+    // core data attributes
     value: {
       level: 'public',
       type: 'number',
-      description: '仪表盘当前数值',
+      description: 'Current value on dashboard',
       defaultValue: 0,
       visibleInInteraction: true,
       visibleInDebug: true
@@ -220,7 +220,7 @@ export const instrumentPanelDefinition: ComponentDefinition = {
     percentage: {
       level: 'public',
       type: 'number',
-      description: '当前百分比',
+      description: 'Current percentage',
       defaultValue: 0,
       visibleInInteraction: true,
       visibleInDebug: true,
@@ -229,42 +229,42 @@ export const instrumentPanelDefinition: ComponentDefinition = {
     status: {
       level: 'public',
       type: 'string',
-      description: '仪表盘状态',
+      description: 'Dashboard status',
       defaultValue: 'normal',
       visibleInInteraction: true,
       visibleInDebug: true,
       readonly: true
     },
-    
-    // 配置属性
+
+    // Configuration properties
     min: {
       level: 'protected',
       type: 'number',
-      description: '最小值',
+      description: 'minimum value',
       defaultValue: 0,
       visibleInDebug: true
     },
     max: {
       level: 'protected',
       type: 'number',
-      description: '最大值',
+      description: 'maximum value',
       defaultValue: 100,
       visibleInDebug: true
     },
     unit: {
       level: 'public',
       type: 'string',
-      description: '数值单位',
+      description: 'numerical unit',
       defaultValue: '',
       visibleInInteraction: true,
       visibleInDebug: true
     },
-    
-    // 内部状态
+
+    // internal state
     isLoading: {
       level: 'private',
       type: 'boolean',
-      description: '数据加载状态',
+      description: 'Data loading status',
       defaultValue: false,
       visibleInDebug: true,
       readonly: true
@@ -273,37 +273,37 @@ export const instrumentPanelDefinition: ComponentDefinition = {
 }
 ```
 
-### 2. 组件配置接口
+### 2. Component configuration interface
 
 ```typescript
-// 组件配置类型定义
+// Component configuration type definition
 export interface InstrumentPanelConfig {
-  // 数值配置
-  min: number           // 最小值
-  max: number           // 最大值
-  unit: string          // 单位
-  precision: number     // 精度
-  
-  // 显示配置
-  title: string         // 标题
-  showTitle: boolean    // 是否显示标题
-  showUnit: boolean     // 是否显示单位
-  
-  // 样式配置
-  gaugeColor: string    // 仪表盘颜色
-  backgroundColor: string // 背景颜色
-  textColor: string     // 文字颜色
-  
-  // 阈值配置
-  warningThreshold?: number   // 警告阈值
-  dangerThreshold?: number    // 危险阈值
-  
-  // 动画配置
-  enableAnimation: boolean    // 启用动画
-  animationDuration: number   // 动画持续时间
+  // Numeric configuration
+  min: number           // minimum value
+  max: number           // maximum value
+  unit: string          // unit
+  precision: number     // Accuracy
+
+  // show configuration
+  title: string         // title
+  showTitle: boolean    // Whether to display title
+  showUnit: boolean     // Whether to display units
+
+  // Style configuration
+  gaugeColor: string    // Dashboard color
+  backgroundColor: string // background color
+  textColor: string     // text color
+
+  // Threshold configuration
+  warningThreshold?: number   // warning threshold
+  dangerThreshold?: number    // danger threshold
+
+  // Animation configuration
+  enableAnimation: boolean    // Enable animation
+  animationDuration: number   // animation duration
 }
 
-// 统一配置结构
+// Unified configuration structure
 export interface InstrumentPanelUnifiedConfig {
   base: {
     deviceId?: string
@@ -325,7 +325,7 @@ export interface InstrumentPanelUnifiedConfig {
     }
   }
   interaction: {
-    // 交互配置
+    // Interactive configuration
     enableClick?: boolean
     enableHover?: boolean
     thresholdAlerts?: boolean
@@ -333,34 +333,34 @@ export interface InstrumentPanelUnifiedConfig {
 }
 ```
 
-### 3. 数据源映射
+### 3. Data source mapping
 
 ```typescript
-// 数据源映射配置
+// Data source mapping configuration
 export const instrumentPanelDataMapping = {
-  // 主数值映射
+  // Master value mapping
   value: {
-    // 从设备遥测数据映射
+    // Mapping telemetry data from devices
     deviceTelemetry: {
       path: 'data[0].value',
       transform: (value: any) => Number(value) || 0,
       fallback: 0
     },
-    // 从API响应映射
+    // fromAPIresponse mapping
     apiResponse: {
       path: 'value',
       transform: (value: any) => Number(value) || 0,
       fallback: 0
     },
-    // WebSocket数据映射
+    // WebSocketdata mapping
     websocket: {
       path: 'payload.value',
       transform: (value: any) => Number(value) || 0,
       fallback: 0
     }
   },
-  
-  // 单位映射
+
+  // unit mapping
   unit: {
     deviceTelemetry: {
       path: 'data[0].unit',
@@ -376,14 +376,14 @@ export const instrumentPanelDataMapping = {
 }
 ```
 
-### 4. 组件实现要点
+### 4. Key points of component implementation
 
 ```typescript
-// Vue 组件实现关键点
+// Vue Key points of component implementation
 export default defineComponent({
   name: 'InstrumentPanel',
   setup(props) {
-    // 使用 Card 2.1 统一配置管理
+    // use Card 2.1 Unified configuration management
     const {
       config,
       displayData,
@@ -395,9 +395,9 @@ export default defineComponent({
       componentId: props.componentId
     })
 
-    // 计算属性
+    // Computed properties
     const currentValue = computed(() => {
-      // 数据源优先级：数据源 > 静态配置
+      // data source优先级：data source > static configuration
       return displayData.value?.value ?? config.value.defaultValue ?? 0
     })
 
@@ -414,24 +414,24 @@ export default defineComponent({
     const status = computed(() => {
       const value = currentValue.value
       const { dangerThreshold, warningThreshold } = config.value
-      
+
       if (dangerThreshold && value >= dangerThreshold) return 'danger'
       if (warningThreshold && value >= warningThreshold) return 'warning'
       return 'normal'
     })
 
-    // 监听属性变化
+    // Listen for property changes
     watchProperty('value', (newValue, oldValue) => {
-      // 检查阈值超限
+      // Check threshold exceeded
       if (config.value.dangerThreshold && newValue >= config.value.dangerThreshold) {
-        // 触发阈值超限事件
+        // Trigger threshold exceeded event
         window.dispatchEvent(new CustomEvent('thresholdExceeded', {
           detail: { componentId: props.componentId, value: newValue, type: 'danger' }
         }))
       }
     })
 
-    // 暴露属性
+    // exposed properties
     exposeWhitelistedProperties({
       value: currentValue,
       percentage,
@@ -453,59 +453,59 @@ export default defineComponent({
 })
 ```
 
-## 📋 迁移检查清单
+## 📋 Migration checklist
 
-### ✅ 功能对等性
-- [x] 圆形仪表盘显示
-- [x] 最小值/最大值配置
-- [x] 单位显示
-- [x] 实时数据更新
-- [x] 响应式布局
+### ✅ functional equivalence
+- [x] Circular instrument panel display
+- [x] minimum value/Maximum configuration
+- [x] unit display
+- [x] Real-time data updates
+- [x] Responsive layout
 
-### ✅ 新增功能
-- [x] 阈值告警机制
-- [x] 交互能力支持
-- [x] 属性暴露白名单
-- [x] 统一配置管理
-- [x] 多数据源支持
+### ✅ New features
+- [x] Threshold alarm mechanism
+- [x] Interactive capability support
+- [x] Attribute exposure whitelist
+- [x] Unified configuration management
+- [x] Multiple data sources support
 
-### ✅ 数据兼容性
-- [x] 设备遥测数据兼容
-- [x] API数据源支持
-- [x] WebSocket实时数据
-- [x] 静态数据配置
+### ✅ Data compatibility
+- [x] Device telemetry data compatible
+- [x] APIData source support
+- [x] WebSocketreal time data
+- [x] Static data configuration
 
-### ✅ 配置迁移
-- [x] 原有配置项映射
-- [x] 新增配置项定义
-- [x] 默认值设置
-- [x] 验证规则定义
+### ✅ Configuration migration
+- [x] Original configuration item mapping
+- [x] Add configuration item definition
+- [x] Default value settings
+- [x] Validation rule definition
 
-## 🔄 迁移步骤
+## 🔄 Migration steps
 
-1. **创建组件目录结构**
+1. **Create component directory structure**
    ```
    src/card2.1/components/chart/dashboard/instrument-panel/
-   ├── definition.ts      # 组件定义
-   ├── index.vue         # Vue组件实现
-   ├── setting.vue       # 配置组件
-   ├── settingConfig.ts  # 配置定义
-   └── index.ts          # 导出文件
+   ├── definition.ts      # Component definition
+   ├── index.vue         # VueComponent implementation
+   ├── setting.vue       # Configure components
+   ├── settingConfig.ts  # Configuration definition
+   └── index.ts          # Export file
    ```
 
-2. **实现组件定义** - 按照上述 `definition.ts` 配置
+2. **Implement component definition** - as above `definition.ts` Configuration
 
-3. **实现Vue组件** - 使用 `useCard2Props` Hook
+3. **accomplishVuecomponents** - use `useCard2Props` Hook
 
-4. **实现配置组件** - 基于 `FlexibleConfigForm`
+4. **Implement configuration components** - based on `FlexibleConfigForm`
 
-5. **注册组件** - 添加到自动注册系统
+5. **Register component** - Add to automatic registration system
 
-6. **测试验证** - 功能测试和数据兼容性测试
+6. **Test verification** - Functional testing and data compatibility testing
 
-## 📚 相关文档
+## 📚 Related documents
 
-- [Card 2.1 开发指南](../../../card2.1/docs/COMPREHENSIVE_DEVELOPMENT_GUIDE.md)
-- [组件开发规范](../../../card2.1/docs/COMPONENT_DEVELOPMENT_GUIDE.md)
-- [数据绑定系统](../../../card2.1/docs/DATA_BINDING_GUIDE.md)
-- [交互系统文档](../../../card2.1/docs/INTERACTION_GUIDE.md)
+- [Card 2.1 Development Guide](../../../card2.1/docs/COMPREHENSIVE_DEVELOPMENT_GUIDE.md)
+- [Component Development Specifications](../../../card2.1/docs/COMPONENT_DEVELOPMENT_GUIDE.md)
+- [data binding system](../../../card2.1/docs/DATA_BINDING_GUIDE.md)
+- [Interactive system documentation](../../../card2.1/docs/INTERACTION_GUIDE.md)

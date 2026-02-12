@@ -1,13 +1,13 @@
 <template>
   <div class="interaction-config-wrapper">
-    <!-- 🔥 调试信息 -->
+    <!-- 🔥 debugging information -->
     <div v-if="isDevelopment" class="debug-info" style="margin-bottom: 12px; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 12px;">
-      <div><strong>调试信息:</strong></div>
+      <div><strong>debugging information:</strong></div>
       <div>NodeId: {{ props.nodeId }}</div>
       <div>ComponentId: {{ componentId }}</div>
       <div>ComponentType: {{ componentType }}</div>
-      <div>配置数量: {{ interactionConfigs.length }}</div>
-      <div>配置内容: {{ JSON.stringify(interactionConfigs, null, 2) }}</div>
+      <div>Configuration quantity: {{ interactionConfigs.length }}</div>
+      <div>Configuration content: {{ JSON.stringify(interactionConfigs, null, 2) }}</div>
       <div>HasWidget: {{ !!props.widget }}</div>
       <div>HasEditorContext: {{ !!editorContext }}</div>
     </div>
@@ -23,21 +23,21 @@
 
 <script setup lang="ts">
 /**
- * 🔥 交互配置包装器 - 重构版本
- * 使用InteractionConfigRouter统一管理交互配置
+ * 🔥 Interactive configuration wrapper - Refactored version
+ * useInteractionConfigRouterUnified management of interactive configurations
  *
- * 解决的问题：
- * 1. 刷新后交互失效 - 统一配置加载和注册时机
- * 2. 一个组件多交互配置支持 - 路由器并发管理
- * 3. 跨组件属性修改 - 配置级别的属性修改
+ * Problem solved：
+ * 1. Interaction fails after refresh - Unified configuration loading and registration timing
+ * 2. One component supports multiple interaction configurations - Router concurrency management
+ * 3. Cross-component property modification - Configuration-level property modifications
  */
 
 import { ref, computed, watch, inject, onMounted, onUnmounted, nextTick } from 'vue'
 import InteractionCardWizard from '@/core/interaction-system/components/InteractionCardWizard.vue'
 import type { InteractionConfig } from '@/card2.1/core2/interaction'
-// 🔥 导入新的交互配置路由器
+// 🔥 Import new interactive configuration router
 import { interactionConfigRouter } from './InteractionConfigRouter'
-// 保留原有配置管理器用于持久化
+// Keep the original configuration manager for persistence
 import { configurationIntegrationBridge as configurationManager } from './ConfigurationIntegrationBridge'
 
 interface Props {
@@ -52,63 +52,63 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false
 })
 
-// 注入编辑器上下文以访问统一配置系统
+// Inject editor context to access the unified configuration system
 const editorContext = inject('editorContext', null) as any
 
-// 开发环境检测
+// Development environment testing
 const isDevelopment = computed(() => {
   return import.meta.env.DEV || import.meta.env.NODE_ENV === 'development'
 })
 
-// 计算属性：componentId和componentType
+// Computed properties：componentIdandcomponentType
 const componentId = computed(() => props.componentId || props.nodeId)
 const componentType = computed(() => props.componentType || props.widget?.type || 'unknown')
 
-// 🔥 使用路由器管理的交互配置
+// 🔥 Interactive configuration using router management
 const interactionConfigs = ref<InteractionConfig[]>([])
 
-// 🔥 从统一配置中心加载交互配置
+// 🔥 Load interactive configuration from unified configuration center
 const loadInteractionConfigs = (): void => {
 
   try {
-    // 从stateManager读取配置
+    // fromstateManagerRead configuration
     if (editorContext?.stateManager) {
       const nodes = editorContext.stateManager.nodes
       const node = nodes.find(n => n.id === componentId.value)
       if (node?.metadata?.unifiedConfig?.interaction?.configs) {
         const configs = node.metadata.unifiedConfig.interaction.configs
 
-        // 更新本地状态
+        // Update local status
         interactionConfigs.value = configs
 
-        // 🔥 关键：向路由器注册配置
+        // 🔥 key：Register configuration with router
         interactionConfigRouter.registerComponentConfigs(componentId.value, configs)
         return
       }
     }
 
-    // 从ConfigurationManager获取配置作为备选
+    // fromConfigurationManagerGet configuration as an alternative
     const config = configurationManager.getConfiguration(componentId.value)
     const configs = config?.interaction?.configs || []
 
 
-    // 更新本地状态
+    // Update local status
     interactionConfigs.value = configs
 
-    // 🔥 关键：向路由器注册配置
+    // 🔥 key：Register configuration with router
     interactionConfigRouter.registerComponentConfigs(componentId.value, configs)
 
   } catch (error) {
-    console.error(`❌ [InteractionConfigWrapper] 加载交互配置失败:`, error)
+    console.error(`❌ [InteractionConfigWrapper] Failed to load interaction configuration:`, error)
     interactionConfigs.value = []
   }
 }
 
-// 🔥 交互配置更新处理器
+// 🔥 Interactive configuration update handler
 const handleInteractionConfigUpdate = (configs: InteractionConfig[]): void => {
 
   try {
-    // 🔥 第一步：保存到ConfigurationManager
+    // 🔥 first step：save toConfigurationManager
     configurationManager.updateConfiguration(
       componentId.value,
       'interaction',
@@ -116,19 +116,19 @@ const handleInteractionConfigUpdate = (configs: InteractionConfig[]): void => {
       props.widget?.type
     )
 
-    // 🔥 第二步：保存到stateManager（统一配置中心）
+    // 🔥 Step 2：save tostateManager（Unified configuration center）
     if (editorContext?.stateManager) {
       const nodes = editorContext.stateManager.nodes
       const nodeIndex = nodes.findIndex(n => n.id === componentId.value)
       if (nodeIndex !== -1) {
         const node = nodes[nodeIndex]
 
-        // 确保unifiedConfig结构存在
+        // make sureunifiedConfigstructure exists
         if (!node.metadata) node.metadata = {}
         if (!node.metadata.unifiedConfig) node.metadata.unifiedConfig = {}
         if (!node.metadata.unifiedConfig.interaction) node.metadata.unifiedConfig.interaction = {}
 
-        // 保存配置
+        // Save configuration
         if (configs.length === 0) {
           node.metadata.unifiedConfig.interaction = {}
           delete node.metadata.unifiedConfig.interaction.configs
@@ -139,39 +139,39 @@ const handleInteractionConfigUpdate = (configs: InteractionConfig[]): void => {
       }
     }
 
-    // 🔥 第三步：更新本地状态
+    // 🔥 Step 3：Update local status
     interactionConfigs.value = configs
 
-    // 🔥 第四步：向路由器注册更新的配置（会自动重新注册监听器）
+    // 🔥 Step 4：Register updated configuration with router（The listener will be automatically re-registered）
     interactionConfigRouter.registerComponentConfigs(componentId.value, configs)
 
 
   } catch (error) {
-    console.error('❌ [InteractionConfigWrapper] 保存交互配置失败:', error)
+    console.error('❌ [InteractionConfigWrapper] Failed to save interaction configuration:', error)
   }
 }
 
-// 监听widget变化，重新加载配置
+// monitorwidgetchange，Reload configuration
 watch(() => props.widget, (newWidget, oldWidget) => {
   loadInteractionConfigs()
 }, { immediate: true })
 
-// 监听nodeId变化，防止节点切换时数据不更新
+// monitornodeIdchange，Prevent data from not being updated when switching nodes
 watch(() => componentId.value, (newComponentId, oldComponentId) => {
   if (newComponentId !== oldComponentId) {
-    // 清理旧组件
+    // Clean up old components
     if (oldComponentId) {
       interactionConfigRouter.unregisterComponent(oldComponentId)
     }
-    // 加载新配置
+    // Load new configuration
     loadInteractionConfigs()
   }
 })
 
-// 🔥 生命周期管理
+// 🔥 life cycle management
 onMounted(() => {
 
-  // 初始化加载配置
+  // Initial load configuration
   nextTick(() => {
     loadInteractionConfigs()
   })
@@ -179,13 +179,13 @@ onMounted(() => {
 
 onUnmounted(() => {
 
-  // 🔥 清理路由器中的组件配置和监听器
+  // 🔥 Clean the component configuration and listeners in the router
   interactionConfigRouter.unregisterComponent(componentId.value)
 })
 </script>
 
 <style scoped>
 .interaction-config-wrapper {
-  /* 样式继承自父容器 */
+  /* Styles are inherited from the parent container */
 }
 </style>

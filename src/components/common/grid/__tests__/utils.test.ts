@@ -1,5 +1,5 @@
 /**
- * Grid工具函数单元测试
+ * GridTool function unit testing
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -47,7 +47,7 @@ describe('Grid Utils Enhanced', () => {
   }
 
   beforeEach(() => {
-    // 清理缓存
+    // clear cache
     cacheManager.clear()
     performanceMonitor.reset()
   })
@@ -70,21 +70,21 @@ describe('Grid Utils Enhanced', () => {
       const invalidItem = { ...mockItem, gridCol: 0 }
       const result = validateGridItem(invalidItem)
       expect(result.success).toBe(false)
-      expect(result.message).toContain('位置')
+      expect(result.message).toContain('Location')
     })
 
     it('should reject item with invalid span', () => {
       const invalidItem = { ...mockItem, gridColSpan: 0 }
       const result = validateGridItem(invalidItem)
       expect(result.success).toBe(false)
-      expect(result.message).toContain('跨度')
+      expect(result.message).toContain('span')
     })
 
     it('should validate min/max constraints', () => {
       const itemWithMinConstraint = { ...mockItem, minColSpan: 3, gridColSpan: 2 }
       const result = validateGridItem(itemWithMinConstraint)
       expect(result.success).toBe(false)
-      expect(result.message).toContain('最小值')
+      expect(result.message).toContain('minimum value')
     })
   })
 

@@ -14,151 +14,151 @@ export default class Irrigation {
   }
 }
 
-/** 获取空间列表 */
+/** Get list of spaces */
 export const getIrrigationSpaces = async () => {
   return await request.get<any>('irrigation/spaces')
 }
 
-/** 获取区域列表 */
+/** Get list of regions */
 export const getIrrigationDistricts = async (params: any) => {
   return await request.get<any>('irrigation/districts', { params })
 }
 
-/** 获取设备列表 */
+/** Get device list */
 export const getIrrigationDiveces = async (params: { id: string }) => {
   return await request.get<any>(`irrigation/districts/device/${params.id}`)
 }
 
-/** 新建定时计划 */
+/** Create a new schedule */
 export const addTimeIrrigation = async (params: any) => {
   return await request.post<any>(`irrigation/scheduled`, params)
 }
 
-/** 新建定时计划 */
+/** Create a new schedule */
 export const editTimeIrrigation = async (params: any) => {
   return await request.put<any>(`irrigation/scheduled`, params)
 }
 
-/** 获取设备列表 */
+/** Get device list */
 export const getIrrigationTimeList = async (params: any) => {
   return await request.get<any>(`irrigation/scheduled`, { params })
 }
 
-/** 定时灌溉-下发 */
+/** Scheduled irrigation-Issue */
 export const irrigationTimeDistribute = async (id: string, params: { status: 2 | 3 }) => {
   return await request.get<any>(`/irrigation/scheduled/execute/${id}`, { params })
 }
-/** 定时灌溉-取消 */
+/** Scheduled irrigation-Cancel */
 export const irrigationTimeCancle = async (params: { id: string; status: 2 | 3 }) => {
   return await request.put<any>(`/irrigation/scheduled/cancel/${params.id}`, { params })
 }
 
-/** 定时灌溉-删除 */
+/** Scheduled irrigation-delete */
 export const irrigationTimeDel = async (id: string) => {
   return await request.delete<any>(`/irrigation/scheduled/${id}`)
 }
 
-/** 定时灌溉-日志 */
+/** Scheduled irrigation-log */
 export const irrigationTimeHistorys = async (params: any) => {
   return await request.get<any>(`/irrigation/scheduled/historys`, { params })
 }
 
-/** 轮灌计划 */
-/** 轮灌-设备列表 */
+/** rotational irrigation program */
+/** Round irrigation-Device list */
 export const irrigationRotationDeviceList = async () => {
   return await request.get<any>(`/irrigation/districts/device/get`, { params: { page: 1, page_size: 100 } } as any)
 }
 
-/** 轮灌-添加计划 */
+/** Round irrigation-Add plan */
 export const addIrrigationRotation = async (params: any) => {
   return await request.post<any>(`/irrigation/rotation`, params)
 }
-/** 轮灌-编辑计划 */
+/** Round irrigation-Edit plan */
 export const editIrrigationRotation = async (params: any) => {
   return await request.put<any>(`/irrigation/rotation`, params)
 }
 
-/** 轮灌-计划列表 */
+/** Round irrigation-Plan list */
 export const irrigationRotationList = async (params: any) => {
   return await request.get<any>(`/irrigation/rotation`, { params })
 }
 
-/** 轮灌-计划下发 */
+/** Round irrigation-Plan issuance */
 export const irrigationRotationExecute = async (params: any) => {
   return await request.put<any>(`/irrigation/rotation/execute/${params.id}`, { status: params.stauts })
 }
 
-/** 轮灌-计划取消 */
+/** Round irrigation-Plan canceled */
 export const irrigationRotationCancel = async (params: any) => {
   return await request.put<any>(`/irrigation/rotation/cancel/${params.id}`)
 }
 
-/** 轮灌-计划删除 */
+/** Round irrigation-Scheduled deletion */
 export const irrigationRotationDel = async (params: any) => {
   return await request.delete<any>(`/irrigation/rotation/${params}`)
 }
 
-/** 轮灌-日志 */
+/** Round irrigation-log */
 export const irrigationRotationHistorys = async (params: any) => {
   return await request.get<any>(`/irrigation/rotation/historys`, { params })
 }
 
-/** 轮灌-日志 */
+/** Round irrigation-log */
 export const irrigationRotationHistorysDetail = async (params: any) => {
   return await request.get<any>(`irrigation/rotation/result/${params.id}`, { params })
 }
 
-/** 轮灌-详情 */
+/** Round irrigation-Details */
 export const irrigationRotationDetail = async (id: any) => {
   return await request.get<any>(`/irrigation/rotation/${id}`)
 }
 
-/** 群灌-添加 */
+/** Group irrigation-Add to */
 export const addIrrigationGroup = async (params: any) => {
   return await request.post<any>(`/irrigation/group`, params)
 }
 
-/** 群灌-计划列表 */
+/** Group irrigation-Plan list */
 export const getIrrigationGroupList = async (params: any) => {
   return await request.get<any>(`/irrigation/group`, { params })
 }
 
-/** 群灌-设备列表 */
+/** Group irrigation-Device list */
 export const irrigationGroupDeviceList = async (params: any) => {
   return await request.get<any>(`/irrigation/districts/device/get`, { params })
 }
 
-/** 群灌-列表详情 */
+/** Group irrigation-List details */
 export const irrigationGroupDeviceDetail = async (id: any) => {
   return await request.get<any>(`/irrigation/group/${id}`)
 }
 
-/** 群灌-设备类型 */
+/** Group irrigation-Device type */
 export const irrigationGroupDeviceTypes = async () => {
   return await request.get<any>('/dict/enum', { params: { dict_code: 'PRODUCT_TYPE' } })
 }
 
-/** 群灌-下发 */
+/** Group irrigation-Issue */
 export const irrigationGroupExcute = async (id: string) => {
   return await request.get<any>(`irrigation/group/execute/${id}`, { params: { status: 3 } })
 }
 
-/** 群灌-取消下发 */
+/** Group irrigation-Cancel delivery */
 export const irrigationGroupCancle = async (id: string) => {
   return await request.put<any>(`/irrigation/group/cancel/${id}`, { id, status: 3 })
 }
 
-/** 群灌-删除 */
+/** Group irrigation-delete */
 export const irrigationGroupDel = async (id: string) => {
   return await request.delete<any>(`/irrigation/group/${id}`)
 }
 
-/** 群灌-日志 */
+/** Group irrigation-log */
 export const irrigationGroupHistorys = async (params: any) => {
   return await request.get<any>(`/irrigation/group/historys`, { params })
 }
 
-/** 群灌-日志详情 */
+/** Group irrigation-Log details */
 export const irrigationGroupHistoryDetail = async (params: any) => {
   return await request.get<any>(`/irrigation/group/result`, { params })
 }

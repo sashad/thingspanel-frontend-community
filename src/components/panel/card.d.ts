@@ -15,10 +15,10 @@ export type DeviceSourceItem = {
 export interface ICardData {
   type?: ICardDefine['type']
   cardId?: string
-  // 组件自定义配置
+  // Component custom configuration
   config?: Record<string, any>
   title?: string
-  // 基础配置
+  // Basic configuration
   basicSettings?: {
     showTitle?: boolean
     title?: string
@@ -29,17 +29,17 @@ export interface ICardData {
     minW?: number
     minH?: number
   }
-  // 数据源
+  // data source
   dataSource?: {
-    // 系统 或 设备
+    // system or equipment
     origin: 'system' | 'device'
-    sourceNum?: number // 不填写即为 1-任意多个，最多9个，如需固定数量，填写整数
+    sourceNum?: number // Just leave it blank 1-as many as you want，most9indivual，If you need a fixed quantity，Fill in the integer
     systemSource?: { type?: number; name?: string }[]
     deviceCount?: number
-    isSupportTimeRange: boolean // 是否支持指定时间范围
-    dataTimeRange: string // 时间范围，custom，last_5m，last_15m，last_30m，last_1h，last_3h，last_6h，last_12h，last_24h，last_3d，last_7d，last_15d，last_30d，last_60d，last_90d，last_6m，last_1y
-    isSupportAggregate: boolean // 是否支持聚合
-    dataAggregateRange: string // 聚合时间范围
+    isSupportTimeRange: boolean // Whether to support specified time range
+    dataTimeRange: string // time range，custom，last_5m，last_15m，last_30m，last_1h，last_3h，last_6h，last_12h，last_24h，last_3d，last_7d，last_15d，last_30d，last_60d，last_90d，last_6m，last_1y
+    isSupportAggregate: boolean // Whether to support aggregation
+    dataAggregateRange: string // Aggregation time range
     deviceSource?: DeviceSourceItem[]
   }
 }
@@ -56,25 +56,25 @@ export interface ICardView {
 }
 
 export interface ICardDefine {
-  component: any // 卡片组件，一般就是 ./component.vue
+  component: any // card component，Usually ./component.vue
   remoteId?: string
-  id: string // 卡片唯一标识，按照card_type_cardName命名不会错
-  title: string // 卡片标题，英文，后期作为国际化key
-  poster: string // 示例图 尺寸193*120
-  type: 'builtin' | 'device' | 'plugin' | 'chart' // 卡片类型
-  // 不存在就是all
+  id: string // Card unique identifier，according tocard_type_cardNameThe naming is correct
+  title: string // card title，English，later as internationalizationkey
+  poster: string // Example diagram size193*120
+  type: 'builtin' | 'device' | 'plugin' | 'chart' // Card type
+  // Doesn't existall
   scene?: 'mobile' | 'pc' | 'all'
-  configForm?: any // 卡片配置文件，一般就是 card-config.vue
-  // 初始化设置参数（可选）
+  configForm?: any // Card configuration file，Usually card-config.vue
+  // Initialization setting parameters（Optional）
   preset?: {
     config?: object
     dataSource?: ICardData['dataSource']
     basicSettings?: ICardData['basicSettings']
     iCardViewDefault?: {
-      w?: number // 卡片初始占几行，尽量配一下
-      h?: number // 卡片初始大几列，尽量配一下
-      minW?: number // 卡片最小占几行
-      minH?: number // 卡片最小大几列
+      w?: number // How many rows does the card initially occupy?，Try to match it as much as possible
+      h?: number // The initial columns of the card，Try to match it as much as possible
+      minW?: number // The minimum number of lines a card should occupy
+      minH?: number // The smallest and largest columns of a card
     }
   }
 }
@@ -85,7 +85,7 @@ export interface ICardFormIns {
 
 export interface IConfigCtx {
   config: Record<string, any>
-  view?: boolean // 预览模式
+  view?: boolean // preview mode
 }
 
 export interface ICardItem {

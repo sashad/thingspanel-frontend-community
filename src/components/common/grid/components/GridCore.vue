@@ -1,6 +1,6 @@
 <!--
-  Grid 核心组件
-  负责网格布局的核心逻辑和渲染
+  Grid core components
+  Responsible for the core logic and rendering of grid layout
 -->
 <template>
   <GridLayout
@@ -63,7 +63,7 @@
       <GridItemContent :item="item" :readonly="readonly" :show-title="showTitle">
         <template #default="{ item: slotItem }">
           <slot :item="slotItem">
-            <!-- 回退到默认内容 -->
+            <!-- Fallback to default content -->
           </slot>
         </template>
       </GridItemContent>
@@ -73,8 +73,8 @@
 
 <script setup lang="ts">
 /**
- * Grid 核心组件
- * 专注于网格布局的核心功能和事件处理
+ * Grid core components
+ * Focus on the core functionality and event handling of grid layout
  */
 
 import { computed, shallowRef, watch } from 'vue'
@@ -83,13 +83,13 @@ import GridItemContent from './GridItemContent.vue'
 import type { GridLayoutPlusConfig, GridLayoutPlusItem, GridLayoutPlusEmits } from '../gridLayoutPlusTypes'
 
 interface Props {
-  /** 网格布局数据 */
+  /** Grid layout data */
   layout: GridLayoutPlusItem[]
-  /** 网格配置 */
+  /** Grid configuration */
   config: GridLayoutPlusConfig
-  /** 是否只读模式 */
+  /** Whether to read-only mode */
   readonly?: boolean
-  /** 是否显示网格项标题 */
+  /** Whether to display grid item titles */
   showTitle?: boolean
 }
 
@@ -102,10 +102,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 内部布局状态
+// Internal layout status
 const internalLayout = shallowRef<GridLayoutPlusItem[]>([...props.layout])
 
-// 监听外部布局变化
+// Monitor external layout changes
 watch(
   () => props.layout,
   newLayout => {
@@ -114,7 +114,7 @@ watch(
   { deep: true }
 )
 
-// 事件处理函数
+// event handler
 const handleLayoutCreated = (event: any) => {
   emit('layout-created', event)
 }
@@ -168,12 +168,12 @@ const handleItemContainerResized = (i: string, newH: number, newW: number, newHP
   emit('item-container-resized', i, newH, newW, newHPx, newWPx)
 }
 
-// 暴露内部状态给父组件
+// Expose internal state to parent component
 defineExpose({
   internalLayout
 })
 </script>
 
 <style scoped>
-/* Grid 核心样式将继承父组件的样式 */
+/* Grid Core styles will inherit the styles of the parent component */
 </style>

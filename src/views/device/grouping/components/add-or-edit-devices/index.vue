@@ -19,7 +19,7 @@ interface Group {
 
 interface TreeNode {
   group: Group
-  children?: TreeNode[] | undefined // TreeNode类型的可选数组，用于描述子节点
+  children?: TreeNode[] | undefined // TreeNodeoptional array of types，Used to describe child nodes
 }
 
 const showModal = ref<boolean>(false)
@@ -68,7 +68,7 @@ const rules: FormRules = {
 interface opNode {
   id?: string
   name?: string
-  children?: opNode[] // TreeNode类型的可选数组，用于描述子节点
+  children?: opNode[] // TreeNodeoptional array of types，Used to describe child nodes
 }
 
 // Extract id and name for tree select options

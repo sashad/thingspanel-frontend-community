@@ -1,48 +1,48 @@
 /**
- * Visual Editor 配置系统类型定义
- * 定义标准化的配置数据结构和接口
+ * Visual Editor Configure system type definition
+ * Define standardized configuration data structures and interfaces
  */
 
-// 数据源相关的导入已移除
+// Data source related imports have been removed
 
 /**
- * 基础配置接口 - 定义NodeWrapper支持的所有基础配置项
- * 包含显示、样式、布局、设备关联等通用配置
+ * Basic configuration interface - definitionNodeWrapperAll basic configuration items supported
+ * Contains display、style、layout、Common configurations such as device association
  */
 export interface BaseConfiguration {
-  // 显示配置
-  /** 是否显示标题 */
+  // show configuration
+  /** Whether to display title */
   showTitle?: boolean
-  /** 组件标题 */
+  /** Component title */
   title?: string
-  /** 是否可见 */
+  /** visible or not */
   visible?: boolean
-  /** 透明度 (0-1) */
+  /** transparency (0-1) */
   opacity?: number
 
-  // 样式配置
-  /** 背景颜色 */
+  // Style configuration
+  /** background color */
   backgroundColor?: string
-  /** 边框宽度 */
+  /** border width */
   borderWidth?: number
-  /** 边框颜色 */
+  /** border color */
   borderColor?: string
-  /** 边框样式 */
+  /** border style */
   borderStyle?: 'solid' | 'dashed' | 'dotted' | 'double' | 'groove' | 'ridge'
-  /** 圆角大小 */
+  /** Fillet size */
   borderRadius?: number
-  /** 阴影效果 */
+  /** shadow effect */
   boxShadow?: string
 
-  // 布局配置
-  /** 内边距 */
+  // layout configuration
+  /** padding */
   padding?: {
     top: number
     right: number
     bottom: number
     left: number
   }
-  /** 外边距 */
+  /** margins */
   margin?: {
     top: number
     right: number
@@ -50,44 +50,44 @@ export interface BaseConfiguration {
     left: number
   }
 
-  // 设备关联配置 - 统一管理所有组件的设备关联
-  /** 关联的设备ID - 用于数据源自动配置和设备模板 */
+  // Device association configuration - Unified management of device associations for all components
+  /** Associated devicesID - Used for data source auto-configuration and device templates */
   deviceId?: string
-  /** 监控的指标列表 - 定义组件关注的设备指标 */
+  /** List of monitored indicators - Define device metrics that the component focuses on */
   metricsList?: Array<{
-    /** 指标唯一标识 */
+    /** Indicator unique identifier */
     id: string
-    /** 指标显示名称 */
+    /** Indicator display name */
     name: string
-    /** 指标单位 */
+    /** Index unit */
     unit?: string
-    /** 指标描述 */
+    /** Indicator description */
     description?: string
-    /** 数据类型 */
+    /** data type */
     dataType?: 'number' | 'string' | 'boolean' | 'object'
-    /** 聚合方式 */
+    /** Aggregation method */
     aggregation?: 'last' | 'avg' | 'sum' | 'min' | 'max' | 'count'
   }>
 
-  // 扩展字段支持
+  // Extended field support
   [key: string]: any
 }
 
 /**
- * 🔧 数据源配置接口 - 泛型化，由独立数据源系统具体定义
- * 配置器层只定义结构，不定义具体字段
+ * 🔧 Data source configuration interface - Genericization，Specifically defined by independent data source systems
+ * The configurator layer only defines the structure，No specific fields defined
  */
 export interface DataSourceConfiguration extends Record<string, any> {
-  // 🔧 保持泛型结构，具体字段由数据源系统定义
+  // 🔧 Keep the generic structure，Specific fields are defined by the data source system
 
-  // 🚀 新增：autoBind配置支持
-  /** 自动绑定配置 - 简化数据源配置 */
+  // 🚀 New：autoBindConfiguration support
+  /** Automatic binding configuration - Simplify data source configuration */
   autoBind?: {
-    /** 是否启用自动绑定 */
+    /** Whether to enable automatic binding */
     enabled: boolean
-    /** 绑定模式 */
+    /** binding mode */
     mode: 'strict' | 'loose' | 'custom'
-    /** 自定义绑定规则 */
+    /** Custom binding rules */
     customRules?: Array<{
       propertyPath: string
       paramName: string
@@ -95,29 +95,29 @@ export interface DataSourceConfiguration extends Record<string, any> {
       required?: boolean
       description?: string
     }>
-    /** 排除的属性列表 */
+    /** Excluded attribute list */
     excludeProperties?: string[]
-    /** 包含的属性列表（仅在strict模式下生效） */
+    /** List of properties included（only instrictEffective in mode） */
     includeProperties?: string[]
   }
 }
 
 /**
- * 🔧 交互配置接口 - 泛型化，由独立交互系统具体定义
- * 配置器层只定义结构，不定义具体字段
+ * 🔧 Interactive configuration interface - Genericization，Specifically defined by independent interactive systems
+ * The configurator layer only defines the structure，No specific fields defined
  */
 export interface InteractionConfiguration extends Record<string, any> {
-  // 🔧 保持泛型结构，具体字段由交互系统定义
+  // 🔧 Keep the generic structure，Specific fields are defined by the interactive system
 }
 
 export interface ComponentConfiguration {
-  /** 组件特定的属性配置 */
+  /** Component specific property configuration */
   properties: Record<string, any>
-  /** 组件样式配置 */
+  /** Component style configuration */
   styles?: Record<string, any>
-  /** 组件行为配置 */
+  /** Component behavior configuration */
   behavior?: Record<string, any>
-  /** 组件验证规则 */
+  /** Component validation rules */
   validation?: {
     required?: string[]
     rules?: Record<string, any>
@@ -125,51 +125,51 @@ export interface ComponentConfiguration {
 }
 
 /**
- * 🔧 完整的组件配置接口 - 重构为分层自治架构
- * 配置器作为接口层，各层自主管理各自配置
+ * 🔧 Complete component configuration interface - Refactored into a layered autonomous architecture
+ * Configurator as interface layer，Each layer independently manages its own configuration
  */
 export interface WidgetConfiguration {
-  /** 🔧 基础配置 - 由NodeWrapper层自主定义和管理 */
+  /** 🔧 Basic configuration - Depend onNodeWrapperLayer self-definition and management */
   base: BaseConfiguration
 
-  /** 🔧 组件配置 - 由各Card2.1组件自主定义和管理 */
+  /** 🔧 Component configuration - by eachCard2.1Component self-definition and management */
   component: ComponentConfiguration
 
-  /** 🔧 数据源配置 - 由独立数据源系统自主定义和管理 */
+  /** 🔧 Data source configuration - Self-defined and managed by independent data source systems */
   dataSource: DataSourceConfiguration
 
-  /** 🔧 交互配置 - 由独立交互系统自主定义和管理 */
+  /** 🔧 Interactive configuration - Autonomously defined and managed by an independent interactive system */
   interaction: InteractionConfiguration
 
-  /** 🔧 配置元数据 - 配置器层统一管理 */
+  /** 🔧 Configuration metadata - Configurator layer unified management */
   metadata?: {
-    /** 配置版本 */
+    /** Configuration version */
     version: string
-    /** 创建时间 */
+    /** creation time */
     createdAt: number
-    /** 更新时间 */
+    /** Update time */
     updatedAt: number
-    /** 创建者 */
+    /** Creator */
     createdBy?: string
-    /** 配置描述 */
+    /** Configuration description */
     description?: string
   }
 }
 
 /**
- * 配置表单组件的通用接口
+ * Common interface for configuring form components
  */
 export interface ConfigFormProps<T = any> {
-  /** 当前配置值 */
+  /** Current configuration value */
   modelValue: T
-  /** 组件实例引用 */
+  /** Component instance reference */
   widget?: any
-  /** 是否只读 */
+  /** Is it read-only? */
   readonly?: boolean
 }
 
 /**
- * 配置表单组件的事件接口
+ * Configure the event interface of the form component
  */
 export interface ConfigFormEmits<T = any> {
   (event: 'update:modelValue', value: T): void
@@ -178,18 +178,18 @@ export interface ConfigFormEmits<T = any> {
 }
 
 /**
- * 配置验证结果
+ * Configuration verification results
  */
 export interface ValidationResult {
-  /** 是否验证通过 */
+  /** Is verification passed? */
   valid: boolean
-  /** 验证错误信息 */
+  /** Validation error message */
   errors?: {
     field: string
     message: string
     code?: string
   }[]
-  /** 验证警告信息 */
+  /** Verification warning message */
   warnings?: {
     field: string
     message: string
@@ -198,84 +198,84 @@ export interface ValidationResult {
 }
 
 /**
- * 配置管理器接口
+ * Configuration Manager Interface
  */
 export interface IConfigurationManager {
-  /** 获取组件配置 */
+  /** Get component configuration */
   getConfiguration(widgetId: string): WidgetConfiguration | null
 
-  /** 设置组件配置 */
+  /** Set component configuration */
   setConfiguration(widgetId: string, config: WidgetConfiguration): void
 
-  /** 更新配置的某个部分 */
+  /** Update some part of the configuration */
   updateConfiguration<K extends keyof WidgetConfiguration>(
     widgetId: string,
     section: K,
     config: WidgetConfiguration[K]
   ): void
 
-  /** 重置配置到默认值 */
+  /** Reset configuration to default */
   resetConfiguration(widgetId: string): void
 
-  /** 验证配置 */
+  /** Verify configuration */
   validateConfiguration(config: WidgetConfiguration): ValidationResult
 
-  /** 导出配置 */
+  /** Export configuration */
   exportConfiguration(widgetId: string): string
 
-  /** 导入配置 */
+  /** Import configuration */
   importConfiguration(widgetId: string, configData: string): boolean
 
-  /** 监听配置变化 */
+  /** Listen for configuration changes */
   onConfigurationChange(widgetId: string, callback: (config: WidgetConfiguration) => void): () => void
 }
 
 /**
- * 配置表单注册信息
+ * Configure form registration information
  */
 export interface ConfigFormRegistration {
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 配置表单组件 */
+  /** Configure form components */
   formComponent: any
-  /** 配置表单标题 */
+  /** Configure form title */
   title?: string
-  /** 配置表单描述 */
+  /** Configuration form description */
   description?: string
 }
 
 /**
- * 配置预设
+ * Configure presets
  */
 export interface ConfigurationPreset {
-  /** 预设名称 */
+  /** Default name */
   name: string
-  /** 预设描述 */
+  /** Default description */
   description?: string
-  /** 预设配置 */
+  /** Default configuration */
   config: Partial<WidgetConfiguration>
-  /** 适用的组件类型 */
+  /** Applicable component types */
   componentTypes?: string[]
-  /** 预设分类 */
+  /** Default category */
   category?: string
-  /** 是否为系统预设 */
+  /** Is it the system default? */
   isSystem?: boolean
 }
 
 /**
- * 默认配置生成器
+ * Default configuration generator
  */
 export type ConfigurationGenerator<T = any> = (context: T) => WidgetConfiguration
 
 /**
- * 配置迁移器接口
- * 用于处理配置版本升级
+ * Configure the migrator interface
+ * Used to handle configuration version upgrades
  */
 export interface ConfigurationMigrator {
-  /** 源版本 */
+  /** source version */
   fromVersion: string
-  /** 目标版本 */
+  /** target version */
   toVersion: string
-  /** 迁移函数 */
+  /** migration function */
   migrate: (oldConfig: any) => WidgetConfiguration
 }

@@ -1,6 +1,6 @@
 /**
- * ConfigurationManager - 简易配置管理服务
- * 提供配置验证、模板管理、存储功能
+ * ConfigurationManager - Simple configuration management service
+ * Provide configuration verification、Template management、Storage function
  */
 
 import type { DataSourceConfiguration, ValidationResult } from '@/core/data-architecture/types'
@@ -16,7 +16,7 @@ export interface ConfigurationTemplate {
 }
 
 /**
- * 配置管理器类
+ * Configuration manager class
  */
 export class ConfigurationManager {
   private templates: ConfigurationTemplate[] = []
@@ -26,14 +26,14 @@ export class ConfigurationManager {
   }
 
   /**
-   * 初始化内置模板
+   * Initialize built-in templates
    */
   private initializeBuiltinTemplates() {
     this.templates = [
       {
         id: 'json-basic',
-        name: 'JSON基础示例',
-        description: '简单的JSON数据配置示例',
+        name: 'JSONBasic example',
+        description: 'simpleJSONData configuration example',
         category: 'basic',
         tags: ['json', 'static', 'basic'],
         configuration: {
@@ -73,8 +73,8 @@ export class ConfigurationManager {
       },
       {
         id: 'http-api',
-        name: 'HTTP API示例',
-        description: 'RESTful API数据获取配置',
+        name: 'HTTP APIExample',
+        description: 'RESTful APIData acquisition configuration',
         category: 'basic',
         tags: ['http', 'api', 'dynamic'],
         configuration: {
@@ -106,8 +106,8 @@ export class ConfigurationManager {
       },
       {
         id: 'script-generated',
-        name: '脚本生成示例',
-        description: '通过JavaScript动态生成数据',
+        name: 'Script generation example',
+        description: 'passJavaScriptDynamically generate data',
         category: 'advanced',
         tags: ['script', 'dynamic', 'computed'],
         configuration: {
@@ -121,7 +121,7 @@ export class ConfigurationManager {
                     type: 'script',
                     config: {
                       script: `
-// 生成模拟传感器数据
+// Generate simulated sensor data
 const sensorData = {
   timestamp: Date.now(),
   temperature: Math.round(20 + Math.random() * 20),
@@ -148,8 +148,8 @@ return sensorData
       },
       {
         id: 'multi-source',
-        name: '多源整合示例',
-        description: '多个数据源合并处理的完整示例',
+        name: 'Multi-source integration example',
+        description: 'Complete example of merging multiple data sources',
         category: 'example',
         tags: ['multi-source', 'merge', 'complex'],
         configuration: {
@@ -192,7 +192,7 @@ return sensorData
                       script: `
 return {
   timestamp: Date.now(),
-  location: "测试区域",
+  location: "test area",
   deviceId: "DEVICE_" + Math.random().toString(36).substring(7),
   version: "1.0.0"
 }
@@ -216,95 +216,95 @@ return {
   }
 
   /**
-   * 获取所有内置模板
+   * Get all built-in templates
    */
   getBuiltinTemplates(): ConfigurationTemplate[] {
     return this.templates
   }
 
   /**
-   * 根据ID获取模板
+   * according toIDGet template
    */
   getTemplate(id: string): ConfigurationTemplate | undefined {
     return this.templates.find(t => t.id === id)
   }
 
   /**
-   * 根据分类获取模板
+   * Get templates by category
    */
   getTemplatesByCategory(category: string): ConfigurationTemplate[] {
     return this.templates.filter(t => t.category === category)
   }
 
   /**
-   * 验证配置
+   * Verify configuration
    */
   validateConfiguration(config: DataSourceConfiguration): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
-    // 基础结构验证
+    // Infrastructure verification
     if (!config.componentId) {
-      errors.push('组件ID不能为空')
+      errors.push('componentsIDcannot be empty')
     }
 
     if (!config.dataSources || config.dataSources.length === 0) {
-      errors.push('至少需要配置一个数据源')
+      errors.push('At least one data source needs to be configured')
     }
 
-    // 数据源验证
+    // Data source validation
     config.dataSources?.forEach((dataSource, dsIndex) => {
       if (!dataSource.sourceId) {
-        errors.push(`数据源 ${dsIndex + 1}: sourceId不能为空`)
+        errors.push(`data source ${dsIndex + 1}: sourceIdcannot be empty`)
       }
 
       if (!dataSource.dataItems || dataSource.dataItems.length === 0) {
-        errors.push(`数据源 ${dsIndex + 1}: 至少需要一个数据项`)
+        errors.push(`data source ${dsIndex + 1}: At least one data item is required`)
       }
 
-      // 数据项验证
+      // Data item validation
       dataSource.dataItems?.forEach((dataItem, diIndex) => {
         if (!dataItem.item.type) {
-          errors.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: 数据类型不能为空`)
+          errors.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: Data type cannot be empty`)
         }
 
-        // 类型特定验证
+        // type specific validation
         switch (dataItem.item.type) {
           case 'json':
             if (!dataItem.item.config.jsonString) {
-              errors.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: JSON内容不能为空`)
+              errors.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: JSONContent cannot be empty`)
             } else {
               try {
                 JSON.parse(dataItem.item.config.jsonString)
               } catch (e) {
-                errors.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: JSON格式错误`)
+                errors.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: JSONFormat error`)
               }
             }
             break
           case 'http':
             if (!dataItem.item.config.url) {
-              errors.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: HTTP URL不能为空`)
+              errors.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: HTTP URLcannot be empty`)
             }
             if (!dataItem.item.config.method) {
-              warnings.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: 建议指定HTTP方法`)
+              warnings.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: Recommended to specifyHTTPmethod`)
             }
             break
           case 'script':
             if (!dataItem.item.config.script) {
-              errors.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: 脚本内容不能为空`)
+              errors.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: Script content cannot be empty`)
             }
             break
         }
 
-        // 处理配置验证
+        // Handle configuration validation
         if (!dataItem.processing.filterPath) {
-          warnings.push(`数据源 ${dsIndex + 1}, 数据项 ${diIndex + 1}: 建议设置过滤路径`)
+          warnings.push(`data source ${dsIndex + 1}, data item ${diIndex + 1}: It is recommended to set the filter path`)
         }
       })
 
-      // 合并策略验证
+      // Merge strategy verification
       if (!dataSource.mergeStrategy.type) {
-        warnings.push(`数据源 ${dsIndex + 1}: 建议指定合并策略`)
+        warnings.push(`data source ${dsIndex + 1}: It is recommended to specify a merge strategy`)
       }
     })
 
@@ -316,25 +316,25 @@ return {
   }
 
   /**
-   * 导出配置为JSON字符串
+   * The export configuration isJSONstring
    */
   exportConfiguration(config: DataSourceConfiguration): string {
     return JSON.stringify(config, null, 2)
   }
 
   /**
-   * 从JSON字符串导入配置
+   * fromJSONString import configuration
    */
   importConfiguration(jsonString: string): DataSourceConfiguration {
     try {
       const config = JSON.parse(jsonString) as DataSourceConfiguration
 
-      // 基础验证
+      // Basic verification
       if (!config.dataSources || !Array.isArray(config.dataSources)) {
-        throw new Error('配置格式错误: dataSources必须是数组')
+        throw new Error('Configuration format error: dataSourcesMust be an array')
       }
 
-      // 添加时间戳
+      // Add timestamp
       config.updatedAt = Date.now()
       if (!config.createdAt) {
         config.createdAt = Date.now()
@@ -342,12 +342,12 @@ return {
 
       return config
     } catch (error) {
-      throw new Error('配置导入失败: ' + (error.message || '格式错误'))
+      throw new Error('Configuration import failed: ' + (error.message || 'Format error'))
     }
   }
 
   /**
-   * 导出配置为文件
+   * Export configuration as file
    */
   exportConfigurationAsFile(config: DataSourceConfiguration, filename?: string) {
     const dataStr = this.exportConfiguration(config)
@@ -363,7 +363,7 @@ return {
   }
 
   /**
-   * 从文件导入配置
+   * Import configuration from file
    */
   async importConfigurationFromFile(file: File): Promise<DataSourceConfiguration> {
     const text = await file.text()
@@ -371,7 +371,7 @@ return {
   }
 
   /**
-   * 生成示例配置
+   * Generate sample configuration
    */
   generateExampleConfiguration(componentId: string): DataSourceConfiguration {
     const template = this.getTemplate('json-basic')
@@ -384,7 +384,7 @@ return {
       }
     }
 
-    // 回退到简单示例
+    // Falling back to the simple example
     return {
       componentId,
       dataSources: [
@@ -410,7 +410,7 @@ return {
   }
 
   /**
-   * 克隆配置
+   * Clone configuration
    */
   cloneConfiguration(config: DataSourceConfiguration, newComponentId?: string): DataSourceConfiguration {
     const cloned = smartDeepClone(config) as DataSourceConfiguration
@@ -426,7 +426,7 @@ return {
   }
 
   /**
-   * 合并配置
+   * Merge configuration
    */
   mergeConfigurations(
     baseConfig: DataSourceConfiguration,
@@ -435,7 +435,7 @@ return {
     const merged = this.cloneConfiguration(baseConfig)
 
     otherConfigs.forEach(config => {
-      // 合并数据源
+      // Merge data sources
       merged.dataSources.push(...config.dataSources)
     })
 
@@ -444,8 +444,8 @@ return {
   }
 }
 
-// 创建单例实例
+// Create a singleton instance
 export const configurationManager = new ConfigurationManager()
 
-// 默认导出
+// Default export
 export default configurationManager

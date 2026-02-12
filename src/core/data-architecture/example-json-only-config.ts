@@ -1,6 +1,6 @@
 /**
- * 纯JSON数据源配置示例
- * 暂时忽略HTTP类型，专注于JSON数据项的完整功能展示
+ * pureJSONData source configuration example
+ * Ignore for nowHTTPtype，focus onJSONComplete function display of data items
  */
 
 import type {
@@ -11,10 +11,10 @@ import type {
 
 import { DEFAULT_ENHANCED_FEATURES } from '@/core/data-architecture/types/enhanced-types'
 
-// ==================== JSON数据项示例集合 ====================
+// ==================== JSONData item example collection ====================
 
 /**
- * 设备状态JSON数据项
+ * Device statusJSONdata item
  */
 export const deviceStatusJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
   type: 'json',
@@ -23,10 +23,10 @@ export const deviceStatusJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = 
     jsonData: JSON.stringify(
       {
         deviceId: 'DEV_001',
-        deviceName: '温湿度传感器01',
+        deviceName: 'Temperature and humidity sensor01',
         status: 'online',
         location: {
-          building: 'A座',
+          building: 'Aseat',
           floor: 3,
           room: '301',
           coordinates: { x: 120.5, y: 80.3 }
@@ -74,15 +74,15 @@ export const deviceStatusJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = 
     transform: 'number'
   },
   metadata: {
-    displayName: '设备状态数据',
-    description: '温湿度传感器实时状态信息',
+    displayName: 'Device status data',
+    description: 'Temperature and humidity sensor real-time status information',
     enabled: true,
-    tags: ['设备', '传感器', '温度', '湿度']
+    tags: ['equipment', 'sensor', 'temperature', 'humidity']
   }
 }
 
 /**
- * 统计数据JSON数据项
+ * StatisticsJSONdata item
  */
 export const statisticsJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
   type: 'json',
@@ -139,15 +139,15 @@ export const statisticsJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
     transform: 'object'
   },
   metadata: {
-    displayName: '设备统计数据',
-    description: '设备在线状态和类型统计信息',
+    displayName: 'Device Statistics',
+    description: 'Device online status and type statistics',
     enabled: true,
-    tags: ['统计', '报表', '设备管理']
+    tags: ['statistics', 'Report', 'Device management']
   }
 }
 
 /**
- * 历史数据JSON数据项
+ * historical dataJSONdata item
  */
 export const historyDataJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
   type: 'json',
@@ -210,15 +210,15 @@ export const historyDataJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
     transform: 'array'
   },
   metadata: {
-    displayName: '历史数据记录',
-    description: '温湿度传感器历史测量数据',
+    displayName: 'Historical data records',
+    description: 'Temperature and humidity sensor historical measurement data',
     enabled: true,
-    tags: ['历史数据', '时间序列', '测量记录']
+    tags: ['historical data', 'time series', 'Measurement records']
   }
 }
 
 /**
- * 配置信息JSON数据项
+ * Configuration informationJSONdata item
  */
 export const configInfoJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
   type: 'json',
@@ -274,24 +274,24 @@ export const configInfoJsonItem: DataItemConfig<EnhancedJsonDataItemConfig> = {
     transform: 'object'
   },
   metadata: {
-    displayName: '系统配置信息',
-    description: '仪表板和告警系统的配置参数',
+    displayName: 'System configuration information',
+    description: 'Configuration parameters for dashboard and alarm system',
     enabled: true,
-    tags: ['系统配置', '仪表板', '告警']
+    tags: ['System configuration', 'Dashboard', 'Alarm']
   }
 }
 
-// ==================== 完整的纯JSON配置示例 ====================
+// ==================== complete pureJSONConfiguration example ====================
 
 /**
- * 完整的纯JSON数据源配置
+ * complete pureJSONData source configuration
  */
 export const pureJsonConfigExample: EnhancedDataSourceConfiguration = {
-  // 基础配置
+  // Basic configuration
   componentId: 'dashboard_sensors_panel_001',
   version: '2.0.0',
 
-  // 数据源配置 - 全部使用JSON类型
+  // Data source configuration - Use allJSONtype
   dataSources: [
     {
       sourceId: 'device_status_source',
@@ -359,64 +359,64 @@ export const pureJsonConfigExample: EnhancedDataSourceConfiguration = {
     }
   ],
 
-  // 动态参数配置（JSON类型暂不需要动态参数，留空数组）
+  // Dynamic parameter configuration（JSONThe type does not require dynamic parameters yet，Leave array empty）
   dynamicParams: [],
 
-  // 增强功能开关（关闭HTTP相关功能）
+  // Enhanced function switch（closureHTTPRelated functions）
   enhancedFeatures: {
     ...DEFAULT_ENHANCED_FEATURES,
-    httpArrayFormat: false, // 关闭HTTP功能
-    dynamicParameterSupport: false, // JSON暂不需要动态参数
-    secureScriptExecution: false, // JSON暂不需要脚本执行
-    configurationValidation: true, // 保持配置验证
-    performanceMonitoring: true // 保持性能监控
+    httpArrayFormat: false, // closureHTTPFunction
+    dynamicParameterSupport: false, // JSONNo dynamic parameters are needed yet
+    secureScriptExecution: false, // JSONNo script execution required yet
+    configurationValidation: true, // Keep configuration verified
+    performanceMonitoring: true // Keep performance monitored
   },
 
-  // 配置元数据
+  // Configuration metadata
   metadata: {
-    name: '传感器监控面板配置',
-    description: '基于纯JSON数据源的传感器监控仪表板',
+    name: 'Sensor monitoring panel configuration',
+    description: 'Based on pureJSONSensor monitoring dashboard for data sources',
     author: 'system-admin',
     versionHistory: [
       {
         version: '1.0.0',
         timestamp: 1705225800000,
-        changelog: '初始JSON配置创建',
+        changelog: 'initialJSONConfiguration creation',
         author: 'system-admin'
       },
       {
         version: '2.0.0',
         timestamp: 1705312200000,
-        changelog: '升级到v2.0增强版配置格式',
+        changelog: 'upgrade tov2.0Enhanced configuration format',
         author: 'ConfigurationAdapter'
       }
     ],
-    tags: ['传感器', 'JSON数据', '监控面板', '设备管理']
+    tags: ['sensor', 'JSONdata', 'Monitoring panel', 'Device management']
   },
 
-  // 时间戳
+  // Timestamp
   createdAt: 1705225800000,
   updatedAt: 1705312200000
 }
 
-// ==================== 使用示例 ====================
+// ==================== Usage example ====================
 
 /**
- * 展示纯JSON配置的使用
+ * show pureJSONConfiguration usage
  */
 export function demonstratePureJsonConfig() {
-  // 1. 基础配置信息
+  // 1. Basic configuration information
 
-  // 2. 数据源详情
+  // 2. Data source details
   pureJsonConfigExample.dataSources.forEach((source, index) => {
     source.dataItems.forEach((dataItem, itemIndex) => {
       const item = dataItem.item
 
-      // 解析JSON数据预览
+      // parseJSONData preview
       const jsonConfig = item.config as EnhancedJsonDataItemConfig
       try {
         const parsedData = JSON.parse(jsonConfig.jsonData)
-        const keys = Object.keys(parsedData).slice(0, 3) // 只显示前3个键
+        const keys = Object.keys(parsedData).slice(0, 3) // Show only before3keys
         if (process.env.NODE_ENV === 'development') {
         }
       } catch (e) {
@@ -424,7 +424,7 @@ export function demonstratePureJsonConfig() {
     })
   })
 
-  // 3. 增强功能状态
+  // 3. Enhancement status
   if (process.env.NODE_ENV === 'development') {
   }
   const features = pureJsonConfigExample.enhancedFeatures

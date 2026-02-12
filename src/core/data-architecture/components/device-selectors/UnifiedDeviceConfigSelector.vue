@@ -1,16 +1,16 @@
 <!--
-  统一设备配置选择器
-  用一个表单管理所有设备相关参数的选择，避免重复参数问题
+  Unified device configuration selector
+  Use one form to manage the selection of all device-related parameters，Avoid duplicate parameter problems
 -->
 <script setup lang="ts">
 /**
- * UnifiedDeviceConfigSelector - 统一设备配置选择器
+ * UnifiedDeviceConfigSelector - Unified device configuration selector
  *
- * 设计原则：
- * - 每种参数类型只能存在一个实例（deviceId、metric等）
- * - 增量式配置：用户可以逐步添加参数，不会产生冲突
- * - 修改模式：再次选择就是修改现有配置
- * - 扩展性：未来可以轻松添加新的设备参数类型
+ * design principles：
+ * - Only one instance of each parameter type can exist（deviceId、metricwait）
+ * - incremental configuration：Users can add parameters step by step，no conflict
+ * - Modify mode：Selecting again is to modify the existing configuration.
+ * - Scalability：New device parameter types can be easily added in the future
  */
 
 import { ref, computed, watch, nextTick } from 'vue'
@@ -26,9 +26,9 @@ import type { EnhancedParameter } from '@/core/data-architecture/types/parameter
 import type { SelectOption } from 'naive-ui'
 
 interface Props {
-  /** 当前已有的参数列表（用于检测现有配置） */
+  /** Currently existing parameter list（Used to detect existing configurations） */
   existingParameters?: EnhancedParameter[]
-  /** 是否为编辑模式 */
+  /** Is it in edit mode? */
   editMode?: boolean
 }
 
@@ -41,23 +41,23 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 /**
- * 设备配置状态
+ * Device configuration status
  */
 interface DeviceConfig {
-  // 基础设备信息
+  // Basic equipment information
   selectedDevice: DeviceInfo | null
 
-  // 参数选择状态
-  includeDeviceId: boolean // 是否包含设备ID参数
-  includeMetric: boolean // 是否包含指标参数
+  // Parameter selection status
+  includeDeviceId: boolean // Whether to include equipmentIDparameter
+  includeMetric: boolean // Whether to include indicator parameters
   selectedMetric: DeviceMetric | null
 
-  // 未来扩展的参数类型
-  includeLocation: boolean // 设备位置
-  includeStatus: boolean // 设备状态
+  // Parameter types for future expansion
+  includeLocation: boolean // Device location
+  includeStatus: boolean // Device status
 }
 
-// 配置状态
+// configuration status
 const config = ref<DeviceConfig>({
   selectedDevice: null,
   includeDeviceId: false,
@@ -68,64 +68,64 @@ const config = ref<DeviceConfig>({
 })
 
 /**
- * 模拟设备数据
+ * Analog device data
  */
 const mockDevices: DeviceInfo[] = [
   {
     deviceId: 'sensor_001',
-    deviceName: '温湿度传感器-01',
-    deviceType: '环境传感器',
+    deviceName: 'Temperature and humidity sensor-01',
+    deviceType: 'environmental sensor',
     deviceModel: 'TH-2000'
   },
   {
     deviceId: 'sensor_002',
-    deviceName: '温湿度传感器-02',
-    deviceType: '环境传感器',
+    deviceName: 'Temperature and humidity sensor-02',
+    deviceType: 'environmental sensor',
     deviceModel: 'TH-2000'
   },
   {
     deviceId: 'power_001',
-    deviceName: '电能表-A区',
-    deviceType: '电力设备',
+    deviceName: 'Electric energy meter-Adistrict',
+    deviceType: 'Electrical equipment',
     deviceModel: 'PM-300'
   }
 ]
 
 /**
- * 根据设备类型获取可用指标
+ * Get available metrics based on device type
  */
 const getMetricsByDeviceType = (deviceType: string): DeviceMetric[] => {
   const metricMap: Record<string, DeviceMetric[]> = {
-    环境传感器: [
+    'environmental sensor': [
       {
         metricKey: 'temperature',
-        metricLabel: '温度',
+        metricLabel: 'temperature',
         metricType: 'number',
         unit: '°C',
-        description: '环境温度值'
+        description: 'ambient temperature value'
       },
       {
         metricKey: 'humidity',
-        metricLabel: '湿度',
+        metricLabel: 'humidity',
         metricType: 'number',
         unit: '%RH',
-        description: '环境湿度值'
+        description: 'ambient humidity value'
       }
     ],
-    电力设备: [
+    'Electrical equipment': [
       {
         metricKey: 'voltage',
-        metricLabel: '电压',
+        metricLabel: 'Voltage',
         metricType: 'number',
         unit: 'V',
-        description: '电压值'
+        description: 'Voltage value'
       },
       {
         metricKey: 'power',
-        metricLabel: '功率',
+        metricLabel: 'power',
         metricType: 'number',
         unit: 'W',
-        description: '功率值'
+        description: 'Power value'
       }
     ]
   }
@@ -133,7 +133,7 @@ const getMetricsByDeviceType = (deviceType: string): DeviceMetric[] => {
   return metricMap[deviceType] || []
 }
 
-// 设备选项
+// Device options
 const deviceOptions = computed<SelectOption[]>(() => {
   return mockDevices.map(device => ({
     label: `${device.deviceName} (${device.deviceType})`,
@@ -142,7 +142,7 @@ const deviceOptions = computed<SelectOption[]>(() => {
   }))
 })
 
-// 可用指标选项
+// Available indicator options
 const availableMetrics = computed<DeviceMetric[]>(() => {
   if (!config.value.selectedDevice) return []
   return getMetricsByDeviceType(config.value.selectedDevice.deviceType)
@@ -156,7 +156,7 @@ const metricOptions = computed<SelectOption[]>(() => {
   }))
 })
 
-// 预览生成的参数
+// Preview generated parameters
 const previewParameters = computed(() => {
   const parameters: Array<{ key: string; value: string; type: string }> = []
 
@@ -164,7 +164,7 @@ const previewParameters = computed(() => {
     parameters.push({
       key: 'deviceId',
       value: config.value.selectedDevice.deviceId,
-      type: '设备ID'
+      type: 'equipmentID'
     })
   }
 
@@ -172,7 +172,7 @@ const previewParameters = computed(() => {
     parameters.push({
       key: 'metric',
       value: config.value.selectedMetric.metricKey,
-      type: '指标键'
+      type: 'indicator key'
     })
   }
 
@@ -180,7 +180,7 @@ const previewParameters = computed(() => {
     parameters.push({
       key: 'deviceLocation',
       value: `location_${config.value.selectedDevice.deviceId}`,
-      type: '设备位置'
+      type: 'Device location'
     })
   }
 
@@ -188,16 +188,16 @@ const previewParameters = computed(() => {
     parameters.push({
       key: 'deviceStatus',
       value: `status_${config.value.selectedDevice.deviceId}`,
-      type: '设备状态'
+      type: 'Device status'
     })
   }
 
   return parameters
 })
 
-// 是否可以生成参数
+// Is it possible to generate parameters
 const canGenerate = computed(() => {
-  // 必须选择了设备，且至少选择了一种参数类型
+  // Device must be selected，and at least one parameter type is selected
   return (
     config.value.selectedDevice !== null &&
     (config.value.includeDeviceId ||
@@ -208,16 +208,16 @@ const canGenerate = computed(() => {
 })
 
 /**
- * 监听设备变化，重置相关选择
+ * Listen for device changes，Reset related selections
  */
 watch(
   () => config.value.selectedDevice,
   (newDevice, oldDevice) => {
     if (newDevice?.deviceId !== oldDevice?.deviceId) {
-      // 设备变化时，重置指标选择
+      // When equipment changes，Reset indicator selection
       config.value.selectedMetric = null
       if (config.value.includeMetric) {
-        // 如果启用了指标选择，但没有可用指标，自动禁用
+        // If metric selection is enabled，but no metric available，Automatically disabled
         if (availableMetrics.value.length === 0) {
           config.value.includeMetric = false
         }
@@ -227,7 +227,7 @@ watch(
 )
 
 /**
- * 监听指标开关，自动处理指标选择
+ * Monitor indicator switch，Automatically handle indicator selection
  */
 watch(
   () => config.value.includeMetric,
@@ -239,7 +239,7 @@ watch(
 )
 
 /**
- * 处理设备选择
+ * Processing device selection
  */
 const handleDeviceChange = (deviceId: string) => {
   const device = mockDevices.find(d => d.deviceId === deviceId)
@@ -247,7 +247,7 @@ const handleDeviceChange = (deviceId: string) => {
 }
 
 /**
- * 处理指标选择
+ * Handling indicator selection
  */
 const handleMetricChange = (metricKey: string) => {
   const metric = availableMetrics.value.find(m => m.metricKey === metricKey)
@@ -255,12 +255,12 @@ const handleMetricChange = (metricKey: string) => {
 }
 
 /**
- * 初始化编辑模式（从现有参数中恢复配置）
+ * Initialize edit mode（Restore configuration from existing parameters）
  */
 const initEditMode = () => {
   if (!props.existingParameters) return
 
-  // 分析现有参数，恢复设备配置
+  // Analyze existing parameters，Restore device configuration
   let deviceId = ''
   let metricKey = ''
 
@@ -281,13 +281,13 @@ const initEditMode = () => {
     }
   }
 
-  // 恢复设备选择
+  // Recovery device selection
   if (deviceId) {
     const device = mockDevices.find(d => d.deviceId === deviceId)
     if (device) {
       config.value.selectedDevice = device
 
-      // 恢复指标选择
+      // Recovery indicator selection
       if (metricKey) {
         nextTick(() => {
           const metric = availableMetrics.value.find(m => m.metricKey === metricKey)
@@ -301,14 +301,14 @@ const initEditMode = () => {
 }
 
 /**
- * 生成参数
+ * Generate parameters
  */
 const generateParameters = () => {
   if (!canGenerate.value) return
 
   const parameters: EnhancedParameter[] = []
 
-  // 生成设备ID参数
+  // Generate deviceIDparameter
   if (config.value.includeDeviceId && config.value.selectedDevice) {
     parameters.push({
       key: 'deviceId',
@@ -317,7 +317,7 @@ const generateParameters = () => {
       valueMode: 'manual',
       dataType: 'string',
       _id: `param_device_id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      description: `设备ID: ${config.value.selectedDevice.deviceName}`,
+      description: `equipmentID: ${config.value.selectedDevice.deviceName}`,
       deviceContext: {
         sourceType: 'device-selection',
         selectionConfig: {
@@ -328,7 +328,7 @@ const generateParameters = () => {
     })
   }
 
-  // 生成指标参数
+  // Generate indicator parameters
   if (config.value.includeMetric && config.value.selectedMetric) {
     parameters.push({
       key: 'metric',
@@ -337,7 +337,7 @@ const generateParameters = () => {
       valueMode: 'manual',
       dataType: 'string',
       _id: `param_metric_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      description: `指标: ${config.value.selectedMetric.metricLabel}`,
+      description: `index: ${config.value.selectedMetric.metricLabel}`,
       deviceContext: {
         sourceType: 'device-selection',
         selectionConfig: {
@@ -349,7 +349,7 @@ const generateParameters = () => {
     })
   }
 
-  // 生成位置参数（未来扩展）
+  // Generate positional parameters（future expansion）
   if (config.value.includeLocation && config.value.selectedDevice) {
     parameters.push({
       key: 'deviceLocation',
@@ -358,11 +358,11 @@ const generateParameters = () => {
       valueMode: 'manual',
       dataType: 'string',
       _id: `param_location_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      description: `设备位置: ${config.value.selectedDevice.deviceName}`
+      description: `Device location: ${config.value.selectedDevice.deviceName}`
     })
   }
 
-  // 生成状态参数（未来扩展）
+  // Generate status parameters（future expansion）
   if (config.value.includeStatus && config.value.selectedDevice) {
     parameters.push({
       key: 'deviceStatus',
@@ -371,7 +371,7 @@ const generateParameters = () => {
       valueMode: 'manual',
       dataType: 'string',
       _id: `param_status_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      description: `设备状态: ${config.value.selectedDevice.deviceName}`
+      description: `Device status: ${config.value.selectedDevice.deviceName}`
     })
   }
 
@@ -379,13 +379,13 @@ const generateParameters = () => {
 }
 
 /**
- * 取消选择
+ * Deselect
  */
 const cancel = () => {
   emit('cancel')
 }
 
-// 初始化编辑模式
+// Initialize edit mode
 if (props.editMode) {
   nextTick(() => {
     initEditMode()
@@ -395,30 +395,30 @@ if (props.editMode) {
 
 <template>
   <div class="unified-device-config-selector">
-    <!-- 标题 -->
+    <!-- title -->
     <div class="selector-header">
       <n-space align="center">
         <n-icon size="20" color="#2080f0">
           <DeviceIcon />
         </n-icon>
-        <n-text strong>{{ editMode ? '修改设备配置' : '设备参数配置' }}</n-text>
+        <n-text strong>{{ editMode ? 'Modify device configuration' : 'Device parameter configuration' }}</n-text>
       </n-space>
-      <n-text depth="3" style="font-size: 12px; margin-top: 4px">选择设备和需要的参数类型，避免重复参数问题</n-text>
+      <n-text depth="3" style="font-size: 12px; margin-top: 4px">Select the device and required parameter types，Avoid duplicate parameter problems</n-text>
     </div>
 
     <n-card :bordered="false" class="config-card">
-      <!-- 设备选择 -->
+      <!-- Equipment selection -->
       <div class="config-section">
         <n-space align="center" style="margin-bottom: 12px">
           <n-icon size="16"><DeviceIcon /></n-icon>
-          <n-text strong>选择设备</n-text>
+          <n-text strong>Select device</n-text>
           <n-text type="error" style="font-size: 12px">*</n-text>
         </n-space>
 
         <n-select
           :value="config.selectedDevice?.deviceId"
           :options="deviceOptions"
-          placeholder="请选择设备..."
+          placeholder="Please select a device..."
           clearable
           filterable
           @update:value="handleDeviceChange"
@@ -427,12 +427,12 @@ if (props.editMode) {
 
       <n-divider style="margin: 20px 0" />
 
-      <!-- 参数类型选择 -->
+      <!-- Parameter type selection -->
       <div class="config-section">
-        <n-text strong style="margin-bottom: 12px; display: block">选择需要的参数类型</n-text>
+        <n-text strong style="margin-bottom: 12px; display: block">Select the required parameter type</n-text>
 
         <n-space vertical size="large">
-          <!-- 设备ID参数 -->
+          <!-- equipmentIDparameter -->
           <div class="param-type-option">
             <n-space align="center">
               <n-checkbox v-model:checked="config.includeDeviceId" :disabled="!config.selectedDevice" />
@@ -440,8 +440,8 @@ if (props.editMode) {
                 <DeviceIcon />
               </n-icon>
               <div class="param-type-info">
-                <n-text strong>设备ID参数</n-text>
-                <n-text depth="3" style="font-size: 12px; display: block">生成 deviceId 参数，用于标识具体设备</n-text>
+                <n-text strong>equipmentIDparameter</n-text>
+                <n-text depth="3" style="font-size: 12px; display: block">generate deviceId parameter，Used to identify specific equipment</n-text>
               </div>
               <n-tag v-if="config.includeDeviceId && config.selectedDevice" size="small" type="success">
                 {{ config.selectedDevice.deviceId }}
@@ -449,7 +449,7 @@ if (props.editMode) {
             </n-space>
           </div>
 
-          <!-- 指标参数 -->
+          <!-- Indicator parameters -->
           <div class="param-type-option">
             <n-space align="center">
               <n-checkbox
@@ -460,20 +460,20 @@ if (props.editMode) {
                 <MetricIcon />
               </n-icon>
               <div class="param-type-info">
-                <n-text strong>指标参数</n-text>
-                <n-text depth="3" style="font-size: 12px; display: block">生成 metric 参数，用于指定监控指标</n-text>
+                <n-text strong>Indicator parameters</n-text>
+                <n-text depth="3" style="font-size: 12px; display: block">generate metric parameter，Used to specify monitoring indicators</n-text>
               </div>
               <n-tag v-if="config.includeMetric && config.selectedMetric" size="small" type="info">
                 {{ config.selectedMetric.metricKey }}
               </n-tag>
             </n-space>
 
-            <!-- 指标选择 -->
+            <!-- Indicator selection -->
             <div v-if="config.includeMetric && config.selectedDevice" style="margin-left: 32px; margin-top: 8px">
               <n-select
                 :value="config.selectedMetric?.metricKey"
                 :options="metricOptions"
-                placeholder="选择指标..."
+                placeholder="Select indicators..."
                 size="small"
                 :disabled="availableMetrics.length === 0"
                 @update:value="handleMetricChange"
@@ -481,7 +481,7 @@ if (props.editMode) {
             </div>
           </div>
 
-          <!-- 位置参数（未来扩展） -->
+          <!-- Positional parameters（future expansion） -->
           <div class="param-type-option">
             <n-space align="center">
               <n-checkbox v-model:checked="config.includeLocation" :disabled="!config.selectedDevice" />
@@ -489,16 +489,16 @@ if (props.editMode) {
                 <LocationIcon />
               </n-icon>
               <div class="param-type-info">
-                <n-text strong>设备位置参数</n-text>
+                <n-text strong>Device location parameters</n-text>
                 <n-text depth="3" style="font-size: 12px; display: block">
-                  生成 deviceLocation 参数（未来扩展功能）
+                  generate deviceLocation parameter（Future expansion capabilities）
                 </n-text>
               </div>
-              <n-tag v-if="config.includeLocation" size="small" type="warning">敬请期待</n-tag>
+              <n-tag v-if="config.includeLocation" size="small" type="warning">Stay tuned</n-tag>
             </n-space>
           </div>
 
-          <!-- 状态参数（未来扩展） -->
+          <!-- status parameters（future expansion） -->
           <div class="param-type-option">
             <n-space align="center">
               <n-checkbox v-model:checked="config.includeStatus" :disabled="!config.selectedDevice" />
@@ -506,24 +506,24 @@ if (props.editMode) {
                 <StatusIcon />
               </n-icon>
               <div class="param-type-info">
-                <n-text strong>设备状态参数</n-text>
+                <n-text strong>Device status parameters</n-text>
                 <n-text depth="3" style="font-size: 12px; display: block">
-                  生成 deviceStatus 参数（未来扩展功能）
+                  generate deviceStatus parameter（Future expansion capabilities）
                 </n-text>
               </div>
-              <n-tag v-if="config.includeStatus" size="small" type="warning">敬请期待</n-tag>
+              <n-tag v-if="config.includeStatus" size="small" type="warning">Stay tuned</n-tag>
             </n-space>
           </div>
         </n-space>
       </div>
 
-      <!-- 参数预览 -->
+      <!-- Parameter preview -->
       <div v-if="previewParameters.length > 0" class="preview-section">
         <n-divider style="margin: 20px 0" />
 
         <n-alert type="info">
           <template #header>
-            <span>生成参数预览</span>
+            <span>Generate parameter preview</span>
           </template>
 
           <div class="param-preview">
@@ -537,12 +537,12 @@ if (props.editMode) {
       </div>
     </n-card>
 
-    <!-- 操作按钮 -->
+    <!-- Action button -->
     <div class="selector-actions">
       <n-space justify="end">
-        <n-button @click="cancel">取消</n-button>
+        <n-button @click="cancel">Cancel</n-button>
         <n-button type="primary" :disabled="!canGenerate" @click="generateParameters">
-          {{ editMode ? '更新参数' : '生成参数' }} ({{ previewParameters.length }})
+          {{ editMode ? 'Update parameters' : 'Generate parameters' }} ({{ previewParameters.length }})
         </n-button>
       </n-space>
     </div>

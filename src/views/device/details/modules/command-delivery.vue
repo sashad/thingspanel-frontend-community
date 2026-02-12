@@ -7,7 +7,7 @@ defineProps<{
   id: string
 }>()
 
-// 状态
+// state
 const formatStatus = (status: string) => {
   const statusjson = {
     '1': $t('generate.sendingSuccess'),

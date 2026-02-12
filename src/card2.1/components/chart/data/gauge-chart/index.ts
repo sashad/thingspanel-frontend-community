@@ -1,5 +1,5 @@
 /**
- * 仪表盘图表组件导出
+ * Dashboard chart component export
  */
 
 export { default } from './definition'

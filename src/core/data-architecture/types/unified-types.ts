@@ -1,433 +1,433 @@
 /**
- * 统一类型导出入口
- * 整合data-architecture系统中所有类型定义，提供统一的导入入口
- * 解决类型重复定义和命名不统一的问题
+ * Unified type export entrance
+ * Integratedata-architectureAll type definitions in the system，Provide a unified import entrance
+ * Solve the problem of repeated type definitions and inconsistent naming
  */
 
-// ==================== 核心基础类型 ====================
+// ==================== core base types ====================
 
 /**
- * 参数值模式枚举 - 统一所有参数配置的编辑模式
+ * Parameter value pattern enumeration - Edit mode that unifies all parameter configurations
  */
 export type ValueMode = 'manual' | 'dropdown' | 'property' | 'component'
 
 /**
- * 数据类型枚举 - 系统中通用的数据类型定义
+ * Data type enumeration - Common data type definitions in the system
  */
 export type DataType = 'string' | 'number' | 'boolean' | 'json'
 
 /**
- * 参数类型枚举 - HTTP参数的分类
+ * Parameter type enum - HTTPClassification of parameters
  */
 export type ParamType = 'path' | 'query' | 'header'
 
 /**
- * 地址类型枚举 - HTTP请求的地址来源类型
+ * Address type enum - HTTPRequested address source type
  */
 export type AddressType = 'internal' | 'external'
 
 /**
- * 数据源类型枚举 - 支持的数据源类型
+ * Data source type enumeration - Supported data source types
  */
 export type DataSourceType = 'static' | 'api' | 'websocket' | 'mqtt' | 'database' | 'script'
 
 /**
- * 触发器类型枚举
+ * Trigger type enum
  */
 export type TriggerType = 'timer' | 'websocket' | 'event' | 'manual'
 
 /**
- * 字段类型枚举 - 支持Card2.1的扩展类型系统
+ * Field type enum - supportCard2.1extended type system
  */
 export type FieldType = 'string' | 'number' | 'boolean' | 'any' | 'object' | 'array'
 
 /**
- * 组件类型枚举
+ * Component type enum
  */
 export type ComponentType = 'visual-editor' | 'card2.1' | 'standard'
 
-// ==================== 基础接口重导出 ====================
+// ==================== Basic interface re-export ====================
 
-// 从parameter-editor.ts导出增强参数类型
+// fromparameter-editor.tsExport enhanced parameter types
 export type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 
-// ==================== HTTP配置核心类型 ====================
+// ==================== HTTPConfigure core types ====================
 
 /**
- * HTTP参数统一接口（标准化版本）
- * 整合了enhanced-types.ts和http-config.ts中的重复定义
+ * HTTPParameter unified interface（standardized version）
+ * Integratedenhanced-types.tsandhttp-config.tsDuplicate definitions in
  */
 export interface HttpParameter {
-  /** 参数键名 */
+  /** Parameter key name */
   key: string
 
-  /** 参数值 - 示例值，类型与dataType匹配 */
+  /** Parameter value - Example value，type withdataTypematch */
   value: string | number | boolean
 
-  /** 默认值 - 当value为空或绑定失败时使用的回退值 */
+  /** default value - whenvalueFallback value used when empty or binding fails */
   defaultValue?: string | number | boolean
 
-  /** 是否启用此参数 */
+  /** Whether to enable this parameter */
   enabled: boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: DataType
 
-  /** 动态时自动生成的变量名 */
+  /** Automatically generated variable names when dynamic */
   variableName: string
 
-  /** 参数说明，建议必填 */
+  /** Parameter description，Recommended required */
   description: string
 
-  /** 参数类型：路径参数、查询参数、请求头参数 */
+  /** Parameter type：path parameters、query parameters、Request header parameters */
   paramType: ParamType
 
-  /** 参数值模式：手动输入、下拉选择、属性绑定等 */
+  /** Parameter value mode：Manual entry、drop down selection、Property binding, etc. */
   valueMode?: ValueMode
 
-  /** 选中的模板ID */
+  /** selected templateID */
   selectedTemplate?: string
 }
 
 /**
- * HTTP请求头配置（为了向后兼容保留）
- * @deprecated 建议使用统一的HttpParameter with paramType: 'header'
+ * HTTPRequest header configuration（Reserved for backward compatibility）
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'header'
  */
 export interface HttpHeader extends HttpParameter {
   paramType: 'header'
 }
 
 /**
- * HTTP查询参数配置（为了向后兼容保留）
- * @deprecated 建议使用统一的HttpParameter with paramType: 'query'
+ * HTTPQuery parameter configuration（Reserved for backward compatibility）
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'query'
  */
 export interface HttpParam extends HttpParameter {
   paramType: 'query'
 }
 
 /**
- * HTTP路径参数配置（为了向后兼容保留）
- * @deprecated 建议使用统一的HttpParameter with paramType: 'path'
+ * HTTPPath parameter configuration（Reserved for backward compatibility）
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'path'
  */
 export interface HttpPathParam extends HttpParameter {
   paramType: 'path'
-  /** 路径参数名（不带大括号），如 'device_id' */
+  /** path parameter name（without braces），like 'device_id' */
   key: string
-  /** 在URL中的占位符格式，如 '{device_id}' */
+  /** existURLplaceholder format in，like '{device_id}' */
   placeholder: string
 }
 
 /**
- * 路径参数简化配置
- * 只支持单个路径参数，直接拼接到URL后
+ * Simplified configuration of path parameters
+ * Only supports a single path parameter，directly spliced ​​toURLback
  */
 export interface PathParameter {
-  /** 参数值 - 示例值，类型与dataType匹配 */
+  /** Parameter value - Example value，type withdataTypematch */
   value: string | number | boolean
 
-  /** 默认值 - 当value为空时使用的回退值 */
+  /** default value - whenvalueFallback value to use when empty */
   defaultValue?: string | number | boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: DataType
 
-  /** 动态时自动生成的变量名 */
+  /** Automatically generated variable names when dynamic */
   variableName: string
 
-  /** 参数说明 */
+  /** Parameter description */
   description: string
 
-  /** 参数值模式：手动输入、下拉选择、属性绑定等 */
+  /** Parameter value mode：Manual entry、drop down selection、Property binding, etc. */
   valueMode?: ValueMode
 
-  /** 选中的模板ID */
+  /** selected templateID */
   selectedTemplate?: string
 
-  /** 参数键名（用于内部标识） */
+  /** Parameter key name（for internal identification） */
   key?: string
 
-  /** 是否启用（用于向后兼容） */
+  /** Whether to enable（for backward compatibility） */
   enabled?: boolean
 }
 
 /**
- * HTTP请求体配置
+ * HTTPRequest body configuration
  */
 export interface HttpBody {
-  /** 请求体类型 */
+  /** Request body type */
   type: 'json' | 'form' | 'text' | 'binary'
 
-  /** 请求体内容 */
+  /** Request body content */
   content: any
 
-  /** 内容类型 */
+  /** Content type */
   contentType?: string
 }
 
 /**
- * HTTP配置接口（统一标准版本）
- * 整合了多个文件中的HTTP配置定义
+ * HTTPConfigure interface（unified standard version）
+ * Integrate multiple filesHTTPConfiguration definition
  */
 export interface HttpConfig {
-  /** 基础请求URL（路径参数会拼接到此URL后） */
+  /** Basic requestURL（The path parameters will be spliced ​​hereURLback） */
   url: string
 
-  /** HTTP方法 */
+  /** HTTPmethod */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
-  /** 超时时间（毫秒） */
+  /** timeout（millisecond） */
   timeout: number
 
-  /** 地址类型：内部地址还是外部地址 */
+  /** Address type：Internal or external address */
   addressType?: AddressType
 
-  /** 选中的内部地址值（当addressType为internal时使用） */
+  /** Selected internal address value（whenaddressTypeforinternalused when） */
   selectedInternalAddress?: string
 
-  /** 是否启用传参（用于内部地址的路径参数配置） */
+  /** Whether to enable parameter passing（Path parameter configuration for internal addresses） */
   enableParams?: boolean
 
-  /** 路径参数配置数组（新格式，支持多个参数） */
+  /** Path parameter configuration array（new format，Support multiple parameters） */
   pathParams?: EnhancedParameter[]
 
-  /** 路径参数（可选，单个参数直接拼接到URL后） */
+  /** path parameters（Optional，A single parameter is spliced ​​directly toURLback） */
   pathParameter?: PathParameter
 
-  /** 查询参数配置 */
+  /** Query parameter configuration */
   params: HttpParam[]
 
-  /** 请求头配置 */
+  /** Request header configuration */
   headers: HttpHeader[]
 
-  /** 请求体（可选） */
+  /** Request body（Optional） */
   body?: string | HttpBody
 
-  /** 请求前处理脚本（可选） */
+  /** Pre-request processing script（Optional） */
   preRequestScript?: string
 
-  /** 响应后处理脚本（可选） */
+  /** Response post-processing script（Optional） */
   postResponseScript?: string
 
-  /** 重试配置 */
+  /** Retry configuration */
   retry?: {
-    /** 最大重试次数 */
+    /** Maximum number of retries */
     maxRetries: number
-    /** 重试间隔（毫秒） */
+    /** Retry interval（millisecond） */
     retryDelay: number
   }
 
-  // ========== 向后兼容字段（已弃用） ==========
-  /** @deprecated 使用简化的 pathParameter 字段替代 */
+  // ========== backward compatibility fields（Deprecated） ==========
+  /** @deprecated Use simplified pathParameter field substitution */
   pathParams_deprecated?: HttpPathParam[]
-  /** @deprecated 使用新的统一 parameters 字段替代 */
+  /** @deprecated Use the new unity parameters field substitution */
   parameters?: HttpParameter[]
 }
 
-// ==================== 数据源系统类型 ====================
+// ==================== Data source system type ====================
 
 /**
- * 组件数据需求声明 - 与Card2.1完全兼容
- * 从simple-types.ts重新导出并标准化
+ * Component Data Requirements Statement - andCard2.1Fully compatible
+ * fromsimple-types.tsRe-export and normalize
  */
 export interface ComponentDataRequirement {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件名称 */
+  /** Component name */
   componentName: string
-  /** 静态参数需求声明 - 与Card2.1 StaticParamRequirement对应 */
+  /** Static parameter requirement declaration - andCard2.1 StaticParamRequirementcorrespond */
   staticParams?: StaticParamRequirement[]
-  /** 数据源需求声明 - 与Card2.1 DataSourceRequirement对应 */
+  /** Data source requirement statement - andCard2.1 DataSourceRequirementcorrespond */
   dataSources: DataSourceRequirement[]
 }
 
 /**
- * 静态参数需求定义 - 与Card2.1完全一致
+ * Static parameter requirement definition - andCard2.1completely consistent
  */
 export interface StaticParamRequirement {
-  /** 参数唯一标识 */
+  /** Parameter unique identifier */
   key: string
-  /** 参数名称 */
+  /** Parameter name */
   name: string
-  /** 参数类型 */
+  /** Parameter type */
   type: FieldType
-  /** 参数描述 */
+  /** Parameter description */
   description: string
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
-  /** 参数验证规则 */
+  /** Parameter validation rules */
   validation?: ValidationRule
-  /** UI 渲染提示 */
+  /** UI Rendering tips */
   ui?: UIConfig
 }
 
 /**
- * 数据源需求声明 - 与Card2.1完全兼容的版本
+ * Data source requirement statement - andCard2.1Fully compatible version
  */
 export interface DataSourceRequirement {
-  /** 数据源唯一标识 - 与Card2.1 key对应 */
+  /** Data source unique identifier - andCard2.1 keycorrespond */
   key: string
-  /** 数据源名称 */
+  /** Data source name */
   name: string
-  /** 数据源描述 */
+  /** Data source description */
   description: string
-  /** 支持的数据源类型 - 与Card2.1对齐 */
+  /** Supported data source types - andCard2.1Alignment */
   supportedTypes: DataSourceType[]
-  /** 字段映射规则 - 与Card2.1 fieldMappings兼容 */
+  /** Field mapping rules - andCard2.1 fieldMappingscompatible */
   fieldMappings: Record<string, FieldMapping>
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
 
-  // ==== 向下兼容字段 - 支持原有简化格式 ====
-  /** 数据结构类型 - 向下兼容 */
+  // ==== backward compatibility fields - Support original simplified format ====
+  /** data structure type - backward compatible */
   structureType?: 'object' | 'array'
-  /** 字段需求 - 向下兼容 */
+  /** Field requirements - backward compatible */
   fields?: FieldRequirement[]
-  /** 数据源ID - 向下兼容 */
+  /** data sourceID - backward compatible */
   id?: string
 }
 
 /**
- * 字段映射规则
+ * Field mapping rules
  */
 export interface FieldMapping {
-  /** 目标字段名 */
+  /** Target field name */
   targetField: string
-  /** 字段类型 */
+  /** Field type */
   type: 'value' | 'object' | 'array'
-  /** 是否必填 */
+  /** Is it required? */
   required: boolean
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
-  /** 数据转换函数 */
+  /** data conversion function */
   transform?: string
 }
 
 /**
- * 字段需求声明 - 与Card2.1兼容的扩展版本
+ * Field requirement statement - andCard2.1Compatible extended version
  */
 export interface FieldRequirement {
-  /** 字段名 */
+  /** Field name */
   name: string
-  /** 字段类型 - 扩展支持Card2.1的类型系统 */
+  /** Field type - Extended supportCard2.1type system */
   type: FieldType
-  /** 值类型 - 用于进一步细分类型 */
+  /** value type - Used to further subdivide types */
   valueType?: 'number' | 'string' | 'boolean' | 'any'
-  /** 是否必填 */
+  /** Is it required? */
   required: boolean
-  /** 字段描述 */
+  /** Field description */
   description: string
-  /** 示例值 */
+  /** Example value */
   example?: any
-  /** 默认值 - 与Card2.1 StaticParamRequirement兼容 */
+  /** default value - andCard2.1 StaticParamRequirementcompatible */
   defaultValue?: any
-  /** 嵌套结构定义 - 支持复杂对象和数组 */
+  /** Nested structure definition - Supports complex objects and arrays */
   structure?: DataSourceRequirement
-  /** 验证规则 - 与Card2.1兼容的验证配置 */
+  /** Validation rules - andCard2.1Compatible authentication configurations */
   validation?: ValidationRule
-  /** UI渲染提示 - 支持Card2.1的UI配置 */
+  /** UIRendering tips - supportCard2.1ofUIConfiguration */
   ui?: UIConfig
 }
 
 /**
- * 验证规则统一接口
+ * Verification rules unified interface
  */
 export interface ValidationRule {
-  /** 最小值/最小长度 */
+  /** minimum value/minimum length */
   min?: number
-  /** 最大值/最大长度 */
+  /** maximum value/maximum length */
   max?: number
-  /** 正则表达式 */
+  /** regular expression */
   pattern?: string
-  /** 枚举选项 */
+  /** Enum options */
   options?: Array<{ label: string; value: any }>
 }
 
 /**
- * UI配置统一接口
+ * UIConfigure unified interface
  */
 export interface UIConfig {
-  /** UI组件类型 */
+  /** UIComponent type */
   component?: 'input' | 'select' | 'number' | 'switch' | 'textarea' | 'color' | 'slider'
-  /** 占位符文本 */
+  /** placeholder text */
   placeholder?: string
-  /** 标签文本 */
+  /** label text */
   label?: string
-  /** 分组名称 */
+  /** Group name */
   group?: string
 }
 
-// ==================== 数据源配置类型 ====================
+// ==================== Data source configuration type ====================
 
 /**
- * 简化的数据源配置 - 输出给外部系统使用
+ * Simplified data source configuration - Output to external systems for use
  */
 export interface SimpleDataSourceConfig {
-  /** 配置ID */
+  /** ConfigurationID */
   id: string
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 数据源定义列表 */
+  /** Data source definition list */
   dataSources: DataSourceDefinition[]
-  /** 触发器配置 - 复用Card2.1的优秀设计 */
+  /** Trigger configuration - ReuseCard2.1excellent design */
   triggers: TriggerConfig[]
-  /** 是否启用 */
+  /** Whether to enable */
   enabled: boolean
 }
 
 /**
- * 数据源定义
+ * Data source definition
  */
 export interface DataSourceDefinition {
-  /** 数据源ID */
+  /** data sourceID */
   id: string
-  /** 数据源类型 */
+  /** Data source type */
   type: DataSourceType
-  /** 数据源配置 */
+  /** Data source configuration */
   config: any
-  /** 字段映射 - 学习自visual-editor的映射机制 */
+  /** Field mapping - learn fromvisual-editormapping mechanism */
   fieldMapping?: { [targetField: string]: string }
 }
 
 /**
- * 触发器配置 - 复用Card2.1的触发器系统
+ * Trigger configuration - ReuseCard2.1trigger system
  */
 export interface TriggerConfig {
-  /** 触发器类型 */
+  /** Trigger type */
   type: TriggerType
-  /** 触发器配置 */
+  /** Trigger configuration */
   config: TriggerConfigData
 }
 
 /**
- * 触发器配置数据
+ * Trigger configuration data
  */
 export interface TriggerConfigData {
-  // 定时器配置
+  // Timer configuration
   interval?: number
   immediate?: boolean
 
-  // WebSocket配置
+  // WebSocketConfiguration
   url?: string
   protocols?: string[]
 
-  // 事件配置
+  // event configuration
   eventName?: string
   target?: EventTarget
 }
 
-// ==================== 增强版类型（从enhanced-types.ts选择性导出） ====================
+// ==================== Enhanced version type（fromenhanced-types.tsSelective export） ====================
 
-// 重新导出增强版配置的核心类型
+// Re-export core types for enhanced configuration
 export type {
-  // 组件映射系统
+  // component mapping system
   ComponentMappingConfig,
   ComponentMappingSource,
   HttpConfigMappingTarget,
@@ -437,7 +437,7 @@ export type {
   DataTransformationConfig,
   ConditionalMappingConfig,
 
-  // 占位符系统
+  // placeholder system
   PlaceholderConfig,
   PlaceholderValidationRule,
   PlaceholderDependencyAnalysis,
@@ -447,91 +447,91 @@ export type {
   PlaceholderValidationError,
   PlaceholderValidationWarning,
 
-  // 增强配置系统
+  // Enhanced configuration system
   EnhancedDataSourceConfiguration,
   EnhancedFeatureFlags,
   ConfigurationMetadata,
   ConfigurationVersion,
 
-  // 配置管理器扩展
+  // Configuration Manager Extension
   EnhancedConfigurationManager,
   CircularDependencyResult
 } from './enhanced-types'
 
-// ==================== 执行结果和数据类型 ====================
+// ==================== Execution results and data types ====================
 
 /**
- * 组件最终接收的数据格式
+ * The final data format received by the component
  */
 export interface ComponentData {
   [dataSourceId: string]: {
-    /** 数据源类型 */
+    /** Data source type */
     type: string
-    /** 解析后的数据 */
+    /** parsed data */
     data: any
-    /** 最后更新时间 */
+    /** Last updated */
     lastUpdated?: number
-    /** 元数据 */
+    /** metadata */
     metadata?: any
   }
 }
 
 /**
- * 标准组件Props - 新组件使用的接口
+ * Standard componentsProps - The interface used by the new component
  */
 export interface StandardComponentProps {
-  /** 数据源配置 */
+  /** Data source configuration */
   dataSourceConfig?: ComponentData
 }
 
 /**
- * 数据执行结果
+ * Data execution results
  */
 export interface ExecutionResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 数据内容 */
+  /** Data content */
   data?: ComponentData
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 执行时间（毫秒） */
+  /** Execution time（millisecond） */
   executionTime: number
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
 /**
- * 配置验证结果
+ * Configuration verification results
  */
 export interface ValidationResult {
-  /** 是否有效 */
+  /** Is it valid? */
   valid: boolean
-  /** 错误信息 */
+  /** error message */
   errors: string[]
-  /** 警告信息 */
+  /** warning message */
   warnings: string[]
 }
 
 /**
- * 字段映射预览结果
+ * Field mapping preview results
  */
 export interface MappingPreviewResult {
-  /** 目标字段 */
+  /** target field */
   targetField: string
-  /** 源路径 */
+  /** source path */
   sourcePath: string
-  /** 映射后的值 */
+  /** mapped value */
   mappedValue: any
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 错误信息 */
+  /** error message */
   error?: string
 }
 
-// ==================== 兼容性类型 ====================
+// ==================== Compatibility type ====================
 
 /**
- * Visual Editor 兼容格式
+ * Visual Editor Compatible formats
  */
 export interface VisualEditorCompatibleProps {
   widgetConfiguration?: {
@@ -548,7 +548,7 @@ export interface VisualEditorCompatibleProps {
 }
 
 /**
- * Card2.1 兼容格式
+ * Card2.1 Compatible formats
  */
 export interface Card21CompatibleProps {
   rawDataSources?: {
@@ -560,10 +560,10 @@ export interface Card21CompatibleProps {
   }
 }
 
-// ==================== 工具类型和类型守卫 ====================
+// ==================== Tool types and type guards ====================
 
 /**
- * 类型守卫：检查是否为有效的HttpParameter
+ * type guard：Check if it is validHttpParameter
  */
 export function isValidHttpParameter(param: any): param is HttpParameter {
   return (
@@ -579,7 +579,7 @@ export function isValidHttpParameter(param: any): param is HttpParameter {
 }
 
 /**
- * 类型守卫：检查是否为有效的PathParameter
+ * type guard：Check if it is validPathParameter
  */
 export function isValidPathParameter(param: any): param is PathParameter {
   return (
@@ -592,7 +592,7 @@ export function isValidPathParameter(param: any): param is PathParameter {
 }
 
 /**
- * 类型守卫：检查是否为有效的HttpConfig
+ * type guard：Check if it is validHttpConfig
  */
 export function isValidHttpConfig(config: any): config is HttpConfig {
   return (
@@ -606,7 +606,7 @@ export function isValidHttpConfig(config: any): config is HttpConfig {
 }
 
 /**
- * 类型守卫：检查是否为有效的ComponentDataRequirement
+ * type guard：Check if it is validComponentDataRequirement
  */
 export function isValidComponentDataRequirement(requirement: any): requirement is ComponentDataRequirement {
   return (
@@ -617,43 +617,43 @@ export function isValidComponentDataRequirement(requirement: any): requirement i
   )
 }
 
-// ==================== 常量定义 ====================
+// ==================== constant definition ====================
 
 /**
- * 系统常量
+ * System constants
  */
 export const DATA_ARCHITECTURE_CONSTANTS = {
-  /** 最大数据源数量 */
+  /** Maximum number of data sources */
   MAX_DATA_SOURCES: 5,
 
-  /** 默认触发器间隔 */
+  /** Default trigger interval */
   DEFAULT_TRIGGER_INTERVAL: 30000,
 
-  /** 默认HTTP超时时间 */
+  /** defaultHTTPtimeout */
   DEFAULT_HTTP_TIMEOUT: 10000,
 
-  /** 配置版本 */
+  /** Configuration version */
   CONFIG_VERSION: '2.1.0',
 
-  /** 支持的数据类型 */
+  /** Supported data types */
   SUPPORTED_DATA_TYPES: ['string', 'number', 'boolean', 'json'] as const,
 
-  /** 支持的参数类型 */
+  /** Supported parameter types */
   SUPPORTED_PARAM_TYPES: ['path', 'query', 'header'] as const,
 
-  /** 支持的值模式 */
+  /** Supported value patterns */
   SUPPORTED_VALUE_MODES: ['manual', 'dropdown', 'property', 'component'] as const,
 
-  /** 支持的数据源类型 */
+  /** Supported data source types */
   SUPPORTED_DATA_SOURCE_TYPES: ['static', 'api', 'websocket', 'mqtt', 'database', 'script'] as const
 } as const
 
 /**
- * 字段类型映射表 - Card2.1与数据源系统之间的类型映射
- * 从simple-types.ts重新导出
+ * Field type mapping table - Card2.1Type mapping to and from the data source system
+ * fromsimple-types.tsRe-export
  */
 export const FIELD_TYPE_MAPPING = {
-  // Card2.1 -> 数据源系统
+  // Card2.1 -> Data source system
   card2ToDataSource: {
     value: 'any' as FieldType,
     object: 'object' as FieldType,
@@ -662,7 +662,7 @@ export const FIELD_TYPE_MAPPING = {
     number: 'number' as FieldType,
     boolean: 'boolean' as FieldType
   },
-  // 数据源系统 -> Card2.1
+  // Data source system -> Card2.1
   dataSourceToCard2: {
     string: 'value',
     number: 'value',
@@ -673,9 +673,9 @@ export const FIELD_TYPE_MAPPING = {
   }
 } as const
 
-// ==================== 工具函数重新导出 ====================
+// ==================== Tool function re-export ====================
 
-// 从http-config.ts重新导出实用工具函数
+// fromhttp-config.tsRe-export utility functions
 export {
   convertValue,
   createDefaultPathParameter,
@@ -684,7 +684,7 @@ export {
   generateVariableName
 } from './http-config'
 
-// 从enhanced-types.ts重新导出工具类
+// fromenhanced-types.tsRe-export tool class
 export {
   DataTypeConverter,
   PlaceholderUtils,
@@ -700,10 +700,10 @@ export {
   ConfigurationVersionEnum
 } from './enhanced-types'
 
-// ==================== 默认配置导出 ====================
+// ==================== Default configuration export ====================
 
 /**
- * 默认HTTP配置
+ * defaultHTTPConfiguration
  */
 export const DEFAULT_HTTP_CONFIG: Partial<HttpConfig> = {
   method: 'GET',
@@ -715,7 +715,7 @@ export const DEFAULT_HTTP_CONFIG: Partial<HttpConfig> = {
 }
 
 /**
- * 默认触发器配置
+ * Default trigger configuration
  */
 export const DEFAULT_TRIGGER_CONFIG: TriggerConfig = {
   type: 'timer',

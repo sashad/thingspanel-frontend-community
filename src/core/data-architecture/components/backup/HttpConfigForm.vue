@@ -1,11 +1,11 @@
 <!--
-  HTTP接口配置表单组件
-  恢复tab布局，去掉图标，保持紧凑
+  HTTPInterface configuration form component
+  recovertablayout，remove icon，keep it compact
 -->
 <script setup lang="ts">
 /**
- * HttpConfigForm - HTTP接口配置表单
- * 恢复tab布局，去掉图标装饰
+ * HttpConfigForm - HTTPInterface configuration form
+ * recovertablayout，Remove icon decoration
  */
 
 import { ref, reactive, computed, watch, nextTick } from 'vue'
@@ -13,21 +13,21 @@ import { useI18n } from 'vue-i18n'
 import { useMessage } from 'naive-ui'
 import type { HttpHeader, HttpParam, HttpPathParam, HttpConfig, PathParameter } from '@/core/data-architecture/types/http-config'
 import { extractPathParamsFromUrl } from '@/core/data-architecture/types/http-config'
-// 导入分步配置组件
+// Import step-by-step configuration components
 import HttpConfigStep1 from '@/core/data-architecture/components/common/HttpConfigStep1.vue'
 import HttpConfigStep2 from '@/core/data-architecture/components/common/HttpConfigStep2.vue'
 import HttpConfigStep3 from '@/core/data-architecture/components/common/HttpConfigStep3.vue'
 import HttpConfigStep4 from '@/core/data-architecture/components/common/HttpConfigStep4.vue'
 
-// Props接口 - 支持v-model模式
+// Propsinterface - supportv-modelmodel
 interface Props {
-  /** v-model绑定的HTTP配置 */
+  /** v-modelboundHTTPConfiguration */
   modelValue?: Partial<HttpConfig>
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
-// Emits接口
+// Emitsinterface
 interface Emits {
   (e: 'update:modelValue', value: Props['modelValue']): void
 }
@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     url: '',
     method: 'GET',
     timeout: 10000,
-    addressType: 'external', // 默认为外部地址
+    addressType: 'external', // Defaults to external address
     selectedInternalAddress: '',
     headers: [],
     params: [],
@@ -53,26 +53,26 @@ const { t } = useI18n()
 const message = useMessage()
 
 /**
- * 当前Tab - 改用Tab切换替代步骤条
- * 'basic': 基础配置, 'headers': 请求头, 'params': 参数配置, 'scripts': 请求脚本
+ * currentTab - Use insteadTabToggle alternative step bar
+ * 'basic': Basic configuration, 'headers': Request header, 'params': Parameter configuration, 'scripts': request script
  */
 const currentTab = ref<'basic' | 'headers' | 'params' | 'scripts'>('basic')
 
 /**
- * 当前选择的内部接口信息 - 用于接口模板功能
+ * Currently selected internal interface information - Used for interface template functions
  */
 const currentApiInfo = ref(null)
 
 /**
- * 数据转换帮助函数
+ * Data conversion helper functions
  */
 const convertHttpToEnhanced = (param: any) => ({
   key: param.key || '',
   value: param.value || '',
   enabled: param.enabled !== false,
-  // 🔥 优先使用保存的 valueMode，回退到基于 isDynamic 推断
+  // 🔥 Prioritize using saved valueMode，Fallback to based on isDynamic infer
   valueMode: param.valueMode || (param.isDynamic ? 'property' : 'manual'),
-  // 🔥 优先使用保存的 selectedTemplate，回退到基于 isDynamic 推断
+  // 🔥 Prioritize using saved selectedTemplate，Fallback to based on isDynamic infer
   selectedTemplate: param.selectedTemplate || (param.isDynamic ? 'property-binding' : 'manual'),
   variableName: param.variableName || '',
   description: param.description || '',
@@ -80,7 +80,7 @@ const convertHttpToEnhanced = (param: any) => ({
 })
 
 /**
- * 本地配置状态 - 包含地址类型状态
+ * local configuration status - Contains address type status
  */
 const localConfig = reactive<HttpConfig>({
   url: '',
@@ -97,17 +97,17 @@ const localConfig = reactive<HttpConfig>({
 })
 
 /**
- * 初始化统一参数数组 - 兼容旧数据结构
+ * Initialize unified parameter array - Compatible with old data structures
  */
 function initializeParameters(config?: HttpConfig): HttpParameter[] {
   const parameters: HttpParameter[] = []
 
-  // 如果有新的parameters字段，直接使用
+  // If there are newparametersField，Use directly
   if (config?.parameters && Array.isArray(config.parameters)) {
     return [...config.parameters]
   }
 
-  // 兼容旧格式：合并 headers、params、pathParams
+  // Compatible with older formats：merge headers、params、pathParams
   if (config?.headers) {
     config.headers.forEach(header => {
       parameters.push({
@@ -145,14 +145,14 @@ function initializeParameters(config?: HttpConfig): HttpParameter[] {
 }
 
 /**
- * URL变化时自动检测路径参数
+ * URLAutomatically detect path parameters when they change
  */
 const onUrlChange = () => {
-  // 从URL中提取路径参数
+  // fromURLExtract path parameters from
   const detectedParams = extractPathParamsFromUrl(localConfig.url)
 
   if (detectedParams.length > 0) {
-    // 合并已存在的路径参数，避免重复
+    // Merge existing path parameters，avoid duplication
     const existingKeys = (localConfig.pathParams || []).map(p => p.key)
     const newParams = detectedParams.filter(p => !existingKeys.includes(p.key))
 
@@ -166,35 +166,35 @@ const onUrlChange = () => {
 }
 
 /**
- * 处理接口信息更新（从Step1传递过来）
+ * Handle interface information updates（fromStep1pass it on）
  */
 const onApiInfoUpdate = (apiInfo: any) => {
   currentApiInfo.value = apiInfo
 }
 
 /**
- * Tab切换函数
+ * Tabswitch function
  */
 const switchToTab = (tab: 'basic' | 'headers' | 'params' | 'scripts') => {
   currentTab.value = tab
 }
 
 /**
- * Tab验证 - 基础配置是否完成
+ * Tabverify - Is the basic configuration completed?
  */
 const isBasicConfigValid = computed(() => {
   return localConfig.url && localConfig.method
 })
 
 /**
- * 简化的配置更新函数 - 立即发射事件，不进行复杂转换
+ * Simplified configuration update function - fire event immediately，No complex conversions
  */
 const updateConfig = () => {
-  // 🔥 关键修复：直接发射当前localConfig，让响应式系统正常工作
+  // 🔥 critical fix：Directly emit the currentlocalConfig，Make responsive systems work
 
   const config = { ...localConfig }
 
-  // 🔥 简化转换逻辑：只进行必要的格式转换
+  // 🔥 Simplify conversion logic：Only perform necessary format conversions
   if (config.headers) {
     config.headers = config.headers.map(header => ({
       ...header,
@@ -212,14 +212,14 @@ const updateConfig = () => {
   }
 
   if (config.pathParams && config.pathParams.length > 0) {
-    // 转换pathParams
+    // ConvertpathParams
     config.pathParams = config.pathParams.map(param => ({
       ...param,
       isDynamic: param.valueMode === 'property',
       paramType: 'path' as const
     }))
 
-    // 保持向后兼容：设置pathParameter
+    // Stay backwards compatible：set uppathParameter
     const firstParam = config.pathParams[0]
     if (process.env.NODE_ENV === 'development') {
     }
@@ -230,7 +230,7 @@ const updateConfig = () => {
       dataType: firstParam.dataType,
       variableName: firstParam.variableName || '',
       description: firstParam.description || '',
-      // 🔥 关键修复：保存完整的字段，确保DataItemFetcher能正确识别
+      // 🔥 critical fix：Save complete fields，make sureDataItemFetcherCan correctly identify
       selectedTemplate: firstParam.selectedTemplate,
       defaultValue: firstParam.defaultValue,
       key: firstParam.key,
@@ -248,13 +248,13 @@ const updateConfig = () => {
 }
 
 /**
- * 防止循环更新的同步标识
+ * Synchronization flag to prevent cyclic updates
  */
 let isUpdatingFromProps = false
 let isUpdatingToParent = false
 
 /**
- * 安全的配置更新 - 防止循环更新
+ * Secure configuration updates - Prevent cyclic updates
  */
 const safeUpdateConfig = () => {
   if (isUpdatingFromProps || isUpdatingToParent) {
@@ -266,7 +266,7 @@ const safeUpdateConfig = () => {
   try {
     updateConfig()
   } finally {
-    // 延迟重置，确保更新完成
+    // delayed reset，Make sure the update is complete
     nextTick(() => {
       isUpdatingToParent = false
     })
@@ -274,12 +274,12 @@ const safeUpdateConfig = () => {
 }
 
 /**
- * 监听本地配置变化 - 使用防护机制
+ * Monitor local configuration changes - Use safeguards
  */
 watch(
   () => localConfig,
   () => {
-    // 🔥 强制重置标志，确保参数更新不被阻止
+    // 🔥 Force reset flag，Ensure parameter updates are not blocked
     if (isUpdatingFromProps) {
       nextTick(() => {
         isUpdatingFromProps = false
@@ -296,12 +296,12 @@ watch(
 )
 
 /**
- * 监听props变化同步到本地状态 - 改进防护机制
+ * monitorpropsSynchronize changes to local state - Improve protection mechanism
  */
 const syncPropsToLocal = (newValue: any) => {
   if (!newValue) return
 
-  // 🔥 改进：只在必要时阻止同步，允许正常的数据回显
+  // 🔥 improve：Block sync only when necessary，Allow normal data echo
   if (isUpdatingToParent && !isUpdatingFromProps) {
     return
   }
@@ -309,12 +309,12 @@ const syncPropsToLocal = (newValue: any) => {
   isUpdatingFromProps = true
 
   try {
-    // 🔥 关键修复：优先保留现有值，只在新值明确提供时覆盖
+    // 🔥 critical fix：Prefer existing values，Only override if new value is provided explicitly
     if (newValue.url !== undefined) localConfig.url = newValue.url
     if (newValue.method !== undefined) localConfig.method = newValue.method
     if (newValue.timeout !== undefined) localConfig.timeout = newValue.timeout
 
-    // 🔥 地址类型相关字段的完整同步，确保回显正确
+    // 🔥 Complete synchronization of address type related fields，Make sure the echo is correct
     if (newValue.addressType !== undefined) localConfig.addressType = newValue.addressType
     if (newValue.selectedInternalAddress !== undefined) {
       localConfig.selectedInternalAddress = newValue.selectedInternalAddress
@@ -326,11 +326,11 @@ const syncPropsToLocal = (newValue: any) => {
       localConfig.preRequestScript = newValue.preRequestScript
     }
 
-    // 数组数据转换
+    // Array data conversion
     localConfig.headers = newValue.headers ? newValue.headers.map(convertHttpToEnhanced) : []
     localConfig.params = newValue.params ? newValue.params.map(convertHttpToEnhanced) : []
 
-    // 路径参数处理
+    // Path parameter processing
     if (newValue.pathParams) {
       localConfig.pathParams = newValue.pathParams.map(convertHttpToEnhanced)
     } else if (newValue.pathParameter) {
@@ -349,7 +349,7 @@ const syncPropsToLocal = (newValue: any) => {
       localConfig.pathParams = []
     }
   } finally {
-    // 延迟重置，确保同步完成
+    // delayed reset，Make sure synchronization is complete
     nextTick(() => {
       isUpdatingFromProps = false
     })
@@ -361,10 +361,10 @@ watch(() => props.modelValue, syncPropsToLocal, { deep: true, immediate: true })
 
 <template>
   <div class="http-config-form">
-    <!-- Tab导航 - 替代步骤条 -->
+    <!-- Tabnavigation - alternative step bar -->
     <div class="tabs-section">
       <n-tabs v-model:value="currentTab" type="line" size="small" :animated="true" @update:value="switchToTab">
-        <n-tab-pane name="basic" tab="基础配置">
+        <n-tab-pane name="basic" tab="Basic configuration">
           <HttpConfigStep1
             :model-value="localConfig"
             :component-id="componentId"
@@ -378,7 +378,7 @@ watch(() => props.modelValue, syncPropsToLocal, { deep: true, immediate: true })
           />
         </n-tab-pane>
 
-        <n-tab-pane name="headers" tab="请求头" :disabled="!isBasicConfigValid">
+        <n-tab-pane name="headers" tab="Request header" :disabled="!isBasicConfigValid">
           <HttpConfigStep2
             :model-value="localConfig"
             :component-id="componentId"
@@ -391,29 +391,29 @@ watch(() => props.modelValue, syncPropsToLocal, { deep: true, immediate: true })
           />
         </n-tab-pane>
 
-        <n-tab-pane name="params" tab="参数配置" :disabled="!isBasicConfigValid">
+        <n-tab-pane name="params" tab="Parameter configuration" :disabled="!isBasicConfigValid">
           <HttpConfigStep3
             :model-value="localConfig"
             :component-id="componentId"
             :current-api-info="currentApiInfo"
             @update:model-value="
               value => {
-                // 🔧 强制重置循环保护标志，确保参数更新能通过
+                // 🔧 Force reset of loop protection flag，Make sure parameter updates can pass
                 if (isUpdatingFromProps) {
                   isUpdatingFromProps = false
                 }
 
-                // 🔥 强制响应式更新 - 使用直接赋值替代Object.assign
+                // 🔥 Force responsive updates - Use direct assignment insteadObject.assign
                 localConfig.params = value.params || []
 
-                // 🔥 强制刷新组件状态
+                // 🔥 Force refresh of component state
                 nextTick(() => {})
               }
             "
           />
         </n-tab-pane>
 
-        <n-tab-pane name="scripts" tab="请求脚本" :disabled="!isBasicConfigValid">
+        <n-tab-pane name="scripts" tab="request script" :disabled="!isBasicConfigValid">
           <HttpConfigStep4
             :model-value="localConfig"
             :component-id="componentId"
@@ -427,9 +427,9 @@ watch(() => props.modelValue, syncPropsToLocal, { deep: true, immediate: true })
       </n-tabs>
     </div>
 
-    <!-- 配置状态提示 -->
+    <!-- Configuration status prompt -->
     <div v-if="!isBasicConfigValid" class="config-tip">
-      <n-alert type="info" style="margin-top: 16px">📝 请先完成基础配置（URL和请求方法），然后可以配置其他选项</n-alert>
+      <n-alert type="info" style="margin-top: 16px">📝 Please complete the basic configuration first（URLand request method），You can then configure other options</n-alert>
     </div>
   </div>
 </template>
@@ -446,21 +446,21 @@ watch(() => props.modelValue, syncPropsToLocal, { deep: true, immediate: true })
 .tabs-section {
   flex: 1;
   min-height: 500px;
-  overflow: visible; /* 🔥 修复：确保下拉菜单不被外层容器裁剪 */
+  overflow: visible; /* 🔥 repair：Ensure dropdown menu is not clipped by outer container */
   position: relative;
 }
 
-/* Tab内容样式调整 */
+/* TabContent style adjustment */
 .tabs-section :deep(.n-tab-pane) {
   min-height: 450px;
   max-height: 600px;
-  overflow-y: visible; /* 🔥 修复：改为visible避免下拉菜单被裁剪 */
+  overflow-y: visible; /* 🔥 repair：Change tovisibleAvoid drop-down menus from being cropped */
   padding: 16px 0;
   position: relative;
   z-index: 1;
 }
 
-/* Tab标签样式 */
+/* Tablabel style */
 .tabs-section :deep(.n-tabs-nav) {
   margin-bottom: 16px;
 }

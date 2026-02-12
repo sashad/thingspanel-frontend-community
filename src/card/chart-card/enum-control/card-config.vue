@@ -7,7 +7,7 @@ import { $t } from '@/locales'
 
 const ctx = inject<IConfigCtx>('config-ctx')!
 
-// 配置默认按钮数据
+// Configure default button data
 const addButtonConfig = () => {
   ctx.config.btOptions = [
     ...ctx.config.btOptions,
@@ -18,13 +18,13 @@ const addButtonConfig = () => {
   ]
 }
 
-// 删除按钮
+// delete button
 const removeButtonConfig = (index: number) => {
   ctx.config.btOptions.splice(index, 1)
   ctx.config.btOptions = [...ctx.config.btOptions]
 }
 
-// 初始化默认的按钮配置
+// Initialize default button configuration
 onMounted(() => {
   if (!ctx.config.btOptions) {
     ctx.config.btOptions = [
@@ -40,7 +40,7 @@ onMounted(() => {
 <template>
   <div>
     <NForm :model="ctx.config">
-      <!-- 动态按钮配置 -->
+      <!-- Dynamic button configuration -->
       <div v-for="(button, index) in ctx.config.btOptions" :key="index" class="button-config">
         <div class="flex flex-row items-center gap-2">
           <span>{{ index + 1 }}</span>
@@ -53,10 +53,10 @@ onMounted(() => {
           </NButton>
         </div>
 
-        <!-- 删除按钮 -->
+        <!-- delete button -->
       </div>
 
-      <!-- 添加按钮 -->
+      <!-- Add button -->
       <NButton type="primary" @click="addButtonConfig">
         <NIcon size="20">
           <PlusOutlined />

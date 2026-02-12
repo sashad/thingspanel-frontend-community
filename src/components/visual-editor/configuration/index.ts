@@ -1,14 +1,14 @@
 /**
- * Visual Editor 配置系统入口文件
- * 导出所有配置相关的组件、类型和工具
+ * Visual Editor Configure system entry file
+ * Export all configuration related components、Types and tools
  */
 
-// 🔄 核心管理器 - 统一使用桥接系统确保数据一致性
+// 🔄 core manager - Unified use of bridging systems to ensure data consistency
 import { configurationIntegrationBridge as configurationManager } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 import { ConfigurationManager } from '@/components/visual-editor/configuration/ConfigurationManager'
 export { configurationManager, ConfigurationManager }
 
-// 类型定义
+// type definition
 export type {
   BaseConfiguration,
   ComponentConfiguration,
@@ -25,36 +25,36 @@ export type {
   ConfigurationMigrator
 } from './types'
 
-// 配置面板组件
+// Configure panel components
 export { default as ConfigurationPanel } from '@/components/visual-editor/configuration/ConfigurationPanel.vue'
 
-// 配置表单组件 - 现在从renderers/base目录导入
+// Configure form components - now fromrenderers/base目录导入
 export { default as BaseConfigForm } from '@/components/visual-editor/renderers/base/BaseConfigForm.vue'
 export { default as ComponentConfigForm } from '@/components/visual-editor/renderers/base/ComponentConfigForm.vue'
 
-// 注意：InteractionConfigForm 暂时移除，专注基础测试
+// Notice：InteractionConfigForm Temporarily remove，Focus on basic testing
 
 // Hooks
 export { useConfiguration, type UseConfigurationOptions } from '@/components/visual-editor/configuration/hooks/useConfiguration'
 
-// 工具函数
-// 🔄 工具函数 - 通过桥接系统导出，确保一致性
+// Utility function
+// 🔄 Utility function - Export via bridge system，ensure consistency
 const createDefaultConfiguration = () => configurationManager.createDefaultConfiguration()
 export { createDefaultConfiguration }
 
 /**
- * 初始化配置系统
- * 注册默认预设和迁移器
+ * Initialize configuration system
+ * Register default presets and migrators
  */
 export const initializeConfigurationSystem = () => {
-  // 注册默认预设
+  // Register default preset
   configurationManager.addPreset({
     name: 'default',
-    description: '默认配置预设',
+    description: 'Default configuration preset',
     config: {
       base: {
         showTitle: true,
-        title: '默认标题',
+        title: 'default title',
         opacity: 1,
         visible: true,
         customClassName: '',
@@ -76,11 +76,11 @@ export const initializeConfigurationSystem = () => {
 
   configurationManager.addPreset({
     name: 'minimal',
-    description: '极简风格预设',
+    description: 'Minimalist style preset',
     config: {
       base: {
         showTitle: false,
-        title: '极简组件',
+        title: 'Minimalist components',
         opacity: 1,
         visible: true,
         customClassName: 'minimal',
@@ -102,11 +102,11 @@ export const initializeConfigurationSystem = () => {
 
   configurationManager.addPreset({
     name: 'dashboard',
-    description: '仪表板风格预设',
+    description: 'Dashboard style presets',
     config: {
       base: {
         showTitle: true,
-        title: '仪表板组件',
+        title: 'Dashboard components',
         opacity: 1,
         visible: true,
         customClassName: 'dashboard-widget',
@@ -128,12 +128,12 @@ export const initializeConfigurationSystem = () => {
     isSystem: true
   })
 
-  // 注册配置迁移器（用于版本升级）
+  // Register configuration migrator（For version upgrade）
   configurationManager.registerMigrator({
     fromVersion: '0.9.0',
     toVersion: '1.0.0',
     migrate: (oldConfig: any) => {
-      // 示例：从旧版本迁移到新版本
+      // Example：Migrate from old version to new version
       return {
         base: {
           showTitle: oldConfig.showLabel || false,
@@ -164,28 +164,28 @@ export const initializeConfigurationSystem = () => {
 }
 
 /**
- * 验证配置系统是否正常工作
+ * Verify that the configuration system is working properly
  */
 export const validateConfigurationSystem = (): boolean => {
   try {
-    // 创建测试配置
+    // Create test configuration
     const testConfig = createDefaultConfiguration()
 
-    // 验证配置
+    // Verify configuration
     const validationResult = configurationManager.validateConfiguration(testConfig)
 
     if (!validationResult.valid) {
       return false
     }
 
-    // 测试导出导入
+    // Test export and import
     const testId = 'test-widget-config'
     configurationManager.setConfiguration(testId, testConfig)
 
     const exported = configurationManager.exportConfiguration(testId)
     const imported = configurationManager.importConfiguration(testId + '-copy', exported)
 
-    // 清理测试数据
+    // Clean test data
     configurationManager.removeConfiguration(testId)
     configurationManager.removeConfiguration(testId + '-copy')
 
@@ -199,7 +199,7 @@ export const validateConfigurationSystem = (): boolean => {
 }
 
 /**
- * 获取配置系统统计信息
+ * Get configuration system statistics
  */
 export const getConfigurationSystemStats = () => {
   const allConfigs = configurationManager.getAllConfigurations()
@@ -215,5 +215,5 @@ export const getConfigurationSystemStats = () => {
   }
 }
 
-// 默认导出配置管理器实例
+// Default export configuration manager instance
 export default configurationManager

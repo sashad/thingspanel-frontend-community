@@ -37,7 +37,7 @@ const userInfoData = ref({
   email: '',
   phone_num: ''
 })
-/** 初始from数据 */
+/** initialfromdata */
 const formData = ref({
   name: '',
   old_password: '',
@@ -100,7 +100,7 @@ function editName() {
   // setModalType('amend');
 }
 
-/** 取消编辑模式 */
+/** Cancel edit mode */
 function closeEdit() {
   editType.value = false
 }
@@ -108,7 +108,7 @@ function closeEdit() {
 function changeBtnType(btn: any) {
   currentIndex.value = btn
 }
-/** 更新用户信息 */
+/** Update user information */
 async function updataUserInfo() {
   if (process.env.NODE_ENV === 'development') {
   }
@@ -118,13 +118,13 @@ async function updataUserInfo() {
     window.$message?.success($t('custom.grouping_details.operationSuccess'))
   }
 }
-/** 重置密码 */
+/** reset password */
 const resetPass = async () => {
   formData.value.old_password = ''
   formData.value.passwords = ''
   formData.value.password = ''
 }
-/** 修改密码 */
+/** Change password */
 const submitPass = async () => {
   await validate()
   const data = localStorage.getItem('enableZcAndYzm') ? JSON.parse(localStorage.getItem('enableZcAndYzm')) : []
@@ -147,7 +147,7 @@ const submitPass = async () => {
 
 async function handleFinish({ event }: { event?: ProgressEvent }) {
   const response = JSON.parse((event?.target as XMLHttpRequest).response)
-  // 字符串转成对象
+  // Convert string to object
   const obj = JSON.parse(userInfoData.value.additional_info)
   obj.user_icon = response.data.path
   const info = JSON.stringify(obj)

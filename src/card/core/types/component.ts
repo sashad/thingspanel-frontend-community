@@ -1,175 +1,175 @@
 /**
- * 组件接口定义
- * 实现逻辑与视图分离的组件架构
+ * Component interface definition
+ * Component architecture that implements separation of logic and views
  */
 
 import type { RendererType, IDataNode, IComponentMeta } from './index'
 import type { IRenderContext } from './renderer'
 
-// 组件逻辑Hook接口
+// Component logicHookinterface
 export interface IComponentLogic<TProps = any, TData = any> {
-  /** Hook函数 */
+  /** Hookfunction */
   (props: TProps): {
-    /** 处理后的数据 */
+    /** processed data */
     data: TData
-    /** 加载状态 */
+    /** Loading status */
     loading: boolean
-    /** 错误信息 */
+    /** error message */
     error: Error | null
-    /** 刷新数据 */
+    /** Refresh data */
     refresh: () => void
-    /** 更新配置 */
+    /** Update configuration */
     updateConfig: (config: Partial<TProps>) => void
-    /** 其他业务逻辑方法 */
+    /** Other business logic methods */
     [key: string]: any
   }
 }
 
-// 组件视图接口
+// component view interface
 export interface IComponentView<TProps = any> {
-  /** 渲染器类型 */
+  /** Renderer type */
   rendererType: RendererType
-  /** 渲染函数 */
+  /** render function */
   render(props: TProps, context: IRenderContext): void | Promise<void>
-  /** 更新函数 */
+  /** update function */
   update?(props: TProps, context: IRenderContext): void | Promise<void>
-  /** 销毁函数 */
+  /** destroy function */
   destroy?(context: IRenderContext): void | Promise<void>
-  /** 事件处理 */
+  /** event handling */
   handleEvent?(event: Event, context: IRenderContext): void
 }
 
-// 组件定义接口
+// Component definition interface
 export interface IComponentDefinition {
-  /** 组件元数据 */
+  /** Component metadata */
   meta: IComponentMeta
-  /** 逻辑Hook */
+  /** logicHook */
   logic: IComponentLogic
-  /** 视图映射 */
+  /** view mapping */
   views: {
     [K in RendererType]?: () => Promise<IComponentView>
   }
-  /** 配置表单组件 */
+  /** Configure form components */
   configForm?: () => Promise<any>
-  /** 默认数据节点 */
+  /** Default data node */
   defaultDataNode?: Partial<IDataNode>
 }
 
-// 组件工厂接口
+// Component factory interface
 export interface IComponentFactory {
-  /** 创建组件实例 */
+  /** Create component instance */
   create(definition: IComponentDefinition, dataNode: IDataNode): Promise<IComponentInstance>
-  /** 克隆组件实例 */
+  /** Clone component instance */
   clone(instance: IComponentInstance): Promise<IComponentInstance>
-  /** 销毁组件实例 */
+  /** Destroy component instance */
   destroy(instance: IComponentInstance): Promise<void>
 }
 
-// 组件实例接口 (扩展基础接口)
+// Component instance interface (Extend basic interface)
 export interface IComponentInstance {
-  /** 实例ID */
+  /** ExampleID */
   id: string
-  /** 组件定义 */
+  /** Component definition */
   definition: IComponentDefinition
-  /** 数据节点 */
+  /** data node */
   dataNode: IDataNode
-  /** 当前渲染器类型 */
+  /** Current renderer type */
   currentRenderer?: RendererType
-  /** 逻辑Hook实例 */
+  /** logicHookExample */
   logicInstance?: any
-  /** 视图实例 */
+  /** View instance */
   viewInstance?: IComponentView
-  /** 是否已挂载 */
+  /** Has it been mounted? */
   mounted: boolean
-  /** 是否可见 */
+  /** visible or not */
   visible: boolean
 
-  /** 初始化组件 */
+  /** Initialize component */
   init(rendererType: RendererType, context: IRenderContext): Promise<void>
-  /** 渲染组件 */
+  /** render component */
   render(context: IRenderContext): Promise<void>
-  /** 更新组件 */
+  /** Update component */
   update(dataNode?: Partial<IDataNode>): Promise<void>
-  /** 切换渲染器 */
+  /** Switch renderer */
   switchRenderer(rendererType: RendererType, context: IRenderContext): Promise<void>
-  /** 显示/隐藏组件 */
+  /** show/Hidden component */
   setVisible(visible: boolean): void
-  /** 获取组件数据 */
+  /** Get component data */
   getData(): any
-  /** 设置组件数据 */
+  /** Set component data */
   setData(data: any): void
-  /** 获取组件属性 */
+  /** Get component properties */
   getProps(): any
-  /** 设置组件属性 */
+  /** Set component properties */
   setProps(props: any): void
-  /** 销毁组件 */
+  /** Destroy component */
   destroy(): Promise<void>
-  /** 导出组件状态 */
+  /** Export component state */
   exportState(): any
-  /** 导入组件状态 */
+  /** Import component status */
   importState(state: any): void
 }
 
-// 组件注册表接口
+// Component registry interface
 export interface IComponentRegistry {
-  /** 注册组件 */
+  /** Register component */
   register(definition: IComponentDefinition): void
-  /** 注销组件 */
+  /** Unregister component */
   unregister(componentId: string): void
-  /** 获取组件定义 */
+  /** Get component definition */
   getDefinition(componentId: string): IComponentDefinition | null
-  /** 获取所有组件定义 */
+  /** Get all component definitions */
   getAllDefinitions(): IComponentDefinition[]
-  /** 按类型获取组件 */
+  /** Get components by type */
   getByType(type: string): IComponentDefinition[]
-  /** 按渲染器获取组件 */
+  /** Get components by renderer */
   getByRenderer(rendererType: RendererType): IComponentDefinition[]
-  /** 检查组件是否存在 */
+  /** Check if the component exists */
   has(componentId: string): boolean
-  /** 清空注册表 */
+  /** Clear registry */
   clear(): void
 }
 
-// 组件加载器接口
+// Component loader interface
 export interface IComponentLoader {
-  /** 动态加载组件 */
+  /** Dynamically load components */
   load(componentId: string): Promise<IComponentDefinition>
-  /** 预加载组件 */
+  /** Preload components */
   preload(componentIds: string[]): Promise<void>
-  /** 卸载组件 */
+  /** Uninstall components */
   unload(componentId: string): void
-  /** 获取加载状态 */
+  /** Get loading status */
   getLoadingState(componentId: string): 'loading' | 'loaded' | 'error' | 'not-found'
-  /** 清理缓存 */
+  /** clear cache */
   clearCache(): void
 }
 
-// 组件配置接口
+// Component configuration interface
 export interface IComponentConfig {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 配置数据 */
+  /** Configuration data */
   config: Record<string, any>
-  /** 配置版本 */
+  /** Configuration version */
   version: string
-  /** 配置描述 */
+  /** Configuration description */
   description?: string
-  /** 创建时间 */
+  /** creation time */
   createdAt: number
-  /** 更新时间 */
+  /** Update time */
   updatedAt: number
 }
 
-// 组件配置管理器接口
+// Component Configuration Manager Interface
 export interface IComponentConfigManager {
-  /** 保存配置 */
+  /** Save configuration */
   save(config: IComponentConfig): Promise<void>
-  /** 加载配置 */
+  /** Load configuration */
   load(componentId: string, version?: string): Promise<IComponentConfig | null>
-  /** 删除配置 */
+  /** Delete configuration */
   delete(componentId: string, version?: string): Promise<void>
-  /** 获取配置历史 */
+  /** Get configuration history */
   getHistory(componentId: string): Promise<IComponentConfig[]>
-  /** 恢复配置 */
+  /** Restore configuration */
   restore(componentId: string, version: string): Promise<void>
 }

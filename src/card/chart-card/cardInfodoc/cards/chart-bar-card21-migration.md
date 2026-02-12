@@ -1,46 +1,46 @@
-# Chart Bar 组件 Card 2.1 迁移配置文档
+# Chart Bar components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-Chart Bar 组件是一个柱状图卡片，用于显示设备的历史数据趋势。支持多数据源、时间范围选择、数据聚合等功能，提供丰富的图表交互和配置选项。
+Chart Bar The component is a histogram card，Used to display historical data trends of the device。Support multiple data sources、Time range selection、Data aggregation and other functions，Provides rich chart interaction and configuration options。
 
-## 当前实现分析
+## Current implementation analysis
 
-### 组件配置 (index.ts)
-- **组件ID**: `chart-bar`
-- **组件类型**: `chart`
-- **标题**: `$t('card.barChart')` (柱状图)
-- **数据源**: 设备来源，支持最多9个数据源
-- **时间范围**: 支持时间范围选择 (isSupportTimeRange: true)
-- **数据聚合**: 支持数据聚合功能 (isSupportAggregate: true)
-- **默认布局**: 6x5 (最小3x3)
+### Component configuration (index.ts)
+- **componentsID**: `chart-bar`
+- **Component type**: `chart`
+- **title**: `$t('card.barChart')` (bar chart)
+- **data source**: Equipment source，Support the most9data sources
+- **time range**: 支持time range选择 (isSupportTimeRange: true)
+- **Data aggregation**: 支持Data aggregation功能 (isSupportAggregate: true)
+- **default layout**: 6x5 (smallest3x3)
 
-### 组件实现 (component.vue + modules/bar-chart.vue)
-- **图表引擎**: 基于 ECharts 实现
-- **数据获取**: 支持历史数据和当前数据获取
-- **交互功能**: 数据缩放、图例控制、工具箱
-- **主题配置**: 支持多种颜色主题配置
-- **响应式**: 自适应容器大小变化
-- **实时更新**: 支持 WebSocket 数据更新
+### Component implementation (component.vue + modules/bar-chart.vue)
+- **charting engine**: based on ECharts accomplish
+- **data acquisition**: 支持历史数据和当前data acquisition
+- **Interactive functions**: Data scaling、Legend control、toolbox
+- **Theme configuration**: 支持多种颜色Theme configuration
+- **Responsive**: Adaptive container size changes
+- **real time updates**: support WebSocket Data update
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 组件定义
+### Component definition
 ```typescript
 export const chartBarCard: CardDefinition = {
   id: 'chart-bar',
-  name: '柱状图',
+  name: 'bar chart',
   category: 'data',
-  description: '柱状图表，支持多数据源历史数据展示和趋势分析',
+  description: 'bar chart，Supports historical data display and trend analysis from multiple data sources',
   version: '2.1.0',
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     required: true,
     maxSources: 9,
     supportedMetrics: ['telemetry', 'attributes'],
-    description: '设备遥测或属性数据源',
+    description: 'Device telemetry or properties data source',
     capabilities: ['read', 'history'],
     dataTypes: ['number'],
     timeRange: {
@@ -55,7 +55,7 @@ export const chartBarCard: CardDefinition = {
     }
   },
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 6, height: 5 },
     minSize: { width: 3, height: 3 },
@@ -63,29 +63,29 @@ export const chartBarCard: CardDefinition = {
     resizable: true
   },
   
-  // 配置选项
+  // Configuration options
   configSchema: {
     name: {
       type: 'string',
-      title: '图表名称',
-      description: '图表的显示名称',
-      default: '柱状图'
+      title: 'Chart name',
+      description: 'The display name of the chart',
+      default: 'bar chart'
     },
     colorGroups: {
       type: 'object',
-      title: '颜色配置',
-      description: '图表的颜色主题配置',
+      title: 'Color configuration',
+      description: 'Chart color theme configuration',
       properties: {
         colorGroup: {
           type: 'array',
-          title: '颜色组',
+          title: 'color group',
           items: {
             type: 'object',
             properties: {
-              name: { type: 'string', title: '主题名称' },
-              top: { type: 'color', title: '顶部颜色' },
-              bottom: { type: 'color', title: '底部颜色' },
-              line: { type: 'color', title: '线条颜色' }
+              name: { type: 'string', title: 'Topic name' },
+              top: { type: 'color', title: 'top color' },
+              bottom: { type: 'color', title: 'bottom color' },
+              line: { type: 'color', title: 'line color' }
             }
           }
         }
@@ -93,28 +93,28 @@ export const chartBarCard: CardDefinition = {
     },
     chartOptions: {
       type: 'object',
-      title: '图表选项',
+      title: 'Chart options',
       properties: {
         showLegend: {
           type: 'boolean',
-          title: '显示图例',
+          title: 'Show legend',
           default: true
         },
         showDataZoom: {
           type: 'boolean',
-          title: '显示数据缩放',
+          title: 'Show data zoom',
           default: true
         },
         showToolbox: {
           type: 'boolean',
-          title: '显示工具箱',
+          title: 'Show toolbox',
           default: false
         }
       }
     }
   },
   
-  // 权限要求
+  // Permission requirements
   permissions: {
     read: true,
     history: true
@@ -122,9 +122,9 @@ export const chartBarCard: CardDefinition = {
 }
 ```
 
-### 数据源映射
+### Data source mapping
 ```typescript
-// 原始数据源结构
+// Original data source structure
 interface OriginalDataSource {
   deviceSource: Array<{
     deviceId: string;
@@ -139,7 +139,7 @@ interface OriginalDataSource {
   isSupportAggregate: boolean;
 }
 
-// Card 2.1 数据源结构
+// Card 2.1 Data source structure
 interface Card21DataSource {
   devices: Array<{
     id: string;
@@ -162,7 +162,7 @@ interface Card21DataSource {
   };
 }
 
-// 映射函数
+// mapping function
 function mapDataSource(original: OriginalDataSource): Card21DataSource {
   const deviceGroups = new Map<string, any>();
   
@@ -188,84 +188,84 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
 }
 ```
 
-### 实现要点
+### Implementation points
 
-1. **图表配置**
-   - 基于 ECharts 的柱状图实现
-   - 支持时间轴和数值轴配置
-   - 可配置图例、工具箱、数据缩放
+1. **Chart configuration**
+   - based on ECharts Histogram implementation
+   - Supports timeline and value axis configuration
+   - Configurable legend、toolbox、Data scaling
 
-2. **数据处理**
-   - 历史数据：telemetryDataHistoryList
-   - 当前数据：telemetryDataCurrentKeys
-   - 支持多设备多指标数据合并
+2. **Data processing**
+   - historical data：telemetryDataHistoryList
+   - current data：telemetryDataCurrentKeys
+   - Supports data merging of multiple devices and indicators
 
-3. **交互功能**
-   - 数据缩放：支持滑动条和内部拖拽
-   - 图例控制：显示/隐藏数据系列
-   - 时间范围选择：支持自定义时间区间
+3. **Interactive functions**
+   - Data scaling：Supports sliders and internal dragging
+   - Legend control：show/Hide data series
+   - Time range selection：Support custom time intervals
 
-4. **主题系统**
-   - 预定义颜色主题组
-   - 支持渐变色配置
-   - 自适应明暗主题
+4. **theme system**
+   - Predefined color theme groups
+   - Support gradient color configuration
+   - Adaptive light and dark themes
 
-5. **性能优化**
-   - 防抖处理数据更新
-   - 虚拟化大数据集
-   - 响应式图表重绘
+5. **Performance optimization**
+   - Anti-shake processing data update
+   - Virtualize big data sets
+   - Responsive chart redraw
 
-## 迁移检查清单
+## Migration checklist
 
-- [ ] 验证数据源映射正确性
-- [ ] 确认多数据源支持
-- [ ] 测试时间范围功能
-- [ ] 验证数据聚合功能
-- [ ] 检查图表交互功能
-- [ ] 测试主题配置
-- [ ] 验证响应式布局
-- [ ] 测试实时数据更新
-- [ ] 确认性能优化效果
+- [ ] Verify data source mapping correctness
+- [ ] Confirm multiple data source support
+- [ ] Test time range function
+- [ ] Verify data aggregation functionality
+- [ ] Check out chart interactivity
+- [ ] Test theme configuration
+- [ ] Validate responsive layout
+- [ ] Test real-time data updates
+- [ ] Confirm performance optimization effect
 
-## 迁移步骤
+## Migration steps
 
-1. **创建 Card 2.1 组件定义**
-   - 定义组件元数据和配置架构
-   - 设置数据源要求和时间范围支持
-   - 配置图表选项和主题系统
+1. **create Card 2.1 Component definition**
+   - Define component metadata and configuration schema
+   - Set data source requirements and time range support
+   - Configure chart options and theme system
 
-2. **实现数据源适配器**
-   - 创建多数据源映射函数
-   - 处理时间范围和聚合配置
-   - 适配历史数据查询接口
+2. **Implement data source adapter**
+   - Create multiple data source mapping functions
+   - Handling time ranges and aggregation configurations
+   - Adapt historical data query interface
 
-3. **迁移图表逻辑**
-   - 保持 ECharts 配置结构
-   - 适配新的数据格式
-   - 维护交互功能
+3. **Migrate chart logic**
+   - Keep ECharts Configuration structure
+   - Adapt to new data formats
+   - Maintain interactive functionality
 
-4. **更新配置表单**
-   - 适配 Card 2.1 配置架构
-   - 优化主题选择界面
-   - 添加图表选项配置
+4. **Update configuration form**
+   - adaptation Card 2.1 Configuration architecture
+   - Optimize the theme selection interface
+   - Add chart option configuration
 
-5. **性能优化**
-   - 优化大数据集渲染
-   - 改进数据更新机制
-   - 增强响应式性能
+5. **Performance optimization**
+   - Optimize rendering of large data sets
+   - Improve data update mechanism
+   - Enhance responsive performance
 
-6. **测试验证**
-   - 功能测试：图表显示、交互操作
-   - 数据测试：多数据源、时间范围、聚合
-   - 性能测试：大数据集、实时更新
-   - 兼容性测试：不同设备类型、数据格式
-   - 用户体验测试：响应式、主题切换
+6. **Test verification**
+   - Functional testing：Chart display、Interaction
+   - Data testing：Multiple data sources、time range、polymerization
+   - Performance testing：big data set、real time updates
+   - Compatibility testing：Different device types、Data format
+   - User experience testing：Responsive、theme switching
 
-## 数据处理流程
+## Data processing flow
 
-1. **数据获取**
+1. **data acquisition**
    ```typescript
-   // 历史数据查询
+   // Historical data query
    const historyData = await telemetryDataHistoryList({
      device_id: deviceId,
      keys: metricsId,
@@ -274,25 +274,25 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
      aggregate: aggregateMethod
    });
    
-   // 当前数据查询
+   // Current data query
    const currentData = await telemetryDataCurrentKeys({
      device_id: deviceId,
      keys: metricsId
    });
    ```
 
-2. **数据转换**
+2. **data conversion**
    ```typescript
-   // 转换为 ECharts 数据格式
+   // Convert to ECharts Data format
    const seriesData = historyData.map(item => [
      item.timestamp,
      item.value
    ]);
    ```
 
-3. **图表更新**
+3. **Chart updates**
    ```typescript
-   // 更新图表配置
+   // Update chart configuration
    option.value.series = [{
      name: metricsName,
      type: 'bar',
@@ -303,12 +303,12 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
    }];
    ```
 
-## 配置示例
+## Configuration example
 
 ```typescript
-// 基础配置
+// Basic configuration
 const basicConfig = {
-  name: '设备温度趋势',
+  name: 'Equipment temperature trends',
   colorGroups: {
     colorGroup: [
       {
@@ -326,24 +326,24 @@ const basicConfig = {
   }
 };
 
-// 时间范围配置
+// Time range configuration
 const timeRangeConfig = {
-  start: Date.now() - 24 * 60 * 60 * 1000, // 24小时前
+  start: Date.now() - 24 * 60 * 60 * 1000, // 24hours ago
   end: Date.now(),
   interval: '1h'
 };
 
-// 聚合配置
+// Aggregation configuration
 const aggregationConfig = {
   method: 'avg',
   interval: '5m'
 };
 ```
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture/card21-architecture.md)
-- [数据源映射指南](../guides/data-source-mapping.md)
-- [ECharts 集成指南](../guides/echarts-integration.md)
-- [图表主题配置](../guides/chart-theme-configuration.md)
-- [时间序列数据处理](../guides/time-series-data-processing.md)
+- [Card 2.1 Architecture documentation](../architecture/card21-architecture.md)
+- [Data Source Mapping Guide](../guides/data-source-mapping.md)
+- [ECharts Integration Guide](../guides/echarts-integration.md)
+- [Chart theme configuration](../guides/chart-theme-configuration.md)
+- [Time series data processing](../guides/time-series-data-processing.md)

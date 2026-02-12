@@ -36,7 +36,7 @@ const props = defineProps({
 const deviceTemplateId = ref<string>(props.deviceTemplateId)
 const objItem = reactive<any>(props.objItem)
 
-// 添加参数配置
+// Add parameter configuration
 let addParameterFrom: any = reactive({
   data_name: '',
   data_identifier: '',
@@ -64,7 +64,7 @@ const addParameterRules: any = reactive({
   }
 })
 
-// 编辑
+// edit
 const addFlag: Ref<boolean> = ref(true)
 const edit: (row: any) => void = row => {
   addParameter.value = true
@@ -72,13 +72,13 @@ const edit: (row: any) => void = row => {
   addParameterFrom = reactive({ ...row })
 }
 
-// 删除
+// delete
 const del: (id: string) => void = async id => {
   const index: number = eventsData.findIndex(item => item.id === id)
   eventsData.splice(index, 1)
 }
 
-// 表格配置
+// Table configuration
 const col: Ref<DataTableColumns<AddDeviceModel.Device>> = ref([
   {
     key: 'data_name',
@@ -127,7 +127,7 @@ const col: Ref<DataTableColumns<AddDeviceModel.Device>> = ref([
   }
 ])
 
-// 提交表单
+// Submit form
 const formRef: any = ref(null)
 const formRefs: any = ref(null)
 
@@ -139,7 +139,7 @@ let addFrom: any = reactive({
   params: ''
 })
 
-// 监听一下父组件传递过来的编辑数据
+// Listen to the editing data passed by the parent component
 watch(
   objItem,
   newVal => {
@@ -190,7 +190,7 @@ const addParams: () => void = () => {
   addParameter.value = true
 }
 
-// 确定按钮
+// OK button
 const submit: () => void = async () => {
   await formRef.value?.validate()
   addFrom.params = JSON.stringify(eventsData)
@@ -211,7 +211,7 @@ const submit: () => void = async () => {
   }
 }
 
-// 取消按钮
+// Cancel button
 const clear: () => void = () => {
   emit('update:objItem', {})
   emit('update:addAndEditModalVisible', false)
@@ -228,25 +228,25 @@ const addParameterClone: () => void = () => {
   })
 }
 
-// 添加枚举值
+// Add enumeration value
 const addEnumItem = () => {
   addParameterFrom.enum_config.push({
     value: '',
     desc: ''
   })
 }
-// 移除枚举值
+// Remove enumeration value
 const removeEnumItem = index => {
   addParameterFrom.enum_config.splice(index, 1)
 }
 
-// 新增确定参数的按钮
+// Added button to confirm parameters
 const parameterSubmit: () => void = async () => {
   await formRefs.value?.validate()
   if (addParameterFrom.param_type === 'Enum') {
     const enum_config = addParameterFrom.enum_config.filter(v => v.value && v.desc)
     if (enum_config.length < 1) {
-      window.$message?.error('请添加枚举项！')
+      window.$message?.error('Please add enumeration items！')
       return
     }
     addParameterFrom.enum_config = enum_config
@@ -255,7 +255,7 @@ const parameterSubmit: () => void = async () => {
     if (addParameterFrom.param_type === 'Enum') {
       const enum_config = addParameterFrom.enum_config.filter(v => v.value && v.desc)
       if (enum_config.length < 1) {
-        window.$message?.error('请添加枚举项！')
+        window.$message?.error('Please add enumeration items！')
         return
       }
       addParameterFrom.enum_config = enum_config

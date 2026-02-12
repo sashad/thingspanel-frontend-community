@@ -421,7 +421,7 @@ const getPlatform = computed(() => {
               {{ deviceData?.gateway_device_name || '--' }}
             </span>
           </div>
-          <!-- 在线/离线，弹窗展示详情 -->
+          <!-- online/Offline，Pop-up display details -->
           <div
             class="mr-4"
             style="display: flex; cursor: pointer; align-items: center;"
@@ -442,7 +442,7 @@ const getPlatform = computed(() => {
               {{ device_is_online === 1 ? $t('custom.device_details.online') : $t('custom.device_details.offline') }}
             </span>
 
-            <!-- 历史记录 -->
+            <!-- History -->
             <SvgIcon
               local-icon="history"
               style="margin-left: 5px;"

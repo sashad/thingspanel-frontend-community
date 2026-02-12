@@ -1,6 +1,6 @@
 <template>
   <div class="device-dispatch-selector">
-    <!-- 设备选择 -->
+    <!-- Equipment selection -->
     <div class="device-selector mb-4">
       <n-select
         v-model:value="selectedDeviceId"
@@ -19,7 +19,7 @@
       </n-select>
     </div>
 
-    <!-- 数据类型选择 -->
+    <!-- Data type selection -->
     <div class="data-type-selector mb-4">
       <n-select
         v-model:value="selectedDataType"
@@ -32,7 +32,7 @@
       />
     </div>
 
-    <!-- 指标选择 -->
+    <!-- Indicator selection -->
     <div class="metrics-selector">
       <n-select
         v-model:value="selectedMetricsId"
@@ -98,7 +98,7 @@ const props = withDefaults(defineProps<DeviceDispatchSelectorProps>(), {
 
 const emit = defineEmits<DeviceDispatchSelectorEmits>()
 
-// 响应式数据
+// Responsive data
 const selectedDeviceId = ref<string>('')
 const selectedDeviceName = ref<string>('')
 const selectedDataType = ref<string>('')
@@ -111,14 +111,14 @@ const metricsOptions = ref<MetricsOption[]>([])
 const metricsOptionsFetched = ref<boolean>(false)
 const internalDeviceOptions = ref<DeviceOption[]>([])
 
-// 数据类型选项
+// Data type options
 const dataTypeOptions: SelectOption[] = [
   { label: $t('generate.attributes'), value: 'attributes' },
   { label: $t('generate.telemetry'), value: 'telemetry' },
   { label: $t('generate.command'), value: 'command' }
 ]
 
-// 计算属性
+// Computed properties
 const deviceOptions = computed(() => {
   if (props.deviceOptions && props.deviceOptions.length > 0) {
     return props.deviceOptions
@@ -126,7 +126,7 @@ const deviceOptions = computed(() => {
   return internalDeviceOptions.value
 })
 
-// 处理指标选项，按数据源类型分组
+// Handling indicator options，Group by data source type
 const processedMetricsOptions = computed(() => {
   try {
     if (!metricsOptions.value || !Array.isArray(metricsOptions.value) || !metricsOptions.value.length) {
@@ -135,20 +135,20 @@ const processedMetricsOptions = computed(() => {
 
     const groupedOptions: SelectOption[] = []
 
-    // API返回的数据结构是 [{ data_source_type, options: [{ key, label, data_type }] }]
+    // APIThe returned data structure is [{ data_source_type, options: [{ key, label, data_type }] }]
     metricsOptions.value.forEach((group: any) => {
       if (!group || typeof group !== 'object') return
 
       const sourceType = group.data_source_type || 'default'
 
-      // 根据数据类型过滤
+      // Filter based on data type
       if (selectedDataType.value) {
         if (selectedDataType.value === 'attributes' && sourceType !== 'attributes') return
         if (selectedDataType.value === 'telemetry' && sourceType !== 'telemetry') return
         if (selectedDataType.value === 'command' && sourceType !== 'command') return
       }
 
-      // 添加分组标题
+      // Add group title
       groupedOptions.push({
         label: sourceType,
         value: `group-${sourceType}`,
@@ -156,7 +156,7 @@ const processedMetricsOptions = computed(() => {
         type: 'group'
       })
 
-      // 添加该分组下的选项
+      // Add options under this group
       if (group.options && Array.isArray(group.options)) {
         group.options.forEach((option: any) => {
           if (option && option.key) {
@@ -175,12 +175,12 @@ const processedMetricsOptions = computed(() => {
 
     return groupedOptions
   } catch (error) {
-    console.error('处理指标选项时出错:', error)
+    console.error('Error while processing indicator options:', error)
     return []
   }
 })
 
-// 监听外部数据变化
+// Monitor external data changes
 watch(
   () => props.modelValue,
   newValue => {
@@ -195,7 +195,7 @@ watch(
   { immediate: true, deep: true }
 )
 
-// 监听内部数据变化，同步到外部
+// Monitor internal data changes，Sync to external
 watch(
   [selectedDeviceId, selectedDeviceName, selectedDataType, selectedMetricsId, selectedMetricsName],
   () => {
@@ -211,11 +211,11 @@ watch(
   { deep: true }
 )
 
-// 设备选择变化
+// Equipment selection changes
 const onDeviceChange = async (deviceId: string) => {
   selectedDeviceId.value = deviceId
 
-  // 清空指标相关数据
+  // Clear indicator related data
   selectedMetricsId.value = ''
   selectedMetricsName.value = ''
   metricsOptions.value = []
@@ -230,11 +230,11 @@ const onDeviceChange = async (deviceId: string) => {
   }
 }
 
-// 数据类型变化
+// Data type changes
 const onDataTypeChange = (dataType: string) => {
   selectedDataType.value = dataType
 
-  // 清空指标相关数据
+  // Clear indicator related data
   selectedMetricsId.value = ''
   selectedMetricsName.value = ''
   metricsOptions.value = []
@@ -243,7 +243,7 @@ const onDataTypeChange = (dataType: string) => {
   emit('data-type-change', dataType)
 }
 
-// 指标下拉显示控制
+// Indicator drop-down display control
 const onMetricsDropdownShow = async (show: boolean) => {
   metricsShow.value = show
 
@@ -252,7 +252,7 @@ const onMetricsDropdownShow = async (show: boolean) => {
   }
 }
 
-// 加载指标选项
+// Load indicator options
 const loadMetricsOptions = async () => {
   if (!selectedDeviceId.value || !selectedDataType.value) return
 
@@ -260,13 +260,13 @@ const loadMetricsOptions = async () => {
     isLoadingMetrics.value = true
     const res = await deviceMetricsList(selectedDeviceId.value)
 
-    // 检查返回的数据结构
+    // Check the returned data structure
     if (res && res.data && Array.isArray(res.data)) {
-      // 根据数据类型过滤指标
+      // Filter metrics based on data type
       const allMetrics = res.data
       metricsOptions.value = allMetrics.filter(metric => {
         if (!metric || typeof metric !== 'object') return false
-        // 根据数据类型过滤，这里需要根据实际API返回的数据结构调整
+        // Filter based on data type，This needs to be based on actualAPIReturned data structure adjustment
         if (selectedDataType.value === 'attributes') {
           return metric.data_source_type === 'attributes'
         } else if (selectedDataType.value === 'telemetry') {
@@ -277,25 +277,25 @@ const loadMetricsOptions = async () => {
         return true
       })
     } else {
-      console.error('API返回数据格式异常:', res)
+      console.error('APIReturn data format exception:', res)
       metricsOptions.value = []
     }
 
     metricsOptionsFetched.value = true
   } catch (error) {
-    console.error('加载指标失败:', error)
+    console.error('Failed to load indicators:', error)
     metricsOptions.value = []
   } finally {
     isLoadingMetrics.value = false
   }
 }
 
-// 指标选择变化
+// Indicator selection changes
 const onMetricsChange = (metricsId: string) => {
   selectedMetricsId.value = metricsId
 
   if (metricsId && metricsOptions.value && Array.isArray(metricsOptions.value)) {
-    // 在新的数据结构中查找指标
+    // Find indicators in new data structures
     let foundMetrics: any = null
     for (const group of metricsOptions.value) {
       if (group && group.options && Array.isArray(group.options)) {
@@ -317,28 +317,28 @@ const onMetricsChange = (metricsId: string) => {
   }
 }
 
-// 加载设备选项
+// Load device options
 const loadDeviceOptions = async () => {
   try {
     isLoadingDevices.value = true
     const res = await deviceListForPanel({})
     internalDeviceOptions.value = res.data || []
   } catch (error) {
-    console.error('加载设备列表失败:', error)
+    console.error('Failed to load device list:', error)
     internalDeviceOptions.value = []
   } finally {
     isLoadingDevices.value = false
   }
 }
 
-// 组件挂载时自动加载设备列表
+// Automatically load the device list when the component is mounted
 onMounted(() => {
   if (!props.deviceOptions || props.deviceOptions.length === 0) {
     loadDeviceOptions()
   }
 })
 
-// 暴露方法
+// exposure method
 defineExpose({
   loadDeviceOptions,
   reset: () => {

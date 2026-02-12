@@ -5,9 +5,9 @@ import { delRolePermissions, fetchUIElementList, getRolePermissions, modifyRoleP
 import { $t } from '@/locales'
 const { proxy }: any = getCurrentInstance()
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   editData?: any | null
 }
 
@@ -30,7 +30,7 @@ function convertToTreeNodes(elements: Element[]): TreeNode[] {
   return elements.map(item => ({
     label: item.description,
     key: item.id,
-    disabled: item.element_code === 'home', // 禁止选中首页
+    disabled: item.element_code === 'home', // Disable selection of homepage
     children: item.children.length > 0 ? convertToTreeNodes(item.children) : []
   }))
 }
@@ -44,7 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'update:visible', visible: boolean): void
 
-  /** 点击协议 */
+  /** Click Agreement */
   (e: 'success'): void
 }
 
@@ -72,8 +72,8 @@ const selectedPermissions = ref<string[]>([])
 const treeOptions = ref<any>([])
 
 const initRolePermissions = async () => {
-  // 首页默认选中
-  const data = treeOptions.value.find(item => item.label === '首页')
+  // Home page selected by default
+  const data = treeOptions.value.find(item => item.label === 'front page')
   if (props.editData) {
     const permissions = await getRolePermissions(props.editData.id)
     selectedPermissions.value = [...new Set([data.key, ...permissions])]

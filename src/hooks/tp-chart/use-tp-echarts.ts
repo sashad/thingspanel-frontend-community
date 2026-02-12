@@ -50,7 +50,7 @@ export type ECOption = echarts.ComposeOption<
   | DatasetComponentOption
 >
 
-// ECharts 组件注册已移至 echarts-manager 统一管理
+// ECharts Component registration has been moved to echarts-manager Unified management
 // echarts.use([
 //   TitleComponent,
 //   LegendComponent,

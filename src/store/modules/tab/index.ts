@@ -58,7 +58,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
    * @param currentRoute Current route
    */
   function initTabStore(currentRoute: App.Global.TabRoute) {
-    // 🧹 禁用localStorage缓存，直接初始化
+    // 🧹 DisablelocalStoragecache，direct initialization
     // const storageTabs = localStg.get('globalTabs')
 
     // if (themeStore.tab.cache && storageTabs) {
@@ -255,7 +255,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
 
   /** Cache tabs */
   function cacheTabs() {
-    // 🧹 禁用localStorage缓存
+    // 🧹 DisablelocalStoragecache
     // if (!themeStore.tab.cache) return
     // localStg.set('globalTabs', tabs.value)
     return

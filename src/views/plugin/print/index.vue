@@ -5,8 +5,8 @@ import { $t } from '@/locales'
 function printTable() {
   printJS({
     printable: [
-      { name: 'soybean', wechat: 'honghuangdc', remark: '欢迎来技术交流' },
-      { name: 'soybean', wechat: 'honghuangdc', remark: '欢迎来技术交流' }
+      { name: 'soybean', wechat: 'honghuangdc', remark: 'Welcome to technical exchange' },
+      { name: 'soybean', wechat: 'honghuangdc', remark: 'Welcome to technical exchange' }
     ],
     properties: ['name', 'wechat', 'remark'],
     type: 'json'

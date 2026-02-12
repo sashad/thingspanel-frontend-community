@@ -1,6 +1,6 @@
 /**
- * 静态数据源实现
- * 支持JSON数据的解析和字段映射
+ * Static data source implementation
+ * supportJSONData parsing and field mapping
  */
 
 import { smartDeepClone } from '@/utils/deep-clone'
@@ -11,7 +11,7 @@ export interface StaticDataSourceConfig {
   name?: string
   data: any
   fieldMappings: {
-    [componentField: string]: string // 数据路径，如 'temperature' 或 'sensor.value'
+    [componentField: string]: string // data path，like 'temperature' or 'sensor.value'
   }
 }
 
@@ -20,7 +20,7 @@ export interface DataSourceValue {
 }
 
 /**
- * 静态数据源处理器
+ * Static data source processor
  */
 export class StaticDataSource {
   private config: StaticDataSourceConfig
@@ -30,35 +30,35 @@ export class StaticDataSource {
   }
 
   /**
-   * 获取数据源ID
+   * Get data sourceID
    */
   getId(): string {
     return this.config.id
   }
 
   /**
-   * 获取数据源类型
+   * Get data source type
    */
   getType(): string {
     return this.config.type
   }
 
   /**
-   * 获取原始数据
+   * Get raw data
    */
   getRawData(): any {
     return this.config.data
   }
 
   /**
-   * 获取字段映射配置
+   * Get field mapping configuration
    */
   getFieldMappings(): Record<string, string> {
     return this.config.fieldMappings
   }
 
   /**
-   * 根据映射配置提取数据
+   * Extract data based on mapping configuration
    */
   async getValue(): Promise<DataSourceValue> {
     const result: DataSourceValue = {}
@@ -76,14 +76,14 @@ export class StaticDataSource {
   }
 
   /**
-   * 根据路径提取值（支持嵌套对象）
+   * Extract value based on path（Support nested objects）
    */
   private extractValueByPath(data: any, path: string): any {
     if (!path || path === '') {
       return data
     }
 
-    // 简单的路径解析：支持 'field' 和 'field.subfield' 格式
+    // Simple path parsing：support 'field' and 'field.subfield' Format
     const pathParts = path.split('.')
     let current = data
 
@@ -103,14 +103,14 @@ export class StaticDataSource {
   }
 
   /**
-   * 更新数据源配置
+   * Update data source configuration
    */
   updateConfig(newConfig: Partial<StaticDataSourceConfig>) {
     this.config = { ...this.config, ...newConfig }
   }
 
   /**
-   * 验证数据路径是否有效
+   * Verify that the data path is valid
    */
   validatePath(path: string): boolean {
     try {
@@ -122,7 +122,7 @@ export class StaticDataSource {
   }
 
   /**
-   * 获取可用的数据路径
+   * Get available data paths
    */
   getAvailablePaths(): Array<{ path: string; type: string; value: any }> {
     const paths: Array<{ path: string; type: string; value: any }> = []
@@ -133,7 +133,7 @@ export class StaticDataSource {
   }
 
   /**
-   * 递归收集所有可用路径
+   * Recursively collect all available paths
    */
   private collectPaths(obj: any, currentPath: string, paths: Array<{ path: string; type: string; value: any }>) {
     if (obj === null || obj === undefined) {
@@ -144,14 +144,14 @@ export class StaticDataSource {
       for (const [key, value] of Object.entries(obj)) {
         const newPath = currentPath ? `${currentPath}.${key}` : key
 
-        // 添加当前路径
+        // Add current path
         paths.push({
           path: newPath,
           type: Array.isArray(value) ? 'array' : typeof value,
           value: value
         })
 
-        // 如果是对象，继续递归（限制深度避免无限递归）
+        // if it is an object，continue recursion（Limit depth to avoid infinite recursion）
         if (typeof value === 'object' && value !== null && !Array.isArray(value) && currentPath.split('.').length < 5) {
           this.collectPaths(value, newPath, paths)
         }
@@ -160,7 +160,7 @@ export class StaticDataSource {
   }
 
   /**
-   * 预览字段映射结果
+   * Preview field mapping results
    */
   previewMapping(fieldMappings: Record<string, string>): Record<string, any> {
     const preview: Record<string, any> = {}
@@ -177,17 +177,17 @@ export class StaticDataSource {
   }
 
   /**
-   * 克隆数据源
+   * Clone data source
    */
   clone(): StaticDataSource {
     return new StaticDataSource({
       ...this.config,
-      data: smartDeepClone(this.config.data) // 使用智能深拷贝
+      data: smartDeepClone(this.config.data) // Use smart deep copy
     })
   }
 
   /**
-   * 导出配置
+   * Export configuration
    */
   exportConfig(): StaticDataSourceConfig {
     return { ...this.config }
@@ -195,18 +195,18 @@ export class StaticDataSource {
 }
 
 /**
- * 静态数据源工厂
+ * Static data source factory
  */
 export class StaticDataSourceFactory {
   /**
-   * 创建静态数据源
+   * Create a static data source
    */
   static create(config: StaticDataSourceConfig): StaticDataSource {
     return new StaticDataSource(config)
   }
 
   /**
-   * 从JSON字符串创建数据源
+   * fromJSONCreate data source from string
    */
   static createFromJson(id: string, jsonString: string, fieldMappings: Record<string, string> = {}): StaticDataSource {
     try {
@@ -218,27 +218,27 @@ export class StaticDataSourceFactory {
         fieldMappings
       })
     } catch (error) {
-      throw new Error(`无效的JSON数据: ${error instanceof Error ? error.message : '解析错误'}`)
+      throw new Error(`InvalidJSONdata: ${error instanceof Error ? error.message : 'Parse error'}`)
     }
   }
 
   /**
-   * 创建示例数据源
+   * Create a sample data source
    */
   static createSample(id: string): StaticDataSource {
     return new StaticDataSource({
       id,
       type: 'static',
-      name: '示例数据源',
+      name: 'Sample data source',
       data: {
         temperature: 25.6,
         humidity: 68.2,
-        title: '温度传感器',
+        title: 'temperature sensor',
         unit: '°C',
         status: 'normal',
         sensor: {
-          name: '传感器001',
-          location: '机房A',
+          name: 'sensor001',
+          location: 'engine roomA',
           value: 42.5
         }
       },

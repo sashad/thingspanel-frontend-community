@@ -1,42 +1,42 @@
-# GridV2 列数切换问题复盘（二次分析）
+# GridV2 Review of column number switching problem（secondary analysis）
 
-目标：定位“修改列数(colNum) 产生 Bug”的新原因，并给出可执行修复建议。
+Target：position“Modify the number of columns(colNum) produce Bug”new reasons，and provide executable repair suggestions。
 
-## 现象与影响
-- 切换列数（如 12→24 或 24→36）时，布局闪动、位置短暂错乱，偶发回退到旧布局。
-- 某些场景下出现重复的布局更新事件，导致状态抖动或覆盖最新结果。
+## Phenomenon and impact
+- Switch number of columns（like 12→24 or 24→36）hour，layout flash、Temporarily confused location，Occasional fallback to old layout。
+- Repeated layout update events occur in some scenarios，Causing status thrashing or overwriting the latest results。
 
-## 根因定位
-1) 双通道重复触发布局更新（事件风暴）
-- `grid.column(newCol, 'moveScale')` 会触发 GridStack 的 `change` 事件；
-- 组件内 `handleChange()` 会 emit 一次 `layout-change/update:layout`（src/components/common/gridv2/GridV2.vue:119）；
-- `updateColumns()` 完成后又手动 emit 一次（src/components/common/gridv2/GridV2.vue:652-674）。
-- 结果：一次列数切换 → 至少两次布局提交，和上层监听（Wrapper 的 watch）相互打架，表现为闪动/回退。
+## root cause location
+1) Dual-channel repeated triggering of layout updates（event storm）
+- `grid.column(newCol, 'moveScale')` will trigger GridStack of `change` event；
+- within component `handleChange()` meeting emit once `layout-change/update:layout`（src/components/common/gridv2/GridV2.vue:119）；
+- `updateColumns()` After completion, manually emit once（src/components/common/gridv2/GridV2.vue:652-674）。
+- result：Switch the number of columns at a time → At least two layout submissions，and upper-level monitoring（Wrapper of watch）fight with each other，Appears as flashing/rollback。
 
-2) 与父层适配器的“配置变更 → 重新构造 layout”互相竞争
-- `GridLayoutPlusWrapper.vue` 在 `props.gridConfig` 变化时会用 store 数据重建 `layout`（src/components/visual-editor/renderers/gridstack/GridLayoutPlusWrapper.vue:200-216）。
-- 列数切换期间，GridV2 正在驱动布局变化、Wrapper 又按旧 store 值重建 layout，二者竞争导致短暂错乱或覆盖。
+2) with parent layer adapter“Configuration changes → Restructure layout”compete with each other
+- `GridLayoutPlusWrapper.vue` exist `props.gridConfig` Used when changing store Data reconstruction `layout`（src/components/visual-editor/renderers/gridstack/GridLayoutPlusWrapper.vue:200-216）。
+- During column number switching，GridV2 Driving layout changes、Wrapper Press the old again store value reconstruction layout，Competition between the two causes temporary confusion or coverage。
 
-3) 仍保留了无效的样式注入路径
-- 旧版 `injectColumnStyles(newCol)` 注入 `.gs-${n}` 选择器，与 GridStack `grid-stack-${n}` 机制不匹配，导致 >12 列宽度未正确计算。
+3) Invalid style injection path remains
+- Old version `injectColumnStyles(newCol)` injection `.gs-${n}` selector，and GridStack `grid-stack-${n}` Mechanism mismatch，lead to >12 Column width not calculated correctly。
 
-4) 列数策略与业务期望未对齐
-- 采用 `'moveScale'` 会按列比例缩放 `w/x`。如业务期望“保持网格单位 w 不变，只改变相对宽度”，则应使用 `'none'`；若期望“自适应填充”，才用 `'moveScale'`/`true`。
+4) Column count strategy misaligned with business expectations
+- use `'moveScale'` will be scaled by column proportions `w/x`。as business expectations“Keep grid units w constant，Only change relative width”，then should use `'none'`；If expected“Adaptive padding”，Use only `'moveScale'`/`true`。
 
-## 修复建议（最小侵入）
-- 去掉 `updateColumns()` 内的 emit，统一由 `handleChange()` 输出布局；或在列数切换期间设置 `suspendChangeEvents` 标志屏蔽一次 `handleChange()`。
-- 在 Wrapper 对 `gridConfig` 的 watch 中，特判 `colNum`：改列只更新配置，不重建 `layout` 数组（避免 remount/覆盖）。
-- 移除 `injectColumnStyles()` 及 `.gs-${n}` 相关逻辑，完全依赖 `styleInHead: true` 与 `grid-stack-${n}`。
-- 明确列数策略：
-  - 若要保持 w 单位不变：`grid.column(newCol, 'none')`；
-  - 若要随列数缩放：`'moveScale'`。与产品期望一致后再定。
+## Repair suggestions（minimally intrusive）
+- remove `updateColumns()` within emit，Unified by `handleChange()` Output layout；Or set during column number switching `suspendChangeEvents` Logo blocked once `handleChange()`。
+- exist Wrapper right `gridConfig` of watch middle，special sentence `colNum`：Change the column and only update the configuration，Don't rebuild `layout` array（avoid remount/cover）。
+- Remove `injectColumnStyles()` and `.gs-${n}` Relevant logic，completely dependent on `styleInHead: true` and `grid-stack-${n}`。
+- Clear column number strategy：
+  - to keep w Unit remains unchanged：`grid.column(newCol, 'none')`；
+  - To scale with the number of columns：`'moveScale'`。Make a decision after it is consistent with product expectations。
 
-## 实施记录
-- [x] 移除 `updateColumns()` 内的显式 emit，改由 `change` 事件统一回写。
-- [x] 替换早期 `.gs-xx` 注入为 `.grid-stack.grid-stack-${n}` 动态样式（覆盖 >12 列场景）。
-- [x] Wrapper 不再在 `gridConfig` 变化时重建布局，仅同步拖拽/缩放属性，避免列切换期间的布局覆盖。
-- [x] 间距改用 GridStack `margin` 管理，横纵向 gap 变更时重新初始化配置，取消 content padding 方案。
+## Implementation records
+- [x] Remove `updateColumns()` explicit within emit，Change to `change` Unified write-back of events。
+- [x] replace early `.gs-xx` Inject as `.grid-stack.grid-stack-${n}` Dynamic styles（cover >12 column scene）。
+- [x] Wrapper no longer here `gridConfig` Rebuild layout on change，Sync drag only/scaling properties，Avoid layout override during column switching。
+- [x] spacing instead GridStack `margin` manage，Horizontal and vertical gap Reinitialize configuration when changing，Cancel content padding plan。
 
-## 验收清单
-- 连续切列（12↔24↔36）无闪动、无回退；布局仅提交一次，日志无重复事件。
-- 改列后拖拽/缩放正常，`preventCollision` 生效；Wrapper 未重建 `layout` 导致的“瞬移”消失。
+## Acceptance Checklist
+- Continuous row cutting（12↔24↔36）No flicker、No fallback；Layout is submitted only once，No duplicate events in the log。
+- Drag and drop after changing the column/Zooming OK，`preventCollision` Take effect；Wrapper not rebuilt `layout` caused by“Teleport”disappear。

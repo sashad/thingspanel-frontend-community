@@ -1,12 +1,12 @@
 /**
- * 数据架构接口定义
- * 明确三个数据层的职责边界，为渐进式重构提供指导
+ * Data architecture interface definition
+ * Clarify the boundaries of responsibilities of the three data layers，Provide guidance for incremental refactoring
  */
 
-// 编辑器大数据管理
+// Editor big data management
 export type { IEditorDataManager, EditorData, EditorDataChangeEvent } from '@/core/data-architecture/interfaces/IEditorDataManager'
 
-// 组件配置管理
+// Component configuration management
 export type {
   IComponentConfigManager,
   WidgetConfiguration,
@@ -19,7 +19,7 @@ export type {
   ConfigValidationResult
 } from './IComponentConfigManager'
 
-// 运行时数据管理
+// Runtime data management
 export type {
   IComponentDataManager,
   ComponentDataRequirement,
@@ -30,7 +30,7 @@ export type {
   DataUpdateEvent
 } from './IComponentDataManager'
 
-// 简化数据桥接器 (新架构)
+// Simplified data bridge (new architecture)
 export { SimpleDataBridge, simpleDataBridge, createSimpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
 
 export type {
@@ -40,7 +40,7 @@ export type {
   DataUpdateCallback
 } from '../SimpleDataBridge'
 
-// 配置转换适配器
+// Configure conversion adapter
 export {
   convertToSimpleDataRequirement,
   shouldConvertConfig,
@@ -48,28 +48,28 @@ export {
   batchConvertConfigs
 } from '../ConfigToSimpleDataAdapter'
 
-// Visual Editor 桥接器
+// Visual Editor Bridge
 export { visualEditorBridge, VisualEditorBridge, getVisualEditorBridge } from '@/core/data-architecture/VisualEditorBridge'
 
 /**
- * 数据架构设计原则：
+ * Data architecture design principles：
  *
- * 1. **职责分离**：三个数据层各司其职，不互相调用
- *    - EditorDataManager：管理组件树和画布配置
- *    - ComponentConfigManager：管理组件四层配置
- *    - ComponentDataManager：管理运行时数据
+ * 1. **Segregation of duties**：Each of the three data layers performs its own duties，Do not call each other
+ *    - EditorDataManager：Manage component tree and canvas configuration
+ *    - ComponentConfigManager：Management component four-layer configuration
+ *    - ComponentDataManager：Manage runtime data
  *
- * 2. **事件驱动**：层间通过事件通信，不直接调用方法
- *    - 配置变更 → 发出事件 → 数据层监听并更新
- *    - 数据更新 → 发出事件 → UI层监听并重渲染
+ * 2. **event driven**：Communication between layers through events，Do not call method directly
+ *    - Configuration changes → emit event → The data layer listens and updates
+ *    - Data update → emit event → UILayer monitoring and re-rendering
  *
- * 3. **简单直接**：避免复杂的状态管理和依赖链
- *    - 不做轮询、连接池等重型功能
- *    - 错误容忍，不阻塞界面
- *    - 缓存策略简单明了
+ * 3. **Simple and direct**：Avoid complex state management and dependency chains
+ *    - No polling、Heavy-duty features like connection pooling
+ *    - error tolerance，Does not block the interface
+ *    - Caching strategy is simple and clear
  *
- * 4. **渐进重构**：接口先行，实现逐步替换
- *    - 先定义清晰接口
- *    - 新实现与旧系统并存
- *    - 逐步切换到新架构
+ * 4. **progressive refactoring**：Interface first，Implement gradual replacement
+ *    - Define a clear interface first
+ *    - New implementation coexists with old systems
+ *    - Gradually switch to the new architecture
  */

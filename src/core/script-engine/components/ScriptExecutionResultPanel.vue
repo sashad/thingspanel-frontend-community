@@ -1,10 +1,10 @@
 <!--
-  脚本执行结果展示面板
-  用于显示脚本执行的详细结果、日志和性能信息
+  Script execution result display panel
+  Used to display detailed results of script execution、Logs and performance information
 -->
 <template>
   <div class="execution-result-panel">
-    <!-- 执行状态头部 -->
+    <!-- Execution status header -->
     <div class="result-header">
       <n-space justify="space-between" align="center">
         <div class="result-status">
@@ -44,10 +44,10 @@
       </n-space>
     </div>
 
-    <!-- 执行结果内容 -->
+    <!-- Execution result content -->
     <div class="result-content">
       <n-tabs type="line" size="small">
-        <!-- 执行结果数据 -->
+        <!-- Execution result data -->
         <n-tab-pane name="data" :tab="t('scriptResult.resultData')">
           <div class="result-data">
             <n-scrollbar style="max-height: 300px">
@@ -56,7 +56,7 @@
           </div>
         </n-tab-pane>
 
-        <!-- 执行日志 -->
+        <!-- execution log -->
         <n-tab-pane name="logs" :tab="`${t('scriptResult.logs')} (${result.logs.length})`">
           <div class="result-logs">
             <n-scrollbar style="max-height: 200px">
@@ -80,7 +80,7 @@
           </div>
         </n-tab-pane>
 
-        <!-- 错误详情 -->
+        <!-- Error details -->
         <n-tab-pane v-if="result.error" name="error" :tab="t('scriptResult.errorDetails')">
           <div class="result-error">
             <n-alert type="error" :title="result.error.name || 'Error'" :show-icon="true">
@@ -96,7 +96,7 @@
           </div>
         </n-tab-pane>
 
-        <!-- 上下文快照 -->
+        <!-- context snapshot -->
         <n-tab-pane v-if="result.contextSnapshot" name="context" :tab="t('scriptResult.contextSnapshot')">
           <div class="result-context">
             <n-scrollbar style="max-height: 250px">
@@ -107,7 +107,7 @@
       </n-tabs>
     </div>
 
-    <!-- 性能统计 -->
+    <!-- Performance Statistics -->
     <div class="result-performance">
       <n-space justify="space-between" size="large">
         <div class="perf-item">
@@ -141,8 +141,8 @@
 
 <script setup lang="ts">
 /**
- * 脚本执行结果展示面板
- * 集成结果数据、日志、错误和性能信息的展示
+ * Script execution result display panel
+ * Integrate results data、log、Display of error and performance information
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -152,23 +152,23 @@ import { CheckmarkOutline, CloseOutline, CopyOutline, DownloadOutline } from '@v
 import type { ScriptExecutionResult } from '@/core/script-engine/types'
 
 interface Props {
-  /** 执行结果 */
+  /** Execution result */
   result: ScriptExecutionResult
 }
 
 const props = defineProps<Props>()
 
-// 国际化和主题
+// Internationalization and themes
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const message = useMessage()
 
-// 主题颜色
+// theme color
 const successColor = computed(() => themeStore.naiveTheme?.common?.successColor || '#18a058')
 const errorColor = computed(() => themeStore.naiveTheme?.common?.errorColor || '#d03050')
 
 /**
- * 格式化结果数据
+ * Format result data
  */
 function formatResultData(): string {
   try {
@@ -195,7 +195,7 @@ function formatResultData(): string {
 }
 
 /**
- * 格式化时间戳
+ * Format timestamp
  */
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp)
@@ -206,7 +206,7 @@ function formatTimestamp(timestamp: number): string {
 }
 
 /**
- * 获取结果大小
+ * Get result size
  */
 function getResultSize(): string {
   try {
@@ -226,7 +226,7 @@ function getResultSize(): string {
 }
 
 /**
- * 复制结果到剪贴板
+ * Copy results to clipboard
  */
 async function copyResult() {
   try {
@@ -239,7 +239,7 @@ async function copyResult() {
 }
 
 /**
- * 下载结果为文件
+ * Download result as file
  */
 function downloadResult() {
   try {
@@ -353,7 +353,7 @@ function downloadResult() {
   border-radius: 4px;
 }
 
-/* 日志级别颜色 */
+/* Log level color */
 .log-error .log-level {
   color: var(--error-color);
 }
@@ -397,7 +397,7 @@ function downloadResult() {
   gap: 2px;
 }
 
-/* 深色主题适配 */
+/* Dark theme adaptation */
 [data-theme='dark'] .execution-result-panel {
   background: var(--card-color);
   border-color: var(--border-color);
@@ -413,7 +413,7 @@ function downloadResult() {
   background: var(--code-color);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .result-header {
     flex-direction: column;

@@ -8,21 +8,21 @@
  */
 import { request } from '../request'
 
-/** 获取个人信息 */
+/** Obtain personal information */
 export const fetchUserInfo = async () => {
   return await request.get<Api.BaseApi.Data | any>('/board/user/info', {})
 }
-/** 修改个人基本信息 */
+/** Modify basic personal information */
 export const changeInformation = async (params: any): Promise<any> => {
   const data = await request.post<Api.BaseApi.Data>('/board/user/update', params)
   return data
 }
-/** 修改密码 */
+/** Change password */
 export const passwordModification = async (params: any): Promise<any> => {
   const data = await request.post('/board/user/update/password', params)
   return data
 }
-/** 上传文件 */
+/** Upload files */
 export const uploadFile = async (params: any): Promise<any> => {
   const data = await request.post<Api.BaseApi.Data>('/file/up', params)
   return data

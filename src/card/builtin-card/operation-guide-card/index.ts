@@ -5,24 +5,24 @@ import poster from './poster.png'
 
 export default {
   id: 'operation-guide',
-  type: 'builtin', // 修改为有效的类型 'builtin'
+  type: 'builtin', // Modify to a valid type 'builtin'
   component: defineAsyncComponent(() => import('./component.vue')),
   poster,
-  title: $t('card.operationGuide'), // 需要在语言文件中添加 'card.operationGuide'
+  title: $t('card.operationGuide'), // Need to be added to the language file 'card.operationGuide'
   preset: {
     dataSource: {
-      // 操作向导通常不需要外部数据源，但需要提供完整结构以避免类型错误
+      // Action wizards typically do not require external data sources，But the complete structure needs to be provided to avoid type errors
       origin: 'system',
       isSupportTimeRange: false,
-      dataTimeRange: '', // 添加 dataTimeRange
+      dataTimeRange: '', // Add to dataTimeRange
       isSupportAggregate: false,
-      dataAggregateRange: '', // 添加 dataAggregateRange
+      dataAggregateRange: '', // Add to dataAggregateRange
       systemSource: [],
       deviceSource: []
     },
     config: {
       guideList: [
-        // 使用 key 替代硬编码文本
+        // use key Replace hardcoded text
         {
           titleKey: 'card.operationGuideCard.guideItems.addDevice.title',
           descriptionKey: 'card.operationGuideCard.guideItems.addDevice.description',
@@ -58,8 +58,8 @@ export default {
       ]
     },
     iCardViewDefault: {
-      w: 3, // 默认宽度
-      h: 5, // 默认高度
+      w: 3, // default width
+      h: 5, // Default height
       minW: 2,
       minH: 2
     }

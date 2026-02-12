@@ -11,7 +11,7 @@ export async function fetchGetUserRoutes() {
   return data
 }
 
-/** 获取路由列表 */
+/** Get route list */
 export const fetchElementList = async (params: any = {}) => {
   const data = await request.get<Api.Route.Data>('/ui_elements', {
     params
@@ -21,18 +21,18 @@ export const fetchElementList = async (params: any = {}) => {
   return data
 }
 
-/** 添加路由 */
+/** Add route */
 export const addElement = async (params: any) => {
   const data = await request.post<Api.BaseApi.Data>('/ui_elements', params)
   return data
 }
-/** 编辑路由 */
+/** Edit route */
 export const editElement = async (params: any) => {
   const data = await request.put<Api.BaseApi.Data>('/ui_elements', params)
   return data
 }
 
-/** 删除路由 */
+/** Delete route */
 export const delElement = async (id: string) => {
   const data = await request.delete<Api.BaseApi.Data>(`/ui_elements/${id}`)
   return data

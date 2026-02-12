@@ -41,11 +41,11 @@ function newEdit() {
   list()
 }
 
-/** 表格案例处理事件 */
+/** Form case handling events */
 const editData = ref<Api.Alarm.NotificationGroupList | null>(null)
 
 function handleEditPwd(row, type) {
-  // type:edit编辑，enable停用启用
+  // type:editedit，enableDisable enable
   if (type === 'edit') {
     editData.value = row
     setModalType('edit')
@@ -89,7 +89,7 @@ interface ColumnsData {
 
 const tableData = ref<ColumnsData[]>([])
 
-/** 告警信息列表 */
+/** Alarm information list */
 async function list() {
   loading.value = true
   const innerparams = { page: pagination.page, page_size: pagination.pageSize }
@@ -134,7 +134,7 @@ async function list() {
   }
 }
 
-/** 获取通知组 */
+/** Get notification group */
 const getTableData = async () => {
   const prams = {
     page: 100,
@@ -235,13 +235,13 @@ const columns: Ref<DataTableColumns<ColumnsData>> = ref([
 
 list()
 
-/** 删除 */
+/** delete */
 function handleDeleteTable(rowId) {
   deleteId.value = rowId.id
   deleteInfo()
 }
 
-/** 编辑:启动停止 */
+/** edit:start stop */
 
 async function editInfos() {
   const { data } = await editInfo(params)
@@ -254,7 +254,7 @@ async function editInfos() {
   }
 }
 
-/** 删除告警 */
+/** Delete alarm */
 
 async function deleteInfo() {
   const { data } = await delInfo(deleteId.value)

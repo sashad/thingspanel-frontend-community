@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
-import { NList, NListItem, NThing, NAvatar, NIcon, NEllipsis, NEmpty, NButton } from 'naive-ui' // 导入 Naive UI 组件
-import { ChevronForwardOutline } from '@vicons/ionicons5' // 导入图标
+import { NList, NListItem, NThing, NAvatar, NIcon, NEllipsis, NEmpty, NButton } from 'naive-ui' // import Naive UI components
+import { ChevronForwardOutline } from '@vicons/ionicons5' // import icon
 import type { ICardData } from '@/components/panel/card'
 import { $t } from '@/locales'
 
@@ -57,7 +57,7 @@ const guideList = computed(() => {
 })
 // --- End of role logic ---
 
-// 计算属性获取颜色配置，提供默认值
+// Computed property gets color configuration，Provide default value
 const serialBgColor = computed(() => props.card?.config?.serialBgColor || '#2080f0')
 const itemHoverBgColor = computed(() => props.card?.config?.itemHoverBgColor || '#EDEDFF')
 const titleColor = computed(() => props.card?.config?.titleColor || '#333639')
@@ -65,26 +65,26 @@ const descriptionColor = computed(() => props.card?.config?.descriptionColor || 
 
 const navigateTo = (link: string) => {
   if (link && link !== '#') {
-    // window.open(link, '_blank'); // 在新标签页打开链接
-    window.location.href = link // 在当前页面导航
+    // window.open(link, '_blank'); // Open link in new tab
+    window.location.href = link // Navigate to current page
   }
 }
 </script>
 
 <template>
   <div class="guide-container h-full p-3 flex flex-col">
-    <!-- 调整 padding 和 flex 布局 -->
-    <!-- 使用 card.operationGuide 作为内部标题 -->
+    <!-- Adjustment padding and flex layout -->
+    <!-- use card.operationGuide as internal title -->
     <h3 class="internal-title mb-3 font-semibold text-lg">{{ $t('card.operationGuide') }}</h3>
 
     <NList v-if="guideList.length > 0" hoverable clickable class="flex-1 overflow-auto bg-[#00000000]">
-      <!-- 移除 bordered, 添加 flex-1 和 overflow -->
+      <!-- Remove bordered, Add to flex-1 and overflow -->
       <NListItem
         v-for="(item, index) in guideList"
         :key="index"
         class="bg-[#f2f2f2] dark:bg-[#1f2937]"
         :style="{
-          '--item-hover-bg-color': itemHoverBgColor, // 设置 CSS 变量给 hover 使用
+          '--item-hover-bg-color': itemHoverBgColor, // set up CSS variable gives hover use
           '--title-color': titleColor,
           '--description-color': descriptionColor
         }"
@@ -92,9 +92,9 @@ const navigateTo = (link: string) => {
       >
         <NThing>
           <template #avatar>
-            <!-- 使用 NAvatar 显示圆形序号 -->
+            <!-- use NAvatar Display circular serial number -->
             <NAvatar circle :color="serialBgColor">
-              <!-- 应用序号背景色 -->
+              <!-- Application serial number background color -->
               <span style="color: white">{{ index + 1 }}</span>
             </NAvatar>
           </template>
@@ -128,10 +128,10 @@ const navigateTo = (link: string) => {
 
 <style scoped>
 .internal-title {
-  /* 可以根据需要添加标题样式 */
-  color: var(--n-title-text-color); /* 使用 Naive UI 变量 */
+  /* Heading styles can be added as needed */
+  color: var(--n-title-text-color); /* use Naive UI variable */
 }
-/* 移除之前的样式，Naive UI 会处理大部分 */
+/* Remove previous styles，Naive UI will handle most */
 .guide-container :deep(.n-list-item) {
   margin-bottom: 12px;
   border-radius: 8px;
@@ -146,9 +146,9 @@ const navigateTo = (link: string) => {
   flex: 1; /* Allow NThing to grow */
 }
 
-/* 应用 hover 颜色 */
+/* application hover color */
 .guide-container :deep(.n-list-item):hover {
-  background-color: var(--item-hover-bg-color) !important; /* 使用 CSS 变量 */
+  background-color: var(--item-hover-bg-color) !important; /* use CSS variable */
 }
 /* Target the NEllipsis component specifically within the NThing header */
 .guide-container :deep(.n-thing-header .n-ellipsis) {

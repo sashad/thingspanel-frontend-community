@@ -1,39 +1,39 @@
 /**
- * Chart Bar 组件 - Card 2.0 Demo
- * 基于新架构的柱状图组件实现
+ * Chart Bar components - Card 2.0 Demo
+ * Implementation of histogram component based on new architecture
  */
 
 import type { IComponentDefinition } from '../../../core/types/component'
 import type { IDataNode } from '../../../core/types/index'
 import { dataTransform } from '../../../core/data/transform'
 
-// 导入Vue视图组件
+// importVueview component
 import BarChartView from './BarChartView.vue'
 
 /**
- * 柱状图组件逻辑Hook
+ * Bar chart component logicHook
  */
 const useBarChartLogic = () => {
   /**
-   * 处理数据
-   * @param rawData 原始数据
-   * @param config 组件配置
-   * @returns 处理后的数据
+   * Process data
+   * @param rawData raw data
+   * @param config Component configuration
+   * @returns processed data
    */
   const processData = async (rawData: IDataNode | IDataNode[], config: any) => {
     try {
-      // 统一数据格式
+      // Unified data format
       const dataNodes = Array.isArray(rawData) ? rawData : [rawData]
 
-      // 数据转换和聚合
+      // Data transformation and aggregation
       const chartData = dataNodes.map(node => {
-        // 提取数值数据
+        // Extract numerical data
         let value = node.value
         if (typeof value === 'object' && value !== null) {
-          // 如果是对象，尝试提取数值字段
+          // if it is an object，Try to extract a numeric field
           const numericFields = Object.keys(value).filter(key => typeof value[key] === 'number')
           if (numericFields.length > 0) {
-            value = value[numericFields[0]] // 取第一个数值字段
+            value = value[numericFields[0]] // Get the first numeric field
           }
         }
 
@@ -46,12 +46,12 @@ const useBarChartLogic = () => {
         }
       })
 
-      // 根据配置进行数据处理
+      // Data processing according to configuration
       if (config.aggregation?.enabled) {
         return aggregateData(chartData, config.aggregation)
       }
 
-      // 数据排序
+      // Data sorting
       if (config.sort?.enabled) {
         chartData.sort((a, b) => {
           const field = config.sort.field || 'value'
@@ -67,23 +67,23 @@ const useBarChartLogic = () => {
         })
       }
 
-      // 数据限制
+      // Data limits
       if (config.limit && config.limit > 0) {
         return chartData.slice(0, config.limit)
       }
 
       return chartData
     } catch (error) {
-      console.error('[BarChart] 数据处理失败:', error)
+      console.error('[BarChart] Data processing failed:', error)
       return []
     }
   }
 
   /**
-   * 聚合数据
-   * @param data 原始数据
-   * @param aggregationConfig 聚合配置
-   * @returns 聚合后的数据
+   * Aggregate data
+   * @param data raw data
+   * @param aggregationConfig Aggregation configuration
+   * @returns Aggregated data
    */
   const aggregateData = (data: any[], aggregationConfig: any) => {
     const { groupBy, method } = aggregationConfig
@@ -136,14 +136,14 @@ const useBarChartLogic = () => {
   }
 
   /**
-   * 组件挂载时的处理
-   * @param context 组件上下文
+   * Processing when mounting components
+   * @param context component context
    */
   const onMounted = async (context: any) => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 初始化图表配置
+    // Initialize chart configuration
     if (!context.config.chart) {
       context.updateConfig({
         ...context.config,
@@ -158,24 +158,24 @@ const useBarChartLogic = () => {
   }
 
   /**
-   * 组件卸载时的处理
-   * @param context 组件上下文
+   * Processing when components are uninstalled
+   * @param context component context
    */
   const onUnmounted = async (context: any) => {
     if (process.env.NODE_ENV === 'development') {
     }
-    // 清理资源
+    // Clean up resources
   }
 
   /**
-   * 配置变更处理
-   * @param newConfig 新配置
-   * @param oldConfig 旧配置
+   * Configuration change handling
+   * @param newConfig New configuration
+   * @param oldConfig old configuration
    */
   const onConfigChanged = async (newConfig: any, oldConfig: any) => {
     if (process.env.NODE_ENV === 'development') {
     }
-    // 处理配置变更逻辑
+    // Handle configuration change logic
   }
 
   return {
@@ -187,13 +187,13 @@ const useBarChartLogic = () => {
 }
 
 /**
- * 柱状图组件定义
+ * Bar chart component definition
  */
 export const barChartDefinition: IComponentDefinition = {
   meta: {
     id: 'chart-bar',
-    name: '柱状图',
-    description: '用于展示分类数据的柱状图组件',
+    name: 'bar chart',
+    description: 'Histogram component for displaying categorical data',
     version: '2.0.0',
     author: 'Card 2.0',
     tags: ['chart', 'bar', 'visualization'],
@@ -214,40 +214,40 @@ export const barChartDefinition: IComponentDefinition = {
       properties: {
         title: {
           type: 'string',
-          title: '图表标题',
-          default: '柱状图'
+          title: 'Chart title',
+          default: 'bar chart'
         },
         chart: {
           type: 'object',
-          title: '图表配置',
+          title: 'Chart configuration',
           properties: {
             type: {
               type: 'string',
-              title: '图表类型',
+              title: 'chart type',
               enum: ['bar', 'column'],
               default: 'bar'
             },
             theme: {
               type: 'string',
-              title: '主题',
+              title: 'theme',
               enum: ['default', 'dark', 'light'],
               default: 'default'
             },
             animation: {
               type: 'boolean',
-              title: '启用动画',
+              title: 'Enable animation',
               default: true
             },
             responsive: {
               type: 'boolean',
-              title: '响应式',
+              title: 'Responsive',
               default: true
             }
           }
         },
         colors: {
           type: 'array',
-          title: '颜色配置',
+          title: 'Color configuration',
           items: {
             type: 'string'
           },
@@ -255,22 +255,22 @@ export const barChartDefinition: IComponentDefinition = {
         },
         aggregation: {
           type: 'object',
-          title: '数据聚合',
+          title: 'Data aggregation',
           properties: {
             enabled: {
               type: 'boolean',
-              title: '启用聚合',
+              title: 'Enable aggregation',
               default: false
             },
             groupBy: {
               type: 'string',
-              title: '分组字段',
+              title: 'grouping field',
               enum: ['category', 'name', 'unit'],
               default: 'category'
             },
             method: {
               type: 'string',
-              title: '聚合方法',
+              title: 'aggregation method',
               enum: ['sum', 'avg', 'max', 'min', 'count'],
               default: 'sum'
             }
@@ -278,22 +278,22 @@ export const barChartDefinition: IComponentDefinition = {
         },
         sort: {
           type: 'object',
-          title: '排序配置',
+          title: 'Sorting configuration',
           properties: {
             enabled: {
               type: 'boolean',
-              title: '启用排序',
+              title: 'Enable sorting',
               default: true
             },
             field: {
               type: 'string',
-              title: '排序字段',
+              title: 'sort field',
               enum: ['name', 'value', 'timestamp'],
               default: 'value'
             },
             order: {
               type: 'string',
-              title: '排序顺序',
+              title: 'sort order',
               enum: ['asc', 'desc'],
               default: 'desc'
             }
@@ -301,7 +301,7 @@ export const barChartDefinition: IComponentDefinition = {
         },
         limit: {
           type: 'number',
-          title: '数据限制',
+          title: 'Data limits',
           minimum: 0,
           maximum: 100,
           default: 10
@@ -310,7 +310,7 @@ export const barChartDefinition: IComponentDefinition = {
     },
 
     defaultConfig: {
-      title: '柱状图',
+      title: 'bar chart',
       chart: {
         type: 'bar',
         theme: 'default',
@@ -357,5 +357,5 @@ export const barChartDefinition: IComponentDefinition = {
   }
 }
 
-// 默认导出
+// Default export
 export default barChartDefinition

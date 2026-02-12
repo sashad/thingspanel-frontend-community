@@ -1,9 +1,9 @@
 /**
- * 多层级执行器链导出索引
- * 4层数据处理管道的统一导出入口
+ * Multi-level executor chain export index
+ * 4Unified export portal for layer data processing pipelines
  */
 
-// 第一层：数据项获取器
+// first floor：Data item getter
 export {
   DataItemFetcher,
   type IDataItemFetcher,
@@ -14,13 +14,13 @@ export {
   type ScriptDataItemConfig
 } from './DataItemFetcher'
 
-// 第二层：数据项处理器
+// second floor：data item handler
 export { DataItemProcessor, type IDataItemProcessor, type ProcessingConfig } from '@/core/data-architecture/executors/DataItemProcessor'
 
-// 第三层：数据源合并器
+// third floor：data source combiner
 export { DataSourceMerger, type IDataSourceMerger, type MergeStrategy } from '@/core/data-architecture/executors/DataSourceMerger'
 
-// 第四层：多源整合器
+// fourth floor：multi-source integrator
 export {
   MultiSourceIntegrator,
   type IMultiSourceIntegrator,
@@ -28,7 +28,7 @@ export {
   type DataSourceResult
 } from './MultiSourceIntegrator'
 
-// 主协调类：多层级执行器链
+// main coordination class：Multi-level actuator chain
 export {
   MultiLayerExecutorChain,
   type IMultiLayerExecutorChain,
@@ -37,17 +37,17 @@ export {
   type ExecutionResult
 } from './MultiLayerExecutorChain'
 
-// 导入用于工厂函数
+// Import for factory function
 import { MultiLayerExecutorChain } from '@/core/data-architecture/executors/MultiLayerExecutorChain'
 
-// 便捷工厂函数
+// Convenience factory function
 export function createExecutorChain(): MultiLayerExecutorChain {
   return new MultiLayerExecutorChain()
 }
 
-// 类型工具
+// type tools
 export type AllDataItemTypes = 'json' | 'http' | 'websocket' | 'script'
 export type AllMergeStrategyTypes = 'object' | 'array' | 'script'
 
-// 版本信息
+// Version information
 export const EXECUTOR_CHAIN_VERSION = '1.0.0'

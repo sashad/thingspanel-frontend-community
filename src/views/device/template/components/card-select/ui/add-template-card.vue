@@ -14,7 +14,7 @@ const formRef = ref<ICardFormIns>()
 const state = reactive({
   curCardData: null as null | Record<string, any>
 })
-// $emit是内置变量 不可以使用$emit 作为变量名
+// $emitis a built-in variable Not available$emit as variable name
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
   (e: 'save', value: any): void
@@ -129,22 +129,22 @@ watch(props, pr => {
 </template>
 
 <style scoped>
-/* 滚动条的宽度 */
+/* scroll bar width */
 #panel_view::-webkit-scrollbar {
   width: 4px;
 }
 
-/* 滚动条的轨道 */
+/* scroll bar track */
 #panel_view::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-/* 滚动条的滑块 */
+/* Scroll bar slider */
 #panel_view::-webkit-scrollbar-thumb {
   background: #888;
 }
 
-/* 滚动条的滑块：鼠标悬停 */
+/* Scroll bar slider：mouseover */
 #panel_view::-webkit-scrollbar-thumb:hover {
   background: #555;
 }

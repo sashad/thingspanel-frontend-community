@@ -1,39 +1,39 @@
 <template>
   <div class="array-data-test">
-    <n-card title="Digit Indicator 数组数据测试" size="small">
+    <n-card title="Digit Indicator Array data test" size="small">
       <n-space vertical>
-        <!-- 测试说明 -->
-        <n-alert type="info" title="数组数据处理测试">
+        <!-- Test instructions -->
+        <n-alert type="info" title="Array data processing test">
           <template #default>
-            <p>测试 digit-indicator 组件对各种数组数据格式的处理能力</p>
-            <p>包括：简单数组、对象数组、嵌套数组等</p>
+            <p>test digit-indicator Component's ability to handle various array data formats</p>
+            <p>include：simple array、object array、Nested arrays etc.</p>
           </template>
         </n-alert>
 
-        <!-- 测试数据选择 -->
-        <n-divider title-placement="left">测试数据</n-divider>
+        <!-- Test data selection -->
+        <n-divider title-placement="left">test data</n-divider>
 
         <n-space>
-          <n-button type="primary" @click="sendSimpleArray">简单数组 [25.6, 30.2]</n-button>
-          <n-button type="success" @click="sendObjectArray">对象数组 [{value: 72.3, unit: '%'}]</n-button>
-          <n-button type="warning" @click="sendNestedArray">嵌套数组 [{data: {value: 58.7}}]</n-button>
-          <n-button type="error" @click="sendComplexArray">复杂数组 [{temp: 25.6}, {humidity: 60.2}]</n-button>
+          <n-button type="primary" @click="sendSimpleArray">simple array [25.6, 30.2]</n-button>
+          <n-button type="success" @click="sendObjectArray">object array [{value: 72.3, unit: '%'}]</n-button>
+          <n-button type="warning" @click="sendNestedArray">Nested array [{data: {value: 58.7}}]</n-button>
+          <n-button type="error" @click="sendComplexArray">complex array [{temp: 25.6}, {humidity: 60.2}]</n-button>
         </n-space>
 
-        <!-- Digit Indicator 组件 -->
-        <n-divider title-placement="left">Digit Indicator 组件</n-divider>
+        <!-- Digit Indicator components -->
+        <n-divider title-placement="left">Digit Indicator components</n-divider>
 
         <div class="component-container">
           <component :is="digitIndicatorComponent" ref="digitIndicatorRef" :card="cardData" />
         </div>
 
-        <!-- 数据日志 -->
-        <n-divider title-placement="left">数据处理日志</n-divider>
+        <!-- Data log -->
+        <n-divider title-placement="left">Data processing log</n-divider>
 
         <n-card size="small" class="log-card">
           <div class="log-header">
-            <n-text strong>数组数据处理日志</n-text>
-            <n-button size="small" @click="clearLogs">清空</n-button>
+            <n-text strong>Array data processing log</n-text>
+            <n-button size="small" @click="clearLogs">Clear</n-button>
           </div>
           <div class="log-content">
             <div v-for="(log, index) in logs" :key="index" class="log-item">
@@ -43,8 +43,8 @@
           </div>
         </n-card>
 
-        <!-- 原始数据预览 -->
-        <n-divider title-placement="left">原始数据预览</n-divider>
+        <!-- Raw data preview -->
+        <n-divider title-placement="left">Raw data preview</n-divider>
 
         <n-card size="small">
           <pre>{{ JSON.stringify(lastSentData, null, 2) }}</pre>
@@ -59,7 +59,7 @@ import { ref } from 'vue'
 import { NCard, NSpace, NDivider, NButton, NAlert, NText } from 'naive-ui'
 import digitIndicatorComponent from './component.vue'
 
-// 卡片数据
+// card data
 const cardData = ref({
   config: {
     color: '#1890ff',
@@ -71,17 +71,17 @@ const cardData = ref({
       {
         deviceId: 'test_device_001',
         metricsId: 'test_metric',
-        metricsName: '测试指标',
+        metricsName: 'Test indicators',
         metricsType: 'telemetry'
       }
     ]
   }
 })
 
-// 组件引用
+// component reference
 const digitIndicatorRef = ref<any>(null)
 
-// 日志
+// log
 const logs = ref<Array<{ timestamp: string; message: string }>>([])
 const lastSentData = ref<any>(null)
 
@@ -100,10 +100,10 @@ const formatTime = (timestamp: string) => {
   return new Date(timestamp).toLocaleTimeString()
 }
 
-// 测试数据发送
+// Test data sending
 const sendSimpleArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -113,12 +113,12 @@ const sendSimpleArray = () => {
 
   lastSentData.value = data
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送简单数组: ${JSON.stringify(data)}`)
+  addLog(`Send simple array: ${JSON.stringify(data)}`)
 }
 
 const sendObjectArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -132,12 +132,12 @@ const sendObjectArray = () => {
 
   lastSentData.value = data
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送对象数组: ${JSON.stringify(data)}`)
+  addLog(`Send array of objects: ${JSON.stringify(data)}`)
 }
 
 const sendNestedArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -147,12 +147,12 @@ const sendNestedArray = () => {
 
   lastSentData.value = data
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送嵌套数组: ${JSON.stringify(data)}`)
+  addLog(`Send nested array: ${JSON.stringify(data)}`)
 }
 
 const sendComplexArray = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -166,7 +166,7 @@ const sendComplexArray = () => {
 
   lastSentData.value = data
   digitIndicatorRef.value.updateData('test_device_001', 'test_metric', data)
-  addLog(`发送复杂数组: ${JSON.stringify(data)}`)
+  addLog(`Send complex array: ${JSON.stringify(data)}`)
 }
 </script>
 

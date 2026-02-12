@@ -1,11 +1,11 @@
 /**
- * 渲染器管理器
- * 统一管理所有渲染器的注册、创建和切换
+ * Renderer Manager
+ * Unified management of registration of all renderers、Create and switch
  */
 
 import type { BaseRenderer, RendererFactory, RendererContext, RendererConfig } from '@/components/visual-editor/renderers/base/BaseRenderer'
 
-// 渲染器注册信息
+// Renderer registration information
 interface RendererRegistration {
   factory: RendererFactory
   type: string
@@ -15,7 +15,7 @@ interface RendererRegistration {
   supported: boolean
 }
 
-// 渲染器管理器类
+// Renderer manager class
 export class RendererManager {
   private static instance: RendererManager
   private registrations = new Map<string, RendererRegistration>()
@@ -23,7 +23,7 @@ export class RendererManager {
 
   private constructor() {}
 
-  // 单例模式
+  // Singleton pattern
   static getInstance(): RendererManager {
     if (!RendererManager.instance) {
       RendererManager.instance = new RendererManager()
@@ -31,7 +31,7 @@ export class RendererManager {
     return RendererManager.instance
   }
 
-  // 注册渲染器
+  // Register renderer
   register(
     type: string,
     factory: RendererFactory,
@@ -56,34 +56,34 @@ export class RendererManager {
     this.registrations.set(type, registration)
   }
 
-  // 取消注册渲染器
+  // Unregister a renderer
   unregister(type: string): boolean {
     const removed = this.registrations.delete(type)
     return removed
   }
 
-  // 获取已注册的渲染器列表
+  // Get a list of registered renderers
   getRegistrations(): RendererRegistration[] {
     return Array.from(this.registrations.values())
   }
 
-  // 获取支持的渲染器列表
+  // Get a list of supported renderers
   getSupportedRenderers(): RendererRegistration[] {
     return this.getRegistrations().filter(reg => reg.supported)
   }
 
-  // 检查渲染器是否已注册
+  // Check if the renderer is registered
   isRegistered(type: string): boolean {
     return this.registrations.has(type)
   }
 
-  // 检查渲染器是否支持
+  // Check if the renderer supports
   isSupported(type: string): boolean {
     const registration = this.registrations.get(type)
     return registration ? registration.supported : false
   }
 
-  // 创建渲染器实例
+  // Create renderer instance
   async createRenderer(type: string, context: RendererContext, config: RendererConfig = {}): Promise<BaseRenderer> {
     const registration = this.registrations.get(type)
     if (!registration) {
@@ -98,11 +98,11 @@ export class RendererManager {
       const renderer = registration.factory.create(context, config)
       await renderer.init()
 
-      // 缓存活跃的渲染器
+      // Caching active renderers
       const instanceKey = `${type}_${Date.now()}`
       this.activeRenderers.set(instanceKey, renderer)
 
-      // 监听渲染器销毁事件，清理缓存
+      // Listen for renderer destruction events，clear cache
       renderer.on('state-change', state => {
         if (state === 'destroyed') {
           this.activeRenderers.delete(instanceKey)
@@ -118,12 +118,12 @@ export class RendererManager {
     }
   }
 
-  // 获取活跃的渲染器数量
+  // Get the number of active renderers
   getActiveRendererCount(): number {
     return this.activeRenderers.size
   }
 
-  // 获取特定类型的活跃渲染器
+  // Get the active renderer of a specific type
   getActiveRenderers(type?: string): BaseRenderer[] {
     if (!type) {
       return Array.from(this.activeRenderers.values())
@@ -135,7 +135,7 @@ export class RendererManager {
     })
   }
 
-  // 销毁所有活跃的渲染器
+  // Destroy all active renderers
   async destroyAllRenderers(): Promise<void> {
     const renderers = Array.from(this.activeRenderers.values())
     const destroyPromises = renderers.map(renderer => renderer.destroy())
@@ -151,7 +151,7 @@ export class RendererManager {
     }
   }
 
-  // 获取渲染器选项（用于 UI 选择器）
+  // Get renderer options（used for UI selector）
   getRendererOptions(): Array<{
     value: string
     label: string
@@ -168,7 +168,7 @@ export class RendererManager {
     }))
   }
 
-  // 获取支持的渲染器选项
+  // Get supported renderer options
   getSupportedRendererOptions(): Array<{
     value: string
     label: string
@@ -183,20 +183,20 @@ export class RendererManager {
     }))
   }
 
-  // 验证渲染器切换
+  // Verify renderer switching
   canSwitchTo(fromType: string, toType: string): boolean {
-    // 检查目标渲染器是否支持
+    // Check if the target renderer supports
     if (!this.isSupported(toType)) {
       return false
     }
 
-    // 这里可以添加更复杂的切换规则
-    // 例如：某些渲染器之间不能直接切换
+    // More complex switching rules can be added here
+    // For example：Some renderers cannot be switched directly between
 
     return true
   }
 
-  // 预加载渲染器（用于性能优化）
+  // Preload renderer（for performance optimization）
   async preloadRenderer(type: string): Promise<void> {
     const registration = this.registrations.get(type)
     if (!registration || !registration.supported) {
@@ -205,8 +205,8 @@ export class RendererManager {
     }
 
     try {
-      // 这里可以实现预加载逻辑
-      // 例如：预加载渲染器的依赖资源
+      // Preloading logic can be implemented here
+      // For example：Preload renderer dependent resources
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
@@ -214,7 +214,7 @@ export class RendererManager {
     }
   }
 
-  // 获取渲染器性能统计
+  // Get renderer performance statistics
   getPerformanceStats(): {
     totalRegistered: number
     totalSupported: number
@@ -241,7 +241,7 @@ export class RendererManager {
     }
   }
 
-  // 清理资源
+  // Clean up resources
   dispose(): void {
     this.destroyAllRenderers().catch(console.error)
     this.registrations.clear()
@@ -250,10 +250,10 @@ export class RendererManager {
   }
 }
 
-// 导出单例实例
+// Export singleton instance
 export const rendererManager = RendererManager.getInstance()
 
-// 导出便捷方法
+// Export convenience method
 export const registerRenderer = (
   type: string,
   factory: RendererFactory,

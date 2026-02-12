@@ -58,30 +58,30 @@ const loadVisitedRoutes = () => {
   }
 }
 
-// 在 setup 阶段立即调用一次以加载初始数据
+// exist setup Stage is called once immediately to load initial data
 loadVisitedRoutes()
 
 const navigateTo = (path: string, query?: LocationQuery) => {
   router.push({ path, query })
 }
 
-// 获取路由显示标题，优先使用国际化翻译
+// Get route display title，Prioritize the use of international translations
 const getRouteDisplayTitle = (route: VisitedRoute): string => {
-  // 如果有i18nKey，则使用国际化翻译
+  // if there isi18nKey，then use internationalized translation
   if (route.i18nKey) {
     try {
       return $t(route.i18nKey as App.I18n.I18nKey)
     } catch {
-      // 如果翻译失败，fallback到原始title
+      // If translation fails，fallbackto originaltitle
       return route.title
     }
   }
-  // 否则使用原始title作为fallback
+  // Otherwise use the originaltitleasfallback
   return route.title
 }
 
 onMounted(() => {
-  // 监听 storage 事件，以便在其他标签页更新时刷新列表
+  // monitor storage event，to refresh the list when other tabs update
   window.addEventListener('storage', event => {
     if (event.key === RECENTLY_VISITED_ROUTES_KEY) {
       loadVisitedRoutes()
@@ -89,7 +89,7 @@ onMounted(() => {
   })
 })
 
-// 组件卸载时移除监听器（虽然对于仪表盘卡片可能不是必须的）
+// Remove listener when component is uninstalled（Although it may not be necessary for dashboard cards）
 // import { onUnmounted } from 'vue';
 // onUnmounted(() => {
 //   window.removeEventListener('storage', loadVisitedRoutes);
@@ -97,7 +97,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 可以在这里添加更精细的滚动条样式（可选） */
+/* More elaborate scrollbar styles can be added here（Optional） */
 ul::-webkit-scrollbar {
   width: 4px;
 }

@@ -1,8 +1,8 @@
 /**
- * 向后兼容系统导出
+ * Backwards compatible system export
  */
 
 export * from './legacy-adapter'
 
-// 默认导出向后兼容适配器
+// Default export backwards compatible adapter
 export { LegacyAdapter } from './legacy-adapter'

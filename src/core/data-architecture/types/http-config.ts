@@ -1,155 +1,155 @@
 /**
- * HTTP配置类型定义（完善版）
- * 基于SUBTASK-008完善版文档设计
+ * HTTPConfiguration type definition（Perfect version）
+ * based onSUBTASK-008Complete document design
  */
 
 /**
- * HTTP参数统一接口
- * 支持路径参数、查询参数、请求头参数的统一管理
+ * HTTPParameter unified interface
+ * Support path parameters、query parameters、Unified management of request header parameters
  */
 export interface HttpParameter {
-  /** 参数键名 */
+  /** Parameter key name */
   key: string
 
-  /** 参数值 - 示例值，类型与dataType匹配 */
+  /** Parameter value - Example value，type withdataTypematch */
   value: string | number | boolean
 
-  /** 默认值 - 当value为空时使用的回退值 */
+  /** default value - whenvalueFallback value to use when empty */
   defaultValue?: string | number | boolean
 
-  /** 是否启用此参数 */
+  /** Whether to enable this parameter */
   enabled: boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 动态时自动生成：var_ + key的snake_case */
+  /** Automatically generated when dynamic：var_ + keyofsnake_case */
   variableName: string
 
-  /** 参数说明，必填 */
+  /** Parameter description，Required */
   description: string
 
-  /** 参数类型：路径参数直接拼接到URL后，查询参数作为query，请求头参数作为header */
+  /** Parameter type：The path parameters are spliced ​​directly toURLback，query parameters asquery，The request header parameters are asheader */
   paramType: 'path' | 'query' | 'header'
 
-  /** 参数值模式：手动输入、下拉选择、属性绑定等 */
+  /** Parameter value mode：Manual entry、drop down selection、Property binding, etc. */
   valueMode?: string
 
-  /** 选中的模板ID */
+  /** selected templateID */
   selectedTemplate?: string
 }
 
 /**
- * HTTP请求头配置 - 为了向后兼容保留
- * @deprecated 建议使用统一的HttpParameter with paramType: 'header'
+ * HTTPRequest header configuration - Reserved for backward compatibility
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'header'
  */
 export interface HttpHeader extends HttpParameter {}
 
 /**
- * HTTP查询参数配置 - 为了向后兼容保留
- * @deprecated 建议使用统一的HttpParameter with paramType: 'query'
+ * HTTPQuery parameter configuration - Reserved for backward compatibility
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'query'
  */
 export interface HttpParam extends HttpParameter {}
 
 /**
- * HTTP路径参数配置 - 为了向后兼容保留
- * @deprecated 建议使用统一的HttpParameter with paramType: 'path'
+ * HTTPPath parameter configuration - Reserved for backward compatibility
+ * @deprecated It is recommended to use a unifiedHttpParameter with paramType: 'path'
  */
 export interface HttpPathParam extends HttpParameter {
-  /** 路径参数名（不带大括号），如 'device_id' */
+  /** path parameter name（without braces），like 'device_id' */
   key: string
-  /** 在URL中的占位符格式，如 '{device_id}' */
+  /** existURLplaceholder format in，like '{device_id}' */
   placeholder: string
 }
 
 /**
- * 路径参数简化配置
- * 只支持单个路径参数，直接拼接到URL后
+ * Simplified configuration of path parameters
+ * Only supports a single path parameter，directly spliced ​​toURLback
  */
 export interface PathParameter {
-  /** 参数值 - 示例值，类型与dataType匹配 */
+  /** Parameter value - Example value，type withdataTypematch */
   value: string | number | boolean
 
-  /** 默认值 - 当value为空时使用的回退值 */
+  /** default value - whenvalueFallback value to use when empty */
   defaultValue?: string | number | boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 动态时自动生成：var_path_param */
+  /** Automatically generated when dynamic：var_path_param */
   variableName: string
 
-  /** 参数说明 */
+  /** Parameter description */
   description: string
 
-  /** 参数值模式：手动输入、下拉选择、属性绑定等 */
+  /** Parameter value mode：Manual entry、drop down selection、Property binding, etc. */
   valueMode?: string
 
-  /** 选中的模板ID */
+  /** selected templateID */
   selectedTemplate?: string
 }
 
-// 导入EnhancedParameter类型
+// importEnhancedParametertype
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 
 /**
- * HTTP配置接口（简化路径参数版本）
+ * HTTPConfigure interface（Simplified path parameter version）
  */
 export interface HttpConfig {
-  /** 基础请求URL（路径参数会拼接到此URL后） */
+  /** Basic requestURL（The path parameters will be spliced ​​hereURLback） */
   url: string
 
-  /** HTTP方法 */
+  /** HTTPmethod */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
-  /** 超时时间（毫秒） */
+  /** timeout（millisecond） */
   timeout: number
 
-  /** 地址类型：内部地址还是外部地址 */
+  /** Address type：Internal or external address */
   addressType?: 'internal' | 'external'
 
-  /** 选中的内部地址值（当addressType为internal时使用） */
+  /** Selected internal address value（whenaddressTypeforinternalused when） */
   selectedInternalAddress?: string
 
-  /** 是否启用传参（用于内部地址的路径参数配置） */
+  /** Whether to enable parameter passing（Path parameter configuration for internal addresses） */
   enableParams?: boolean
 
-  /** 路径参数配置数组（新格式，支持多个参数） */
+  /** Path parameter configuration array（new format，Support multiple parameters） */
   pathParams?: EnhancedParameter[]
 
-  /** 路径参数（可选，单个参数直接拼接到URL后） */
+  /** path parameters（Optional，A single parameter is spliced ​​directly toURLback） */
   pathParameter?: PathParameter
 
-  /** 查询参数配置 */
+  /** Query parameter configuration */
   params: HttpParam[]
 
-  /** 请求头配置 */
+  /** Request header configuration */
   headers: HttpHeader[]
 
-  /** 请求体（可选） */
+  /** Request body（Optional） */
   body?: string
 
-  /** 请求前处理脚本（可选） */
+  /** Pre-request processing script（Optional） */
   preRequestScript?: string
 
-  /** 响应后处理脚本（可选） */
+  /** Response post-processing script（Optional） */
   postResponseScript?: string
 
-  // 向后兼容字段（已弃用）
-  /** @deprecated 使用简化的 pathParameter 字段替代 */
+  // backward compatibility fields（Deprecated）
+  /** @deprecated Use simplified pathParameter field substitution */
   pathParams?: HttpPathParam[]
-  /** @deprecated 使用新的统一 parameters 字段替代 */
+  /** @deprecated Use the new unity parameters field substitution */
   parameters?: HttpParameter[]
 }
 
 /**
- * 类型转换器 - 将值转换为指定数据类型
+ * type converter - Convert a value to a specified data type
  */
 export function convertValue(value: any, dataType: string): any {
   if (value === null || value === undefined) return value
@@ -180,28 +180,28 @@ export function convertValue(value: any, dataType: string): any {
 }
 
 /**
- * 创建默认路径参数
+ * Create default path parameters
  */
 export function createDefaultPathParameter(): PathParameter {
   return {
     value: '',
-    isDynamic: false, // 默认为静态
+    isDynamic: false, // Default is static
     dataType: 'string',
     variableName: 'var_path_param',
-    description: '路径参数'
+    description: 'path parameters'
   }
 }
 
 /**
- * 创建默认HTTP参数 (向后兼容)
- * @deprecated 建议使用具体的创建函数
+ * create defaultHTTPparameter (backwards compatible)
+ * @deprecated It is recommended to use specific creation functions
  */
 export function createDefaultHttpParameter(paramType: 'path' | 'query' | 'header' = 'query'): HttpParameter {
   return {
     key: '',
     value: '',
     enabled: true,
-    isDynamic: paramType === 'path', // 路径参数默认为动态
+    isDynamic: paramType === 'path', // Path parameters default to dynamic
     dataType: 'string',
     variableName: '',
     description: '',
@@ -210,24 +210,24 @@ export function createDefaultHttpParameter(paramType: 'path' | 'query' | 'header
 }
 
 /**
- * 创建默认HttpHeader - 向后兼容
- * @deprecated 使用 createDefaultHttpParameter('header') 替代
+ * create defaultHttpHeader - backwards compatible
+ * @deprecated use createDefaultHttpParameter('header') substitute
  */
 export function createDefaultHttpHeader(): HttpHeader {
   return createDefaultHttpParameter('header') as HttpHeader
 }
 
 /**
- * 创建默认HttpParam - 向后兼容
- * @deprecated 使用 createDefaultHttpParameter('query') 替代
+ * create defaultHttpParam - backwards compatible
+ * @deprecated use createDefaultHttpParameter('query') substitute
  */
 export function createDefaultHttpParam(): HttpParam {
   return createDefaultHttpParameter('query') as HttpParam
 }
 
 /**
- * 创建默认HttpPathParam - 向后兼容
- * @deprecated 使用 createDefaultHttpParameter('path') 替代
+ * create defaultHttpPathParam - backwards compatible
+ * @deprecated use createDefaultHttpParameter('path') substitute
  */
 export function createDefaultHttpPathParam(): HttpPathParam {
   const baseParam = createDefaultHttpParameter('path')
@@ -238,9 +238,9 @@ export function createDefaultHttpPathParam(): HttpPathParam {
 }
 
 /**
- * 从URL自动提取路径参数
- * @param url - 包含路径参数的URL，如 '/api/device/{device_id}/data/{metric_id}'
- * @returns 路径参数配置数组
+ * fromURLAutomatically extract path parameters
+ * @param url - Contains path parametersURL，like '/api/device/{device_id}/data/{metric_id}'
+ * @returns Path parameter configuration array
  */
 export function extractPathParamsFromUrl(url: string): HttpPathParam[] {
   const pathParamRegex = /\{([^}]+)\}/g
@@ -249,7 +249,7 @@ export function extractPathParamsFromUrl(url: string): HttpPathParam[] {
 
   while ((match = pathParamRegex.exec(url)) !== null) {
     const key = match[1]
-    const placeholder = match[0] // 完整的 {parameter}
+    const placeholder = match[0] // complete {parameter}
 
     params.push({
       key,
@@ -259,7 +259,7 @@ export function extractPathParamsFromUrl(url: string): HttpPathParam[] {
       isDynamic: true,
       dataType: 'string',
       variableName: generateVariableName(key),
-      description: `路径参数：${key}`
+      description: `path parameters：${key}`
     })
   }
 
@@ -267,10 +267,10 @@ export function extractPathParamsFromUrl(url: string): HttpPathParam[] {
 }
 
 /**
- * 替换URL中的路径参数
- * @param url - 原始URL
- * @param pathParams - 路径参数配置
- * @returns 替换后的URL
+ * replaceURLpath parameters in
+ * @param url - originalURL
+ * @param pathParams - Path parameter configuration
+ * @returns after replacementURL
  */
 export function replaceUrlPathParams(url: string, pathParams: HttpPathParam[]): string {
   let resultUrl = url
@@ -285,15 +285,15 @@ export function replaceUrlPathParams(url: string, pathParams: HttpPathParam[]): 
 }
 
 /**
- * 变量名生成器 - 将key转换为snake_case格式的变量名
+ * variable name generator - WillkeyConvert tosnake_caseformat variable name
  */
 export function generateVariableName(key: string): string {
   return `var_${
     key
-      .replace(/([a-z])([A-Z])/g, '$1_$2') // 驼峰转下划线（只在小写字母后跟大写字母时）
-      .toLowerCase() // 转小写
-      .replace(/[^a-z0-9_]/g, '_') // 非法字符转下划线
-      .replace(/_+/g, '_') // 多个下划线合并
-      .replace(/^_|_$/, '') // 去掉首尾下划线
+      .replace(/([a-z])([A-Z])/g, '$1_$2') // camelback to underline（Only when a lowercase letter is followed by an uppercase letter）
+      .toLowerCase() // Convert to lower case
+      .replace(/[^a-z0-9_]/g, '_') // Convert illegal characters to underline
+      .replace(/_+/g, '_') // Combine multiple underscores
+      .replace(/^_|_$/, '') // Remove leading and trailing underscores
   }`
 }

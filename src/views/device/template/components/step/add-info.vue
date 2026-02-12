@@ -98,7 +98,7 @@ const customRequest = ({ file, event }: { file: UploadFileInfo; event?: Progress
   pngPath.value = `${url.value.replace('api/v1', '') + relativePath}`
 }
 
-// 新增设备功能模板
+// Added device function template
 const next: () => void = async () => {
   await formRef.value?.validate()
   if (addFrom.id) {

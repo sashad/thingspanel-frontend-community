@@ -1,7 +1,7 @@
 <script setup lang="tsx"></script>
 
 <template>
-  <div>打撒都是</div>
+  <div>It's all about spanking</div>
 </template>
 
 <style scoped></style>

@@ -1,37 +1,37 @@
 /**
- * Visual Editor 数据桥接器
- * 为 Visual Editor 组件提供新架构的数据执行能力
- * 替代原有的 ComponentExecutorManager 直接依赖
+ * Visual Editor data bridge
+ * for Visual Editor Components provide new architecture data execution capabilities
+ * replace the original ComponentExecutorManager Direct dependence
  */
 
 import { simpleDataBridge, type ComponentDataRequirement, type DataResult } from '@/core/data-architecture/SimpleDataBridge'
 import type { DataSourceDefinition } from '@/core/data-architecture/interfaces/IComponentDataManager'
 import { dataSourceBindingConfig, type AutoBindConfig } from '@/core/data-architecture/DataSourceBindingConfig'
 
-// 🔥 修复：使用动态导入避免循环依赖
+// 🔥 repair：Use dynamic imports to avoid circular dependencies
 // import { configurationIntegrationBridge } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 import { useEditorStore } from '@/components/visual-editor/store/editor'
 
 /**
- * Visual Editor 专用的数据桥接器
- * 封装 SimpleDataBridge，提供与旧API兼容的接口
+ * Visual Editor dedicated data bridge
+ * Encapsulation SimpleDataBridge，Provided with oldAPICompatible interface
  */
 export class VisualEditorBridge {
   private dataUpdateCallbacks = new Map<string, (componentId: string, data: any) => void>()
 
   /**
-   * 更新组件执行器（兼容旧API）
-   * @param componentId 组件ID
-   * @param componentType 组件类型
-   * @param config 数据源配置
+   * Update component executor（Compatible with oldAPI）
+   * @param componentId componentsID
+   * @param componentType Component type
+   * @param config Data source configuration
    */
   async updateComponentExecutor(componentId: string, componentType: string, config: any): Promise<DataResult> {
 
 
-    // 🔥 添加详细的配置结构调试
+    // 🔥 Add detailed configuration structure debugging
   
 
-    // 将旧配置格式转换为新的数据需求格式
+    // Convert old configuration format to new data requirements format
     const requirement = this.convertConfigToRequirement(componentId, componentType, config)
 
 
@@ -39,15 +39,15 @@ export class VisualEditorBridge {
     const result = await simpleDataBridge.executeComponent(requirement)
 
 
-    // 通知数据更新回调
+    // Notification data update callback
     this.notifyDataUpdate(componentId, result.data)
 
     return result
   }
 
   /**
-   * 监听数据更新（兼容旧API）
-   * @param callback 数据更新回调函数
+   * Monitor data updates（Compatible with oldAPI）
+   * @param callback Data update callback function
    */
   onDataUpdate(callback: (componentId: string, data: any) => void): () => void {
     const callbackId = Math.random().toString(36).substring(2, 15)
@@ -59,25 +59,25 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 获取组件当前数据
-   * @param componentId 组件ID
+   * Get the current data of the component
+   * @param componentId componentsID
    */
   getComponentData(componentId: string): Record<string, any> | null {
     return simpleDataBridge.getComponentData(componentId)
   }
 
   /**
-   * 清除组件数据缓存
-   * @param componentId 组件ID
+   * Clear component data cache
+   * @param componentId componentsID
    */
   clearComponentCache(componentId: string): void {
     simpleDataBridge.clearComponentCache(componentId)
   }
 
   /**
-   * 通知数据更新
-   * @param componentId 组件ID
-   * @param data 数据
+   * Notify data updates
+   * @param componentId componentsID
+   * @param data data
    */
   private notifyDataUpdate(componentId: string, data: any): void {
     this.dataUpdateCallbacks.forEach(callback => {
@@ -88,10 +88,10 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 将旧的配置格式转换为新的数据需求格式
-   * @param componentId 组件ID
-   * @param componentType 组件类型
-   * @param config 配置对象
+   * Convert the old configuration format to the new data requirements format
+   * @param componentId componentsID
+   * @param componentType Component type
+   * @param config Configuration object
    */
   private convertConfigToRequirement(
     componentId: string,
@@ -100,43 +100,43 @@ export class VisualEditorBridge {
   ): ComponentDataRequirement {
     const dataSources: DataSourceDefinition[] = []
 
-    // 🔥 关键修复：提取基础配置属性并注入到数据源参数中
+    // 🔥 critical fix：Extract basic configuration properties and inject them into data source parameters
     let resolvedConfig = config
     let baseConfig: any = null
 
-    // 如果配置是 WidgetConfiguration 格式，提取相关部分
+    // If the configuration is WidgetConfiguration Format，Extract relevant parts
     if (config && typeof config === 'object') {
-      // 检查是否是新的分层配置格式
+      // Check if it is the new hierarchical configuration format
       if (config.base || config.dataSource) {
         baseConfig = config.base || {}
         resolvedConfig = {
-          // 合并基础配置中的设备属性到主配置中，用于数据源解析
+          // Merge device attributes in the basic configuration into the main configuration，Used for data source parsing
           ...config.dataSource,
-          // 将基础配置中的设备属性暴露给数据源使用
+          // Expose the device properties in the basic configuration to the data source for use
           deviceId: baseConfig.deviceId,
           metricsList: baseConfig.metricsList,
-          // 保持原有的数据源配置
+          // Keep the original data source configuration
           ...(config.dataSource || {})
         }
 
 
 
-        // 🔥 新增：将基础配置注入到HTTP参数中，确保参数绑定使用最新值
+        // 🔥 New：Inject basic configuration intoHTTPin parameters，Make sure parameter bindings use the latest values
         resolvedConfig = this.injectBaseConfigToDataSource(resolvedConfig, baseConfig)
       }
     }
 
-    // 处理配置中的数据源
+    // Handle data sources in configuration
     if (resolvedConfig && typeof resolvedConfig === 'object') {
-      // 🔥 新增：详细的配置结构调试日志
+      // 🔥 New：Detailed configuration structure debugging log
     
 
-      // 🆕 处理新的 DataSourceConfiguration 格式
+      // 🆕 process new DataSourceConfiguration Format
       if (resolvedConfig.dataSources && Array.isArray(resolvedConfig.dataSources)) {
         resolvedConfig.dataSources.forEach((dataSource: any) => {
           if (dataSource.sourceId && dataSource.dataItems && Array.isArray(dataSource.dataItems)) {
-            // 🔥 关键修复：保持数据源的完整性，不要拆分成独立数据源
-            // 保持原有的数据源结构，让 MultiLayerExecutorChain 处理多数据项合并
+            // 🔥 critical fix：Maintain data source integrity，Do not split into independent data sources
+            // Maintain the original data source structure，let MultiLayerExecutorChain Handle multiple data item merges
             const processedDataItems = dataSource.dataItems
               .map((dataItem: any, itemIndex: number) => {
                 if (dataItem && dataItem.item) {
@@ -156,7 +156,7 @@ export class VisualEditorBridge {
               })
               .filter(Boolean)
 
-            // 创建单一数据源配置，包含所有数据项和合并策略
+            // Create a single data source configuration，Contains all data items and merge strategies
             dataSources.push({
               sourceId: dataSource.sourceId,
               dataItems: processedDataItems,
@@ -166,7 +166,7 @@ export class VisualEditorBridge {
         })
       }
 
-      // 🆕 处理 rawDataList 结构（来自数据源配置表单）
+      // 🆕 deal with rawDataList structure（From the data source configuration form）
       else if (resolvedConfig.rawDataList && Array.isArray(resolvedConfig.rawDataList)) {
         resolvedConfig.rawDataList.forEach((item: any, index: number) => {
           if (item && item.type && item.enabled !== false) {
@@ -181,11 +181,11 @@ export class VisualEditorBridge {
         })
       }
 
-      // 处理多个数据源的情况（如 dataSource1, dataSource2, dataSource3）
+      // Handling multiple data sources（like dataSource1, dataSource2, dataSource3）
       if (dataSources.length === 0) {
         for (const [key, value] of Object.entries(resolvedConfig)) {
           if (key.startsWith('dataSource') && value && typeof value === 'object') {
-            // 🔥 关键修复：在数据源配置中注入基础配置属性
+            // 🔥 critical fix：Inject basic configuration properties into the data source configuration
             const enhancedDataSourceConfig = this.injectBaseConfigToDataSource(value as any, baseConfig)
             const dataSourceConfig = value as any
 
@@ -202,24 +202,24 @@ export class VisualEditorBridge {
         }
       }
 
-      // 处理单一数据源的情况
+      // Dealing with a single data source situation
       if (dataSources.length === 0 && resolvedConfig.type && resolvedConfig.enabled !== false) {
-        // 🔥 特殊处理 data-source-bindings 类型
+        // 🔥 special handling data-source-bindings type
         if (resolvedConfig.type === 'data-source-bindings') {
-          // 对于data-source-bindings，数据在config的各个dataSourceX字段中
+          // fordata-source-bindings，data inconfigof variousdataSourceXin field
           for (const [key, value] of Object.entries(resolvedConfig)) {
             if (key.startsWith('dataSource') && value && typeof value === 'object') {
               dataSources.push({
                 id: key,
                 type: resolvedConfig.type as any,
-                config: { dataSourceBindings: { [key]: value } }, // 🔥 关键：正确包装数据
+                config: { dataSourceBindings: { [key]: value } }, // 🔥 key：Pack data correctly
                 filterPath: undefined,
                 processScript: undefined
               })
             }
           }
         } else {
-          // 🔥 关键修复：注入基础配置到单一数据源
+          // 🔥 critical fix：Inject basic configuration into a single data source
           const enhancedConfig = this.injectBaseConfigToDataSource(resolvedConfig, baseConfig)
           dataSources.push({
             id: 'dataSource1',
@@ -232,7 +232,7 @@ export class VisualEditorBridge {
       }
     }
 
-    // 🔥 最终结果调试日志
+    // 🔥 Final result debug log
 
     return {
       componentId,
@@ -243,10 +243,10 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🔥 关键新增：将基础配置属性注入到数据源配置中
-   * 确保 deviceId 和 metricsList 等基础配置能被数据源正确使用
-   * @param dataSourceConfig 数据源配置
-   * @param baseConfig 基础配置
+   * 🔥 Key new additions：Inject basic configuration properties into the data source configuration
+   * make sure deviceId and metricsList Wait for the basic configuration to be used correctly by the data source
+   * @param dataSourceConfig Data source configuration
+   * @param baseConfig Basic configuration
    */
   private injectBaseConfigToDataSource(dataSourceConfig: any, baseConfig: any): any {
     if (!baseConfig) {
@@ -254,10 +254,10 @@ export class VisualEditorBridge {
     }
 
 
-    // 创建增强的配置对象
-    const enhanced = JSON.parse(JSON.stringify(dataSourceConfig)) // 深拷贝
+    // Create enhanced configuration objects
+    const enhanced = JSON.parse(JSON.stringify(dataSourceConfig)) // deep copy
 
-    // 🚀 关键扩展：不仅注入基础配置，还要处理所有绑定表达式替换
+    // 🚀 key extension：Not only inject basic configuration，Also handle all binding expression substitutions
     this.processBindingReplacements(enhanced, baseConfig)
 
 
@@ -265,45 +265,45 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🚀 新增：处理所有绑定表达式替换
-   * 包括基础配置注入和组件属性绑定替换
-   * ⚠️ 关键警告：此方法修改传入的配置对象，确保传入的是克隆对象！
+   * 🚀 New：Handles all binding expression substitutions
+   * Includes basic configuration injection and component property binding replacement
+   * ⚠️ critical warning：This method modifies the configuration object passed in，Make sure you pass in a cloned object！
    */
   private processBindingReplacements(config: any, baseConfig: any): void {
 
-    // 🚀 新增：检查是否启用autoBind
+    // 🚀 New：Check if enabledautoBind
     const autoBindConfig = this.getAutoBindConfigFromDataSource(config)
 
     if (autoBindConfig && autoBindConfig.enabled) {
-      // 使用autoBind配置处理参数绑定（同步版本）
+      // useautoBindConfiguration processing parameter binding（sync version）
       this.processAutoBindParamsSync(config, baseConfig, autoBindConfig)
     } else {
-      // 使用传统方式处理参数绑定
+      // Handling parameter bindings the traditional way
       this.processTraditionalBinding(config, baseConfig)
     }
   }
 
   /**
-   * 🚀 新增：使用autoBind配置处理参数绑定（同步版本）
+   * 🚀 New：useautoBindConfiguration processing parameter binding（sync version）
    */
   private processAutoBindParamsSync(config: any, baseConfig: any, autoBindConfig: AutoBindConfig): void {
-    // 使用已导入的dataSourceBindingConfig
+    // Use the importeddataSourceBindingConfig
 
-    // 构建完整配置对象
+    // Build a complete configuration object
     const fullConfig = {
       base: baseConfig,
       dataSource: config,
       componentType: config.componentType || 'widget'
     }
 
-    // 使用autoBind生成HTTP参数
+    // useautoBindgenerateHTTPparameter
     const autoBindParams = dataSourceBindingConfig.buildAutoBindParams(
       fullConfig,
       autoBindConfig,
       config.componentType
     )
 
-    // 将autoBind参数注入到HTTP配置中
+    // WillautoBindParameters are injected intoHTTPConfiguring
     if (config.type === 'http' && config.config) {
       config.config.params = {
         ...config.config.params,
@@ -316,7 +316,7 @@ export class VisualEditorBridge {
       }
     }
 
-    console.log(`🚀 [VisualEditorBridge] AutoBind参数注入完成:`, {
+    console.log(`🚀 [VisualEditorBridge] AutoBindParameter injection completed:`, {
       mode: autoBindConfig.mode,
       autoBindParams,
       finalConfig: config.config
@@ -324,39 +324,39 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 传统方式处理参数绑定
+   * Traditional way to handle parameter binding
    */
   private processTraditionalBinding(config: any, baseConfig: any): void {
-    // 1. 首先处理基础配置注入（原有逻辑，模拟设备ID的硬编码机制）
+    // 1. First handle the basic configuration injection（original logic，Analog deviceIDhard-coded mechanism）
     if (config.config && typeof config.config === 'object') {
       config.config = {
         ...config.config,
-        // 注入基础配置中的设备属性（模拟设备ID硬编码逻辑）
+        // Inject device properties in base configuration（Analog deviceIDhardcoded logic）
         ...(baseConfig.deviceId && { deviceId: baseConfig.deviceId }),
         ...(baseConfig.metricsList && { metricsList: baseConfig.metricsList })
       }
     } else {
-      // 如果没有 config 对象，直接在顶层注入
+      // if not config object，Inject directly at the top level
       config.deviceId = config.deviceId || baseConfig.deviceId
       config.metricsList = config.metricsList || baseConfig.metricsList
     }
 
-    // 2. 🔥 关键新增：然后处理所有绑定表达式替换（这是组件属性绑定的核心逻辑）
+    // 2. 🔥 Key new additions：Then handle all binding expression substitutions（This is the core logic of component property binding）
     this.recursivelyReplaceBindings(config)
   }
 
   /**
-   * 🚀 新增：从数据源配置中提取autoBind设置
-   * @param dataSourceConfig 数据源配置
-   * @returns autoBind配置或null
+   * 🚀 New：Extract from data source configurationautoBindset up
+   * @param dataSourceConfig Data source configuration
+   * @returns autoBindconfigure ornull
    */
   private getAutoBindConfigFromDataSource(dataSourceConfig: any): import('./DataSourceBindingConfig').AutoBindConfig | null {
-    // 检查数据源配置中的autoBind设置
+    // Check the data source configuration forautoBindset up
     if (dataSourceConfig.autoBind) {
       return dataSourceConfig.autoBind
     }
 
-    // 检查config层级的autoBind设置
+    // examineconfighierarchicalautoBindset up
     if (dataSourceConfig.config?.autoBind) {
       return dataSourceConfig.config.autoBind
     }
@@ -365,9 +365,9 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🚀 新增：递归替换所有绑定表达式
-   * 从 useCard2Props 获取当前组件的所有属性值，并替换绑定表达式
-   * 🔥 关键修复：精确检测和替换组件属性绑定表达式，支持多种绑定格式
+   * 🚀 New：Recursively replace all binding expressions
+   * from useCard2Props Get all property values ​​of the current component，and replace the binding expression with
+   * 🔥 critical fix：Accurately detect and replace component property binding expressions，Supports multiple binding formats
    */
   private recursivelyReplaceBindings(obj: any, path: string = 'root'): void {
     if (!obj || typeof obj !== 'object') {
@@ -382,20 +382,20 @@ export class VisualEditorBridge {
 
         if (typeof val === 'string') {
 
-          // 🔥 关键修复：检查多种绑定表达式格式
-          // 格式1: componentId.component.propertyName （标准组件属性绑定）
+          // 🔥 critical fix：Check multiple binding expression formats
+          // Format1: componentId.component.propertyName （Standard component property binding）
           const componentBindingMatch = val.match(/^([^.]+)\.component\.(.+)$/)
 
-          // 格式2: componentId.base.propertyName （基础配置绑定）
+          // Format2: componentId.base.propertyName （Basic configuration binding）
           const baseBindingMatch = val.match(/^([^.]+)\.base\.(.+)$/)
 
-          // 格式3: componentId.whitelist.propertyName （旧格式兼容，已废弃但需要兼容）
+          // Format3: componentId.whitelist.propertyName （旧Format兼容，Deprecated but needs compatibility）
           const whitelistBindingMatch = val.match(/^([^.]+)\.whitelist\.(.+)$/)
 
           if (componentBindingMatch) {
             const [, componentId, propertyName] = componentBindingMatch
 
-            // 🚀 关键修复：获取组件的当前属性值，使用正确的获取逻辑
+            // 🚀 critical fix：Get the current property value of the component，Use correct fetch logic
             const actualValue = this.getComponentPropertyValueFixed(componentId, propertyName)
             if (actualValue !== undefined) {
               obj[key] = String(actualValue)
@@ -404,29 +404,29 @@ export class VisualEditorBridge {
           } else if (baseBindingMatch) {
             const [, componentId, propertyName] = baseBindingMatch
 
-            // 尝试获取基础配置值（使用已有的获取逻辑）
+            // Try to get basic configuration values（Use existing acquisition logic）
             const actualValue = this.getBaseConfigPropertyValue(componentId, propertyName)
             if (actualValue !== undefined) {
               obj[key] = String(actualValue)
             } else {
             }
           } else if (whitelistBindingMatch) {
-            // 🔥 兼容性处理：将旧的whitelist格式转换为component格式再处理
+            // 🔥 Compatibility processing：will oldwhitelistThe format is converted tocomponentformat reprocessing
             const [, componentId, propertyName] = whitelistBindingMatch
 
-            // 转换为标准component格式再处理
+            // convert to standardcomponentformat reprocessing
             const actualValue = this.getComponentPropertyValueFixed(componentId, propertyName)
             if (actualValue !== undefined) {
               obj[key] = String(actualValue)
             } else {
             }
           } else {
-            // 不是绑定表达式，无需处理
+            // Not a binding expression，No processing required
             if (val.includes('.')) {
             }
           }
         } else if (typeof val === 'object' && val !== null) {
-          // 递归处理嵌套对象
+          // Process nested objects recursively
           this.recursivelyReplaceBindings(val, currentPath)
         }
       }
@@ -434,12 +434,12 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🔥 新增：获取基础配置属性值（用于base层绑定）
+   * 🔥 New：Get basic configuration property values（used forbaselayer binding）
    */
   private getBaseConfigPropertyValue(componentId: string, propertyName: string): any {
     try {
-      // 简化处理：直接返回undefined，避免循环依赖
-      // TODO: 在需要时重新实现此功能
+      // Simplified processing：Return directlyundefined，Avoid circular dependencies
+      // TODO: Reimplement this feature if needed
       return undefined
 
       if (config?.base?.[propertyName] !== undefined) {
@@ -449,7 +449,7 @@ export class VisualEditorBridge {
 
       return undefined
     } catch (error) {
-      console.error(`❌ [VisualEditorBridge] 获取基础配置属性值失败:`, {
+      console.error(`❌ [VisualEditorBridge] Failed to obtain basic configuration property values:`, {
         componentId,
         propertyName,
         error: error instanceof Error ? error.message : error
@@ -459,29 +459,29 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🚀 修复版本：获取组件的当前属性值
-   * 专门处理实际的属性值获取，优先级：最新配置 > 编辑器节点 > DOM
+   * 🚀 Repair version：Get the current property value of the component
+   * Specially handles actual attribute value acquisition，priority：latest configuration > Editor node > DOM
    */
   private getComponentPropertyValueFixed(componentId: string, propertyName: string): any {
     try {
-      // 简化处理：直接返回undefined，避免循环依赖
-      // TODO: 在需要时重新实现此功能
+      // Simplified processing：Return directlyundefined，Avoid circular dependencies
+      // TODO: Reimplement this feature if needed
       return undefined
 
 
-      // 1. 优先从component层直接获取属性
+      // 1. Prioritize fromcomponentThe layer directly obtains the properties
       if (fullConfig?.component?.[propertyName] !== undefined) {
         const value = fullConfig.component[propertyName]
         return value
       }
 
-      // 2. 检查customize层（兼容某些组件结构）
+      // 2. examinecustomizelayer（Compatible with certain component structures）
       if (fullConfig?.component?.customize?.[propertyName] !== undefined) {
         const value = fullConfig.component.customize[propertyName]
         return value
       }
 
-      // 3. 从编辑器节点获取（备用方案）
+      // 3. Get from editor node（backup plan）
       const editorStore = useEditorStore()
       const node = editorStore.nodes?.find((n: any) => n.id === componentId)
 
@@ -490,7 +490,7 @@ export class VisualEditorBridge {
         return value
       }
 
-      // 4. 检查编辑器节点的统一配置
+      // 4. Check the unified configuration of the editor node
       if (node?.metadata?.unifiedConfig?.component?.[propertyName] !== undefined) {
         const value = node.metadata.unifiedConfig.component[propertyName]
         return value
@@ -498,7 +498,7 @@ export class VisualEditorBridge {
 
       return undefined
     } catch (error) {
-      console.error(`❌ [VisualEditorBridge] getComponentPropertyValueFixed失败:`, {
+      console.error(`❌ [VisualEditorBridge] getComponentPropertyValueFixedfail:`, {
         componentId,
         propertyName,
         error: error instanceof Error ? error.message : error
@@ -508,33 +508,33 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 🚀 原版本：获取组件的当前属性值（保留兼容）
-   * 从配置管理器或其他数据源获取组件属性的实际值
-   * 🔥 关键修复：确保获取到最新的属性值，优先级：配置管理器 > 编辑器节点 > DOM暴露属性
+   * 🚀 original version：Get the current property value of the component（Keep compatible）
+   * Get the actual value of a component property from the configuration manager or other data source
+   * 🔥 critical fix：Make sure you get the latest attribute values，priority：configuration manager > Editor node > DOMexposed properties
    */
   private getComponentPropertyValue(componentId: string, propertyName: string): any {
     try {
-      // 简化处理：直接返回undefined，避免循环依赖
-      // TODO: 在需要时重新实现此功能
+      // Simplified processing：Return directlyundefined，Avoid circular dependencies
+      // TODO: Reimplement this feature if needed
       return undefined
 
 
-      // 🔥 关键修复：优先从component层获取，然后检查customize层（兼容不同组件结构）
+      // 🔥 critical fix：Prioritize fromcomponentlayer获取，then checkcustomizelayer（Compatible with different component structures）
       let value = undefined
       if (config?.component?.[propertyName] !== undefined) {
         value = config.component[propertyName]
         return value
       }
 
-      // 兼容性检查：某些组件可能将属性存储在customize层
+      // Compatibility check：Some components may store properties incustomizelayer
       if (config?.component?.customize?.[propertyName] !== undefined) {
         value = config.component.customize[propertyName]
         return value
       }
 
-      // 🚀 关键新增：检查根层级的component配置（Card2.1的新格式）
+      // 🚀 Key new additions：Check the root levelcomponentConfiguration（Card2.1new format）
       if (config?.component !== undefined) {
-        // 遍历component层的所有属性，寻找匹配的属性名
+        // TraversecomponentAll properties of the layer，Find matching attribute names
         const componentConfig = config.component
         for (const [key, val] of Object.entries(componentConfig)) {
           if (key === propertyName && val !== undefined) {
@@ -543,7 +543,7 @@ export class VisualEditorBridge {
         }
       }
 
-      // 方法2: 从编辑器节点获取（第二优先级）
+      // method2: Get from editor node（second priority）
       const editorStore = useEditorStore()
       const node = editorStore.nodes?.find((n: any) => n.id === componentId)
 
@@ -553,19 +553,19 @@ export class VisualEditorBridge {
         return value
       }
 
-      // 检查编辑器节点的component层属性
+      // Check the editor node'scomponentLayer properties
       if (node?.properties?.component?.[propertyName] !== undefined) {
         value = node.properties.component[propertyName]
         return value
       }
 
-      // 🚀 关键新增：检查统一配置格式（metadata.unifiedConfig）
+      // 🚀 Key new additions：Check unified configuration format（metadata.unifiedConfig）
       if (node?.metadata?.unifiedConfig?.component?.[propertyName] !== undefined) {
         value = node.metadata.unifiedConfig.component[propertyName]
         return value
       }
 
-      // 方法3: 从DOM元素获取（最后选择）
+      // method3: fromDOMelement acquisition（final choice）
       if (typeof window !== 'undefined') {
         const element = document.querySelector(`[data-component-id="${componentId}"]`)
         if (element) {
@@ -579,7 +579,7 @@ export class VisualEditorBridge {
 
       return undefined
     } catch (error) {
-      console.error(`❌ [VisualEditorBridge] 获取组件属性值失败:`, {
+      console.error(`❌ [VisualEditorBridge] Failed to get component property value:`, {
         componentId,
         propertyName,
         error: error instanceof Error ? error.message : error
@@ -589,25 +589,25 @@ export class VisualEditorBridge {
   }
 
   /**
-   * 转换数据项配置，处理字段映射
+   * Transform data item configuration，Handle field mapping
    */
   private convertItemConfig(item: any): any {
     const { type, config } = item
 
     switch (type) {
       case 'json':
-        // JSON类型：jsonString → jsonContent
+        // JSONtype：jsonString → jsonContent
         return {
           ...config,
           jsonContent: config.jsonString || config.jsonContent
         }
 
       case 'http':
-        // HTTP类型：保持原有字段
+        // HTTPtype：Keep original fields
         return config
 
       case 'script':
-        // Script类型：script → scriptContent
+        // Scripttype：script → scriptContent
         return {
           ...config,
           scriptContent: config.script || config.scriptContent
@@ -619,11 +619,11 @@ export class VisualEditorBridge {
   }
 }
 
-// 端口隔离的VisualEditorBridge实例管理
+// Port isolatedVisualEditorBridgeInstance management
 const bridgeInstances = new Map<string, VisualEditorBridge>()
 
 /**
- * 获取端口ID（用于多端口开发环境的实例隔离）
+ * Get portID（Instance isolation for multi-port development environments）
  */
 function getPortId(): string {
   if (typeof window !== 'undefined') {
@@ -633,8 +633,8 @@ function getPortId(): string {
 }
 
 /**
- * 获取当前端口的VisualEditorBridge实例
- * 确保不同端口使用独立的桥接器实例，避免数据回调干扰
+ * Get the current portVisualEditorBridgeExample
+ * Ensure separate bridge instances are used for different ports，Avoid data callback interference
  */
 export function getVisualEditorBridge(): VisualEditorBridge {
   const portId = getPortId()
@@ -647,8 +647,8 @@ export function getVisualEditorBridge(): VisualEditorBridge {
 }
 
 /**
- * Visual Editor 桥接器单例实例
- * 用于替代原有的 componentExecutorManager
- * @deprecated 使用 getVisualEditorBridge() 替代，以支持端口隔离
+ * Visual Editor Bridge singleton instance
+ * used to replace the original componentExecutorManager
+ * @deprecated use getVisualEditorBridge() substitute，to support port isolation
  */
 export const visualEditorBridge = getVisualEditorBridge()

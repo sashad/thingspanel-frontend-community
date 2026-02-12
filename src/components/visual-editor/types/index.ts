@@ -1,18 +1,18 @@
 /**
- * 类型定义统一导出
+ * Unified export of type definitions
  */
 
-// 基础类型
+// base type
 export type { GraphData, Position, Size, CanvasState, TransformOperation } from '@/components/visual-editor/types/base-types'
 
-// 编辑器类型
+// Editor type
 export type { EditorConfig, KanbanConfig, DashboardConfig } from '@/components/visual-editor/types/editor'
 
-// 渲染器类型
+// Renderer type
 export type { RendererType, IRenderer, RendererConfig } from '@/components/visual-editor/types/renderer'
 
-// 组件类型
+// Component type
 export type { WidgetType, WidgetConfig } from '@/components/visual-editor/types/widget'
 
-// 插件类型
+// Plug-in type
 export type { IPlugin, PluginConfig } from '@/components/visual-editor/types/plugin'

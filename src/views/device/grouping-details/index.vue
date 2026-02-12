@@ -195,18 +195,18 @@ const reload = async (nid: string) => {
 }
 
 /**
- * 导航到父级分组详情页
+ * Navigate to the parent group details page
  */
 const goToParentGroup = () => {
   if (details_data.value.detail.parent_id && details_data.value.detail.parent_id !== '0') {
     routerPush({ name: 'device_grouping-details', query: { id: details_data.value.detail.parent_id } })
   } else {
-    console.error('无法导航到父级分组，parent_id 无效或为顶级:', details_data.value.detail.parent_id)
+    console.error('Unable to navigate to parent group，parent_id Invalid or top-level:', details_data.value.detail.parent_id)
   }
 }
 
 /**
- * 导航到顶层分组列表页
+ * Navigate to the top-level group list page
  */
 const goToGroupListRoot = () => {
   routerPush({ name: 'device_grouping' })

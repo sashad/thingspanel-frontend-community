@@ -1,6 +1,6 @@
 /**
- * Grid 核心状态管理 Hook
- * 专注于网格布局的基础状态管理
+ * Grid Core state management Hook
+ * Focus on basic state management of grid layout
  */
 
 import { ref, computed, watch } from 'vue'
@@ -9,32 +9,32 @@ import { validateLayout, validateGridItem, cloneLayout, getLayoutBounds, getLayo
 import { DEFAULT_GRID_LAYOUT_PLUS_CONFIG } from '../gridLayoutPlusTypes'
 
 export interface UseGridCoreOptions {
-  /** 初始布局数据 */
+  /** Initial layout data */
   initialLayout?: GridLayoutPlusItem[]
-  /** 网格配置 */
+  /** Grid configuration */
   config?: Partial<GridLayoutPlusConfig>
-  /** 是否启用深度验证 */
+  /** Whether to enable deep verification */
   enableValidation?: boolean
 }
 
 /**
- * 核心网格状态管理Hook
- * 提供基础的布局数据管理和验证功能
+ * Core grid state managementHook
+ * Provide basic layout data management and verification functions
  */
 export function useGridCore(options: UseGridCoreOptions = {}) {
-  // 基础状态
+  // base state
   const layout = ref<GridLayoutPlusItem[]>(options.initialLayout || [])
   const selectedItems = ref<string[]>([])
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
 
-  // 配置状态
+  // configuration status
   const config = ref<GridLayoutPlusConfig>({
     ...DEFAULT_GRID_LAYOUT_PLUS_CONFIG,
     ...options.config
   })
 
-  // 计算属性
+  // Computed properties
   const layoutStats = computed(() => {
     try {
       return getLayoutStats(layout.value, config.value.colNum)
@@ -72,10 +72,10 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
 
   const hasSelectedItems = computed(() => selectedItems.value.length > 0)
 
-  // 布局操作方法
+  // Layout operation method
   const updateLayout = (newLayout: GridLayoutPlusItem[]): LayoutOperationResult<void> => {
     try {
-      // 验证新布局
+      // Validate new layout
       if (options.enableValidation) {
         const validation = validateLayout(newLayout)
         if (!validation.success) {
@@ -104,7 +104,7 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
 
   const addItem = (item: GridLayoutPlusItem): LayoutOperationResult<GridLayoutPlusItem> => {
     try {
-      // 验证新项目
+      // Verify new project
       if (options.enableValidation) {
         const validation = validateGridItem(item)
         if (!validation.success) {
@@ -116,12 +116,12 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
         }
       }
 
-      // 检查ID是否已存在
+      // examineIDDoes it already exist?
       if (layout.value.some(existingItem => existingItem.i === item.i)) {
         return {
           success: false,
           error: new Error('Item ID already exists'),
-          message: `项目ID '${item.i}' 已存在`
+          message: `projectID '${item.i}' Already exists`
         }
       }
 
@@ -145,13 +145,13 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
         return {
           success: false,
           error: new Error('Item not found'),
-          message: `项目 '${itemId}' 不存在`
+          message: `project '${itemId}' does not exist`
         }
       }
 
       const removedItem = layout.value.splice(index, 1)[0]
 
-      // 同时从选中列表中移除
+      // Also remove from selected list
       const selectedIndex = selectedItems.value.indexOf(itemId)
       if (selectedIndex > -1) {
         selectedItems.value.splice(selectedIndex, 1)
@@ -179,11 +179,11 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
         return {
           success: false,
           error: new Error('Item not found'),
-          message: `项目 '${itemId}' 不存在`
+          message: `project '${itemId}' does not exist`
         }
       }
 
-      // 创建更新后的项目进行验证
+      // Create updated project for verification
       const updatedItem = { ...item, ...updates }
       if (options.enableValidation) {
         const validation = validateGridItem(updatedItem)
@@ -196,7 +196,7 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
         }
       }
 
-      // 应用更新
+      // Apply updates
       Object.assign(item, updates)
       return { success: true, data: item }
     } catch (err) {
@@ -216,7 +216,7 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
     error.value = null
   }
 
-  // 选择管理
+  // Select management
   const selectItem = (itemId: string) => {
     if (!selectedItems.value.includes(itemId)) {
       selectedItems.value.push(itemId)
@@ -247,7 +247,7 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
     selectedItems.value = []
   }
 
-  // 查询方法
+  // Query method
   const getItem = (itemId: string) => {
     return layout.value.find(item => item.i === itemId) || null
   }
@@ -257,34 +257,34 @@ export function useGridCore(options: UseGridCoreOptions = {}) {
   }
 
   return {
-    // 状态
+    // state
     layout,
     selectedItems,
     isLoading,
     error,
     config,
 
-    // 计算属性
+    // Computed properties
     layoutStats,
     layoutBounds,
     isValidLayout,
     hasSelectedItems,
 
-    // 布局操作
+    // Layout operations
     updateLayout,
     addItem,
     removeItem,
     updateItem,
     clearLayout,
 
-    // 选择管理
+    // Select management
     selectItem,
     deselectItem,
     toggleItemSelection,
     selectAll,
     deselectAll,
 
-    // 查询方法
+    // Query method
     getItem,
     getSelectedItems
   }

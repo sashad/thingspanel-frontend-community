@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Ultra看板详情页面
- * 使用Visual Editor的PanelEditorV2组件实现看板编辑功能
+ * UltraKanban details page
+ * useVisual EditorofPanelEditorV2Component implements Kanban editing function
  */
 
 import { onMounted, ref, computed, onUnmounted } from 'vue'
@@ -10,31 +10,31 @@ import { NCard, NSpace, useMessage, NSpin, NBackTop } from 'naive-ui'
 import { $t } from '@/locales'
 import { getBoard, PutBoard } from '@/service/api'
 
-// 正式编辑器：基于 PanelEditorV2（无测试选项）
+// Official editor：based on PanelEditorV2（No testing options）
 import PanelEditorV2 from '@/components/visual-editor/PanelEditorV2.vue'
 
-// 路由和消息管理
+// Routing and message management
 const route = useRoute()
 const message = useMessage()
 
-// 页面状态管理
+// Page status management
 const loading = ref(true)
 const panelData = ref<Panel.Board>()
 const error = ref<string>('')
 const isUnmounted = ref(false)
 
-// 🔥 编辑器配置状态
+// 🔥 Editor configuration status
 const editorConfig = ref<{ widgets: any[]; config: any } | undefined>()
 
 /**
- * 获取看板ID
+ * Get KanbanID
  */
 const panelId = computed(() => {
   return (route.query.id as string) || ''
 })
 
 /**
- * 🔥 获取看板数据并解析配置
+ * 🔥 Get Kanban data and parse configuration
  */
 const fetchBoardData = async () => {
   if (!panelId.value) {
@@ -50,37 +50,37 @@ const fetchBoardData = async () => {
     if (data) {
       panelData.value = data
 
-      // 🔥 解析看板配置为编辑器格式
+      // 🔥 Parse Kanban configuration into editor format
       if (data.config) {
         try {
           const parsedConfig = JSON.parse(data.config)
 
           if (parsedConfig.widgets !== undefined || parsedConfig.config !== undefined) {
-            // 标准格式：{widgets: [...], config: {...}}
+            // standard format：{widgets: [...], config: {...}}
             editorConfig.value = parsedConfig
           } else if (Array.isArray(parsedConfig)) {
-            // 旧版数组格式
+            // Legacy array format
             editorConfig.value = {
               widgets: parsedConfig,
               config: { gridConfig: {}, canvasConfig: {} }
             }
           } else {
-            // 空或未知格式，使用默认空配置
+            // Empty or unknown format，Use default empty configuration
             editorConfig.value = {
               widgets: [],
               config: { gridConfig: {}, canvasConfig: {} }
             }
           }
         } catch (e) {
-          console.error('❌ 解析看板配置失败:', e)
-          // 解析失败，使用空配置
+          console.error('❌ Failed to parse Kanban configuration:', e)
+          // Parsing failed，Use empty configuration
           editorConfig.value = {
             widgets: [],
             config: { gridConfig: {}, canvasConfig: {} }
           }
         }
       } else {
-        // 没有配置，使用空配置
+        // No configuration，Use empty configuration
         editorConfig.value = {
           widgets: [],
           config: { gridConfig: {}, canvasConfig: {} }
@@ -90,7 +90,7 @@ const fetchBoardData = async () => {
       error.value = $t('common.dataNotFound')
     }
   } catch (err) {
-    console.error('❌ 加载看板数据失败:', err)
+    console.error('❌ Failed to load Kanban data:', err)
     error.value = $t('common.loadError')
     message.error($t('common.loadError'))
   } finally {
@@ -99,8 +99,8 @@ const fetchBoardData = async () => {
 }
 
 /**
- * 🔥 自定义保存处理函数
- * 保存编辑器状态到看板 API
+ * 🔥 Custom save processing function
+ * Save editor state to Kanban board API
  */
 const handleSave = async (state: any) => {
   if (!panelData.value) {
@@ -109,7 +109,7 @@ const handleSave = async (state: any) => {
 
   const { error: saveError } = await PutBoard({
     id: panelId.value,
-    config: JSON.stringify(state), // 保存 {widgets: [], config: {}}
+    config: JSON.stringify(state), // save {widgets: [], config: {}}
     name: panelData.value.name,
     home_flag: panelData.value.home_flag
   })
@@ -120,21 +120,21 @@ const handleSave = async (state: any) => {
 }
 
 /**
- * 页面初始化
+ * Page initialization
  */
 onMounted(async () => {
   await fetchBoardData()
 })
 
 /**
- * 页面销毁时的清理工作
+ * Cleanup work when the page is destroyed
  */
 onUnmounted(() => {
   isUnmounted.value = true
 })
 
 /**
- * 错误重试
+ * Retry on error
  */
 const retryLoad = async () => {
   error.value = ''
@@ -144,7 +144,7 @@ const retryLoad = async () => {
 
 <template>
   <div class="ultra-kanban-details">
-    <!-- 加载状态 -->
+    <!-- Loading status -->
     <div v-if="loading" class="loading-container">
       <NSpin size="large">
         <template #description>
@@ -153,7 +153,7 @@ const retryLoad = async () => {
       </NSpin>
     </div>
 
-    <!-- 错误状态 -->
+    <!-- error status -->
     <div v-else-if="error" class="error-container">
       <NCard class="error-card">
         <NSpace vertical align="center">
@@ -166,9 +166,9 @@ const retryLoad = async () => {
       </NCard>
     </div>
 
-    <!-- 主内容区域 - 集成Visual Editor -->
+    <!-- main content area - integratedVisual Editor -->
     <div v-else-if="panelData && editorConfig && !isUnmounted" class="main-content">
-      <!-- 正式编辑器（V2）集成 -->
+      <!-- Official editor（V2）integrated -->
       <div class="visual-editor-container">
         <PanelEditorV2
           :key="`ultra-panel-editor-${panelId}`"
@@ -184,13 +184,13 @@ const retryLoad = async () => {
       </div>
     </div>
 
-    <!-- 回到顶部按钮 -->
+    <!-- back to top button -->
     <NBackTop :right="40" />
   </div>
 </template>
 
 <style scoped>
-/* 主容器样式 */
+/* Main container style */
 .ultra-kanban-details {
   width: 100%;
   display: flex;
@@ -198,7 +198,7 @@ const retryLoad = async () => {
   background-color: var(--body-color);
 }
 
-/* 加载状态容器 */
+/* Load state container */
 .loading-container {
   display: flex;
   align-items: center;
@@ -208,7 +208,7 @@ const retryLoad = async () => {
   background-color: var(--body-color);
 }
 
-/* 错误状态容器 */
+/* error status container */
 .error-container {
   display: flex;
   align-items: center;
@@ -224,7 +224,7 @@ const retryLoad = async () => {
   text-align: center;
 }
 
-/* 主内容区域 */
+/* main content area */
 .main-content {
   width: 100%;
   flex: 1;
@@ -233,7 +233,7 @@ const retryLoad = async () => {
   overflow: hidden;
 }
 
-/* Visual Editor容器 */
+/* Visual Editorcontainer */
 .visual-editor-container {
   width: 100%;
   flex: 1;
@@ -241,7 +241,7 @@ const retryLoad = async () => {
   background-color: var(--card-color);
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .ultra-kanban-details {
   background-color: var(--body-color);
 }
@@ -250,7 +250,7 @@ const retryLoad = async () => {
   background-color: var(--card-color);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .error-card {
     min-width: 280px;

@@ -1,6 +1,6 @@
 /**
  * Grid Layout Plus Hook
- * 提供网格布局的状态管理和工具方法
+ * Provides state management and tool methods for grid layout
  */
 
 import { ref, computed, watch, nextTick, type Ref } from 'vue'
@@ -32,26 +32,26 @@ import {
 import { DEFAULT_GRID_LAYOUT_PLUS_CONFIG } from '../gridLayoutPlusTypes'
 
 export interface UseGridLayoutPlusOptions {
-  /** 初始布局 */
+  /** initial layout */
   initialLayout?: GridLayoutPlusItem[]
-  /** 网格配置 */
+  /** Grid configuration */
   config?: Partial<GridLayoutPlusConfig>
-  /** 性能配置 */
+  /** Performance configuration */
   performance?: Partial<PerformanceConfig>
-  /** 是否启用自动保存 */
+  /** Whether to enable auto-save */
   autoSave?: boolean
-  /** 自动保存延迟 */
+  /** Autosave delay */
   autoSaveDelay?: number
-  /** 保存回调 */
+  /** save callback */
   onSave?: (layout: GridLayoutPlusItem[]) => void
-  /** 是否启用历史记录 */
+  /** Whether to enable history */
   enableHistory?: boolean
-  /** 历史记录最大长度 */
+  /** Maximum length of history */
   maxHistoryLength?: number
 }
 
 export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
-  // 配置
+  // Configuration
   const config = ref<GridLayoutPlusConfig>({
     ...DEFAULT_GRID_LAYOUT_PLUS_CONFIG,
     ...options.config
@@ -67,22 +67,22 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     ...options.performance
   })
 
-  // 状态
+  // state
   const layout = ref<GridLayoutPlusItem[]>(options.initialLayout || [])
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
   const selectedItems = ref<string[]>([])
   const currentBreakpoint = ref<string>('lg')
 
-  // 历史记录
+  // History
   const history = ref<GridLayoutPlusItem[][]>([])
   const historyIndex = ref(-1)
   const maxHistoryLength = options.maxHistoryLength || 50
 
-  // 响应式布局
+  // Responsive layout
   const responsiveLayouts = ref<ResponsiveLayout>({})
 
-  // 计算属性
+  // Computed properties
   const layoutStats = computed(() => getLayoutStats(layout.value, config.value.colNum))
 
   const layoutBounds = computed(() => getLayoutBounds(layout.value))
@@ -102,13 +102,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return optimizeLayoutPerformance(layout.value, performanceConfig.value)
   })
 
-  // 历史记录管理
+  // History management
   const saveToHistory = () => {
     if (!options.enableHistory) return
 
     const currentLayout = cloneLayout(layout.value)
 
-    // 如果当前不在历史记录末尾，删除后面的记录
+    // If you are not currently at the end of the history，Delete subsequent records
     if (historyIndex.value < history.value.length - 1) {
       history.value = history.value.slice(0, historyIndex.value + 1)
     }
@@ -116,21 +116,21 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     history.value.push(currentLayout)
     historyIndex.value = history.value.length - 1
 
-    // 限制历史记录长度
+    // Limit history length
     if (history.value.length > maxHistoryLength) {
       history.value = history.value.slice(-maxHistoryLength)
       historyIndex.value = history.value.length - 1
     }
   }
 
-  // 自动保存
+  // Auto save
   const autoSave = debounce(() => {
     if (options.autoSave && options.onSave) {
       options.onSave(cloneLayout(layout.value))
     }
   }, options.autoSaveDelay || 1000)
 
-  // 布局操作
+  // Layout operations
   const addItem = (
     type: string,
     itemOptions?: Partial<GridLayoutPlusItem>
@@ -162,13 +162,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: newItem,
-        message: '项目添加成功'
+        message: 'Project added successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '项目添加失败'
+        message: 'Project addition failed'
       }
     }
   }
@@ -180,14 +180,14 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
         return {
           success: false,
           error: new Error('Item not found'),
-          message: '项目不存在'
+          message: 'Project does not exist'
         }
       }
 
       saveToHistory()
       const removedItem = layout.value.splice(index, 1)[0]
 
-      // 从选中项目中移除
+      // Remove from selected items
       selectedItems.value = selectedItems.value.filter(id => id !== itemId)
 
       autoSave()
@@ -195,13 +195,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: removedItem,
-        message: '项目删除成功'
+        message: 'Project deleted successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '项目删除失败'
+        message: 'Project deletion failed'
       }
     }
   }
@@ -216,7 +216,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
         return {
           success: false,
           error: new Error('Item not found'),
-          message: '项目不存在'
+          message: 'Project does not exist'
         }
       }
 
@@ -233,13 +233,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: item,
-        message: '项目更新成功'
+        message: 'Project updated successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '项目更新失败'
+        message: 'Project update failed'
       }
     }
   }
@@ -251,7 +251,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
         return {
           success: false,
           error: new Error('Source item not found'),
-          message: '源项目不存在'
+          message: 'Source project does not exist'
         }
       }
 
@@ -271,13 +271,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: duplicatedItem,
-        message: '项目复制成功'
+        message: 'Project copied successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '项目复制失败'
+        message: 'Project copy failed'
       }
     }
   }
@@ -292,18 +292,18 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: true,
-        message: '布局清空成功'
+        message: 'Layout cleared successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '布局清空失败'
+        message: 'Layout clearing failed'
       }
     }
   }
 
-  // 选择操作
+  // Select action
   const selectItem = (itemId: string) => {
     if (!selectedItems.value.includes(itemId)) {
       selectedItems.value.push(itemId)
@@ -334,14 +334,14 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     }
   }
 
-  // 批量操作
+  // Batch operations
   const deleteSelectedItems = (): LayoutOperationResult<string[]> => {
     try {
       if (selectedItems.value.length === 0) {
         return {
           success: false,
           error: new Error('No items selected'),
-          message: '没有选中的项目'
+          message: 'No items selected'
         }
       }
 
@@ -356,13 +356,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: deletedIds,
-        message: `删除了 ${deletedIds.length} 个项目`
+        message: `deleted ${deletedIds.length} items`
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '批量删除失败'
+        message: 'Batch deletion failed'
       }
     }
   }
@@ -373,7 +373,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
         return {
           success: false,
           error: new Error('No items selected'),
-          message: '没有选中的项目'
+          message: 'No items selected'
         }
       }
 
@@ -390,18 +390,18 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: duplicatedItems,
-        message: `复制了 ${duplicatedItems.length} 个项目`
+        message: `Copied ${duplicatedItems.length} items`
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '批量复制失败'
+        message: 'Batch copy failed'
       }
     }
   }
 
-  // 布局工具
+  // Layout tools
   const compactCurrentLayout = () => {
     saveToHistory()
     layout.value = compactLayout(layout.value)
@@ -422,13 +422,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return filterLayout(layout.value, predicate)
   }
 
-  // 历史记录操作
+  // History operations
   const undo = (): LayoutOperationResult<boolean> => {
     if (!canUndo.value) {
       return {
         success: false,
         error: new Error('Nothing to undo'),
-        message: '没有可撤销的操作'
+        message: 'No undoable actions'
       }
     }
 
@@ -438,7 +438,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return {
       success: true,
       data: true,
-      message: '撤销成功'
+      message: 'Revoked successfully'
     }
   }
 
@@ -447,7 +447,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: false,
         error: new Error('Nothing to redo'),
-        message: '没有可重做的操作'
+        message: 'No operations to redo'
       }
     }
 
@@ -457,11 +457,11 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return {
       success: true,
       data: true,
-      message: '重做成功'
+      message: 'Redo successfully'
     }
   }
 
-  // 响应式布局
+  // Responsive layout
   const setBreakpoint = (breakpoint: string) => {
     currentBreakpoint.value = breakpoint
   }
@@ -475,9 +475,9 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return breakpointLayout || layout.value
   }
 
-  // 导入导出
+  // Import and export
   const exportCurrentLayout = (format: 'json' | 'csv' = 'json'): string => {
-    return JSON.stringify(layout.value, null, 2) // 简化实现
+    return JSON.stringify(layout.value, null, 2) // Simplify implementation
   }
 
   const importLayout = (data: string): LayoutOperationResult<boolean> => {
@@ -497,18 +497,18 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
       return {
         success: true,
         data: true,
-        message: '布局导入成功'
+        message: 'Layout imported successfully'
       }
     } catch (error) {
       return {
         success: false,
         error: error as Error,
-        message: '布局导入失败'
+        message: 'Layout import failed'
       }
     }
   }
 
-  // 工具方法
+  // Tool method
   const getItem = (itemId: string): GridLayoutPlusItem | undefined => {
     return layout.value.find(item => item.i === itemId)
   }
@@ -521,17 +521,17 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     return layout.value.filter(item => selectedItems.value.includes(item.i))
   }
 
-  // 节流的布局更新函数
+  // Throttled layout update function
   const throttledLayoutUpdate = throttle((newLayout: GridLayoutPlusItem[]) => {
     layout.value = newLayout
     autoSave()
   }, performanceConfig.value.throttleDelay)
 
-  // 监听器
+  // listener
   watch(
     () => config.value,
     () => {
-      // 配置变化时重新验证布局
+      // Revalidate layout when configuration changes
       const validation = validateLayout(layout.value)
       if (!validation.success) {
         error.value = validation.error || null
@@ -542,13 +542,13 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     { deep: true }
   )
 
-  // 初始化历史记录
+  // Initialize history
   if (options.enableHistory && layout.value.length > 0) {
     saveToHistory()
   }
 
   return {
-    // 状态
+    // state
     layout,
     config,
     performanceConfig,
@@ -558,7 +558,7 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     currentBreakpoint,
     responsiveLayouts,
 
-    // 计算属性
+    // Computed properties
     layoutStats,
     layoutBounds,
     hasSelectedItems,
@@ -567,14 +567,14 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     isValidLayout,
     optimizedLayout,
 
-    // 布局操作
+    // Layout operations
     addItem,
     removeItem,
     updateItem,
     duplicateItem,
     clearLayout,
 
-    // 选择操作
+    // Select action
     selectItem,
     deselectItem,
     selectMultipleItems,
@@ -582,31 +582,31 @@ export function useGridLayoutPlus(options: UseGridLayoutPlusOptions = {}) {
     clearSelection,
     toggleItemSelection,
 
-    // 批量操作
+    // Batch operations
     deleteSelectedItems,
     duplicateSelectedItems,
 
-    // 布局工具
+    // Layout tools
     compactCurrentLayout,
     sortCurrentLayout,
     searchItems,
     filterItems,
 
-    // 历史记录
+    // History
     undo,
     redo,
     saveToHistory,
 
-    // 响应式布局
+    // Responsive layout
     setBreakpoint,
     createResponsiveLayoutForAll,
     getLayoutForBreakpoint,
 
-    // 导入导出
+    // Import and export
     exportCurrentLayout,
     importLayout,
 
-    // 工具方法
+    // Tool method
     getItem,
     hasItem,
     getSelectedItems,

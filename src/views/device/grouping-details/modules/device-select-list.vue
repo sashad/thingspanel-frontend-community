@@ -46,7 +46,7 @@ function handleCheck(rowKeys: DataTableRowKey[]) {
   checkedRowKeysRef.value = rowKeys
 }
 
-// 定义 emit 函数，指定可能发出的事件类型
+// definition emit function，Specify the types of events that may be emitted
 
 const closeModal = () => {
   // eslint-disable-next-line vue/custom-event-name-casing

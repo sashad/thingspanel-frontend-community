@@ -1,11 +1,11 @@
 /**
- * Card 2.1 Hooks 入口
- * 提供组件树管理和 Visual Editor 集成功能
+ * Card 2.1 Hooks Entrance
+ * Provides component tree management and Visual Editor Integrated functions
  */
 
-// 🔥 简化：只保留核心Hook
+// 🔥 simplify：Keep only the coreHook
 export { useComponentTree } from '@/card2.1/hooks/useComponentTree'
 export { useCard2Props } from '@/card2.1/hooks/useCard2Props'
 
-// 导出类型
+// Export type
 export type { ComponentTreeOptions, FilteredComponentTree } from '@/card2.1/hooks/useComponentTree'

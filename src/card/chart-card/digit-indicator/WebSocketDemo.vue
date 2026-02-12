@@ -1,44 +1,44 @@
 <template>
   <div class="websocket-demo">
-    <n-card title="Digit Indicator WebSocket 演示" size="small">
+    <n-card title="Digit Indicator WebSocket Demo" size="small">
       <n-space vertical>
-        <!-- 说明 -->
-        <n-alert type="info" title="WebSocket 数据流演示">
+        <!-- illustrate -->
+        <n-alert type="info" title="WebSocket Data flow demonstration">
           <template #default>
             <p>
-              <strong>目标</strong>
-              ：设备数据源支持 WebSocket 方式请求数据，组件响应数据更新
+              <strong>Target</strong>
+              ：Device data source support WebSocket method to request data，Component responds to data updates
             </p>
             <p>
-              <strong>流程</strong>
-              ：配置数据源 → 建立 WebSocket 连接 → 接收数据 → 映射显示 → 实时更新
+              <strong>process</strong>
+              ：Configure data source → Establish WebSocket connect → receive data → Mapping display → real time updates
             </p>
           </template>
         </n-alert>
 
-        <!-- 模拟 WebSocket 数据发送 -->
-        <n-divider title-placement="left">模拟 WebSocket 数据</n-divider>
+        <!-- simulation WebSocket Data sending -->
+        <n-divider title-placement="left">simulation WebSocket data</n-divider>
 
         <n-space>
-          <n-button type="primary" @click="sendMockData">发送模拟数据</n-button>
-          <n-button type="success" @click="sendArrayData">发送数组数据</n-button>
-          <n-button type="warning" @click="sendObjectData">发送对象数据</n-button>
+          <n-button type="primary" @click="sendMockData">Send simulated data</n-button>
+          <n-button type="success" @click="sendArrayData">Send array data</n-button>
+          <n-button type="warning" @click="sendObjectData">Send object data</n-button>
         </n-space>
 
-        <!-- Digit Indicator 组件 -->
-        <n-divider title-placement="left">Digit Indicator 组件</n-divider>
+        <!-- Digit Indicator components -->
+        <n-divider title-placement="left">Digit Indicator components</n-divider>
 
         <div class="component-container">
           <component :is="digitIndicatorComponent" ref="digitIndicatorRef" :card="cardData" />
         </div>
 
-        <!-- 数据日志 -->
-        <n-divider title-placement="left">数据更新日志</n-divider>
+        <!-- Data log -->
+        <n-divider title-placement="left">Data update log</n-divider>
 
         <n-card size="small" class="log-card">
           <div class="log-header">
-            <n-text strong>WebSocket 数据更新日志</n-text>
-            <n-button size="small" @click="clearLogs">清空</n-button>
+            <n-text strong>WebSocket Data update log</n-text>
+            <n-button size="small" @click="clearLogs">Clear</n-button>
           </div>
           <div class="log-content">
             <div v-for="(log, index) in logs" :key="index" class="log-item">
@@ -57,7 +57,7 @@ import { ref, onMounted } from 'vue'
 import { NCard, NSpace, NDivider, NButton, NAlert, NText } from 'naive-ui'
 import digitIndicatorComponent from './component.vue'
 
-// 卡片数据
+// card data
 const cardData = ref({
   config: {
     color: '#1890ff',
@@ -69,17 +69,17 @@ const cardData = ref({
       {
         deviceId: 'demo_device_001',
         metricsId: 'humidity',
-        metricsName: '湿度',
+        metricsName: 'humidity',
         metricsType: 'telemetry'
       }
     ]
   }
 })
 
-// 组件引用
+// component reference
 const digitIndicatorRef = ref<any>(null)
 
-// 日志
+// log
 const logs = ref<Array<{ timestamp: string; message: string }>>([])
 
 const addLog = (message: string) => {
@@ -97,10 +97,10 @@ const formatTime = (timestamp: string) => {
   return new Date(timestamp).toLocaleTimeString()
 }
 
-// 模拟 WebSocket 数据发送
+// simulation WebSocket Data sending
 const sendMockData = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -109,12 +109,12 @@ const sendMockData = () => {
   }
 
   digitIndicatorRef.value.updateData('demo_device_001', 'humidity', mockData)
-  addLog(`发送数据: ${JSON.stringify(mockData)}`)
+  addLog(`Send data: ${JSON.stringify(mockData)}`)
 }
 
 const sendArrayData = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -126,12 +126,12 @@ const sendArrayData = () => {
   }
 
   digitIndicatorRef.value.updateData('demo_device_001', 'humidity', arrayData)
-  addLog(`发送数组数据: ${JSON.stringify(arrayData)}`)
+  addLog(`Send array data: ${JSON.stringify(arrayData)}`)
 }
 
 const sendObjectData = () => {
   if (!digitIndicatorRef.value) {
-    addLog('组件未加载')
+    addLog('Component not loaded')
     return
   }
 
@@ -144,11 +144,11 @@ const sendObjectData = () => {
   }
 
   digitIndicatorRef.value.updateData('demo_device_001', 'humidity', objectData)
-  addLog(`发送对象数据: ${JSON.stringify(objectData)}`)
+  addLog(`Send object data: ${JSON.stringify(objectData)}`)
 }
 
 onMounted(() => {
-  addLog('组件已加载，可以开始发送模拟数据')
+  addLog('Component loaded，You can start sending simulated data')
 })
 </script>
 

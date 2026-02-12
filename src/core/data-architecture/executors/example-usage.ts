@@ -1,16 +1,16 @@
 /**
- * 多层级执行器链使用示例
- * 展示如何在实际项目中使用4层数据处理管道
+ * Multi-level executor chain usage example
+ * Show how to use it in real projects4layer data processing pipeline
  */
 
 import { createExecutorChain, DataSourceConfiguration, ExecutionResult } from '@/core/data-architecture/executors/index'
 
 /**
- * 创建示例配置数据生成器
+ * Create a sample configuration data generator
  */
 export class ExampleConfigGenerator {
   /**
-   * 生成JSON数据源示例配置
+   * generateJSONData source sample configuration
    */
   generateJsonExample(): DataSourceConfiguration {
     return {
@@ -25,10 +25,10 @@ export class ExampleConfigGenerator {
                 config: {
                   jsonString: JSON.stringify({
                     user: {
-                      name: '张三',
+                      name: 'Zhang San',
                       level: 5,
                       points: 1200,
-                      badges: ['新手', '活跃用户']
+                      badges: ['newbie', 'active users']
                     },
                     performance: {
                       daily: { visits: 45, duration: 120 },
@@ -46,7 +46,7 @@ export class ExampleConfigGenerator {
                     totalBadges: data.badges.length
                   };
                 `,
-                defaultValue: { name: '未知用户', level: 0 }
+                defaultValue: { name: 'unknown user', level: 0 }
               }
             }
           ],
@@ -89,7 +89,7 @@ export class ExampleConfigGenerator {
   }
 
   /**
-   * 生成HTTP数据源示例配置
+   * generateHTTPData source sample configuration
    */
   generateHttpExample(): DataSourceConfiguration {
     return {
@@ -114,11 +114,11 @@ export class ExampleConfigGenerator {
                     id: data.id,
                     name: data.name,
                     email: data.email,
-                    company: data.company?.name || '无',
-                    address: data.address?.city || '未知'
+                    company: data.company?.name || 'none',
+                    address: data.address?.city || 'unknown'
                   };
                 `,
-                defaultValue: { name: '数据加载失败' }
+                defaultValue: { name: 'Data loading failed' }
               }
             }
           ],
@@ -131,13 +131,13 @@ export class ExampleConfigGenerator {
   }
 
   /**
-   * 生成混合数据源示例配置
+   * Generate a sample hybrid data source configuration
    */
   generateMixedExample(): DataSourceConfiguration {
     return {
       componentId: 'mixed-widget-003',
       dataSources: [
-        // JSON数据源
+        // JSONdata source
         {
           sourceId: 'local-config',
           dataItems: [
@@ -160,7 +160,7 @@ export class ExampleConfigGenerator {
           ],
           mergeStrategy: { type: 'object' }
         },
-        // 脚本生成数据源
+        // Script to generate data source
         {
           sourceId: 'generated-data',
           dataItems: [
@@ -187,7 +187,7 @@ export class ExampleConfigGenerator {
                     ...data,
                     formatted: {
                       time: new Date(data.timestamp).toLocaleString('zh-CN'),
-                      weekStatus: data.isWeekend ? '周末' : '工作日'
+                      weekStatus: data.isWeekend ? 'weekend' : 'working days'
                     }
                   };
                 `,
@@ -205,14 +205,14 @@ export class ExampleConfigGenerator {
 }
 
 /**
- * 执行器链使用示例类
+ * Executor chain usage example class
  */
 export class ExecutorChainUsageExample {
   private executorChain = createExecutorChain()
   private configGenerator = new ExampleConfigGenerator()
 
   /**
-   * 运行JSON数据处理示例
+   * runJSONData processing example
    */
   async runJsonExample(): Promise<ExecutionResult> {
     const config = this.configGenerator.generateJsonExample()
@@ -221,7 +221,7 @@ export class ExecutorChainUsageExample {
   }
 
   /**
-   * 运行HTTP数据处理示例
+   * runHTTPData processing example
    */
   async runHttpExample(): Promise<ExecutionResult> {
     const config = this.configGenerator.generateHttpExample()
@@ -230,7 +230,7 @@ export class ExecutorChainUsageExample {
   }
 
   /**
-   * 运行混合数据源处理示例
+   * Run the mixed data source processing example
    */
   async runMixedExample(): Promise<ExecutionResult> {
     const config = this.configGenerator.generateMixedExample()
@@ -240,7 +240,7 @@ export class ExecutorChainUsageExample {
   }
 
   /**
-   * 运行所有示例
+   * Run all examples
    */
   async runAllExamples(): Promise<void> {
     try {
@@ -250,15 +250,15 @@ export class ExecutorChainUsageExample {
 
       await this.runMixedExample()
 
-      // 显示执行器链统计信息
+      // Show executor chain statistics
       const stats = this.executorChain.getChainStatistics()
     } catch (error) {}
   }
 }
 
-// 便捷导出
+// Convenient export
 export const exampleRunner = new ExecutorChainUsageExample()
 export const configGenerator = new ExampleConfigGenerator()
 
-// 浏览器环境下不支持require.main检查
-// 如需运行示例，请手动调用: exampleRunner.runAllExamples()
+// Not supported in browser environmentrequire.mainexamine
+// To run the example，Please call manually: exampleRunner.runAllExamples()

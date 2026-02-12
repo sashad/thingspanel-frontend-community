@@ -172,7 +172,7 @@ function handleEditTable(rowId: string) {
 }
 
 function handleDeleteTable(rowId: string) {
-  window.$message?.info(`${$t('generate.clickDelete')}，rowId为${rowId}`)
+  window.$message?.info(`${$t('generate.clickDelete')}，rowIdfor${rowId}`)
 }
 
 const pagination: PaginationProps = reactive({
@@ -189,7 +189,7 @@ const pagination: PaginationProps = reactive({
   }
 })
 
-/** 查看密钥 */
+/** view key */
 const secretKey = ref<string>('')
 
 function handleViewKey(rowId: string) {
@@ -205,7 +205,7 @@ function init() {
   getTableData()
 }
 
-// 初始化
+// initialization
 init()
 </script>
 

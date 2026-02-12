@@ -2,17 +2,17 @@
 defineOptions({ name: 'DashboardWorkbenchMainTechnologyCard' })
 
 interface Props {
-  /** 技术名称 */
+  /** Technical name */
   name: string
-  /** 技术描述 */
+  /** Technical description */
   description: string
-  /** 技术作者 */
+  /** technical writer */
   author: string
-  /** 技术官网 */
+  /** Technology official website */
   site: string
-  /** 技术图标 */
+  /** technology icons */
   icon: string
-  /** 图标颜色 */
+  /** icon color */
   iconColor?: string
 }
 

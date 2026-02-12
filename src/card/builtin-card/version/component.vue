@@ -55,24 +55,24 @@ const version = ref('')
 const latestVersion = ref('')
 const isLatestVersion = ref(false)
 onMounted(async () => {
-  // 尝试获取最新版本信息，失败时不影响后续逻辑
+  // Try to get the latest version information，Failure does not affect subsequent logic
   try {
     const res = await axios.get('https://api.github.com/repos/ThingsPanel/thingspanel-backend-community/tags')
     if (res?.data?.[0]?.name) {
       latestVersion.value = res.data[0].name || '--'
     }
   } catch (error) {
-    console.error('获取最新版本信息失败:', error)
+    console.error('Failed to obtain latest version information:', error)
     latestVersion.value = '--'
   }
 
-  // 获取当前系统版本
+  // Get the current system version
   const ver = await getSysVersion()
   if (ver) {
     version.value = ver?.data?.version || '--'
   }
 
-  // 比较版本信息
+  // Compare version information
   if (latestVersion.value && version.value && latestVersion.value === version.value) {
     if (process.env.NODE_ENV === 'development') {
     }
@@ -85,7 +85,7 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 微调动画效果 */
+/* Fine-tune animation effects */
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

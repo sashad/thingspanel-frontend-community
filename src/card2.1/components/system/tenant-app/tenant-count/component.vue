@@ -33,8 +33,8 @@ import GenericCard from '@/card2.1/components/common/generic-card/component.vue'
 import { createLogger } from '@/utils/logger';
 
 /**
- * @description 租户数量统计组件
- * @summary 显示系统中租户总数，支持实时数据更新
+ * @description Tenant number statistics component
+ * @summary Display the total number of tenants in the system，Support real-time data updates
  */
 
 const logger = createLogger('TenantCountCard');
@@ -43,26 +43,26 @@ defineOptions({ name: 'TenantCountCard' });
 
 const { loading, startLoading, endLoading } = useLoading(false);
 const value = ref<number | null>(null);
-const unit = ref<string>('个');
+const unit = ref<string>('indivual');
 let intervalId: number | null = null;
 
 /**
- * 获取租户统计数据
+ * Get tenant statistics
  */
 const fetchData = async () => {
   startLoading();
   try {
     const { data } = await tenant();
-    logger.info('租户统计响应:', data);
+    logger.info('Tenant statistics response:', data);
 
     if (data && typeof data.user_total === 'number') {
       value.value = data.user_total || 0;
     } else {
-      logger.warn('租户数据未找到或格式错误:', data);
+      logger.warn('Tenant data not found or in the wrong format:', data);
       value.value = null;
     }
   } catch (error) {
-    logger.error('获取租户统计失败:', error);
+    logger.error('Failed to obtain tenant statistics:', error);
     value.value = null;
   } finally {
     endLoading();
@@ -71,7 +71,7 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData();
-  // 每60秒更新一次租户数据
+  // Every60Update tenant data once every second
   intervalId = window.setInterval(fetchData, 60000);
 });
 

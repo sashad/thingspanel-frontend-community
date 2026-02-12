@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Ultra看板预览页面
- * 基于Visual Editor的PanelEditor组件实现看板预览功能，使用全局预览模式
+ * UltraKanban preview page
+ * based onVisual EditorofPanelEditorComponent implements Kanban preview function，Use global preview mode
  */
 
 import { onMounted, ref, computed, onUnmounted } from 'vue'
@@ -10,40 +10,40 @@ import { NCard, NSpace, useMessage, NSpin, NBackTop } from 'naive-ui'
 import { $t } from '@/locales'
 import { getBoard } from '@/service/api'
 
-// 正式编辑器：基于 PanelEditorV2（预览模式）
+// Official editor：based on PanelEditorV2（preview mode）
 import PanelEditorV2 from '@/components/visual-editor/PanelEditorV2.vue'
-// 导入全局预览模式管理
+// Import global preview mode management
 import { globalPreviewMode } from '@/components/visual-editor/hooks/usePreviewMode'
 
-// 路由和消息管理
+// Routing and message management
 const route = useRoute()
 const message = useMessage()
 
-// 页面状态管理
+// Page status management
 const loading = ref(true)
 const panelData = ref<Panel.Board>()
 const error = ref<string>('')
 const isUnmounted = ref(false)
 
-// 🔥 编辑器配置状态
+// 🔥 Editor configuration status
 const editorConfig = ref<{ widgets: any[]; config: any } | undefined>()
 
 /**
- * 获取看板ID和渲染器类型
+ * Get KanbanIDand renderer type
  */
 const panelId = computed(() => {
   return (route.query.id as string) || ''
 })
 
 /**
- * 获取渲染器类型，默认为gridstack（看板）
+ * Get renderer type，Default isgridstack（Kanban）
  */
 const rendererType = computed(() => {
   return (route.query.renderer as string) || 'gridstack'
 })
 
 /**
- * 🔥 获取看板数据并解析配置
+ * 🔥 Get Kanban data and parse configuration
  */
 const fetchBoardData = async () => {
   if (!panelId.value) {
@@ -59,37 +59,37 @@ const fetchBoardData = async () => {
     if (data) {
       panelData.value = data
 
-      // 🔥 解析看板配置为编辑器格式
+      // 🔥 Parse Kanban configuration into editor format
       if (data.config) {
         try {
           const parsedConfig = JSON.parse(data.config)
 
           if (parsedConfig.widgets !== undefined || parsedConfig.config !== undefined) {
-            // 标准格式：{widgets: [...], config: {...}}
+            // standard format：{widgets: [...], config: {...}}
             editorConfig.value = parsedConfig
           } else if (Array.isArray(parsedConfig)) {
-            // 旧版数组格式
+            // Legacy array format
             editorConfig.value = {
               widgets: parsedConfig,
               config: { gridConfig: {}, canvasConfig: {} }
             }
           } else {
-            // 空或未知格式，使用默认空配置
+            // Empty or unknown format，Use default empty configuration
             editorConfig.value = {
               widgets: [],
               config: { gridConfig: {}, canvasConfig: {} }
             }
           }
         } catch (e) {
-          console.error('❌ 解析看板配置失败:', e)
-          // 解析失败，使用空配置
+          console.error('❌ Failed to parse Kanban configuration:', e)
+          // Parsing failed，Use empty configuration
           editorConfig.value = {
             widgets: [],
             config: { gridConfig: {}, canvasConfig: {} }
           }
         }
       } else {
-        // 没有配置，使用空配置
+        // No configuration，Use empty configuration
         editorConfig.value = {
           widgets: [],
           config: { gridConfig: {}, canvasConfig: {} }
@@ -99,7 +99,7 @@ const fetchBoardData = async () => {
       error.value = $t('common.dataNotFound')
     }
   } catch (err) {
-    console.error('❌ 加载看板数据失败:', err)
+    console.error('❌ Failed to load Kanban data:', err)
     error.value = $t('common.loadError')
     message.error($t('common.loadError'))
   } finally {
@@ -108,26 +108,26 @@ const fetchBoardData = async () => {
 }
 
 /**
- * 页面初始化
+ * Page initialization
  */
 onMounted(async () => {
-  // 设置为预览模式 - 这是关键！
+  // Set to preview mode - this is the key！
   globalPreviewMode.setPreviewMode(true)
 
   await fetchBoardData()
 })
 
 /**
- * 页面销毁时的清理工作
+ * Cleanup work when the page is destroyed
  */
 onUnmounted(() => {
   isUnmounted.value = true
-  // 可选：离开页面时重置预览模式
+  // Optional：Reset preview mode when leaving the page
   // globalPreviewMode.setPreviewMode(false)
 })
 
 /**
- * 错误重试
+ * Retry on error
  */
 const retryLoad = async () => {
   error.value = ''
@@ -137,7 +137,7 @@ const retryLoad = async () => {
 
 <template>
   <div class="ultra-kanban-preview">
-    <!-- 加载状态 -->
+    <!-- Loading status -->
     <div v-if="loading" class="loading-container">
       <NSpin size="large">
         <template #description>
@@ -146,7 +146,7 @@ const retryLoad = async () => {
       </NSpin>
     </div>
 
-    <!-- 错误状态 -->
+    <!-- error status -->
     <div v-else-if="error" class="error-container">
       <NCard class="error-card">
         <NSpace vertical align="center">
@@ -159,9 +159,9 @@ const retryLoad = async () => {
       </NCard>
     </div>
 
-    <!-- 主内容区域 - 集成Visual Editor（预览模式） -->
+    <!-- main content area - integratedVisual Editor（preview mode） -->
     <div v-else-if="panelData && editorConfig && !isUnmounted" class="main-content">
-      <!-- 预览模式编辑器（V2）集成 - 使用全局预览模式控制 -->
+      <!-- Preview mode editor（V2）integrated - Using global preview mode controls -->
       <div class="visual-editor-container">
         <PanelEditorV2
           :key="`ultra-panel-preview-${panelId}-${rendererType}`"
@@ -177,13 +177,13 @@ const retryLoad = async () => {
       </div>
     </div>
 
-    <!-- 回到顶部按钮 -->
+    <!-- back to top button -->
     <NBackTop :right="40" />
   </div>
 </template>
 
 <style scoped>
-/* 主容器样式 */
+/* Main container style */
 .ultra-kanban-preview {
   width: 100%;
   height: 100vh;
@@ -193,7 +193,7 @@ const retryLoad = async () => {
   overflow: hidden;
 }
 
-/* 加载状态容器 */
+/* Load state container */
 .loading-container {
   display: flex;
   align-items: center;
@@ -203,7 +203,7 @@ const retryLoad = async () => {
   background-color: var(--body-color);
 }
 
-/* 错误状态容器 */
+/* error status container */
 .error-container {
   display: flex;
   align-items: center;
@@ -219,7 +219,7 @@ const retryLoad = async () => {
   text-align: center;
 }
 
-/* 主内容区域 */
+/* main content area */
 .main-content {
   width: 100%;
   height: 100vh;
@@ -229,7 +229,7 @@ const retryLoad = async () => {
   overflow: hidden;
 }
 
-/* Visual Editor容器 - 预览模式专用样式 */
+/* Visual Editorcontainer - Preview mode specific styles */
 .visual-editor-container {
   width: 100%;
   height: 100%;
@@ -239,7 +239,7 @@ const retryLoad = async () => {
   position: relative;
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .ultra-kanban-preview {
   background-color: var(--body-color);
 }
@@ -248,7 +248,7 @@ const retryLoad = async () => {
   background-color: var(--card-color);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .error-card {
     min-width: 280px;

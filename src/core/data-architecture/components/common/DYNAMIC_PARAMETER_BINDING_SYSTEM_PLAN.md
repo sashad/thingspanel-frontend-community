@@ -1,50 +1,50 @@
-# 动态参数绑定系统实施方案
+# Dynamic parameter binding system implementation plan
 
-## 项目背景
+## Project background
 
-基于已有的 `DynamicParameterEditor.vue` 组件，实现一个完整的动态参数绑定系统。该系统允许组件属性与HTTP请求的动态参数进行绑定，当组件属性变化时，自动触发新的HTTP请求执行。
+based on existing `DynamicParameterEditor.vue` components，Implement a complete dynamic parameter binding system。该系统允许components属性与HTTPBind the dynamic parameters of the request，当components属性变化时，Automatically trigger newHTTPrequest execution。
 
-## 核心需求
+## core needs
 
-1. **属性绑定机制**：组件属性可以绑定到HTTP动态参数（headers、query、path等）
-2. **实时更新触发**：属性变化时自动更新配置并触发执行器重新执行
-3. **多数据源支持**：按数据源和接口分类管理动态参数绑定
-4. **默认值机制**：属性无值时使用默认值，有值时使用属性值
-5. **配置持久化**：绑定配置需要保存和恢复
+1. **Property binding mechanism**：Component properties can be bound toHTTPdynamic parameters（headers、query、pathwait）
+2. **Real-time update trigger**：Automatically update the configuration when attributes change and trigger the executor to re-execute
+3. **Multiple data sources support**：Manage dynamic parameter binding by data source and interface classification
+4. **default value mechanism**：Use default value when attribute has no value，Use the attribute value if it has a value
+5. **Configure persistence**：Binding configuration needs to be saved and restored
 
-## 技术架构
+## Technical architecture
 
-### 1. 现有基础组件分析
+### 1. Analysis of existing infrastructure components
 
-**DynamicParameterEditor.vue** 已提供：
-- 参数模板系统（手动输入、下拉选择、属性绑定）
-- `ParameterTemplateType.PROPERTY` 模式支持
-- `EnhancedParameter` 接口包含 `valueMode`、`variableName`、`description` 字段
-- 属性绑定配置UI界面
+**DynamicParameterEditor.vue** provided：
+- Parameter template system（Manual entry、drop down selection、Property binding）
+- `ParameterTemplateType.PROPERTY` Mode support
+- `EnhancedParameter` The interface contains `valueMode`、`variableName`、`description` Field
+- Property binding configurationUIinterface
 
-### 2. 系统架构设计
+### 2. System architecture design
 
 ```
-动态参数绑定系统架构
-├── DynamicParameterEditor.vue      # 参数编辑器（已有，需增强）
-├── ParameterBindingManager.ts      # 核心绑定管理器（新增）
-├── ComponentPropertyExposer.ts     # 组件属性暴露器（新增）
-├── ConfigurationChangeNotifier.ts  # 配置变更通知器（新增）
-├── DataItemFetcher.ts              # 执行器（需增强动态解析）
-└── 集成点
-    ├── HttpConfigForm.vue          # HTTP配置表单集成
-    ├── Card2.1 属性系统           # 卡片属性暴露接口
-    └── Visual Editor 集成         # 编辑器组件属性获取
+Dynamic parameter binding system architecture
+├── DynamicParameterEditor.vue      # Parameter editor（Already，Need to be enhanced）
+├── ParameterBindingManager.ts      # core binding manager（New）
+├── ComponentPropertyExposer.ts     # Component property exposer（New）
+├── ConfigurationChangeNotifier.ts  # Configuration change notifier（New）
+├── DataItemFetcher.ts              # actuator（Need to enhance dynamic analysis）
+└── integration point
+    ├── HttpConfigForm.vue          # HTTPConfigure form integration
+    ├── Card2.1 attribute system           # Card attribute exposure interface
+    └── Visual Editor integrated         # Get editor component properties
 ```
 
-## 详细实施方案
+## Detailed implementation plan
 
-### 阶段1：增强现有 DynamicParameterEditor
+### stage1：enhance existing DynamicParameterEditor
 
-#### 1.1 扩展 EnhancedParameter 接口
+#### 1.1 Expand EnhancedParameter interface
 
 ```typescript
-// 在 DynamicParameterEditor.vue 中扩展接口
+// exist DynamicParameterEditor.vue Medium expansion interface
 interface EnhancedParameter {
   key: string
   value: string | number | boolean
@@ -55,21 +55,21 @@ interface EnhancedParameter {
   description?: string
   dataType: 'string' | 'number' | 'boolean' | 'json'
   
-  // 新增：属性绑定相关字段
+  // New：Attribute binding related fields
   bindingInfo?: {
-    componentId?: string           // 绑定的组件ID
-    propertyPath?: string          // 属性路径（如 'config.deviceId'）
-    propertyType?: string          // 属性类型
-    fallbackValue?: any           // 回退默认值
-    isActive?: boolean            // 绑定是否激活
+    componentId?: string           // bound componentsID
+    propertyPath?: string          // Property path（like 'config.deviceId'）
+    propertyType?: string          // Property type
+    fallbackValue?: any           // Fallback to default
+    isActive?: boolean            // Is the binding activated?
   }
 }
 ```
 
-#### 1.2 属性选择器组件
+#### 1.2 Attribute selector component
 
 ```typescript
-// 新增组件属性选择逻辑
+// Added component attribute selection logic
 const availableProperties = computed(() => {
   if (!props.componentId) return []
   return getComponentProperties(props.componentId)
@@ -83,55 +83,55 @@ const onPropertyBinding = (param: EnhancedParameter, propertyPath: string) => {
     isActive: true,
     fallbackValue: param.value
   }
-  // 注册绑定关系到 ParameterBindingManager
+  // Registration binding is related to ParameterBindingManager
   parameterBindingManager.registerBinding(param.key, updatedParam.bindingInfo)
   updateParameter(updatedParam, index)
 }
 ```
 
-#### 1.3 UI界面增强
+#### 1.3 UIInterface enhancement
 
 ```vue
-<!-- 属性绑定模式的UI增强 -->
+<!-- Property binding modeUIEnhance -->
 <div v-if="param.valueMode === 'property'" class="property-binding-config">
   <n-space vertical size="small">
-    <!-- 现有UI保持不变 -->
+    <!-- existingUIremain unchanged -->
     <div class="binding-info">
-      <n-tag size="small" type="info">属性绑定 - 运行时动态获取值</n-tag>
+      <n-tag size="small" type="info">Property binding - Dynamically obtain values ​​at runtime</n-tag>
     </div>
     
-    <!-- 新增：属性选择器 -->
+    <!-- New：attribute selector -->
     <n-space align="center" size="small">
-      <n-text depth="3" style="font-size: 11px; width: 60px">绑定属性:</n-text>
+      <n-text depth="3" style="font-size: 11px; width: 60px">Binding properties:</n-text>
       <n-select
         :value="param.bindingInfo?.propertyPath"
         :options="availableProperties"
-        placeholder="选择要绑定的组件属性"
+        placeholder="Select the component properties to bind"
         size="small"
         style="flex: 1"
         @update:value="path => onPropertyBinding(param, path)"
       />
     </n-space>
     
-    <!-- 新增：绑定状态显示 -->
+    <!-- New：Binding status display -->
     <n-space align="center" size="small" v-if="param.bindingInfo?.isActive">
-      <n-text depth="3" style="font-size: 11px; width: 60px">当前值:</n-text>
+      <n-text depth="3" style="font-size: 11px; width: 60px">current value:</n-text>
       <n-tag size="small" :type="getBindingValueType(param)">
-        {{ getCurrentBindingValue(param) || '使用默认值' }}
+        {{ getCurrentBindingValue(param) || 'Use default value' }}
       </n-tag>
     </n-space>
   </n-space>
 </div>
 ```
 
-### 阶段2：核心绑定管理系统
+### stage2：Core binding management system
 
 #### 2.1 ParameterBindingManager.ts
 
 ```typescript
 /**
- * 参数绑定管理器
- * 负责管理组件属性与HTTP参数的绑定关系
+ * Parameter binding manager
+ * Responsible for managing component properties andHTTPParameter binding relationship
  */
 export class ParameterBindingManager {
   private bindingRegistry = new Map<string, BindingConfiguration>()
@@ -143,7 +143,7 @@ export class ParameterBindingManager {
   }
   
   /**
-   * 注册参数绑定
+   * Register parameter binding
    */
   registerBinding(
     parameterId: string, 
@@ -164,7 +164,7 @@ export class ParameterBindingManager {
   }
   
   /**
-   * 设置属性监听
+   * Set property monitoring
    */
   private setupPropertyWatch(binding: BindingConfiguration): void {
     const component = this.getComponentInstance(binding.componentId)
@@ -182,7 +182,7 @@ export class ParameterBindingManager {
   }
   
   /**
-   * 属性变化处理
+   * Property change processing
    */
   private onPropertyChange(parameterId: string, newValue: any): void {
     const binding = this.bindingRegistry.get(parameterId)
@@ -190,12 +190,12 @@ export class ParameterBindingManager {
     
     const effectiveValue = newValue !== undefined ? newValue : binding.fallbackValue
     
-    // 通知配置变更
+    // Notify configuration changes
     this.configurationNotifier.notifyParameterChange(parameterId, effectiveValue)
   }
   
   /**
-   * 获取当前绑定值
+   * Get the current binding value
    */
   getCurrentBindingValue(parameterId: string): any {
     const binding = this.bindingRegistry.get(parameterId)
@@ -209,7 +209,7 @@ export class ParameterBindingManager {
   }
   
   /**
-   * 解除绑定
+   * Unbind
    */
   unregisterBinding(parameterId: string): void {
     const watcher = this.propertyWatchers.get(parameterId)
@@ -221,22 +221,22 @@ export class ParameterBindingManager {
   }
   
   /**
-   * 获取组件实例（需要与Card2.1系统集成）
+   * Get component instance（Need andCard2.1System integration）
    */
   private getComponentInstance(componentId: string): any {
-    // TODO: 与Card2.1系统集成，获取组件实例
+    // TODO: andCard2.1System integration，Get component instance
     return getCard2ComponentInstance(componentId)
   }
   
   /**
-   * 获取嵌套属性值
+   * Get nested attribute values
    */
   private getNestedProperty(obj: any, path: string): any {
     return path.split('.').reduce((current, key) => current?.[key], obj)
   }
 }
 
-// 全局实例
+// global instance
 export const parameterBindingManager = new ParameterBindingManager()
 ```
 
@@ -244,14 +244,14 @@ export const parameterBindingManager = new ParameterBindingManager()
 
 ```typescript
 /**
- * 配置变更通知器
- * 负责通知相关系统配置已变更，触发重新执行
+ * Configuration change notifier
+ * Responsible for notifying relevant system configurations that have been changed，Trigger re-execution
  */
 export class ConfigurationChangeNotifier {
   private changeListeners = new Map<string, Set<(value: any) => void>>()
   
   /**
-   * 注册配置变更监听
+   * Register configuration change monitoring
    */
   onParameterChange(parameterId: string, callback: (value: any) => void): void {
     if (!this.changeListeners.has(parameterId)) {
@@ -261,7 +261,7 @@ export class ConfigurationChangeNotifier {
   }
   
   /**
-   * 通知参数变更
+   * Notify parameter changes
    */
   notifyParameterChange(parameterId: string, newValue: any): void {
     const listeners = this.changeListeners.get(parameterId)
@@ -269,44 +269,44 @@ export class ConfigurationChangeNotifier {
       listeners.forEach(callback => callback(newValue))
     }
     
-    // 触发全局配置重新执行
+    // Trigger global configuration re-execution
     this.triggerConfigurationReexecution(parameterId, newValue)
   }
   
   /**
-   * 触发配置重新执行
+   * Trigger configuration re-execution
    */
   private triggerConfigurationReexecution(parameterId: string, newValue: any): void {
-    // 找到包含此参数的所有HTTP配置
+    // Find all that contain this parameterHTTPConfiguration
     const affectedConfigurations = this.findAffectedConfigurations(parameterId)
     
     affectedConfigurations.forEach(config => {
-      // 更新配置中的参数值
+      // Update parameter values ​​in configuration
       this.updateConfigurationParameter(config, parameterId, newValue)
       
-      // 触发DataItemFetcher重新执行
+      // triggerDataItemFetcherRe-execute
       this.triggerDataItemRefetch(config)
     })
   }
   
   /**
-   * 查找受影响的配置
+   * Find affected configurations
    */
   private findAffectedConfigurations(parameterId: string): HttpConfig[] {
-    // TODO: 实现配置查找逻辑
-    // 需要维护参数ID到配置的映射关系
+    // TODO: Implement configuration lookup logic
+    // Need to maintain parametersIDmapping to configuration
     return []
   }
   
   /**
-   * 更新配置参数值
+   * Update configuration parameter values
    */
   private updateConfigurationParameter(
     config: HttpConfig, 
     parameterId: string, 
     newValue: any
   ): void {
-    // 更新headers中的参数
+    // renewheadersParameters in
     if (config.headers) {
       Object.keys(config.headers).forEach(key => {
         if (this.isParameterReference(config.headers![key], parameterId)) {
@@ -315,7 +315,7 @@ export class ConfigurationChangeNotifier {
       })
     }
     
-    // 更新query参数
+    // renewqueryparameter
     if (config.params) {
       config.params.forEach(param => {
         if (param.variableName === parameterId) {
@@ -324,42 +324,42 @@ export class ConfigurationChangeNotifier {
       })
     }
     
-    // 更新路径参数
+    // Update path parameters
     if (config.pathParameter?.variableName === parameterId) {
       config.pathParameter.value = newValue
     }
   }
   
   /**
-   * 触发数据项重新获取
+   * Trigger data item re-fetching
    */
   private triggerDataItemRefetch(config: HttpConfig): void {
-    // TODO: 与DataItemFetcher集成，触发重新执行
-    console.log('🔄 配置变更触发重新执行:', config)
+    // TODO: andDataItemFetcherintegrated，Trigger re-execution
+    console.log('🔄 Configuration changes trigger re-execution:', config)
   }
   
   /**
-   * 检查是否为参数引用
+   * Check if it is a parameter reference
    */
   private isParameterReference(value: string, parameterId: string): boolean {
-    // 简单的参数引用检查逻辑
+    // Simple parameter reference checking logic
     return value.includes(`{${parameterId}}`)
   }
 }
 ```
 
-### 阶段3：组件属性暴露系统
+### stage3：Component property exposure system
 
 #### 3.1 ComponentPropertyExposer.ts
 
 ```typescript
 /**
- * 组件属性暴露器
- * 负责从Card2.1组件中暴露可绑定的属性
+ * Component property exposer
+ * Responsible forCard2.1Expose bindable properties in components
  */
 export class ComponentPropertyExposer {
   /**
-   * 获取组件可绑定属性
+   * Get component bindable properties
    */
   getComponentProperties(componentId: string): PropertyDescriptor[] {
     const component = this.getComponentInstance(componentId)
@@ -368,17 +368,17 @@ export class ComponentPropertyExposer {
     const definition = this.getComponentDefinition(componentId)
     if (!definition) return []
     
-    // 方案1：基于组件定义的properties声明
+    // plan1：Based on component definitionpropertiesstatement
     if (definition.properties) {
       return this.extractFromProperties(definition.properties)
     }
     
-    // 方案2：基于组件实际属性（运行时反射）
+    // plan2：Based on the actual properties of the component（runtime reflection）
     return this.extractFromInstance(component)
   }
   
   /**
-   * 从properties定义提取属性
+   * frompropertiesDefine extraction properties
    */
   private extractFromProperties(properties: Record<string, any>): PropertyDescriptor[] {
     return Object.entries(properties).map(([key, prop]) => ({
@@ -391,12 +391,12 @@ export class ComponentPropertyExposer {
   }
   
   /**
-   * 从组件实例提取属性
+   * Extract properties from component instance
    */
   private extractFromInstance(component: any): PropertyDescriptor[] {
     const properties: PropertyDescriptor[] = []
     
-    // 提取config属性
+    // extractconfigproperty
     if (component.config) {
       Object.keys(component.config).forEach(key => {
         properties.push({
@@ -408,7 +408,7 @@ export class ComponentPropertyExposer {
       })
     }
     
-    // 提取其他可用属性
+    // Extract other available properties
     const excludeKeys = ['config', '$el', '$parent', '$root']
     Object.keys(component).forEach(key => {
       if (!excludeKeys.includes(key) && !key.startsWith('_')) {
@@ -425,12 +425,12 @@ export class ComponentPropertyExposer {
   }
   
   private getComponentInstance(componentId: string): any {
-    // TODO: 与Card2.1系统集成
+    // TODO: andCard2.1System integration
     return null
   }
   
   private getComponentDefinition(componentId: string): any {
-    // TODO: 与Card2.1系统集成
+    // TODO: andCard2.1System integration
     return null
   }
 }
@@ -446,35 +446,35 @@ interface PropertyDescriptor {
 export const componentPropertyExposer = new ComponentPropertyExposer()
 ```
 
-### 阶段4：DataItemFetcher增强
+### stage4：DataItemFetcherEnhance
 
-#### 4.1 动态参数解析增强
+#### 4.1 Dynamic parameter parsing enhancement
 
 ```typescript
-// 在 DataItemFetcher.ts 中增强
+// exist DataItemFetcher.ts Medium enhancement
 private async fetchHttpData(config: HttpDataItemConfig): Promise<any> {
   try {
-    // 现有逻辑保持不变...
+    // Existing logic remains unchanged...
     
-    // 新增：动态参数解析步骤
+    // New：Dynamic parameter parsing steps
     const resolvedConfig = await this.resolveDynamicParameters(config)
     
-    // 使用解析后的配置继续执行...
-    // ... 现有请求逻辑
+    // Continue execution using the parsed configuration...
+    // ... Existing request logic
     
   } catch (error) {
-    console.error('DataItemFetcher: HTTP数据获取失败', error)
+    console.error('DataItemFetcher: HTTPData acquisition failed', error)
     return {}
   }
 }
 
 /**
- * 解析动态参数
+ * Parse dynamic parameters
  */
 private async resolveDynamicParameters(config: HttpDataItemConfig): Promise<HttpDataItemConfig> {
   const resolvedConfig = { ...config }
   
-  // 解析路径参数
+  // Parse path parameters
   if (resolvedConfig.pathParameter?.variableName) {
     const bindingValue = parameterBindingManager.getCurrentBindingValue(
       resolvedConfig.pathParameter.variableName
@@ -484,7 +484,7 @@ private async resolveDynamicParameters(config: HttpDataItemConfig): Promise<Http
     }
   }
   
-  // 解析headers中的动态参数
+  // parseheadersdynamic parameters in
   if (resolvedConfig.headers) {
     Object.keys(resolvedConfig.headers).forEach(key => {
       const headerValue = resolvedConfig.headers![key]
@@ -494,7 +494,7 @@ private async resolveDynamicParameters(config: HttpDataItemConfig): Promise<Http
     })
   }
   
-  // 解析query参数
+  // parsequeryparameter
   if (resolvedConfig.params) {
     resolvedConfig.params = resolvedConfig.params.map(param => {
       if (param.variableName) {
@@ -507,16 +507,16 @@ private async resolveDynamicParameters(config: HttpDataItemConfig): Promise<Http
     })
   }
   
-  console.log('🔧 [HTTP请求器] 动态参数解析完成:', {
-    原始配置: config,
-    解析后配置: resolvedConfig
+  console.log('🔧 [HTTPrequester] Dynamic parameter analysis completed:', {
+    original configuration: config,
+    Configure after parsing: resolvedConfig
   })
   
   return resolvedConfig
 }
 
 /**
- * 插值解析
+ * Interpolation analysis
  */
 private interpolateValue(template: string): string {
   return template.replace(/\{(\w+)\}/g, (match, variableName) => {
@@ -526,16 +526,16 @@ private interpolateValue(template: string): string {
 }
 ```
 
-### 阶段5：HttpConfigForm集成
+### stage5：HttpConfigFormintegrated
 
-#### 5.1 传入组件ID
+#### 5.1 Pass in componentID
 
 ```vue
-<!-- HttpConfigForm.vue 增强 -->
+<!-- HttpConfigForm.vue Enhance -->
 <script setup lang="ts">
 interface Props {
   modelValue: HttpConfig
-  // 新增：组件ID用于属性绑定
+  // New：componentsIDfor property binding
   componentId?: string
 }
 
@@ -545,11 +545,11 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <!-- 在DynamicParameterEditor中传入componentId -->
+  <!-- existDynamicParameterEditorincomingcomponentId -->
   <DynamicParameterEditor
     v-model="httpConfig.params"
     parameter-type="query"
-    title="查询参数"
+    title="query parameters"
     :component-id="props.componentId"
     @parameter-binding-change="onParameterBindingChange"
   />
@@ -557,107 +557,107 @@ const props = withDefaults(defineProps<Props>(), {
   <DynamicParameterEditor
     v-model="httpConfig.headers"
     parameter-type="header"
-    title="请求头"
+    title="Request header"
     :component-id="props.componentId"
     @parameter-binding-change="onParameterBindingChange"
   />
 </template>
 ```
 
-#### 5.2 绑定变更处理
+#### 5.2 Binding change handling
 
 ```typescript
 /**
- * 处理参数绑定变更
+ * Handle parameter binding changes
  */
 const onParameterBindingChange = (parameterId: string, bindingInfo: any) => {
-  console.log('参数绑定变更:', { parameterId, bindingInfo })
+  console.log('Parameter binding changes:', { parameterId, bindingInfo })
   
-  // 可以在这里添加额外的处理逻辑
-  // 例如：保存配置、验证绑定等
+  // Additional processing logic can be added here
+  // For example：Save configuration、Verify binding etc.
 }
 ```
 
-### 阶段6：Card2.1系统集成
+### stage6：Card2.1System integration
 
-#### 6.1 组件属性声明规范
+#### 6.1 Component property declaration specification
 
 ```typescript
-// Card2.1组件需要声明可绑定属性
+// Card2.1Components need to declare bindable properties
 export const MyCard2Component: ComponentDefinition = {
   type: 'my-component',
-  name: '我的组件',
-  // ... 其他定义
+  name: 'my component',
+  // ... Other definitions
   
-  // 新增：可绑定属性声明
+  // New：Bindable property declaration
   bindableProperties: {
     deviceId: {
       type: 'string',
-      label: '设备ID',
-      description: '当前选中的设备ID',
+      label: 'equipmentID',
+      description: 'Currently selected deviceID',
       category: 'config'
     },
     selectedMetric: {
       type: 'string',
-      label: '选中指标',
-      description: '用户选择的指标名称',
+      label: 'selected indicator',
+      description: 'User-selected metric name',
       category: 'runtime'
     }
   }
 }
 ```
 
-## 实施时序
+## Implementation timing
 
-### Phase 1: 基础增强 (1-2天)
-- [ ] 增强 `DynamicParameterEditor.vue` 的UI和接口
-- [ ] 实现 `ParameterBindingManager` 核心类
-- [ ] 基础的属性绑定注册和监听机制
+### Phase 1: Basic enhancement (1-2sky)
+- [ ] Enhance `DynamicParameterEditor.vue` ofUIand interface
+- [ ] accomplish `ParameterBindingManager` core class
+- [ ] Basic attribute binding registration and monitoring mechanism
 
-### Phase 2: 核心系统 (2-3天)  
-- [ ] 完善 `ConfigurationChangeNotifier` 
-- [ ] 实现 `ComponentPropertyExposer`
-- [ ] DataItemFetcher动态参数解析集成
+### Phase 2: core system (2-3sky)  
+- [ ] Complete `ConfigurationChangeNotifier` 
+- [ ] accomplish `ComponentPropertyExposer`
+- [ ] DataItemFetcherDynamic parameter parsing integration
 
-### Phase 3: 集成测试 (1-2天)
-- [ ] HttpConfigForm集成测试
-- [ ] 端到端绑定流程测试
-- [ ] Card2.1系统集成验证
+### Phase 3: Integration testing (1-2sky)
+- [ ] HttpConfigFormIntegration testing
+- [ ] End-to-end binding process testing
+- [ ] Card2.1System integration verification
 
-### Phase 4: 优化和文档 (1天)
-- [ ] 性能优化和错误处理
-- [ ] 用户文档和示例代码
-- [ ] 单元测试补充
+### Phase 4: Optimization and documentation (1sky)
+- [ ] Performance optimization and error handling
+- [ ] User documentation and sample code
+- [ ] Unit testing supplement
 
-## 技术细节和考虑事项
+## Technical details and considerations
 
-### 1. 内存管理
-- 组件销毁时需要清理属性监听器
-- 避免循环引用导致内存泄漏
+### 1. Memory management
+- Property listeners need to be cleaned up when the component is destroyed
+- Avoid memory leaks caused by circular references
 
-### 2. 性能优化
-- 属性监听的节流/防抖处理
-- 批量配置更新避免频繁触发
+### 2. Performance optimization
+- Throttling of attribute listening/Anti-shake processing
+- Batch configuration updates avoid frequent triggering
 
-### 3. 错误处理
-- 绑定失败的降级机制
-- 组件属性不存在时的处理
+### 3. Error handling
+- Downgrade mechanism for binding failure
+- Handling when component properties do not exist
 
-### 4. 类型安全
-- 严格的TypeScript类型定义
-- 属性类型匹配验证
+### 4. type safety
+- strictTypeScripttype definition
+- Attribute type match verification
 
-### 5. 向后兼容
-- 现有配置格式的兼容性保证
-- 渐进式升级路径
+### 5. backwards compatible
+- Compatibility guarantee for existing configuration formats
+- Progressive upgrade path
 
-## 总结
+## Summarize
 
-本方案基于现有的 `DynamicParameterEditor.vue` 组件，通过最小化的架构变更实现完整的动态参数绑定系统。核心思路是：
+This plan is based on existing `DynamicParameterEditor.vue` components，Implement a complete dynamic parameter binding system with minimal architectural changes。The core idea is：
 
-1. **以DynamicParameterEditor为中心**：利用现有的属性绑定UI和数据结构
-2. **管理器模式**：使用ParameterBindingManager统一管理所有绑定关系
-3. **响应式触发**：通过Vue的watch机制实现属性变更的实时响应
-4. **配置驱动**：保持现有的配置文件结构，通过动态解析实现参数替换
+1. **byDynamicParameterEditoras the center**：Leverage existing property bindingsUIand data structures
+2. **manager mode**：useParameterBindingManagerUnified management of all binding relationships
+3. **Reactive triggering**：passVueofwatchMechanism to implement real-time response to attribute changes
+4. **Configure driver**：Maintain existing configuration file structure，Parameter replacement through dynamic parsing
 
-该系统实现后，用户可以在HTTP配置界面直接将组件属性绑定到请求参数，实现真正的动态数据获取能力。
+After the system is implemented，Users canHTTPThe configuration interface directly binds component properties to request parameters.，Achieve true dynamic data acquisition capabilities。

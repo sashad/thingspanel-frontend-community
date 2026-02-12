@@ -1,21 +1,21 @@
 <template>
   <div class="province-city-district-selector">
-    <!-- 省份选择 -->
+    <!-- Province selection -->
     <n-select
       v-model:value="selectedProvince"
       :options="provinceOptions"
-      placeholder="请选择省份"
+      placeholder="Please select a province"
       clearable
       filterable
       class="selector-item"
       @update:value="handleProvinceChange"
     />
     
-    <!-- 城市选择 -->
+    <!-- City selection -->
     <n-select
       v-model:value="selectedCity"
       :options="cityOptions"
-      :placeholder="isMunicipality ? '请选择区县' : '请选择城市'"
+      :placeholder="isMunicipality ? 'Please select a district or county' : 'Please select a city'"
       clearable
       filterable
       :disabled="!selectedProvince"
@@ -23,12 +23,12 @@
       @update:value="handleCityChange"
     />
     
-    <!-- 区县选择 - 直辖市时隐藏 -->
+    <!-- District and county selection - Hide when municipality -->
     <n-select
       v-if="!isMunicipality"
       v-model:value="selectedDistrict"
       :options="districtOptions"
-      placeholder="请选择区县"
+      placeholder="Please select a district or county"
       clearable
       filterable
       :disabled="!selectedCity"
@@ -43,17 +43,17 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { NSelect } from 'naive-ui'
 import pwData from '@/views/management/user/components/pw.json'
 
-// 定义组件的 props
+// Define components props
 interface Props {
-  // 当前选中的省市区值
+  // The currently selected province and city value
   province?: string
   city?: string
   district?: string
 }
 
-// 定义组件的 emits
+// Define components emits
 interface Emits {
-  // 当选择发生变化时触发
+  // Fires when selection changes
   change: [value: { province: string; city: string; district: string }]
 }
 
@@ -65,12 +65,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 当前选中的值
+// currently selected value
 const selectedProvince = ref<string>('')
 const selectedCity = ref<string>('')
 const selectedDistrict = ref<string>('')
 
-// 省份选项
+// Province options
 const provinceOptions = computed(() => {
   return pwData.map(province => ({
     label: province.name,
@@ -78,7 +78,7 @@ const provinceOptions = computed(() => {
   }))
 })
 
-// 城市选项
+// city ​​options
 const cityOptions = computed(() => {
   if (!selectedProvince.value) return []
   
@@ -86,8 +86,8 @@ const cityOptions = computed(() => {
   if (!province || !province.children) return []
   
   if (isMunicipality.value) {
-    // 直辖市：跳过"市辖区"层级，直接返回区县作为城市选项
-    const cityDistricts = province.children.find(city => city.name === '市辖区')
+    // municipality：jump over"Municipal district"Hierarchy，Return directly to district and county as city option
+    const cityDistricts = province.children.find(city => city.name === 'Municipal district')
     if (cityDistricts && cityDistricts.children) {
       return cityDistricts.children.map(district => ({
         label: district.name,
@@ -96,32 +96,32 @@ const cityOptions = computed(() => {
     }
   }
   
-  // 普通省份：返回正常的城市列表
+  // Ordinary province：Return to normal city list
   return province.children.map(city => ({
     label: city.name,
     value: city.name
   }))
 })
 
-// 判断是否为直辖市
+// Determine whether it is a municipality
 const isMunicipality = computed(() => {
-  const municipalities = ['北京市', '天津市', '上海市', '重庆市']
+  const municipalities = ['Beijing', 'Tianjin City', 'Shanghai', 'Chongqing City']
   return municipalities.includes(selectedProvince.value)
 })
 
-// 区县选项
+// District and county options
 const districtOptions = computed(() => {
   if (!selectedProvince.value || !selectedCity.value) return []
   
   const province = pwData.find(p => p.name === selectedProvince.value)
   if (!province || !province.children) return []
   
-  // 直辖市不显示区县选择器
+  // Municipalities do not display district and county selectors
   if (isMunicipality.value) {
     return []
   }
   
-  // 普通省份：查找对应城市的区县
+  // Ordinary province：Find the districts and counties corresponding to the city
   const city = province.children.find(c => c.name === selectedCity.value)
   if (!city || !city.children) return []
   
@@ -131,7 +131,7 @@ const districtOptions = computed(() => {
   }))
 })
 
-// 处理省份变化
+// Handling province changes
 const handleProvinceChange = (value: string | null) => {
   selectedProvince.value = value || ''
   selectedCity.value = ''
@@ -139,27 +139,27 @@ const handleProvinceChange = (value: string | null) => {
   emitChange()
 }
 
-// 处理城市变化
+// Dealing with urban change
 const handleCityChange = (value: string | null) => {
   selectedCity.value = value || ''
   selectedDistrict.value = ''
   emitChange()
 }
 
-// 处理区县变化
+// Handling district and county changes
 const handleDistrictChange = (value: string | null) => {
   selectedDistrict.value = value || ''
   emitChange()
 }
 
-// 触发变化事件
+// Trigger change event
 const emitChange = () => {
   let province = selectedProvince.value
   let city = selectedCity.value
   let district = selectedDistrict.value
   
   if (isMunicipality.value) {
-    // 直辖市：城市就是省份，区县就是选择的"城市"
+    // municipality：Cities are provinces，Districts and counties are the ones who choose"City"
     city = selectedProvince.value
     district = selectedCity.value
   }
@@ -171,22 +171,22 @@ const emitChange = () => {
   })
 }
 
-// 监听 props 变化，用于回显
+// monitor props change，used to echo
 watch(
   () => [props.province, props.city, props.district],
   ([newProvince, newCity, newDistrict]) => {
     selectedProvince.value = newProvince || ''
     
-    // 处理直辖市的回显逻辑
-    const municipalities = ['北京市', '天津市', '上海市', '重庆市']
+    // Processing the echo logic of municipalities
+    const municipalities = ['Beijing', 'Tianjin City', 'Shanghai', 'Chongqing City']
     const isCurrentMunicipality = municipalities.includes(newProvince || '')
     
     if (isCurrentMunicipality) {
-      // 直辖市：城市选择器显示的是区县
+      // municipality：The city selector shows districts and counties
       selectedCity.value = newDistrict || ''
       selectedDistrict.value = ''
     } else {
-      // 普通省份：正常显示
+      // Ordinary province：Normal display
       selectedCity.value = newCity || ''
       selectedDistrict.value = newDistrict || ''
     }
@@ -194,9 +194,9 @@ watch(
   { immediate: true }
 )
 
-// 组件挂载时初始化
+// Initialized when component is mounted
 onMounted(() => {
-  // 如果有初始值，触发一次变化事件
+  // If there is an initial value，Trigger a change event
   if (props.province || props.city || props.district) {
     emitChange()
   }
@@ -211,17 +211,17 @@ onMounted(() => {
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  /* 让地址选择器占据整行 */
+  /* Make the address selector occupy the entire line */
 }
 
 .selector-item {
   min-width: 150px;
   flex: 1;
   max-width: 200px;
-  /* 限制最大宽度，保持合理比例 */
+  /* Limit maximum width，Keep proportions reasonable */
 }
 
-/* 响应式布局 */
+/* Responsive layout */
 @media (max-width: 768px) {
   .province-city-district-selector {
     flex-direction: column;
@@ -235,7 +235,7 @@ onMounted(() => {
   }
 }
 
-/* 平板布局 */
+/* Tablet layout */
 @media (max-width: 1024px) and (min-width: 769px) {
   .selector-item {
     max-width: 180px;

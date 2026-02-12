@@ -77,14 +77,14 @@ const initialOptions = ref({
   },
   dataZoom: [
     {
-      type: 'slider', // 添加一个滑动条型的 dataZoom
+      type: 'slider', // Add a slider dataZoom
       show: true,
       xAxisIndex: [0],
       start: 0,
       end: 100
     },
     {
-      type: 'inside', // 添加一个内置型的 dataZoom，支持鼠标滚轮或触摸板缩放
+      type: 'inside', // Add a built-in dataZoom，Supports mouse wheel or touchpad zooming
       xAxisIndex: [0],
       start: 0,
       end: 100
@@ -152,8 +152,8 @@ const initialOptions = ref({
   },
   yAxis: {
     type: 'value',
-    // min: 0, // 设置 y 轴的最小值
-    // max: 0, // 设置 y 轴的最大值
+    // min: 0, // set up y axis minimum value
+    // max: 0, // set up y axis maximum value
     scale: true
   },
   series: [
@@ -252,7 +252,7 @@ const navigateTime = (direction: string) => {
   let end: number | undefined
 
   if (!start) {
-    // 如果没有设置开始时间，使用当前时间
+    // If no start time is set，Use current time
     start = dayjs().startOf('hour').valueOf()
   }
 
@@ -284,7 +284,7 @@ const navigateTime = (direction: string) => {
       end = startDate.endOf('month').valueOf()
       break
     default:
-      // 如果没有匹配的方向，保持当前开始时间不变，结束时间设置为开始时间的结束
+      // If there is no matching direction，Keep current start time unchanged，The end time is set to the end of the start time
       end = startDate.endOf('hour').valueOf()
       break
   }
@@ -295,14 +295,14 @@ const navigateTime = (direction: string) => {
   selectedOption.value.end_time = end
   selectedOption.value.time_range = 'custom'
 
-  // 更新日期选择器的值
+  // Update date picker value
   datePickerValue.value = [start, end]
 }
 
 watch(
   selectedOption,
   async v => {
-    // 这里是当 selectedOption 变化时需要执行的逻辑
+    // This is when selectedOption The logic that needs to be executed when changing
 
     if (v.time_range === 'custom' && (!v.start_time || !v.end_time)) {
       window.NMessage.destroyAll()
@@ -314,7 +314,7 @@ watch(
       ...v
     })
     if (!error && data && initialOptions.value.series) {
-      // 对数据进行排序，确保最新的数据在前面
+      // Sort data，Make sure the latest data comes first
       const sortedData = data.sort((a, b) => {
         return b.x - a.x
       })
@@ -335,7 +335,7 @@ watch(
           }
         })
         avgValue.value = sumValue / data.length
-        // 这里是当 通过接口改变 initialOptions的数据
+        // This is when Change via interface initialOptionsdata
 
         initialOptions.value.series.forEach(series => {
           series.data = data.map(item => {
@@ -367,8 +367,8 @@ const onTimeRangeChange = value => {
 }
 
 /**
- * 根据开始时间和结束时间计算一个权重，权重越大，表示时间范围越大 1小时内，权重为0 3小时内，权重为1 6小时内，权重为2 12小时内，权重为3 24小时内，权重为4 3天内，权重为5 7天内，权重为6 15天内，权重为7
- * 30天内，权重为8
+ * Calculate a weight based on start time and end time，The greater the weight，Indicates that the larger the time range 1within hours，The weight is0 3within hours，The weight is1 6within hours，The weight is2 12within hours，The weight is3 24within hours，The weight is4 3within days，The weight is5 7within days，The weight is6 15within days，The weight is7
+ * 30within days，The weight is8
  */
 const calculateTimeWeight = (start: number, end: number) => {
   const startDate = dayjs(start)
@@ -447,7 +447,7 @@ const initData = () => {
 
 const exportData = () => {
   const excelData = [
-    ['时间', (props.theName ? props.theName : props.theKey) + (props.theUnit ? `(${props.theUnit})` : '')], // 表头
+    ['time', (props.theName ? props.theName : props.theKey) + (props.theUnit ? `(${props.theUnit})` : '')], // Header
     ...tableData.value.map(item => [dayjs(item.x).format('YYYY-MM-DD HH:mm:ss'), item.y])
   ]
   // save as csv

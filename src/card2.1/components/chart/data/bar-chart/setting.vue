@@ -1,72 +1,72 @@
 <template>
   <n-space vertical :size="16">
-    <!-- 基础配置 -->
-    <n-card title="基础配置" size="small">
+    <!-- Basic configuration -->
+    <n-card title="Basic configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="图表标题">
+        <n-form-item label="Chart title">
           <n-input
             v-model:value="localConfig.title"
-            placeholder="数据对比"
+            placeholder="Data comparison"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="显示图例">
+        <n-form-item label="Show legend">
           <n-switch
             v-model:value="localConfig.showLegend"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="显示标签">
+        <n-form-item label="show label">
           <n-switch
             v-model:value="localConfig.showLabel"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="显示网格">
+        <n-form-item label="show grid">
           <n-switch
             v-model:value="localConfig.showGrid"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="柱宽度">
+        <n-form-item label="column width">
           <n-input
             v-model:value="localConfig.barWidth"
-            placeholder="60% 或 20"
+            placeholder="60% or 20"
             @update:value="handleConfigChange"
           />
         </n-form-item>
       </n-space>
     </n-card>
 
-    <!-- 坐标轴配置 -->
-    <n-card title="坐标轴配置" size="small">
+    <!-- Axis configuration -->
+    <n-card title="Axis configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="X轴标签">
+        <n-form-item label="Xaxis labels">
           <n-input
             v-model:value="localConfig.xAxisLabel"
-            placeholder="类别"
+            placeholder="category"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="Y轴标签">
+        <n-form-item label="Yaxis labels">
           <n-input
             v-model:value="localConfig.yAxisLabel"
-            placeholder="数值"
+            placeholder="numerical value"
             @update:value="handleConfigChange"
           />
         </n-form-item>
       </n-space>
     </n-card>
 
-    <!-- 样式配置 -->
-    <n-card title="样式配置" size="small">
+    <!-- Style configuration -->
+    <n-card title="Style configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="柱条颜色">
+        <n-form-item label="Bar color">
           <n-color-picker
             v-model:value="localConfig.barColor"
             :show-alpha="false"
@@ -74,14 +74,14 @@
           />
         </n-form-item>
 
-        <n-form-item label="使用渐变色">
+        <n-form-item label="Use gradient colors">
           <n-switch
             v-model:value="localConfig.barGradient"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item v-if="localConfig.barGradient" label="渐变终止颜色">
+        <n-form-item v-if="localConfig.barGradient" label="gradient end color">
           <n-color-picker
             v-model:value="localConfig.barGradientColor"
             :show-alpha="false"
@@ -91,10 +91,10 @@
       </n-space>
     </n-card>
 
-    <!-- 动画配置 -->
-    <n-card title="动画配置" size="small">
+    <!-- Animation configuration -->
+    <n-card title="Animation configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="动画时长 (ms)">
+        <n-form-item label="Animation duration (ms)">
           <n-input-number
             v-model:value="localConfig.animationDuration"
             :min="0"
@@ -104,7 +104,7 @@
           />
         </n-form-item>
 
-        <n-form-item label="动画延迟 (ms)">
+        <n-form-item label="animation delay (ms)">
           <n-input-number
             v-model:value="localConfig.animationDelay"
             :min="0"
@@ -120,14 +120,14 @@
 
 <script setup lang="ts">
 /**
- * 柱状图组件配置面板
+ * Bar chart component configuration panel
  */
 
 import { ref, watch } from 'vue'
 import { NSpace, NCard, NFormItem, NInput, NInputNumber, NSwitch, NColorPicker } from 'naive-ui'
 import type { BarChartCustomize } from './settingConfig'
 
-// Props 和 emits
+// Props and emits
 const props = defineProps<{
   config: BarChartCustomize
 }>()
@@ -136,15 +136,15 @@ const emit = defineEmits<{
   (e: 'update:config', config: BarChartCustomize): void
 }>()
 
-// 本地配置
+// local configuration
 const localConfig = ref<BarChartCustomize>({ ...props.config })
 
-// 配置变更处理
+// Configuration change handling
 const handleConfigChange = () => {
   emit('update:config', { ...localConfig.value })
 }
 
-// 监听外部配置变化
+// Monitor external configuration changes
 watch(
   () => props.config,
   (newConfig) => {

@@ -5,7 +5,7 @@ import { getWebsocketServerUrl } from '@/utils/common/tool'
 const wsUrl = `${getWebsocketServerUrl()}/telemetry/datas/current/keys/ws`
 
 export interface ICardView {
-  // 定义 ICardView 接口
+  // definition ICardView interface
   data?: {
     dataSource?: {
       deviceSource?: {

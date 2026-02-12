@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 - 紧凑设计 -->
+    <!-- card title bar - Compact design -->
     <div class="flex justify-between items-center px-3 py-2 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-2">
         <div class="p-1.5 bg-green-100 dark:bg-green-900 rounded-md">
@@ -11,7 +11,7 @@
         </h3>
       </div>
 
-      <!-- 刷新按钮 - 更小尺寸 -->
+      <!-- refresh button - smaller size -->
       <n-button
         text
         size="tiny"
@@ -30,15 +30,15 @@
       </n-button>
     </div>
 
-    <!-- 内容区域 - 减少内边距 -->
+    <!-- content area - reduce padding -->
     <div class="flex-1 p-2 overflow-hidden">
       <n-spin :show="loading">
-        <!-- 错误状态 -->
+        <!-- error status -->
         <n-alert v-if="error && !loading" type="error" :title="$t('common.error')" class="mb-4">
           {{ error.message || $t('card.fetchError') }}
         </n-alert>
 
-        <!-- 无数据状态 -->
+        <!-- No data status -->
         <n-empty
           v-if="!loading && !error && (!devices || devices.length === 0)"
           :description="$t('card.noData')"
@@ -49,7 +49,7 @@
           </template>
         </n-empty>
 
-        <!-- 设备列表 - 减少间距 -->
+        <!-- Device list - reduce spacing -->
         <div v-else-if="!loading && devices && devices.length > 0" class="h-full overflow-auto">
           <n-spin :show="isFetchingUpdate && !loading">
             <div class="space-y-2">
@@ -61,7 +61,7 @@
                   'ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20': index === 0
                 }"
               >
-                <!-- 设备标题 - 减少内边距 -->
+                <!-- Device title - reduce padding -->
                 <div class="px-3 py-2 border-b border-gray-200 dark:border-gray-600">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2 flex-1 min-w-0">
@@ -82,7 +82,7 @@
                       </n-tag>
                     </div>
 
-                    <!-- 最后推送时间 -->
+                    <!-- Last push time -->
                     <div class="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
                       <Icon icon="mdi:clock-outline" class="text-xs" />
                       <span>{{ formatRelativeTime(device.last_push_time) }}</span>
@@ -90,7 +90,7 @@
                   </div>
                 </div>
 
-                <!-- 遥测数据区域 - 减少内边距 -->
+                <!-- telemetry data area - reduce padding -->
                 <div class="px-3 py-2">
                   <BottomUpInfiniteScroller
                     v-if="device.telemetry_data && device.telemetry_data.length > 0"
@@ -100,7 +100,7 @@
                   >
                     <template #default="{ item: pair }">
                       <div class="grid grid-cols-2 gap-2 px-2 py-1.5 text-xs border-b border-gray-100 dark:border-gray-600 last:border-b-0">
-                        <!-- 左列 -->
+                        <!-- left column -->
                         <div v-if="pair.left" class="space-y-1">
                           <div
                             class="text-gray-600 dark:text-gray-400 truncate"
@@ -117,7 +117,7 @@
                         </div>
                         <div v-else class="h-8"></div>
 
-                        <!-- 右列 -->
+                        <!-- right column -->
                         <div v-if="pair.right" class="space-y-1 border-l border-gray-200 dark:border-gray-600 pl-3">
                           <div
                             class="text-gray-600 dark:text-gray-400 truncate"
@@ -137,7 +137,7 @@
                     </template>
                   </BottomUpInfiniteScroller>
 
-                  <!-- 无遥测数据 - 减少内边距 -->
+                  <!-- No telemetry data - reduce padding -->
                   <div v-else class="text-xs text-center py-2 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-600 rounded-md">
                     {{ $t('card.reportedData.noTelemetry') }}
                   </div>
@@ -149,7 +149,7 @@
       </n-spin>
     </div>
 
-    <!-- 底部链接 - 减少内边距 -->
+    <!-- Bottom link - reduce padding -->
     <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
       <div class="text-center">
         <router-link
@@ -166,8 +166,8 @@
 
 <script setup lang="ts">
 /**
- * 设备上报数据组件
- * 显示设备最新上报的遥测数据，支持实时刷新和在线状态展示
+ * Device reporting data component
+ * Display the latest telemetry data reported by the device，Support real-time refresh and online status display
  */
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -180,7 +180,7 @@ import BottomUpInfiniteScroller from '@/components/BottomUpInfiniteScroller.vue'
 
 dayjs.extend(relativeTime)
 
-// 接口定义
+// Interface definition
 interface TelemetryItem {
   key: string
   label: string | null
@@ -206,7 +206,7 @@ interface PairedTelemetryItem {
   right: TelemetryItem | null
 }
 
-// 响应式状态
+// Responsive state
 const devices = ref<DeviceData[]>([])
 const loading = ref(true)
 const error = ref<Error | null>(null)
@@ -215,11 +215,11 @@ const refreshIntervalId = ref<ReturnType<typeof setInterval> | null>(null)
 const REFRESH_INTERVAL = 6000
 const isFetchingUpdate = ref(false)
 
-// 当前语言环境
+// current locale
 const currentLocale = computed(() => dayjs.locale())
 
 /**
- * 配对遥测数据（两列显示）
+ * Pairing telemetry data（Two columns display）
  */
 const getPairedTelemetry = (telemetry: TelemetryItem[]): PairedTelemetryItem[] => {
   if (!Array.isArray(telemetry)) return []
@@ -234,7 +234,7 @@ const getPairedTelemetry = (telemetry: TelemetryItem[]): PairedTelemetryItem[] =
 }
 
 /**
- * 获取数据
+ * Get data
  */
 const fetchData = async (initialLoad = false) => {
   if (initialLoad) {
@@ -269,7 +269,7 @@ const fetchData = async (initialLoad = false) => {
 }
 
 /**
- * 开始轮询
+ * Start polling
  */
 const startPolling = () => {
   stopPolling()
@@ -281,7 +281,7 @@ const startPolling = () => {
 }
 
 /**
- * 停止轮询
+ * Stop polling
  */
 const stopPolling = () => {
   if (refreshIntervalId.value) {
@@ -291,7 +291,7 @@ const stopPolling = () => {
 }
 
 /**
- * 切换刷新状态
+ * Toggle refresh status
  */
 const toggleRefresh = () => {
   isRefreshing.value = !isRefreshing.value
@@ -304,19 +304,19 @@ const toggleRefresh = () => {
 }
 
 /**
- * 格式化相对时间
+ * Format relative time
  */
 const formatRelativeTime = (timeStr: string | null | undefined): string => {
   if (!timeStr) return '-'
   const time = dayjs(timeStr).locale(currentLocale.value)
   if (!time.isValid()) return '-'
   const now = dayjs().locale(currentLocale.value)
-  if (now.diff(time, 'minute') < 1) return $t('time.justNow', '刚刚')
+  if (now.diff(time, 'minute') < 1) return $t('time.justNow', 'just')
   return time.fromNow()
 }
 
 /**
- * 格式化遥测值
+ * Format telemetry values
  */
 const formatValue = (item: TelemetryItem | any): string => {
   if (item !== null && typeof item !== 'object') {
@@ -363,7 +363,7 @@ const formatValue = (item: TelemetryItem | any): string => {
   return displayValue
 }
 
-// 生命周期
+// life cycle
 onMounted(() => {
   fetchData(true)
   if (isRefreshing.value) {
@@ -381,12 +381,12 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 自定义滚动条样式 */
+/* Custom scroll bar style */
 :deep(.n-scrollbar-rail) {
   border-radius: 4px;
 }
 
-/* 旋转动画 */
+/* rotation animation */
 .animate-spin {
   animation: spin 1s linear infinite;
 }

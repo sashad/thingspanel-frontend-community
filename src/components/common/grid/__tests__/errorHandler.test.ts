@@ -1,5 +1,5 @@
 /**
- * 错误处理器单元测试
+ * Error handler unit testing
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -145,7 +145,7 @@ describe('Grid Error Handler', () => {
       const result = validateGridConfig(config)
 
       expect(result.success).toBe(false)
-      expect(result.message).toContain('配置验证失败')
+      expect(result.message).toContain('Configuration verification failed')
     })
 
     it('should reject invalid row height', () => {

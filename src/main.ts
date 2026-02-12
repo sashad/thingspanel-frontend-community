@@ -8,25 +8,25 @@ import { setupStore } from './store'
 import { router, setupRouter } from './router'
 import { i18n, setupI18n } from './locales'
 import { initEChartsComponents } from '@/utils/echarts/echarts-manager'
-// 导入 Card2.1 组件注册文件以启动组件注册和属性暴露系统（使用统一入口）
+// import Card2.1 Component registration file to start the component registration and property exposure system（Use unified entrance）
 import '@/card2.1/index'
-// 🔥 关键修复：确保组件系统在应用启动时初始化（使用统一入口）
+// 🔥 critical fix：Make sure the component system is initialized when the app starts（Use unified entrance）
 import { initializeCard2System } from '@/card2.1/index'
-// 🔥 关键修复：确保 InteractionManager 在应用启动时被正确初始化
+// 🔥 critical fix：make sure InteractionManager is properly initialized when the application starts
 import '@/card2.1/core2/interaction'
-// 🧹 导入localStorage清理工具
+// 🧹 importlocalStoragecleaning tool
 import { cleanupLocalStorage } from '@/utils/storage-cleaner'
-// 🎯 导入渲染器注册系统
+// 🎯 Import renderer registration system
 import { registerAllRenderers } from '@/components/visual-editor/renderers/registry'
 import App from './App.vue'
-// 最近访问路由功能
+// Recently visited routing function
 const RECENTLY_VISITED_ROUTES_KEY = 'RECENTLY_VISITED_ROUTES'
 const MAX_RECENT_ROUTES = 8
 
-// --- 更新排除路径列表，支持通配符 ---
+// --- Update list of excluded paths，Supports wildcards ---
 const excludedPaths = ['/login/*', '/404', '/home', '/visualization/kanban-details']
 
-// 防抖函数 - 减少频繁的 localStorage 操作
+// Anti-shake function - reduce frequent localStorage operate
 function debounce<T extends () => any>(func: T, wait: number): T {
   let timeout: NodeJS.Timeout | null = null
   return ((...args: any[]) => {
@@ -35,44 +35,44 @@ function debounce<T extends () => any>(func: T, wait: number): T {
   }) as T
 }
 
-// 内存缓存最近访问的路由，减少 localStorage 读取
+// Memory cache of recently accessed routes，reduce localStorage read
 let recentRoutesCache: any[] | null = null
 
 async function setupApp() {
-  // 🧹 清理不需要的localStorage项
+  // 🧹 Clean up unnecessarylocalStorageitem
   cleanupLocalStorage()
 
   const app = createApp(App)
 
-  // 1. 关键同步初始化 - 应用启动必需
+  // 1. Critical sync initialization - Required for application startup
   setupStore(app)
   setupI18n(app)
   setupNProgress()
   // Show splash loading once during bootstrap (before mount).
   setupLoading()
-  // 🔥 关键修复：初始化 Card2.1 组件系统
+  // 🔥 critical fix：initialization Card2.1 component system
   initializeCard2System()
     .then(() => {
-      // 组件系统初始化完成，通知所有监听器
+      // Component system initialization completed，Notify all listeners
       window.dispatchEvent(new CustomEvent('card2-system-ready'))
     })
     .catch(error => {
-      console.error('❌ Card2.1 组件系统初始化失败:', error)
+      console.error('❌ Card2.1 Component system initialization failed:', error)
     })
 
-  // 🎯 初始化渲染器注册系统
+  // 🎯 Initialize the renderer registration system
   try {
     registerAllRenderers()
   } catch (error) {
-    console.error('❌ 渲染器注册系统初始化失败:', error)
+    console.error('❌ Renderer registration system initialization failed:', error)
   }
 
-  // 2. 系统设置延迟加载 - 避免阻塞应用启动
+  // 2. System settings lazy loading - Avoid blocking application startup
   const sysSettingStore = useSysSettingStore()
 
-  // 使用 Promise 但不等待，让系统设置并行加载
+  // use Promise but don't wait，Let system settings load in parallel
   sysSettingStore.initSysSetting().then(() => {
-    // 监听 system_name 的变化，并根据变化动态更新国际化消息
+    // monitor system_name changes，And dynamically update international news according to changes
     watch(
       () => sysSettingStore.system_name,
       newSystemName => {
@@ -90,19 +90,19 @@ async function setupApp() {
     )
   })
 
-  // 3. 非关键初始化 - 使用 requestIdleCallback 延迟执行
+  // 3. non-critical initialization - use requestIdleCallback Delayed execution
   if (typeof requestIdleCallback !== 'undefined') {
     requestIdleCallback(
       () => {
         setupIconifyOffline()
         setupDayjs()
-        // ECharts 延迟初始化，减少启动内存占用
+        // ECharts Lazy initialization，Reduce startup memory usage
         initEChartsComponents()
       },
       { timeout: 2000 }
     )
   } else {
-    // 兼容性回退
+    // Compatibility rollback
     setTimeout(() => {
       setupIconifyOffline()
       setupDayjs()
@@ -110,10 +110,10 @@ async function setupApp() {
     }, 100)
   }
 
-  // 4. 路由初始化 - 应用启动必需
+  // 4. Route initialization - Required for application startup
   await setupRouter(app)
 
-  // 路由记录功能
+  // Route recording function
   const debouncedSaveRoutes = debounce((routes: any[]) => {
     try {
       localStorage.setItem(RECENTLY_VISITED_ROUTES_KEY, JSON.stringify(routes))
@@ -121,7 +121,7 @@ async function setupApp() {
     } catch (error) {}
   }, 1000)
 
-  // 初始化缓存
+  // Initialize cache
   try {
     const routesRaw = localStorage.getItem(RECENTLY_VISITED_ROUTES_KEY)
     recentRoutesCache = routesRaw ? JSON.parse(routesRaw) : []
@@ -129,16 +129,16 @@ async function setupApp() {
     recentRoutesCache = []
   }
 
-  // 路由记录功能的后置守卫
+  // Post guard for routing record function
   router.afterEach(to => {
-    // --- 更新排除逻辑以支持通配符 ---
+    // --- Update exclusion logic to support wildcards ---
     const isExcluded = excludedPaths.some(pattern => {
       if (pattern.endsWith('/*')) {
-        // 处理通配符模式，确保匹配 /login/ 而不是 /login-other
+        // Handling wildcard patterns，ensure match /login/ instead of /login-other
         const prefix = pattern.slice(0, -1) // /login/
         return to.path.startsWith(prefix)
       } else {
-        // 处理精确匹配模式
+        // Handling exact match patterns
         return to.path === pattern
       }
     })
@@ -146,52 +146,52 @@ async function setupApp() {
     if (isExcluded) {
       return
     }
-    // --- 排除逻辑结束 ---
+    // --- end of exclusion logic ---
 
-    // 简单过滤掉没有名称或者 title 的路由，以及重定向的路由
+    // Simply filter out no names or title routing，以及重定向routing
     if (!to.name || !to.meta?.title || to.redirectedFrom) {
       return
     }
 
-    // 使用内存缓存避免频繁读取 localStorage
+    // Use memory cache to avoid frequent reads localStorage
     if (!recentRoutesCache) {
       return
     }
 
     try {
-      // 从内存缓存获取数据，避免 JSON.parse
+      // Get data from memory cache，avoid JSON.parse
       let recentRoutes = [...recentRoutesCache]
 
-      // 检查是否已存在相同路由，避免重复添加
+      // Check if the same route already exists，Avoid duplicate additions
       const existingIndex = recentRoutes.findIndex(route => route.path === to.path)
       if (existingIndex === 0) {
-        // 如果已经是第一个，直接返回
+        // If it is already the first，Return directly
         return
       }
 
-      // 移除已存在的相同路由
+      // Remove the same route that already exists
       if (existingIndex > 0) {
         recentRoutes.splice(existingIndex, 1)
       }
 
-      // 添加新路由到列表开头
+      // Add a new route to the beginning of the list
       const newRoute = {
         path: to.path,
         name: to.name,
         title: to.meta.title,
         i18nKey: to.meta.i18nKey,
         icon: to.meta.icon,
-        query: to.query // 保存 query 参数
+        query: to.query // save query parameter
       }
 
       recentRoutes.unshift(newRoute)
 
-      // 限制列表长度
+      // Limit list length
       if (recentRoutes.length > MAX_RECENT_ROUTES) {
         recentRoutes = recentRoutes.slice(0, MAX_RECENT_ROUTES)
       }
 
-      // 使用防抖保存，减少 localStorage 写入频率
+      // Save with image stabilization，reduce localStorage write frequency
       debouncedSaveRoutes(recentRoutes)
     } catch (error) {}
   })

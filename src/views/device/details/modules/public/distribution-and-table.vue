@@ -65,7 +65,7 @@ const attributeList = ref<any[]>([])
 const attributeLoading = ref(false)
 const isTextArea = ref<any>(true)
 
-// 新增：管理页签切换
+// New：Management tab switching
 const activeTab = ref('visual')
 const rules = computed<FormRules>(() => {
   const r: FormRules = {}
@@ -122,7 +122,7 @@ const submit = async () => {
     let parms
     const params: any = {}
     
-    // 处理可视化配置页签的参数
+    // Process the parameters of the visual configuration tab
     if (activeTab.value === 'visual') {
       if (props.isCommand && paramsData.value.length > 0) {
         paramsData.value.forEach((item: any) => {
@@ -140,7 +140,7 @@ const submit = async () => {
       }
     }
 
-    // 统一要求载荷为合法 JSON（命令和属性下发都校验）
+    // Uniformly requires the payload to be legal JSON（Both command and attribute delivery are verified）
     if (formModel.textValue && !isJSON(formModel.textValue)) {
       window.$message?.error($t('generate.inputRightJson'))
       return
@@ -212,10 +212,10 @@ const getOptions = async show => {
 }
 
 
-// 新增：处理命令标识符输入（支持输入和选择）
+// New：Handle command identifier input（Support input and selection）
 const handleCommandInput = (value: string) => {
   formModel.commandValue = value
-  // 如果输入的是现有选项，自动解析参数
+  // If you enter an existing option，Automatically parse parameters
   const option = options.value?.find((opt: any) => opt.data_identifier === value)
   if (option && option.params) {
     try {
@@ -225,7 +225,7 @@ const handleCommandInput = (value: string) => {
       paramsData.value = []
     }
   } else {
-    // 如果输入的是自定义命令标识符，清空参数数据
+    // If you enter a custom command identifier，Clear parameter data
     paramsData.value = []
   }
 }
@@ -246,7 +246,7 @@ const getPlatform = computed(() => {
   return proxy.getPlatform()
 })
 const validationJson = computed(() => {
-  // 统一做 JSON 校验（命令和属性下发）
+  // Do it uniformly JSON check（Command and attribute delivery）
   if (formModel.textValue && !isJSON(formModel.textValue)) {
     return 'error'
   }
@@ -275,11 +275,11 @@ const isAttributeIndeterminate = computed(() => {
 })
 
 const isSubmitDisabled = computed(() => {
-  // 条件1：如果是命令下发且命令标识符为空，则禁用
+  // condition1：If the command is issued and the command identifier is empty，is disabled
   if (props.isCommand && !formModel.commandValue) {
     return true
   }
-  // 条件2：如果载荷文本框有内容但不是有效的 JSON，则禁用（命令和属性下发都校验）
+  // condition2：If the payload text box has content but is not valid JSON，is disabled（Both command and attribute delivery are verified）
   if (formModel.textValue && !isJSON(formModel.textValue)) {
     return true
   }
@@ -478,7 +478,7 @@ const buildAttributePayload = () => {
             />
           </NFormItem>
           
-          <!-- 切换页签：可视化配置和命令行 -->
+          <!-- Switch tab：Visual configuration and command line -->
           <NTabs v-model:value="activeTab" type="line" animated>
             <NTabPane name="visual" :tab="visualTabLabel">
               <template v-if="isCommand">
@@ -616,7 +616,7 @@ const buildAttributePayload = () => {
       line-height: 1.3;
     }
 
-    // 输入框样式优化
+    // Input box style optimization
     :deep(.n-input),
     :deep(.n-input-number),
     :deep(.n-select) {
@@ -629,7 +629,7 @@ const buildAttributePayload = () => {
       }
     }
 
-    // 文本域样式
+    // Text field style
     :deep(.n-input--textarea) {
       .n-input__textarea-el {
         min-height: 60px;

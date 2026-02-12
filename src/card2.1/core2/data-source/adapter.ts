@@ -1,85 +1,85 @@
 /**
- * 数据源适配器
- * 提供数据源格式转换和兼容性处理
+ * data source adapter
+ * Provide data source format conversion and compatibility processing
  */
 
 import type { ExecutorData } from '../types'
 
 /**
- * 数据源适配器类
+ * Data source adapter class
  */
 export class DataSourceAdapter {
   /**
-   * 标准化执行器数据格式
+   * Standardized actuator data format
    */
   static normalizeExecutorData(data: any): ExecutorData {
     if (!data) {
       return {}
     }
 
-    // 如果已经是标准格式，直接返回
+    // If it is already in standard format，Return directly
     if (typeof data === 'object' && (data.main || data.primaryData)) {
       return data as ExecutorData
     }
 
-    // 如果是简单对象，包装到 main 字段
+    // If it is a simple object，packaged to main Field
     if (typeof data === 'object' && !Array.isArray(data)) {
       return {
         main: data
       }
     }
 
-    // 如果是数组或其他类型，包装到 primaryData
+    // If it is an array or other type，packaged to primaryData
     return {
       primaryData: data
     }
   }
 
   /**
-   * 转换旧格式数据到新格式
+   * Convert data from old format to new format
    */
   static convertLegacyData(legacyData: any): ExecutorData {
     if (!legacyData) {
       return {}
     }
 
-    // 旧格式通常是简单的键值对
+    // Old formats are usually simple key-value pairs
     if (typeof legacyData === 'object' && !Array.isArray(legacyData)) {
       return {
         main: legacyData
       }
     }
 
-    // 其他格式直接包装
+    // Other formats are packaged directly
     return {
       primaryData: legacyData
     }
   }
 
   /**
-   * 提取主要数据
+   * Extract primary data
    */
   static extractPrimaryData(executorData: ExecutorData): any {
     if (!executorData) {
       return null
     }
 
-    // 优先从 primaryData 提取
+    // Prioritize from primaryData extract
     if (executorData.primaryData !== undefined) {
       return executorData.primaryData
     }
 
-    // 其次从 main 提取
+    // Secondly from main extract
     if (executorData.main && typeof executorData.main === 'object') {
       return executorData.main
     }
 
-    // 最后返回整个数据
+    // Finally return the entire data
     return executorData
   }
 
   /**
-   * 检查数据源格式
+   * Check data source format
    */
   static detectDataSourceFormat(data: any): 'standard' | 'legacy' | 'unknown' {
     if (!data) {
@@ -98,7 +98,7 @@ export class DataSourceAdapter {
   }
 
   /**
-   * 合并多个数据源
+   * Combine multiple data sources
    */
   static mergeDataSources(...dataSources: ExecutorData[]): ExecutorData {
     const result: ExecutorData = {}
@@ -106,7 +106,7 @@ export class DataSourceAdapter {
     dataSources.forEach(data => {
       if (!data) return
 
-      // 合并 main 字段
+      // merge main Field
       if (data.main && typeof data.main === 'object') {
         if (!result.main) {
           result.main = {}
@@ -114,12 +114,12 @@ export class DataSourceAdapter {
         Object.assign(result.main, data.main)
       }
 
-      // 合并 primaryData（最后一个有效）
+      // merge primaryData（The last one is valid）
       if (data.primaryData !== undefined) {
         result.primaryData = data.primaryData
       }
 
-      // 合并其他字段
+      // Merge other fields
       Object.keys(data).forEach(key => {
         if (key !== 'main' && key !== 'primaryData') {
           result[key] = data[key]
@@ -131,7 +131,7 @@ export class DataSourceAdapter {
   }
 
   /**
-   * 过滤无效数据
+   * Filter invalid data
    */
   static filterInvalidData(executorData: ExecutorData): ExecutorData {
     const result: ExecutorData = {}
@@ -166,6 +166,6 @@ export class DataSourceAdapter {
 }
 
 /**
- * 默认导出
+ * Default export
  */
 export default DataSourceAdapter

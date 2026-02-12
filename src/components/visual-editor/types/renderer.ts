@@ -1,11 +1,11 @@
 /**
- * 渲染器类型定义
+ * Renderer type definition
  */
 
-// 渲染器类型
+// Renderer type
 export type RendererType = 'canvas' | 'gridstack' | 'kanban' | 'dashboard' | 'report' | 'three-d'
 
-// 渲染器接口
+// Renderer interface
 export interface IRenderer {
   init(): void
   render(): void
@@ -14,7 +14,7 @@ export interface IRenderer {
   wakeup?(): void
 }
 
-// 渲染器配置
+// Renderer configuration
 export interface RendererConfig {
   type: RendererType
   name: string

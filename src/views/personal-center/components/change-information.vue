@@ -16,7 +16,7 @@ import { $t } from '@/locales'
 import { encryptDataByRsa, generateRandomHexString, validName, validPasswordByExp } from '@/utils/common/tool'
 
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
   type?: 'amend' | 'changePassword'
 }
@@ -60,20 +60,20 @@ const estimate = computed(() => {
   return titles[props.type]
 })
 
-/** 初始from数据 */
+/** initialfromdata */
 const formData = ref({
   name: '',
   old_password: '',
   password: '',
   passwords: ''
 })
-/** 关闭弹框 */
+/** Close popup */
 const closeModal = () => {
   modalVisible.value = false
   formData.value.name = ''
 }
 /**
- * 修改姓名
+ * Modify name
  *
  * @param name
  */

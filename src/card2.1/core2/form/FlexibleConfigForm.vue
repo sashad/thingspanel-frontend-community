@@ -1,13 +1,13 @@
 <template>
   <div class="flexible-config-form">
-    <!-- 模式指示器 -->
+    <!-- mode indicator -->
     <div v-if="showModeIndicator" class="mode-indicator">
       <n-tag :type="getModeTagType()" size="small">
         {{ getModeLabel() }}
       </n-tag>
     </div>
 
-    <!-- 自动表单生成器 -->
+    <!-- Automatic form builder -->
     <AutoFormGenerator
       v-model="configValues"
       :ts-config="tsConfig"
@@ -28,8 +28,8 @@ import AutoFormGenerator from '@/card2.1/core2/form/AutoFormGenerator.vue'
 import type { TSConfig, ConfigMode, ConfigValues } from '@/card2.1/types/setting-config'
 
 /**
- * 检测配置模式
- * 根据 vueConfig 和 tsConfig 的存在情况判断配置类型
+ * Detect configuration mode
+ * according to vueConfig and tsConfig Determine the configuration type by its existence
  */
 function detectConfigMode(vueConfig?: Component, tsConfig?: TSConfig): ConfigMode {
   const hasVue = !!vueConfig
@@ -42,25 +42,25 @@ function detectConfigMode(vueConfig?: Component, tsConfig?: TSConfig): ConfigMod
   } else if (hasVue) {
     return 'vue-only'
   } else {
-    return 'vue-only' // 默认为 vue-only
+    return 'vue-only' // Default is vue-only
   }
 }
 
 interface Props {
-  // 组件类型（用于自动检测配置）
+  // Component type（For automatic detection of configuration）
   componentType?: string
 
-  // 直接传入配置（可选）
+  // Pass configuration directly（Optional）
   tsConfig?: TSConfig
   vueConfig?: Component
 
-  // 当前配置值
+  // Current configuration value
   modelValue?: ConfigValues
 
-  // 是否只读
+  // Is it read-only?
   readonly?: boolean
 
-  // 是否显示模式指示器
+  // Whether to display the mode indicator
   showModeIndicator?: boolean
 }
 
@@ -78,12 +78,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 响应式数据
+// Responsive data
 const configValues = ref<ConfigValues>({})
 const tsConfig = ref<TSConfig>()
 const vueConfig = ref<Component>()
 
-// 检测到的配置模式
+// Configuration mode detected
 const detectedMode = computed<ConfigMode>(() => {
   try {
     return detectConfigMode(vueConfig.value, tsConfig.value)
@@ -92,7 +92,7 @@ const detectedMode = computed<ConfigMode>(() => {
   }
 })
 
-// 模式标签类型
+// Schema tag type
 const getModeTagType = () => {
   switch (detectedMode.value) {
     case 'ts-only':
@@ -106,28 +106,28 @@ const getModeTagType = () => {
   }
 }
 
-// 模式标签文本
+// Mode label text
 const getModeLabel = () => {
   switch (detectedMode.value) {
     case 'ts-only':
-      return 'TS配置'
+      return 'TSConfiguration'
     case 'vue-only':
-      return 'Vue配置'
+      return 'VueConfiguration'
     case 'hybrid':
-      return '混合配置'
+      return 'hybrid configuration'
     default:
-      return '未知模式'
+      return 'Unknown mode'
   }
 }
 
-// 自动检测组件配置
+// Automatically detect component configuration
 const detectComponentConfig = async () => {
   if (!props.componentType) return
 
   try {
-    // 尝试动态导入TS配置
+    // Try dynamic importTSConfiguration
     try {
-      // 使用动态导入，支持任意组件类型
+      // Use dynamic import，Supports any component type
       const tsConfigPath = `/src/card2.1/components/${props.componentType}/config.ts`
       const tsModule = await import(/* @vite-ignore */ tsConfigPath)
 
@@ -136,7 +136,7 @@ const detectComponentConfig = async () => {
       }
     } catch (e) {}
 
-    // 尝试动态导入Vue配置
+    // Try dynamic importVueConfiguration
     try {
       const vueConfigPath = `/src/card2.1/components/${props.componentType}/config.vue`
       const vueModule = await import(/* @vite-ignore */ vueConfigPath)
@@ -148,19 +148,19 @@ const detectComponentConfig = async () => {
   } catch (error) {}
 }
 
-// 处理配置变化
+// Handle configuration changes
 const handleConfigChange = (newValues: ConfigValues) => {
   configValues.value = { ...newValues }
   emit('update:modelValue', newValues)
   emit('change', newValues)
 }
 
-// 处理验证结果
+// Handle verification results
 const handleValidate = (result: { valid: boolean; errors: string[] }) => {
   emit('validate', result)
 }
 
-// 监听外部值变化
+// Monitor external value changes
 watch(
   () => props.modelValue,
   newValue => {
@@ -171,7 +171,7 @@ watch(
   { immediate: true, deep: true }
 )
 
-// 监听组件类型变化
+// Monitor component type changes
 watch(
   () => props.componentType,
   () => {
@@ -180,7 +180,7 @@ watch(
   { immediate: true }
 )
 
-// 监听直接传入的配置
+// Listen for directly passed configuration
 watch(
   () => [props.tsConfig, props.vueConfig],
   () => {
@@ -190,9 +190,9 @@ watch(
   { immediate: true }
 )
 
-// 组件挂载
+// Component mounting
 onMounted(() => {
-  // 设置初始值
+  // Set initial value
   if (props.modelValue) {
     configValues.value = { ...props.modelValue }
   }

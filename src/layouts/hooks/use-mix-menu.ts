@@ -19,7 +19,7 @@ export function useMixMenu() {
 
     const routeName = (hideInMenu ? activeMenu : name) || name
 
-    // 确保 routeName 存在且为字符串，否则使用默认值
+    // make sure routeName exists and is a string，Otherwise use default value
     const safeRouteName = routeName || 'home'
     const [firstLevelRouteName] = safeRouteName.split('_')
 

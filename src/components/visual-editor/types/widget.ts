@@ -1,16 +1,16 @@
 /**
- * 组件类型定义
+ * Component type definition
  */
 
-// 组件类型
+// Component type
 export type WidgetType = 'text' | 'image' | 'barchart' | 'linechart' | 'piechart'
 
-// 组件配置基类
+// Component configuration base class
 export interface WidgetConfig {
   [key: string]: any
 }
 
-// 文本组件配置
+// Text component configuration
 export interface TextWidgetConfig extends WidgetConfig {
   content: string
   fontSize: number
@@ -18,7 +18,7 @@ export interface TextWidgetConfig extends WidgetConfig {
   textAlign: 'left' | 'center' | 'right'
 }
 
-// 图片组件配置
+// Picture component configuration
 export interface ImageWidgetConfig extends WidgetConfig {
   src: string
   alt: string

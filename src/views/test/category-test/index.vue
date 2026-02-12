@@ -1,13 +1,13 @@
 <template>
   <div class="category-test">
-    <h1>分类系统测试</h1>
-    <n-button @click="testComponentTree">测试 getComponentTree()</n-button>
+    <h1>Classification system testing</h1>
+    <n-button @click="testComponentTree">test getComponentTree()</n-button>
     
     <div v-if="componentTree">
-      <h2>分类统计结果</h2>
+      <h2>Classification statistics results</h2>
       <n-data-table :columns="columns" :data="categoryStats" />
       
-      <h2>详细组件列表</h2>
+      <h2>Detailed component list</h2>
       <n-data-table :columns="detailColumns" :data="componentDetails" />
     </div>
   </div>
@@ -23,26 +23,26 @@ const categoryStats = ref<any[]>([])
 const componentDetails = ref<any[]>([])
 
 const columns = [
-  { title: '分类', key: 'category' },
-  { title: '组件数量', key: 'count' }
+  { title: 'Classification', key: 'category' },
+  { title: 'Number of components', key: 'count' }
 ]
 
 const detailColumns = [
-  { title: '组件名称', key: 'name' },
-  { title: '主分类', key: 'mainCategory' },
-  { title: '子分类', key: 'subCategory' },
-  { title: '完整路径', key: 'path' }
+  { title: 'Component name', key: 'name' },
+  { title: 'Main category', key: 'mainCategory' },
+  { title: 'subcategory', key: 'subCategory' },
+  { title: 'full path', key: 'path' }
 ]
 
 const testComponentTree = async () => {
   try {
     componentTree.value = getComponentTree()
     
-    // 统计分类
+    // Statistical classification
     const stats: Record<string, number> = {}
     const details: any[] = []
     
-    // 正确遍历 components 数组
+    // Traverse correctly components array
     componentTree.value.components.forEach((component: any) => {
       const category = `${component.mainCategory}/${component.subCategory}`
       stats[category] = (stats[category] || 0) + 1
@@ -62,9 +62,9 @@ const testComponentTree = async () => {
     
     componentDetails.value = details
     
-    console.log('分类系统测试结果:', componentTree.value)
+    console.log('Classification system test results:', componentTree.value)
   } catch (error) {
-    console.error('测试失败:', error)
+    console.error('test failed:', error)
   }
 }
 </script>

@@ -23,33 +23,33 @@ import { usePanelLifecycleManager } from './hooks/usePanelLifecycleManager'
 import PollingController from './components/PollingController.vue'
 import type { RendererType, VisualEditorWidget, GraphData } from './types'
 
-// 导入数据源注册
-// import './data-sources' // 临时注释，文件不存在
+// Import data source registration
+// import './data-sources' // Temporary notes，File does not exist
 
 import { useComponentTree } from '@/card2.1/hooks'
 import { visualEditorLogger } from '@/utils/logger'
-// 🔥 轮询系统导入
+// 🔥 Polling system import
 import { useGlobalPollingManager } from './core/GlobalPollingManager'
 import { editorDataSourceManager } from './core/EditorDataSourceManager'
 import { interactionManager } from '@/card2.1/core/interaction-manager'
 
-// 🔥 提供EditorDataSourceManager给子组件
+// 🔥 supplyEditorDataSourceManagerto child component
 provide('editorDataSourceManager', editorDataSourceManager)
 
-// 🔥 组件执行器注册表
+// 🔥 Component Executor Registry
 const componentExecutorRegistry = ref(new Map<string, () => Promise<void>>())
 provide('componentExecutorRegistry', componentExecutorRegistry.value)
 
-// 🔥 将组件执行器注册表传递给EditorDataSourceManager
+// 🔥 Pass the component executor registry toEditorDataSourceManager
 editorDataSourceManager.setComponentExecutorRegistry(componentExecutorRegistry.value)
 
-// 初始化 Card 2.1 集成
+// initialization Card 2.1 integrated
 useComponentTree({
   autoInit: true,
   enableI18n: true
 })
 
-// 初始化设置面板
+// Initialization settings panel
 initializeSettings()
 
 const dialog = useDialog()
@@ -59,13 +59,13 @@ const appStore = useAppStore()
 const props = defineProps<{
   panelId: string
   /**
-   * 是否显示工具栏
-   * 默认为 true，保持向后兼容
+   * Whether to display the toolbar
+   * Default is true，Stay backwards compatible
    */
   showToolbar?: boolean
   /**
-   * 是否显示页面标题栏
-   * 默认为 true，保持向后兼容
+   * Whether to display the page title bar
+   * Default is true，Stay backwards compatible
    */
   showPageHeader?: boolean
 }>()
@@ -74,60 +74,60 @@ const emit = defineEmits<{
   'state-manager-ready': [stateManager: any]
 }>()
 
-// 状态管理
+// Status management
 const fullui = ref()
-const isEditing = ref(false) // 默认预览模式
+const isEditing = ref(false) // Default preview mode
 const isSaving = ref(false)
 
-// 🔥 性能优化：状态缓存
+// 🔥 Performance optimization：state cache
 const stateCache = ref<{
   lastGetState?: any
   lastSetState?: any
   lastStateHash?: string
   cacheTime?: number
 }>({})
-const STATE_CACHE_DURATION = 5000 // 5秒缓存
+const STATE_CACHE_DURATION = 5000 // 5second cache
 const hasChanges = ref(false)
 const isUnmounted = ref(false)
 
-// 交互测试相关代码已迁移到 visual-editor-details/index.vue
+// The code related to interactive testing has been migrated to visual-editor-details/index.vue
 
-// 编辑器状态
+// Editor status
 const currentRenderer = ref<RendererType>('gridstack')
 
-// 抽屉状态 - 初始状态：预览模式，抽屉关闭
-const showLeftDrawer = ref(false) // 左侧组件库抽屉
-const showRightDrawer = ref(false) // 右侧属性面板抽屉
+// drawer status - initial state：preview mode，Drawer closed
+const showLeftDrawer = ref(false) // Left component library drawer
+const showRightDrawer = ref(false) // Right properties panel drawer
 
-// 拖拽状态管理
+// Drag and drop state management
 const isDragging = ref(false)
 const draggedComponent = ref<string | null>(null)
 const selectedNodeId = ref<string>('')
-const showWidgetTitles = ref(true) // 总开关，默认显示标题
+const showWidgetTitles = ref(true) // main switch，Show title by default
 
-// 多数据源数据存储 - 以组件ID为键
+// Multiple data sources data storage - with componentsIDas key
 const multiDataSourceStore = ref<Record<string, Record<string, any>>>({})
 
-// 多数据源配置存储 - 以组件ID为键，存储完整配置信息
+// Multiple data source configuration storage - with componentsIDas key，Store complete configuration information
 const multiDataSourceConfigStore = ref<Record<string, any>>({})
 
-// 轮询管理器实例
+// Poll manager instance
 const pollingManager = useGlobalPollingManager()
 
-// 全局轮询开关状态和处理函数已迁移到 usePanelPollingManager
+// Global polling switch status and processing functions have been migrated to usePanelPollingManager
 
-// 全屏功能
+// Full screen functionality
 const { isFullscreen, toggle } = useFullscreen(fullui)
 
-// 创建编辑器上下文
+// Create editor context
 const editorContext = createEditor()
 const { stateManager, addWidget, selectNode, updateNode } = editorContext
 const { setPreviewMode, isPreviewMode } = usePreviewMode()
 
-// 🔥 配置管理组合式函数
+// 🔥 Configuration management combined functions
 const { parseConfig, validateConfig, migrateConfig, getDefaultConfig, analyzeCloneability } = usePanelConfigManager()
 
-// 🔥 数据管理组合式函数
+// 🔥 Data management combined functions
 const dataManagerDependencies = {
   stateManager,
   configurationManager,
@@ -145,7 +145,7 @@ const {
   initializePanelData: initializePanelDataFromManager
 } = usePanelDataManager(props, dataManagerDependencies)
 
-// 🔥 轮询管理组合式函数
+// 🔥 Poll management combined functions
 const pollingManagerDependencies = {
   pollingManager,
   stateManager,
@@ -161,19 +161,19 @@ const {
   handlePollingDisabled: handlePollingDisabledFromManager
 } = usePanelPollingManager(pollingManagerDependencies)
 
-// 使用来自数据管理器的状态变量（替换原有的）
+// Using state variables from the data manager（Replace the original）
 const panelData = panelDataFromManager
 const dataFetched = dataFetchedFromManager
 const editorConfig = editorConfigFromManager
 const preEditorConfig = preEditorConfigFromManager
 
-// 使用来自数据管理器的函数
+// Using functions from the data manager
 const setState = setStateFromManager
 const getState = getStateFromManager
 const fetchBoard = fetchBoardFromManager
 const initializePanelData = initializePanelDataFromManager
 
-// 使用来自轮询管理器的状态和函数
+// Using status and functions from the polling manager
 const globalPollingEnabled = globalPollingEnabledFromManager
 const pollingStats = pollingStatsFromManager
 const initializePollingTasksAndEnable = initializePollingTasksAndEnableFromManager
@@ -181,9 +181,9 @@ const handlePollingToggle = handlePollingToggleFromManager
 const handlePollingEnabled = handlePollingEnabledFromManager
 const handlePollingDisabled = handlePollingDisabledFromManager
 
-// 🔥 事件处理组合式函数
+// 🔥 Event handling combined functions
 const eventHandlerDependencies = {
-  // 状态管理
+  // Status management
   showLeftDrawer,
   showRightDrawer,
   isDragging,
@@ -195,11 +195,11 @@ const eventHandlerDependencies = {
   multiDataSourceConfigStore,
   selectedNodeId,
 
-  // 配置管理
+  // Configuration management
   editorConfig,
   panelData,
 
-  // 编辑器功能
+  // Editor features
   stateManager,
   addWidget,
   setState,
@@ -209,58 +209,58 @@ const eventHandlerDependencies = {
   editorDataSourceManager
 }
 const {
-  // 抽屉控制
+  // Drawer control
   handleToggleLeftDrawer: handleToggleLeftDrawerFromHandler,
   handleToggleRightDrawer: handleToggleRightDrawerFromHandler,
 
-  // 拖拽处理
+  // Drag and drop processing
   handleDragStart: handleDragStartFromHandler,
   handleDragEnd: handleDragEndFromHandler,
 
-  // 渲染器和视图控制
+  // Renderers and view controls
   handleRendererChange: handleRendererChangeFromHandler,
   handleToggleWidgetTitles: handleToggleWidgetTitlesFromHandler,
 
-  // 组件操作
+  // Component operations
   handleAddWidget: handleAddWidgetFromHandler,
   handleClearAll: handleClearAllFromHandler,
 
-  // 导入导出
+  // Import and export
   handleImportConfig: handleImportConfigFromHandler,
   handleExportConfig: handleExportConfigFromHandler,
 
-  // 配置变更
+  // Configuration changes
   handleGridConfigChange: handleGridConfigChangeFromHandler,
   handleGridstackConfigChange: handleGridstackConfigChangeFromHandler,
   handleCanvasConfigChange: handleCanvasConfigChangeFromHandler,
 
-  // 数据源处理
+  // Data source processing
   handleMultiDataSourceUpdate: handleMultiDataSourceUpdateFromHandler,
   handleMultiDataSourceConfigUpdate: handleMultiDataSourceConfigUpdateFromHandler,
 
-  // 画布操作控制
+  // Canvas operation control
   handleZoomIn: handleZoomInFromHandler,
   handleZoomOut: handleZoomOutFromHandler,
   handleResetZoom: handleResetZoomFromHandler,
   handleUndo: handleUndoFromHandler,
   handleRedo: handleRedoFromHandler,
 
-  // 渲染器事件处理
+  // Renderer event handling
   handleRendererReady: handleRendererReadyFromHandler,
   handleRendererError: handleRendererErrorFromHandler,
 
-  // 节点选择和交互
+  // Node selection and interaction
   handleNodeSelect: handleNodeSelectFromHandler,
   handleRequestSettings: handleRequestSettingsFromHandler,
   handleCanvasClick: handleCanvasClickFromHandler,
 
-  // 组件生命周期事件
+  // Component life cycle events
   handleComponentAdded: handleComponentAddedFromHandler,
   handleComponentRemoved: handleComponentRemovedFromHandler,
   handleComponentConfigChanged: handleComponentConfigChangedFromHandler
 } = usePanelEventHandler(props, eventHandlerDependencies)
 
-// 使用来自事件处理器的函数
+// Using functions from event handlers
 const handleToggleLeftDrawer = handleToggleLeftDrawerFromHandler
 const handleToggleRightDrawer = handleToggleRightDrawerFromHandler
 const handleDragStart = handleDragStartFromHandler
@@ -290,22 +290,22 @@ const handleComponentAdded = handleComponentAddedFromHandler
 const handleComponentRemoved = handleComponentRemovedFromHandler
 const handleComponentConfigChanged = handleComponentConfigChangedFromHandler
 
-// 🔥 生命周期管理组合式函数
-// 事件监听器引用，用于清理
+// 🔥 Lifecycle management combined functions
+// Event listener reference，for cleaning
 const dataUpdateListener = ref<Function | null>(null)
 const statusChangeListener = ref<Function | null>(null)
 const pollingStatusListener = ref<Function | null>(null)
 const selectedWidgetTimerRef = ref<NodeJS.Timeout | null>(null)
 
 const lifecycleManagerDependencies = {
-  // 状态管理
+  // Status management
   isEditing,
   isUnmounted,
   dataFetched,
   multiDataSourceConfigStore,
   selectedWidgetTimer: selectedWidgetTimerRef,
 
-  // 编辑器功能
+  // Editor features
   stateManager,
   setPreviewMode,
   initializePanelData,
@@ -314,21 +314,21 @@ const lifecycleManagerDependencies = {
   handleComponentRemoved,
   handleComponentConfigChanged,
 
-  // 事件监听器引用
+  // Event listener reference
   dataUpdateListener,
   statusChangeListener,
   pollingStatusListener,
 
-  // 组件通信
+  // Component communication
   emit
 }
 const { initializeLifecycleManagement: initializeLifecycleManagementFromManager } =
   usePanelLifecycleManager(lifecycleManagerDependencies)
 
-// 使用来自生命周期管理器的函数
+// Using functions from the lifecycle manager
 const initializeLifecycleManagement = initializeLifecycleManagementFromManager
 
-// 初始化生命周期管理
+// Initialization life cycle management
 initializeLifecycleManagement()
 
 const selectedWidget = computed<VisualEditorWidget | null>(() => {
@@ -340,18 +340,18 @@ const selectedWidget = computed<VisualEditorWidget | null>(() => {
   return null
 })
 
-// 监听选中组件变化，添加防抖
+// Monitor changes in selected components，Add anti-shake
 watch(
   () => selectedWidget.value,
   (newWidget, oldWidget) => {
-    // 清除之前的定时器
+    // Clear previous timer
     if (selectedWidgetTimerRef.value) {
       clearTimeout(selectedWidgetTimerRef.value)
     }
 
-    // 设置新的定时器，防抖100ms
+    // Set new timer，Anti-shake100ms
     selectedWidgetTimerRef.value = setTimeout(() => {
-      // 只有当组件真正不同时才更新selectedNodeId
+      // Only update if components are truly differentselectedNodeId
       if (newWidget?.id !== oldWidget?.id) {
         selectedNodeId.value = newWidget?.id || ''
       }
@@ -360,40 +360,40 @@ watch(
   { deep: true }
 )
 
-// setState 函数已迁移到 usePanelDataManager
+// setState Function has been migrated to usePanelDataManager
 
-// getState 函数已迁移到 usePanelDataManager
+// getState Function has been migrated to usePanelDataManager
 
-// fetchBoard 函数已迁移到 usePanelDataManager
+// fetchBoard Function has been migrated to usePanelDataManager
 
-// parseConfig 函数已迁移到 usePanelConfigManager
+// parseConfig Function has been migrated to usePanelConfigManager
 
-// validateConfig 函数已迁移到 usePanelConfigManager
+// validateConfig Function has been migrated to usePanelConfigManager
 
-// migrateConfig 函数已迁移到 usePanelConfigManager
+// migrateConfig Function has been migrated to usePanelConfigManager
 
-// 已迁移到 /utils/deep-clone.ts
+// Migrated to /utils/deep-clone.ts
 
-// analyzeCloneability 函数已迁移到 usePanelConfigManager
+// analyzeCloneability Function has been migrated to usePanelConfigManager
 
-// getDefaultConfig 函数已迁移到 usePanelConfigManager
+// getDefaultConfig Function has been migrated to usePanelConfigManager
 
-// 渲染器选项
+// Renderer options
 const rendererOptions = computed(() => [
   { label: $t('visualEditor.canvas'), value: 'canvas' as RendererType },
   { label: $t('visualEditor.gridstack'), value: 'gridstack' as RendererType }
 ])
 
-// 工具栏事件处理
+// Toolbar event handling
 const handleModeChange = (mode: 'edit' | 'preview') => {
   if (mode === 'edit') {
-    // 🔴 关闭全局轮询（编辑模式）
+    // 🔴 Turn off global polling（edit mode）
     pollingManager.disableGlobalPolling()
 
     isEditing.value = true
-    setPreviewMode(false) // 同步全局预览模式
+    setPreviewMode(false) // Sync global preview mode
 
-    // 🎯 改进用户体验：进入编辑模式时自动打开左侧组件库抽屉
+    // 🎯 Improve user experience：Automatically open the left component library drawer when entering edit mode
     if (!showLeftDrawer.value) {
       showLeftDrawer.value = true
     }
@@ -405,67 +405,67 @@ const handleModeChange = (mode: 'edit' | 'preview') => {
         positiveText: $t('device_template.confirm'),
         negativeText: $t('common.cancel'),
         onPositiveClick: () => {
-          // 用户确认退出，重置配置
+          // User confirms exit，Reset configuration
           isEditing.value = false
-          setPreviewMode(true) // 同步全局预览模式
+          setPreviewMode(true) // Sync global preview mode
 
-          // 🔛 自动启动全局轮询（预览模式默认开启）
+          // 🔛 Automatically start global polling（Preview mode is enabled by default）
           initializePollingTasksAndEnable()
 
-          // 退出编辑模式时关闭所有抽屉
+          // Close all drawers when exiting edit mode
           showLeftDrawer.value = false
           showRightDrawer.value = false
-          // 清空选中状态
+          // Clear selection
           selectedNodeId.value = ''
-          // 重要：确保editorConfig中的isEditing为false，避免状态冲突
+          // important：make sureeditorConfiginisEditingforfalse，Avoid state conflicts
           editorConfig.value = { ...preEditorConfig.value, isEditing: false }
-          // 重要：在调用setState之前，确保preEditorConfig中的isEditing为false
+          // important：callingsetStateBefore，make surepreEditorConfiginisEditingforfalse
           const resetConfig = { ...preEditorConfig.value, isEditing: false }
           setState(resetConfig)
         },
         onNegativeClick: () => {
-          // 用户取消退出，保持当前状态，不做任何操作
+          // User cancels exit，keep current status，Do nothing
         }
       })
     } else {
-      // 没有未保存的更改，直接退出编辑模式
+      // No unsaved changes，Exit edit mode directly
       isEditing.value = false
-      setPreviewMode(true) // 同步全局预览模式
+      setPreviewMode(true) // Sync global preview mode
 
-      // 🔛 自动启动全局轮询（预览模式默认开启）
+      // 🔛 Automatically start global polling（Preview mode is enabled by default）
       initializePollingTasksAndEnable()
 
-      // 退出编辑模式时关闭所有抽屉
+      // Close all drawers when exiting edit mode
       showLeftDrawer.value = false
       showRightDrawer.value = false
-      // 清空选中状态
+      // Clear selection
       selectedNodeId.value = ''
     }
   }
 }
 
-// 🔥 轮询管理功能
+// 🔥 Polling management function
 
-// initializePollingTasksAndEnable 函数已迁移到 usePanelPollingManager
+// initializePollingTasksAndEnable Function has been migrated to usePanelPollingManager
 
-// 事件处理函数已迁移到 usePanelEventHandler
+// The event handler has been migrated to usePanelEventHandler
 
-// handleAddWidget 和 handleClearAll 已迁移到 usePanelEventHandler
+// handleAddWidget and handleClearAll Migrated to usePanelEventHandler
 
-// 导入导出、视图控制等事件处理函数已迁移到 usePanelEventHandler
+// Import and export、Event handling functions such as view control have been migrated to usePanelEventHandler
 
-// 画布配置、多数据源处理函数已迁移到 usePanelEventHandler
+// Canvas configuration、Multiple data source processing functions have been migrated to usePanelEventHandler
 
 /**
- * 🔥 新增：处理配置面板请求当前数据
- * 提供组件当前运行时数据给配置面板，实现内存数据优先原则
+ * 🔥 New：Handle configuration panel request for current data
+ * Provide the current runtime data of the component to the configuration panel，Implement the memory data priority principle
  */
 const handleRequestCurrentData = (widgetId: string) => {
-  // 获取当前运行时配置数据
+  // Get current runtime configuration data
   const currentConfig = multiDataSourceConfigStore.value[widgetId]
 
   if (currentConfig) {
-    // 通过 ConfigurationManager 临时更新配置，让配置面板可以获取到
+    // pass ConfigurationManager Temporarily update configuration，Make the configuration panel available
     const tempDataSourceConfig = {
       type: 'data-mapping',
       enabled: true,
@@ -474,19 +474,19 @@ const handleRequestCurrentData = (widgetId: string) => {
         componentType: selectedWidget.value?.type || 'unknown',
         mappingType: 'json-path',
         updatedAt: Date.now(),
-        isRuntime: true // 标记为运行时数据
+        isRuntime: true // Mark as runtime data
       }
     }
 
-    // 临时更新 ConfigurationManager 中的数据源配置
+    // Temporary update ConfigurationManager Data source configuration in
     configurationManager.updateConfiguration(widgetId, 'dataSource', tempDataSourceConfig)
   } else {
   }
 }
 
 /**
- * 🔥 新增：处理数据源管理器更新事件
- * 从配置面板接收数据源配置更新，并同步到编辑器数据源管理器
+ * 🔥 New：Handling data source manager update events
+ * Receive data source configuration updates from the configuration panel，and sync to the editor data source manager
  */
 const handleDataSourceManagerUpdate = (updateData: {
   componentId: string
@@ -497,30 +497,30 @@ const handleDataSourceManagerUpdate = (updateData: {
   try {
     const { componentId, componentType, config, action } = updateData
 
-    // 🔥 防护：确保编辑器数据源管理器已初始化且组件存在
+    // 🔥 protection：Make sure the editor data source manager is initialized and the component exists
     if (!editorDataSourceManager.isInitialized()) {
       return
     }
 
-    // 🔥 防护：确保组件节点存在
+    // 🔥 protection：Make sure the component node exists
     const componentNode = stateManager.nodes.find(n => n.id === componentId)
     if (!componentNode) {
       return
     }
 
-    // 🔥 防护：检查配置是否有效
+    // 🔥 protection：Check if the configuration is valid
     if (action === 'update' && !config) {
       return
     }
 
-    // 🔥 修复：支持新的配置格式检查
+    // 🔥 repair：Support new configuration format checking
     if (action === 'update' || action === 'config-updated') {
-      // 检查多种配置格式
+      // Check multiple configuration formats
       const hasDataSourceBindings = config.dataSourceBindings && Object.keys(config.dataSourceBindings).length > 0
       const hasDataSources =
         config.type === 'data-source-bindings' && (config.dataSource1 || config.dataSource2 || config.dataSource3)
 
-      // 🔥 新增：支持新三文件架构的配置格式检查
+      // 🔥 New：Support configuration format check of new three-file architecture
       const hasNewArchitectureConfig =
         config.config &&
         ((config.config.dataSource1 && config.config.dataSource1.type) ||
@@ -528,10 +528,10 @@ const handleDataSourceManagerUpdate = (updateData: {
           (config.config.dataSource3 && config.config.dataSource3.type) ||
           (config.config.data && config.config.data.type))
 
-      // 🔥 新增：检查任何配置字段中是否包含数据源配置
+      // 🔥 New：Check if any configuration field contains data source configuration
       const hasAnyDataSourceConfig = config.dataSource1 || config.dataSource2 || config.dataSource3 || config.data
 
-      // 🔥 新增：检查配置是否包含有效的数据源类型
+      // 🔥 New：Check that the configuration contains a valid data source type
       const hasValidDataSourceType =
         config.type && ['static', 'api', 'websocket', 'data-source-bindings'].includes(config.type)
 
@@ -547,60 +547,60 @@ const handleDataSourceManagerUpdate = (updateData: {
     }
 
     if (action === 'update' || action === 'config-updated' || action === 'config-restored') {
-      // 更新编辑器数据源管理器
+      // Update Editor Data Source Manager
 
-      // 先检查组件是否已注册
+      // First check whether the component has been registered
       const existingConfig = editorDataSourceManager.getComponentConfig(componentId)
 
       if (existingConfig) {
-        // 组件已存在，先删除再重新注册来实现更新
+        // Component already exists，Delete first and then re-register to update
         editorDataSourceManager.removeComponentDataSource(componentId)
         editorDataSourceManager.registerComponentDataSource(
           componentId,
           componentType,
           config,
-          { type: 'timer', interval: 30000 } // 默认30秒轮询
+          { type: 'timer', interval: 30000 } // default30Second polling
         )
       } else {
-        // 组件不存在，新注册
+        // Component does not exist，New registration
         editorDataSourceManager.registerComponentDataSource(
           componentId,
           componentType,
           config,
-          { type: 'timer', interval: 30000 } // 默认30秒轮询
+          { type: 'timer', interval: 30000 } // default30Second polling
         )
       }
 
-      // 🔧 修复：注册后立即启动数据源，确保实时配置能立即生效
+      // 🔧 repair：Start the data source immediately after registration，Ensure that real-time configuration can take effect immediately
       setTimeout(() => {
         editorDataSourceManager.startComponentDataSource(componentId)
-      }, 100) // 短暂延迟确保注册完成
+      }, 100) // A short delay to ensure registration is complete
 
-      // 同步到本地配置存储
+      // Sync to local configuration store
       if (config.dataSourceBindings && Object.keys(config.dataSourceBindings).length > 0) {
         multiDataSourceConfigStore.value[componentId] = config
       }
     } else if (action === 'delete') {
-      // 删除数据源配置
+      // Delete data source configuration
       editorDataSourceManager.removeComponentDataSource(componentId)
 
-      // 清理本地存储
+      // Clean local storage
       delete multiDataSourceConfigStore.value[componentId]
       delete multiDataSourceStore.value[componentId]
     }
 
-    // 标记有变化
+    // Tags have changed
     hasChanges.value = true
   } catch (error) {
-    // 🔥 防护：错误时不要影响整体流程，只记录错误
+    // 🔥 protection：Don’t affect the overall process when making mistakes，Only log errors
   }
 }
 
-// 画布操作控制、渲染器事件处理、节点选择和交互函数已迁移到 usePanelEventHandler
+// Canvas operation control、Renderer event handling、Node selection and interaction functions have been migrated to usePanelEventHandler
 
-// 保存面板
+// save panel
 const handleSave = async () => {
-  // 检查是否为Canvas渲染器，如果是则显示开发中提示
+  // Check if it isCanvasRenderer，If so, a developing prompt will be displayed.
   if (currentRenderer.value === 'canvas') {
     message.warning($t('visualEditor.canvasNotSupported'))
     return
@@ -610,9 +610,9 @@ const handleSave = async () => {
   try {
     const currentState = getState()
 
-    // 🔍 保存过程调试
+    // 🔍 Save process debugging
 
-    // 解析现有配置
+    // Parse existing configuration
     let existingConfig: any = {}
     if (panelData.value?.config) {
       try {
@@ -620,7 +620,7 @@ const handleSave = async () => {
       } catch (error: any) {}
     }
 
-    // 先构建基础配置（不包含 configSize）
+    // Build the basic configuration first（Not included configSize）
     const baseConfig = {
       legacyComponents: existingConfig.legacyComponents || [],
       visualEditor: {
@@ -629,7 +629,7 @@ const handleSave = async () => {
           version: '1.0.0',
           updatedAt: Date.now(),
           editorType: 'visual-editor',
-          // 面板基本信息
+          // Panel basic information
           panelInfo: {
             id: props.panelId,
             name: panelData.value?.name || '',
@@ -637,28 +637,28 @@ const handleSave = async () => {
             createdAt: panelData.value?.created_at || Date.now(),
             updatedAt: Date.now()
           },
-          // 编辑器版本信息
+          // Editor version information
           editorVersion: '1.0.0',
-          // 渲染器信息
+          // Renderer information
           rendererInfo: {
             type: currentRenderer.value,
             version: '1.0.0',
             features: ['drag', 'resize', 'grid', 'canvas']
           },
-          // 配置统计信息
+          // Configure statistics
           stats: {
             totalNodes: currentState.nodes.length,
             card2Nodes: currentState.nodes.filter((node: any) => node.metadata?.isCard2Component).length,
             legacyNodes: currentState.nodes.filter((node: any) => !node.metadata?.isCard2Component).length,
             hasGridConfig: !!currentState.gridConfig,
             hasCanvasConfig: !!currentState.canvasConfig,
-            configSize: 0 // 初始值，稍后会被更新
+            configSize: 0 // initial value，will be updated later
           }
         }
       }
     }
 
-    // 现在可以安全地计算配置大小
+    // Configuration sizes can now be calculated safely
     const configSize = JSON.stringify(baseConfig).length
     baseConfig.visualEditor.metadata.stats.configSize = configSize
     const { error } = await PutBoard({
@@ -669,7 +669,7 @@ const handleSave = async () => {
     })
 
     if (!error) {
-      // 🔥 智能深拷贝：使用优化的smartDeepClone
+      // 🔥 Smart deep copy：Use optimizedsmartDeepClone
       preEditorConfig.value = smartDeepClone(currentState)
       hasChanges.value = false
       message.success($t('page.dataForward.saveSuccess'))
@@ -683,7 +683,7 @@ const handleSave = async () => {
   }
 }
 
-// 监听状态变化，自动设置 hasChanges
+// Monitor status changes，Automatically set hasChanges
 watch(
   [
     () => currentRenderer.value,
@@ -695,7 +695,7 @@ watch(
     () => stateManager.nodes
   ],
   () => {
-    // 只有在数据加载完成后才监听变化
+    // Only listen for changes after data loading is complete
     if (dataFetched.value && !isUnmounted.value) {
       hasChanges.value = true
     }
@@ -704,18 +704,18 @@ watch(
 )
 
 /**
- * 监听组件节点变化，自动同步数据源管理器
+ * Monitor component node changes，Automatically sync data source manager
  */
 watch(
   () => stateManager.nodes,
   (newNodes, oldNodes) => {
     if (!editorDataSourceManager.isInitialized()) return
 
-    // 处理新增的组件
+    // Handle new components
     const newNodeIds = newNodes.map(n => n.id)
     const oldNodeIds = oldNodes?.map(n => n.id) || []
 
-    // 注册新增的组件
+    // Register new components
     const addedNodeIds = newNodeIds.filter(id => !oldNodeIds.includes(id))
     addedNodeIds.forEach(async nodeId => {
       const node = newNodes.find(n => n.id === nodeId)
@@ -731,7 +731,7 @@ watch(
       }
     })
 
-    // 注销移除的组件
+    // Unregister removed components
     const removedNodeIds = oldNodeIds.filter(id => !newNodeIds.includes(id))
     removedNodeIds.forEach(async nodeId => {
       try {
@@ -743,34 +743,34 @@ watch(
 )
 
 /**
- * 同步现有组件的数据源配置到编辑器数据源管理器
+ * Synchronize the data source configuration of existing components to the editor data source manager
  */
 /**
- * 设置数据源事件监听器
- * 监听数据源管理器的事件，实现数据分发
+ * Set up data source event listener
+ * Listening to data source manager events，Implement data distribution
  */
 const setupDataSourceEventListeners = () => {
   try {
-    // 创建监听器函数并保存引用
+    // Create listener function and save reference
     dataUpdateListener = (eventData: { componentId: string; result: any }) => {
       const { componentId, result } = eventData
 
-      // 🔥 性能优化：减少非必要的控制台输出
+      // 🔥 Performance optimization：Reduce unnecessary console output
 
       if (result.success && result.data) {
         try {
-          // 🔥 性能优化：检查数据是否实际发生变化，避免不必要的响应式更新
+          // 🔥 Performance optimization：Check if the data actually changed，Avoid unnecessary responsive updates
           const existingData = multiDataSourceStore.value[componentId]
           const hasDataChanged = !existingData || JSON.stringify(existingData) !== JSON.stringify(result.data)
 
           if (hasDataChanged) {
-            // 🔥 关键：将数据分发到 multiDataSourceStore，供组件使用
+            // 🔥 key：Distribute data to multiDataSourceStore，for component use
             multiDataSourceStore.value[componentId] = result.data
           } else {
-            // 数据未变化，跳过更新
+            // Data has not changed，Skip updates
           }
 
-          // 标记有变化（可选，取决于是否希望数据更新触发保存提示）
+          // Tags have changed（Optional，Depends on whether you want data updates to trigger a save prompt）
           // hasChanges.value = true
         } catch (error) {}
       } else {
@@ -780,21 +780,21 @@ const setupDataSourceEventListeners = () => {
     statusChangeListener = (eventData: { componentId: string; status: string; error?: string }) => {
       const { componentId, status, error } = eventData
 
-      // 🔥 性能优化：只在开发环境输出状态变化日志
+      // 🔥 Performance optimization：Only output status change logs in the development environment
 
       if (error) {
-        // 🔥 TODO: 可以在这里添加用户友好的错误通知UI
-        // message.error(`组件 ${componentId} 数据获取失败: ${error}`)
+        // 🔥 TODO: User friendly error notifications can be added hereUI
+        // message.error(`components ${componentId} Data acquisition failed: ${error}`)
       }
     }
 
     pollingStatusListener = (eventData: { componentId: string; isPolling: boolean }) => {
       const { componentId, isPolling } = eventData
 
-      // 🔥 性能优化：只在开发环境输出轮询状态日志
+      // 🔥 Performance optimization：Only output polling status log in development environment
     }
 
-    // 注册监听器
+    // Register listener
     editorDataSourceManager.on('data-updated', dataUpdateListener)
     editorDataSourceManager.on('component-status-changed', statusChangeListener)
     editorDataSourceManager.on('polling-status-changed', pollingStatusListener)
@@ -802,22 +802,22 @@ const setupDataSourceEventListeners = () => {
 }
 
 /**
- * 设置组件生命周期监听器
- * 监听组件的添加、删除、配置变更等事件
+ * Set up component lifecycle listeners
+ * Adding a listening component、delete、Configuration changes and other events
  */
-// setupComponentLifecycleListeners 已迁移到 usePanelLifecycleManager
+// setupComponentLifecycleListeners Migrated to usePanelLifecycleManager
 
-// 组件生命周期事件处理函数已迁移到 usePanelEventHandler
+// Component lifecycle event handlers have been migrated to usePanelEventHandler
 
 const syncDataSourceConfigs = async () => {
   try {
-    // 遍历所有节点，检查是否有数据源配置
+    // Traverse all nodes，Check if there is data source configuration
     for (const node of stateManager.nodes) {
       if (node && node.id) {
-        // 检查是否存在多数据源配置
+        // Check if multiple data source configuration exists
         const multiConfig = multiDataSourceConfigStore.value[node.id]
         if (multiConfig && Object.keys(multiConfig).length > 0) {
-          // 注册组件到数据源管理器
+          // Register the component to the data source manager
           await editorDataSourceManager.registerComponent(node.id, {
             type: node.type || 'unknown',
             name: node.title || node.id,
@@ -831,18 +831,18 @@ const syncDataSourceConfigs = async () => {
 }
 
 /**
- * 🔥 添加按照新架构开发的双数据源测试组件
- * 添加一个 dual-data-display 组件，配置两个数据源用于测试新架构
+ * 🔥 Add dual data source test components developed according to the new architecture
+ * add a dual-data-display components，Configure two data sources for testing the new architecture
  */
 const addNewArchitectureTestComponent = async () => {
   try {
-    // 创建一个 dual-data-display 组件实例
+    // Create a dual-data-display Component instance
     const testComponentId = `dual-data-display-${Date.now()}`
 
     const testComponent: VisualEditorWidget = {
       id: testComponentId,
       type: 'dual-data-display',
-      name: '双数据源显示组件',
+      name: 'Dual data source display component',
       layout: {
         canvas: {
           x: 50,
@@ -859,7 +859,7 @@ const addNewArchitectureTestComponent = async () => {
         }
       },
       config: {
-        // 🔥 配置两个数据源用于测试新架构
+        // 🔥 Configure two data sources for testing the new architecture
         dataSources: {
           dataSource1: {
             type: 'static',
@@ -870,7 +870,7 @@ const addNewArchitectureTestComponent = async () => {
                 value: 25.8,
                 unit: '°C',
                 status: 'normal',
-                location: '机房A-01',
+                location: 'engine roomA-01',
                 timestamp: new Date().toISOString()
               }
             }
@@ -884,7 +884,7 @@ const addNewArchitectureTestComponent = async () => {
                 reading: 62,
                 unit: '%',
                 status: 'active',
-                location: '机房A-02',
+                location: 'engine roomA-02',
                 lastCheck: new Date().toISOString()
               }
             }
@@ -898,14 +898,14 @@ const addNewArchitectureTestComponent = async () => {
       }
     }
 
-    // 添加组件到画布（只传类型字符串和位置）
+    // Add components to the canvas（Only pass type string and position）
     await addWidget('dual-data-display', { x: 50, y: 50 })
 
-    // 获取刚添加的组件ID（从stateManager.nodes中找到最新的）
+    // Get the newly added componentID（fromstateManager.nodesFind the latest in）
     const addedComponent = stateManager.nodes[stateManager.nodes.length - 1]
     const actualComponentId = addedComponent?.id || testComponentId
 
-    // 更新组件的数据源配置
+    // Update the data source configuration of the component
     updateNode(actualComponentId, {
       config: testComponent.config,
       metadata: {
@@ -914,7 +914,7 @@ const addNewArchitectureTestComponent = async () => {
       }
     })
 
-    // 选中新添加的组件
+    // Select the newly added component
     selectNode(actualComponentId)
 
     return actualComponentId
@@ -923,17 +923,17 @@ const addNewArchitectureTestComponent = async () => {
   }
 }
 
-// 初始化面板数据和配置的核心逻辑
-// initializePanelData 函数已迁移到 usePanelDataManager
+// Initialize the core logic of panel data and configuration
+// initializePanelData Function has been migrated to usePanelDataManager
 
-// 组件初始化和页签刷新监听已迁移到 usePanelLifecycleManager
+// Component initialization and tab refresh monitoring have been migrated to usePanelLifecycleManager
 
-// 暴露方法给父组件使用
+// Expose methods for parent components to use
 defineExpose({
   initializePollingTasksAndEnable
 })
 
-// 组件生命周期管理（恢复多数据源配置、事件监听器清理、onUnmounted）已迁移到 usePanelLifecycleManager
+// Component lifecycle management（Restoring a multiple data source configuration、Event listener cleanup、onUnmounted）Migrated to usePanelLifecycleManager
 </script>
 
 <template>
@@ -941,7 +941,7 @@ defineExpose({
     class="panel-editor-root"
     :class="{ 'px-5 py-5': props.showPageHeader !== false || props.showToolbar !== false }"
   >
-    <!-- 页面标题栏 - 根据 showPageHeader prop 控制显示 -->
+    <!-- Page title bar - according to showPageHeader prop control display -->
     <div
       v-show="!appStore.fullContent && props.showPageHeader !== false"
       class="flex items-center justify-between border-b border-gray-200 px-10px pb-3 dark:border-gray-200/10"
@@ -958,7 +958,7 @@ defineExpose({
       </NSpace>
     </div>
 
-    <!-- 编辑器区域 -->
+    <!-- Editor area -->
     <div ref="fullui" class="h-edit-area flex bg-white">
       <div v-if="!dataFetched" class="h-full flex items-center justify-center w-full">
         <n-spin size="large">
@@ -969,7 +969,7 @@ defineExpose({
       </div>
 
       <div v-else class="panel-editor w-full h-full flex flex-col">
-        <!-- 工具栏 - 根据 showToolbar prop 控制显示 -->
+        <!-- Toolbar - according to showToolbar prop control display -->
         <div v-if="props.showToolbar !== false" class="toolbar-container flex-shrink-0">
           <VisualEditorToolbar
             v-if="dataFetched && !isUnmounted"
@@ -1003,11 +1003,11 @@ defineExpose({
           />
         </div>
 
-        <!-- 主内容区域 -->
+        <!-- main content area -->
         <div class="main-container flex-1 relative overflow-hidden" :class="{ dragging: isDragging }">
-          <!-- 中央画布 -->
+          <!-- central canvas -->
           <div class="canvas-container h-full w-full" @click="handleCanvasClick">
-            <!-- 动态渲染器 -->
+            <!-- dynamic renderer -->
             <CanvasRenderer
               v-if="currentRenderer === 'canvas' && dataFetched && !isUnmounted"
               key="canvas-renderer"
@@ -1037,7 +1037,7 @@ defineExpose({
             />
           </div>
 
-          <!-- 左侧组件库抽屉 -->
+          <!-- Left component library drawer -->
           <NDrawer
             v-model:show="showLeftDrawer"
             :width="320"
@@ -1054,7 +1054,7 @@ defineExpose({
             </NDrawerContent>
           </NDrawer>
 
-          <!-- 右侧属性面板抽屉 -->
+          <!-- Right properties panel drawer -->
           <NDrawer
             v-model:show="showRightDrawer"
             :width="450"
@@ -1084,7 +1084,7 @@ defineExpose({
           </NDrawer>
         </div>
 
-        <!-- 低调的轮询控制器 - 仅在预览模式下显示 -->
+        <!-- Low profile polling controller - Only shown in preview mode -->
         <PollingController
           v-if="isPreviewMode && dataFetched"
           mode="global"
@@ -1101,31 +1101,31 @@ defineExpose({
 </template>
 
 <style scoped>
-/* 🔥 核心修复：PanelEditor 根容器高度设置 */
+/* 🔥 Core fix：PanelEditor Root container height settings */
 .panel-editor-root {
   width: 100%;
   height: 100%;
-  min-height: 100vh; /* 确保至少有视口高度 */
+  min-height: 100vh; /* Make sure you have at least the viewport height */
 }
 
 .panel-editor {
   min-height: 600px;
-  /* 🔥 强化：确保编辑器在任何情况下都有足够高度 */
+  /* 🔥 strengthen：Make sure the editor is tall enough in any case */
   height: 100%;
 }
 
 .h-edit-area {
   height: calc(100% - 30px);
-  /* 🔥 关键修复：当父容器高度不明确时，使用视口高度作为基准 */
-  min-height: calc(100vh - 160px); /* 减去头部、导航等固定高度 */
+  /* 🔥 critical fix：When the height of the parent container is unclear，Use viewport height as baseline */
+  min-height: calc(100vh - 160px); /* minus the head、Navigation and other fixed heights */
 }
 
-/* 画布容器 */
+/* canvas container */
 .canvas-container {
   position: relative;
   width: 100%;
   height: 100%;
-  /* 🔥 关键修复：画布容器设置最小高度，确保网格区域可见 */
+  /* 🔥 critical fix：Canvas container sets minimum height，Make sure the grid area is visible */
   min-height: 600px;
   overflow: hidden;
   background-color: var(--n-body-color);
@@ -1134,12 +1134,12 @@ defineExpose({
 .renderer-container {
   width: 100%;
   height: 100%;
-  /* 🔥 网格布局需要固定高度，不能使用overflow:auto */
+  /* 🔥 Grid layout requires fixed height，Cannot be usedoverflow:auto */
   min-height: 500px;
   position: relative;
 }
 
-/* 拖拽状态样式 */
+/* Drag state style */
 .main-container.dragging .n-drawer {
   opacity: 0.3;
   transition: opacity 0.2s ease;
@@ -1149,14 +1149,14 @@ defineExpose({
   pointer-events: none;
 }
 
-/* 确保拖拽元素在最顶层 */
+/* Make sure the dragged element is at the top level */
 .dragging-element {
   position: fixed;
   z-index: 9999 !important;
   pointer-events: none;
 }
 
-/* 抽屉内容优化 */
+/* Drawer content optimization */
 :deep(.n-drawer-content) {
   height: 100%;
 }
@@ -1166,7 +1166,7 @@ defineExpose({
   height: 100%;
 }
 
-/* 左侧抽屉特殊样式 - 半透明效果，不影响拖拽 */
+/* Special style of left drawer - Translucent effect，Does not affect dragging */
 :deep(.n-drawer--left) {
   background-color: rgba(250, 250, 250, 0.9) !important;
   backdrop-filter: blur(8px);
@@ -1179,7 +1179,7 @@ defineExpose({
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* 暗色主题下的左侧抽屉 */
+/* Left drawer in dark theme */
 :deep(.dark .n-drawer--left) {
   background-color: rgba(37, 37, 37, 0.9) !important;
 }
@@ -1188,18 +1188,18 @@ defineExpose({
   background-color: rgba(37, 37, 37, 0.9) !important;
 }
 
-/* 右侧抽屉增强阴影效果 */
+/* Enhanced shadow effect on the right drawer */
 :deep(.n-drawer--right) {
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 工具栏容器 */
+/* toolbar container */
 .toolbar-container {
   border-bottom: 1px solid #e0e0e0;
   background-color: #fff;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .panel-editor {
     min-height: 400px;

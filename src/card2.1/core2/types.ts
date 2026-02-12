@@ -1,14 +1,14 @@
 /**
- * Card2.1 核心类型定义
- * 统一管理所有核心类型，避免类型分散
+ * Card2.1 core type definition
+ * Unified management of all core types，avoid type fragmentation
  */
 
 import type { Component } from 'vue'
 
-// ============ 组件定义相关类型 ============
+// ============ Component definition related types ============
 
 /**
- * 组件定义接口
+ * Component definition interface
  */
 export interface ComponentDefinition<TConfig = Record<string, any>> {
   type: string
@@ -25,14 +25,14 @@ export interface ComponentDefinition<TConfig = Record<string, any>> {
   tags?: string[]
   isRegistered?: boolean
 
-  // 分类信息
+  // Classified information
   mainCategory?: string
   subCategory?: string
   category?: string
 }
 
 /**
- * 数据源需求定义
+ * Data source requirement definition
  */
 export interface DataSourceRequirement {
   key: string
@@ -43,14 +43,14 @@ export interface DataSourceRequirement {
 }
 
 /**
- * 组件属性白名单
+ * Component property whitelist
  */
 export interface ComponentPropertyWhitelist {
   [propName: string]: PropertyExposureConfig
 }
 
 /**
- * 属性暴露配置
+ * Property exposure configuration
  */
 export interface PropertyExposureConfig {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object'
@@ -66,7 +66,7 @@ export interface PropertyExposureConfig {
 }
 
 /**
- * 组件默认配置
+ * Component default configuration
  */
 export interface ComponentDefaultConfig<TConfig = Record<string, any>> {
   staticParams?: TConfig
@@ -75,7 +75,7 @@ export interface ComponentDefaultConfig<TConfig = Record<string, any>> {
 }
 
 /**
- * 静态参数定义
+ * Static parameter definition
  */
 export interface StaticParamDefinition {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object'
@@ -88,10 +88,10 @@ export interface StaticParamDefinition {
   order?: number
 }
 
-// ============ 分类系统类型 ============
+// ============ Classification system type ============
 
 /**
- * 分类配置接口
+ * Classification configuration interface
  */
 export interface CategoryConfig {
   id: string
@@ -105,7 +105,7 @@ export interface CategoryConfig {
 }
 
 /**
- * 组件分类
+ * Component classification
  */
 export interface ComponentCategory {
   id: string
@@ -116,7 +116,7 @@ export interface ComponentCategory {
 }
 
 /**
- * 组件树结构
+ * Component tree structure
  */
 export interface ComponentTree {
   categories: ComponentCategory[]
@@ -124,10 +124,10 @@ export interface ComponentTree {
   totalCount: number
 }
 
-// ============ 数据源相关类型 ============
+// ============ Data source related types ============
 
 /**
- * 执行器数据格式
+ * Actuator data format
  */
 export interface ExecutorData {
   [key: string]: unknown
@@ -138,16 +138,16 @@ export interface ExecutorData {
 }
 
 /**
- * 数据源映射结果
+ * Data source mapping results
  */
 export interface DataSourceMappingResult {
   [propName: string]: unknown
 }
 
-// ============ 交互系统类型 ============
+// ============ Interactive system type ============
 
 /**
- * 交互配置
+ * Interactive configuration
  */
 export interface InteractionConfig {
   id: string
@@ -160,12 +160,12 @@ export interface InteractionConfig {
 }
 
 /**
- * 交互事件类型
+ * Interaction event type
  */
 export type InteractionEventType = 'click' | 'hover' | 'focus' | 'blur' | 'change' | 'custom'
 
 /**
- * 条件配置
+ * Conditional configuration
  */
 export interface ConditionConfig {
   property: string
@@ -174,12 +174,12 @@ export interface ConditionConfig {
 }
 
 /**
- * 比较操作符
+ * comparison operator
  */
 export type ComparisonOperator = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains' | 'notContains'
 
 /**
- * 交互响应
+ * interactive response
  */
 export interface InteractionResponse {
   action: InteractionActionType
@@ -187,12 +187,12 @@ export interface InteractionResponse {
 }
 
 /**
- * 交互动作类型
+ * Interaction type
  */
 export type InteractionActionType = 'jump' | 'modify' | 'showNotification' | 'changeVisibility'
 
 /**
- * 跳转配置
+ * Jump configuration
  */
 export interface JumpConfig {
   jumpType: 'internal' | 'external'
@@ -202,7 +202,7 @@ export interface JumpConfig {
 }
 
 /**
- * 修改配置
+ * Modify configuration
  */
 export interface ModifyConfig {
   targetComponentId: string
@@ -212,16 +212,16 @@ export interface ModifyConfig {
 }
 
 /**
- * 组件交互状态
+ * Component interaction state
  */
 export interface ComponentInteractionState {
   [interactionId: string]: any
 }
 
-// ============ 表单配置类型 ============
+// ============ Form configuration type ============
 
 /**
- * TypeScript 配置
+ * TypeScript Configuration
  */
 export interface TSConfig {
   title?: string
@@ -231,12 +231,12 @@ export interface TSConfig {
 }
 
 /**
- * 配置模式
+ * configuration mode
  */
 export type ConfigMode = 'standard' | 'vue-component' | 'hybrid'
 
 /**
- * 表单字段
+ * form fields
  */
 export interface FormField {
   type: string
@@ -253,7 +253,7 @@ export interface FormField {
 }
 
 /**
- * 表单分组
+ * Form grouping
  */
 export interface FormGroup {
   name: string
@@ -264,17 +264,17 @@ export interface FormGroup {
   defaultExpanded?: boolean
 }
 
-// ============ 权限相关类型 ============
+// ============ Permission related types ============
 
 /**
- * 用户权限类型
+ * User permission type
  */
-export type UserAuthority = 'SYS_ADMIN' | 'TENANT_ADMIN' | 'TENANT_USER' | '不限'
+export type UserAuthority = 'SYS_ADMIN' | 'TENANT_ADMIN' | 'TENANT_USER' | 'NO_LIMIT'
 
-// ============ 注册表接口 ============
+// ============ Registry interface ============
 
 /**
- * 组件注册表接口
+ * Component registry interface
  */
 export interface IComponentRegistry {
   register(definition: ComponentDefinition): void
@@ -287,7 +287,7 @@ export interface IComponentRegistry {
 }
 
 /**
- * 数据源映射器接口
+ * Data source mapper interface
  */
 export interface IDataSourceMapper {
   mapDataSources(componentType: string, executorData: ExecutorData | null | undefined): DataSourceMappingResult
@@ -303,7 +303,7 @@ export interface IDataSourceMapper {
 }
 
 /**
- * 属性暴露管理器接口
+ * Property exposure manager interface
  */
 export interface IPropertyExposureManager {
   registerPropertyWhitelist(componentType: string, whitelist: ComponentPropertyWhitelist): void
@@ -312,7 +312,7 @@ export interface IPropertyExposureManager {
   addGlobalBaseProperties(whitelist: ComponentPropertyWhitelist): ComponentPropertyWhitelist
 }
 
-// ============ 导出所有类型 ============
+// ============ Export all types ============
 
 export type {
   ComponentDefinition,

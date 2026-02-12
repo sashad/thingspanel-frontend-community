@@ -1,21 +1,21 @@
 /**
- * 组件运行时数据管理接口
- * 负责管理组件的运行时数据：数据获取、缓存、更新
+ * Component runtime data management interface
+ * Responsible for managing the runtime data of components：data acquisition、cache、renew
  */
 
 /**
- * 数据源类型
+ * Data source type
  */
 export type DataSourceType = 'static' | 'http' | 'websocket' | 'script'
 
 /**
- * 数据源配置
+ * Data source configuration
  */
 export interface DataSourceDefinition {
   id: string
   type: DataSourceType
   config: {
-    // HTTP配置
+    // HTTPConfiguration
     url?: string
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
     headers?: Record<string, string>
@@ -23,72 +23,72 @@ export interface DataSourceDefinition {
     body?: any
     timeout?: number
 
-    // 静态数据配置
+    // Static data configuration
     data?: any
 
-    // WebSocket配置
+    // WebSocketConfiguration
     wsUrl?: string
     reconnect?: boolean
 
-    // 脚本配置
+    // Script configuration
     script?: string
     context?: Record<string, any>
 
     [key: string]: any
   }
-  // 数据过滤路径（如JSONPath）
+  // Data filtering path（likeJSONPath）
   filterPath?: string
-  // 数据处理脚本
+  // Data processing script
   processScript?: string
 }
 
 /**
- * 组件数据需求
+ * Component data requirements
  */
 export interface ComponentDataRequirement {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 数据源列表 */
+  /** Data source list */
   dataSources: DataSourceDefinition[]
-  /** 是否启用 */
+  /** Whether to enable */
   enabled: boolean
 }
 
 /**
- * 数据执行结果
+ * Data execution results
  */
 export interface DataExecutionResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 数据内容 */
+  /** Data content */
   data?: any
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 执行时间（毫秒） */
+  /** Execution time（millisecond） */
   executionTime: number
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
 /**
- * 组件数据状态
+ * Component data status
  */
 export interface ComponentDataState {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 当前数据 */
+  /** current data */
   currentData: Record<string, any>
-  /** 最后更新时间 */
+  /** Last updated */
   lastUpdated: number
-  /** 是否正在加载 */
+  /** Is loading */
   loading: boolean
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 数据源状态 */
+  /** Data source status */
   dataSourceStates: Record<
     string,
     {
@@ -100,7 +100,7 @@ export interface ComponentDataState {
 }
 
 /**
- * 数据更新事件
+ * data update event
  */
 export interface DataUpdateEvent {
   componentId: string
@@ -111,109 +111,109 @@ export interface DataUpdateEvent {
 }
 
 /**
- * 组件运行时数据管理器接口
- * 职责：
- * 1. 根据配置获取和处理数据
- * 2. 管理数据缓存和更新策略
- * 3. 提供简单的数据转换功能
- * 4. 通知组件数据变更
+ * Component runtime data manager interface
+ * Responsibilities：
+ * 1. Get and process data according to configuration
+ * 2. Manage data caching and update policies
+ * 3. Provide simple data conversion functions
+ * 4. Notify component of data changes
  *
- * 设计原则：
- * - 简单直接，不做复杂的状态管理
- * - 无轮询、无WebSocket连接池等重型功能
- * - 只处理基本的HTTP请求和静态数据
- * - 错误容忍，不阻塞界面
+ * design principles：
+ * - Simple and direct，No complex state management
+ * - none轮询、noneWebSocketHeavy-duty features like connection pooling
+ * - Only handle basicHTTPRequests and static data
+ * - error tolerance，Does not block the interface
  */
 export interface IComponentDataManager {
-  // --- 数据需求管理 ---
+  // --- Data requirements management ---
 
   /**
-   * 注册组件数据需求
+   * Register component data requirements
    */
   registerComponent(requirement: ComponentDataRequirement): void
 
   /**
-   * 注销组件数据需求
+   * Unregister component data requirements
    */
   unregisterComponent(componentId: string): void
 
   /**
-   * 更新组件数据需求
+   * Update component data requirements
    */
   updateComponentRequirement(requirement: ComponentDataRequirement): void
 
   /**
-   * 获取组件数据需求
+   * Get component data requirements
    */
   getComponentRequirement(componentId: string): ComponentDataRequirement | null
 
-  // --- 数据执行 ---
+  // --- data execution ---
 
   /**
-   * 执行组件数据获取（手动触发）
+   * Execution component data acquisition（manual trigger）
    */
   executeComponent(componentId: string): Promise<DataExecutionResult>
 
   /**
-   * 执行特定数据源
+   * Execute specific data source
    */
   executeDataSource(componentId: string, dataSourceId: string): Promise<DataExecutionResult>
 
   /**
-   * 批量执行多个组件
+   * Execute multiple components in batches
    */
   executeMultipleComponents(componentIds: string[]): Promise<Record<string, DataExecutionResult>>
 
-  // --- 数据状态查询 ---
+  // --- Data status query ---
 
   /**
-   * 获取组件当前数据
+   * Get the current data of the component
    */
   getComponentData(componentId: string): Record<string, any> | null
 
   /**
-   * 获取组件数据状态
+   * Get component data status
    */
   getComponentState(componentId: string): ComponentDataState | null
 
   /**
-   * 获取所有组件状态
+   * Get all component status
    */
   getAllStates(): Record<string, ComponentDataState>
 
-  // --- 数据缓存管理 ---
+  // --- Data cache management ---
 
   /**
-   * 清除组件数据缓存
+   * Clear component data cache
    */
   clearComponentCache(componentId: string): void
 
   /**
-   * 清除所有缓存
+   * clear all cache
    */
   clearAllCache(): void
 
   /**
-   * 设置缓存过期时间（毫秒）
+   * Set cache expiration time（millisecond）
    */
   setCacheExpiry(milliseconds: number): void
 
-  // --- 事件监听 ---
+  // --- event listening ---
 
   /**
-   * 监听数据更新
+   * Monitor data updates
    */
   onDataUpdate(listener: (event: DataUpdateEvent) => void): () => void
 
   /**
-   * 监听特定组件数据更新
+   * Monitor specific component data updates
    */
   onComponentDataUpdate(componentId: string, listener: (event: DataUpdateEvent) => void): () => void
 
-  // --- 统计信息 ---
+  // --- Statistics ---
 
   /**
-   * 获取简单统计信息
+   * Get simple statistics
    */
   getStats(): {
     totalComponents: number
@@ -223,7 +223,7 @@ export interface IComponentDataManager {
   }
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   destroy(): void
 }

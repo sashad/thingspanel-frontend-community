@@ -60,7 +60,7 @@ const queryData = ref({
 const associatedFormRules = ref({
   // device_ids: {
   //   required: true,
-  //   message: '请选择设备',
+  //   message: 'Please select a device',
   //   trigger: 'change'
   // },
 })
@@ -305,7 +305,7 @@ onMounted(async () => {
             :options="deviceOptions"
             :loading="loadingMore"
             :has-more="hasMoreDevices"
-            :placeholder="$t('page.irrigation.rotation.chooseDevice') || '请选择设备'"
+            :placeholder="$t('page.irrigation.rotation.chooseDevice') || 'Please select a device'"
             @load-more="handleLoadMoreDevices"
             @initial-load="handleInitialLoadDevices"
           />

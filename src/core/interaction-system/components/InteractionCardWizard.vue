@@ -1,6 +1,6 @@
 <template>
   <div class="interaction-simple">
-    <!-- 简洁列表 + 添加按钮 -->
+    <!-- concise list + Add button -->
     <div class="interaction-header">
       <h4 class="section-title">{{ t('interaction.wizard.title') }}</h4>
       <n-button size="small" type="primary" @click="showAddModal = true">
@@ -11,7 +11,7 @@
       </n-button>
     </div>
 
-    <!-- 交互列表 -->
+    <!-- interactive list -->
     <div class="interactions-list">
       <div v-if="interactions.length === 0" class="empty-state">
         <div class="empty-icon">🎯</div>
@@ -43,14 +43,14 @@
       </div>
     </div>
 
-    <!-- 添加/编辑弹窗 -->
+    <!-- Add to/Edit pop-up window -->
     <n-modal
       v-model:show="showAddModal"
       :title="editingIndex >= 0 ? t('interaction.wizard.editInteraction') : t('interaction.wizard.addInteraction')"
     >
       <n-card style="width: 600px" :bordered="false">
         <n-form :model="currentInteraction" label-placement="left" label-width="auto">
-          <!-- 触发条件 -->
+          <!-- Trigger condition -->
           <n-form-item :label="t('interaction.events.title')">
             <n-select
               v-model:value="currentInteraction.event"
@@ -59,7 +59,7 @@
             />
           </n-form-item>
 
-          <!-- 动作类型 -->
+          <!-- action type -->
           <n-form-item :label="t('interaction.actions.title')">
             <n-select
               v-model:value="currentActionType"
@@ -69,7 +69,7 @@
             />
           </n-form-item>
 
-          <!-- URL跳转配置 -->
+          <!-- URLJump configuration -->
           <template v-if="currentActionType === 'jump'">
             <n-form-item :label="t('interaction.properties.linkType')">
               <n-radio-group v-model:value="urlType" @update:value="handleUrlTypeChange">
@@ -103,7 +103,7 @@
             </n-form-item>
           </template>
 
-          <!-- 🔥 数据变化时的属性选择和条件配置 -->
+          <!-- 🔥 Attribute selection and condition configuration when data changes -->
           <template v-if="currentInteraction.event === 'dataChange'">
             <n-form-item :label="t('interaction.properties.watchedProperty')">
               <n-select
@@ -154,9 +154,9 @@
             </n-form-item>
           </template>
 
-          <!-- 属性修改配置 -->
+          <!-- Property modification configuration -->
           <template v-if="currentActionType === 'modify'">
-            <!-- 🔥 替换为新的二级联动组件属性选择器 -->
+            <!-- 🔥 Replaced with the new secondary linkage component attribute selector -->
             <n-form-item :label="t('interaction.properties.modifyProperty')">
               <ComponentPropertySelector
                 v-model:value="currentTargetPropertyBinding"
@@ -187,13 +187,13 @@
 
 <script setup lang="ts">
 /**
- * 交互配置组件 - 简洁弹窗版
- * 特点：列表 + 弹窗，简单直接
+ * Interactive configuration components - Simple pop-up version
+ * Features：list + Pop-up window，Simple and direct
  */
 
 import { ref, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-// 🔒 导入属性暴露管理器用于安全的属性访问
+// 🔒 Import property exposure manager for secure property access
 import { propertyExposureManager, type PropertyAccessContext } from '@/card2.1/core2/property'
 import {
   NSpace,
@@ -212,13 +212,13 @@ import {
 } from 'naive-ui'
 import { FlashOutline, TrashOutline } from '@vicons/ionicons5'
 import { fetchGetUserRoutes } from '@/service/api/route'
-// 🔥 简化：移除复杂的属性暴露系统，使用简单的属性访问
+// 🔥 simplify：Remove complex property exposure system，Use simple property access
 import { useEditorStore } from '@/store/modules/editor'
-// 🔥 新增：交互执行引擎
+// 🔥 New：interactive execution engine
 import { createInteractionEngine } from '../interaction-engine'
-// 🔥 新增：导入二级联动组件属性选择器
+// 🔥 New：Import the secondary linkage component attribute selector
 import ComponentPropertySelector from '@/core/data-architecture/components/common/ComponentPropertySelector.vue'
-// 🔥 新增：导入配置管理器，用于监听属性选择器
+// 🔥 New：Import configuration manager，Used to listen for attribute selectors
 import { configurationIntegrationBridge } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 
 interface Props {
@@ -234,28 +234,28 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// 🔥 直接使用 useEditorStore 获取当前画布组件（修复空数组问题）
+// 🔥 Use directly useEditorStore Get the current canvas component（Fix empty array issue）
 const editorStore = useEditorStore()
 
-// 保持向后兼容
+// Stay backwards compatible
 const visualEditorState = {
   getAvailableComponents: () => {
     return editorStore.nodes || []
   }
 }
 
-// 状态
+// state
 const interactions = ref(props.modelValue || [])
 const showAddModal = ref(false)
 const editingIndex = ref(-1)
 
-// 🔥 关键修复：监听外部传入的modelValue变化，确保组件内部数据同步
+// 🔥 critical fix：Listen for external incomingmodelValuechange，Ensure data synchronization within components
 watch(
   () => props.modelValue,
   (newValue) => {
     
     if (newValue) {
-      interactions.value = [...newValue] // 🔥 使用展开语法确保响应式更新
+      interactions.value = [...newValue] // 🔥 Use expand syntax to ensure responsive updates
     }
   },
   { immediate: true, deep: true }
@@ -272,7 +272,7 @@ const currentInteraction = ref({
 })
 const currentActionType = ref('')
 
-// 🔥 恢复内部菜单选择功能
+// 🔥 Restore internal menu selection functionality
 const urlType = ref<'external' | 'internal'>('external')
 const selectedMenuPath = ref('')
 const menuOptions = ref<{ label: string; value: string }[]>([])
@@ -280,32 +280,32 @@ const menuLoading = ref(false)
 const message = useMessage()
 const { t } = useI18n()
 
-// 🔥 恢复数据变化配置状态
+// 🔥 Restore data change configuration status
 const currentWatchedProperty = ref('')
 const currentConditionType = ref('')
 const currentConditionOperator = ref('')
 const currentConditionValue = ref('')
 
-// 🔥 新增：目标属性绑定状态（替换原来的分离选择）
+// 🔥 New：Target attribute binding status（Replace the original detached selection）
 const currentTargetPropertyBinding = ref('')
 const currentTargetPropertyInfo = ref<any>(null)
 
-// ✅ 正确的3个事件选项
+// ✅ correct3event options
 const eventOptions = computed(() => [
   { label: t('interaction.events.click'), value: 'click' },
   { label: t('interaction.events.hover'), value: 'hover' },
   { label: t('interaction.events.dataChange'), value: 'dataChange' }
 ])
 
-// 🔥 恢复数据变化时的属性选择和条件配置
-// 条件类型选项
+// 🔥 Attribute selection and condition configuration when restoring data changes
+// Condition type options
 const conditionTypeOptions = computed(() => [
   { label: t('interaction.conditions.comparison'), value: 'comparison' },
   { label: t('interaction.conditions.range'), value: 'range' },
   { label: t('interaction.conditions.expression'), value: 'expression' }
 ])
 
-// 比较运算符选项
+// Comparison operator options
 const comparisonOperatorOptions = computed(() => [
   { label: t('interaction.operators.equals'), value: 'equals' },
   { label: t('interaction.operators.notEquals'), value: 'notEquals' },
@@ -318,27 +318,27 @@ const comparisonOperatorOptions = computed(() => [
   { label: t('interaction.operators.endsWith'), value: 'endsWith' }
 ])
 
-// ✅ 正确的2个动作选项
+// ✅ correct2action options
 const actionTypeOptions = computed(() => [
   { label: t('interaction.summary.pageJump'), value: 'jump' },
   { label: t('interaction.summary.modifyProperty'), value: 'modify' }
 ])
 
-// ✅ 动态获取当前画布上的组件（用于目标组件选择）
+// ✅ Dynamically obtain components on the current canvas（for target component selection）
 const componentOptions = computed(() => {
   try {
     const components = visualEditorState.getAvailableComponents() || []
 
     const options = components.map(comp => {
-      // 🔥 直接使用组件ID，在显示中标识当前组件
+      // 🔥 Use components directlyID，Identify the current component in the display
       const isCurrentComponent = comp.id === props.componentId
       const displayName = isCurrentComponent
-        ? `📍 ${comp.type || 'unknown'} (${comp.id.slice(0, 8)}...) - 当前组件`
+        ? `📍 ${comp.type || 'unknown'} (${comp.id.slice(0, 8)}...) - current component`
         : `🔧 ${comp.type || 'unknown'} (${comp.id.slice(0, 8)}...)`
 
       return {
         label: displayName,
-        value: comp.id,  // 🔥 直接使用实际组件ID，移除 "self" 概念
+        value: comp.id,  // 🔥 Use actual components directlyID，Remove "self" concept
         componentType: comp.type,
         isCurrentComponent
       }
@@ -347,10 +347,10 @@ const componentOptions = computed(() => {
 
     return options
   } catch (error) {
-    console.error(`🔥 [InteractionCardWizard] componentOptions 生成失败:`, error)
-    // 失败时至少返回当前组件
+    console.error(`🔥 [InteractionCardWizard] componentOptions Build failed:`, error)
+    // Return at least the current component on failure
     return [{
-      label: `📍 ${props.componentType || 'unknown'} (当前组件)`,
+      label: `📍 ${props.componentType || 'unknown'} (current component)`,
       value: props.componentId || 'unknown',
       componentType: props.componentType || 'unknown',
       isCurrentComponent: true
@@ -358,17 +358,17 @@ const componentOptions = computed(() => {
   }
 })
 
-// 🔒 安全的目标属性选项（使用ref支持异步更新）
+// 🔒 Safe target attribute options（userefSupport asynchronous updates）
 const targetPropertyOptions = ref<any[]>([])
 
-// 🔒 异步更新目标属性选项的函数
+// 🔒 Function to update target attribute options asynchronously
 const updateTargetPropertyOptions = async () => {
   if (!currentInteraction.value.targetComponentId) {
     targetPropertyOptions.value = []
     return
   }
 
-  // 🔥 移除 "self" 概念，直接根据组件ID查找
+  // 🔥 Remove "self" concept，directly based on the componentIDFind
   const components = visualEditorState.getAvailableComponents()
   const targetComponent = components.find(comp => comp.id === currentInteraction.value.targetComponentId)
 
@@ -377,17 +377,17 @@ const updateTargetPropertyOptions = async () => {
     return
   }
 
-  // 转换为选择器选项格式，按分组组织
+  // Convert to selector options format，Organized by groups
   const groupedOptions: any[] = []
   const groups: Record<string, any[]> = {}
 
-  // 🔒 第一步：安全获取白名单属性（替换不安全的exposedProperties访问）
+  // 🔒 first step：Safely get whitelist attributes（Replace unsafeexposedPropertiesaccess）
   await getWhitelistedProperties(targetComponent, groups)
 
-  // 🔥 第二步：从组件定义获取可修改属性声明
+  // 🔥 Step 2：Get modifiable property declaration from component definition
   if (targetComponent.metadata?.card2Definition?.interactionCapabilities?.watchableProperties) {
     const watchableProps = targetComponent.metadata.card2Definition.interactionCapabilities.watchableProperties
-    const definitionGroup = '组件属性 (定义)'
+    const definitionGroup = 'Component properties (definition)'
 
     if (!groups[definitionGroup]) {
       groups[definitionGroup] = []
@@ -409,51 +409,51 @@ const updateTargetPropertyOptions = async () => {
     })
   }
 
-  // 🔥 第三步：添加基础配置级别的属性（只暴露 deviceId 和 metricsList）
-  const baseGroup = '基础配置'
+  // 🔥 Step 3：Add base configuration level properties（only exposed deviceId and metricsList）
+  const baseGroup = 'Basic configuration'
   if (!groups[baseGroup]) {
     groups[baseGroup] = []
   }
 
   groups[baseGroup].push(
     {
-      label: '设备ID (关联的设备ID，用于数据源自动配置)',
+      label: 'equipmentID (关联的equipmentID，For data source automatic configuration)',
       value: 'base.deviceId',
       property: {
         name: 'deviceId',
-        label: '设备ID',
+        label: 'equipmentID',
         type: 'string',
-        description: '关联的设备ID，用于数据源自动配置和设备模板',
+        description: 'Associated devicesID，Used for data source auto-configuration and device templates',
         isCore: true,
-        group: '设备配置'
+        group: 'Device configuration'
       }
     },
     {
-      label: '指标列表 (选择的设备指标列表)',
+      label: 'Indicator list (选择的设备Indicator list)',
       value: 'base.metricsList',
       property: {
         name: 'metricsList',
-        label: '指标列表',
+        label: 'Indicator list',
         type: 'array',
-        description: '选择的设备指标列表，用于数据获取和显示',
+        description: 'List of selected device metrics，For data acquisition and display',
         isCore: true,
-        group: '设备配置'
+        group: 'Device configuration'
       }
     }
   )
 
-  // 🔥 第四步：如果没有定义，提供通用属性fallback
+  // 🔥 Step 4：if not defined，Provide common propertiesfallback
   if (Object.keys(groups).length === 1 && groups[baseGroup]) {
-    const fallbackGroup = '通用属性 (fallback)'
+    const fallbackGroup = 'Common properties (fallback)'
     if (!groups[fallbackGroup]) {
       groups[fallbackGroup] = []
     }
 
     const universalProperties = [
-      { name: 'title', label: '标题', type: 'string', description: '组件标题' },
-      { name: 'visible', label: '可见性', type: 'boolean', description: '组件是否可见' },
-      { name: 'opacity', label: '透明度', type: 'number', description: '组件透明度' },
-      { name: 'backgroundColor', label: '背景色', type: 'string', description: '组件背景颜色' }
+      { name: 'title', label: 'title', type: 'string', description: 'Component title' },
+      { name: 'visible', label: 'visibility', type: 'boolean', description: 'Is the component visible?' },
+      { name: 'opacity', label: 'transparency', type: 'number', description: '组件transparency' },
+      { name: 'backgroundColor', label: 'background color', type: 'string', description: 'Component background color' }
     ]
 
     universalProperties.forEach(prop => {
@@ -471,8 +471,8 @@ const updateTargetPropertyOptions = async () => {
     })
   }
 
-  // 🔒 转换为分组选项格式，确保基础配置排在前面
-  const safeGroupOrder = ['🔒 白名单属性 (安全)', '组件属性 (定义)', '基础配置', '通用属性 (fallback)']
+  // 🔒 Convert to group options format，Make sure the basic configuration comes first
+  const safeGroupOrder = ['🔒 Whitelist attributes (Safety)', 'Component properties (definition)', 'Basic configuration', 'Common properties (fallback)']
   safeGroupOrder.forEach(groupName => {
     if (groups[groupName] && groups[groupName].length > 0) {
       groupedOptions.push({
@@ -489,7 +489,7 @@ const updateTargetPropertyOptions = async () => {
   targetPropertyOptions.value = options
 }
 
-// 🔒 监听目标组件ID变化，自动更新属性选项
+// 🔒 Listen to the target componentIDchange，Automatically update properties options
 watch(
   () => currentInteraction.value.targetComponentId,
   () => {
@@ -498,11 +498,11 @@ watch(
   { immediate: true }
 )
 
-// 🔥 可用属性选项 - 直接基于当前组件ID获取配置属性（与ComponentPropertySelector逻辑一致）
+// 🔥 Available property options - Based directly on the current componentIDGet configuration properties（andComponentPropertySelectorlogically consistent）
 const availablePropertyOptions = computed(() => {
 
   if (!props.componentId) {
-    console.error(`🚨 [InteractionCardWizard] 监听属性选择器：缺少componentId!`, {
+    console.error(`🚨 [InteractionCardWizard] Listening attribute selector：LackcomponentId!`, {
       props: props,
       componentId: props.componentId,
       componentType: props.componentType
@@ -511,49 +511,49 @@ const availablePropertyOptions = computed(() => {
   }
 
 
-  // 🔥 直接从配置管理器获取当前组件配置
+  // 🔥 Get the current component configuration directly from the configuration manager
   const config = configurationIntegrationBridge.getConfiguration(props.componentId)
 
   if (!config) {
-    console.error(`🚨 [InteractionCardWizard] 无法获取组件 ${props.componentId} 的配置，生成标准属性!`)
-    // 🔥 即使无配置，也要生成标准属性
+    console.error(`🚨 [InteractionCardWizard] Unable to get component ${props.componentId} configuration，Generate standard properties!`)
+    // 🔥 Even without configuration，Also generate standard properties
   } else {
   }
 
   const options: any[] = []
 
-  // 🔥 基础层标准属性定义 - 与ComponentPropertySelector保持一致
+  // 🔥 Base layer standard attribute definition - andComponentPropertySelectorBe consistent
   const standardBaseProperties = [
-    // 显示配置
-    { path: 'showTitle', displayPath: '显示标题', type: 'boolean' },
-    { path: 'title', displayPath: '标题', type: 'string' },
-    { path: 'visible', displayPath: '可见性', type: 'boolean' },
-    { path: 'opacity', displayPath: '透明度', type: 'number' },
+    // show configuration
+    { path: 'showTitle', displayPath: 'show title', type: 'boolean' },
+    { path: 'title', displayPath: 'title', type: 'string' },
+    { path: 'visible', displayPath: 'visibility', type: 'boolean' },
+    { path: 'opacity', displayPath: 'transparency', type: 'number' },
 
-    // 样式配置
-    { path: 'backgroundColor', displayPath: '背景颜色', type: 'string' },
-    { path: 'borderWidth', displayPath: '边框宽度', type: 'number' },
-    { path: 'borderColor', displayPath: '边框颜色', type: 'string' },
-    { path: 'borderStyle', displayPath: '边框样式', type: 'string' },
-    { path: 'borderRadius', displayPath: '圆角大小', type: 'number' },
-    { path: 'boxShadow', displayPath: '阴影效果', type: 'string' },
+    // Style configuration
+    { path: 'backgroundColor', displayPath: 'background color', type: 'string' },
+    { path: 'borderWidth', displayPath: 'border width', type: 'number' },
+    { path: 'borderColor', displayPath: 'border color', type: 'string' },
+    { path: 'borderStyle', displayPath: 'border style', type: 'string' },
+    { path: 'borderRadius', displayPath: 'Fillet size', type: 'number' },
+    { path: 'boxShadow', displayPath: 'shadow effect', type: 'string' },
 
-    // 布局配置
-    { path: 'padding', displayPath: '内边距', type: 'object' },
-    { path: 'margin', displayPath: '外边距', type: 'object' },
+    // layout configuration
+    { path: 'padding', displayPath: 'padding', type: 'object' },
+    { path: 'margin', displayPath: 'margins', type: 'object' },
 
-    // 设备关联配置 (核心必需)
-    { path: 'deviceId', displayPath: '设备ID', type: 'string' },
-    { path: 'metricsList', displayPath: '指标列表', type: 'array' }
+    // Device association configuration (core required)
+    { path: 'deviceId', displayPath: 'equipmentID', type: 'string' },
+    { path: 'metricsList', displayPath: 'Indicator list', type: 'array' }
   ]
 
 
-  // 添加所有标准基础属性
+  // Add all standard base properties
   standardBaseProperties.forEach(prop => {
-    const currentValue = config?.base?.[prop.path] // 🔥 使用可选链，即使config为空也不报错
+    const currentValue = config?.base?.[prop.path] // 🔥 Use optional chaining，even thoughconfigNo error will be reported if it is empty
     const option = {
-      label: `[基础] ${prop.displayPath} (${prop.type})`,
-      value: `base.${prop.path}`, // 🔥 修复：监听属性使用简单路径，不需要组件ID
+      label: `[Base] ${prop.displayPath} (${prop.type})`,
+      value: `base.${prop.path}`, // 🔥 repair：Listening properties use simple paths，No components requiredID
       property: {
         name: prop.path,
         label: prop.displayPath,
@@ -564,19 +564,19 @@ const availablePropertyOptions = computed(() => {
     options.push(option)
   })
 
-  // Component层标准属性
+  // ComponentLayer standard properties
   const standardComponentProperties = [
-    { path: 'properties', displayPath: '组件属性', type: 'object' },
-    { path: 'styles', displayPath: '组件样式', type: 'object' },
-    { path: 'behavior', displayPath: '组件行为', type: 'object' }
+    { path: 'properties', displayPath: 'Component properties', type: 'object' },
+    { path: 'styles', displayPath: 'Component style', type: 'object' },
+    { path: 'behavior', displayPath: 'Component behavior', type: 'object' }
   ]
 
 
   standardComponentProperties.forEach(prop => {
-    const currentValue = config?.component?.[prop.path] // 🔥 使用可选链，即使config为空也不报错
+    const currentValue = config?.component?.[prop.path] // 🔥 Use optional chaining，even thoughconfigNo error will be reported if it is empty
     const option = {
-      label: `[组件] ${prop.displayPath} (${prop.type})`,
-      value: `component.${prop.path}`, // 🔥 修复：监听属性使用简单路径，不需要组件ID
+      label: `[components] ${prop.displayPath} (${prop.type})`,
+      value: `component.${prop.path}`, // 🔥 repair：Listening properties use simple paths，No components requiredID
       property: {
         name: prop.path,
         label: prop.displayPath,
@@ -591,7 +591,7 @@ const availablePropertyOptions = computed(() => {
   return options
 })
 
-// ✅ 正确的事件类型样式 (3种)
+// ✅ Correct event type styling (3kind)
 const getEventType = (event: string) => {
   const typeMap = {
     click: 'click',
@@ -601,7 +601,7 @@ const getEventType = (event: string) => {
   return typeMap[event] || 'default'
 }
 
-// ✅ 正确的事件标签 (3种)
+// ✅ Correct event label (3kind)
 const getEventLabel = (event: string) => {
   const labelMap = {
     click: t('interaction.events.click'),
@@ -611,7 +611,7 @@ const getEventLabel = (event: string) => {
   return labelMap[event] || event
 }
 
-// 获取摘要标题
+// Get summary title
 const getSummaryTitle = (interaction: any) => {
   const actionType = getActionType(interaction)
   if (actionType === 'jump') {
@@ -622,12 +622,12 @@ const getSummaryTitle = (interaction: any) => {
   return t('interaction.summary.customAction')
 }
 
-// 获取摘要描述
+// Get summary description
 const getSummaryDesc = (interaction: any) => {
   const event = getEventLabel(interaction.event)
   const actionType = getActionType(interaction)
 
-  // 🔥 数据变化事件需要显示监听属性和条件
+  // 🔥 Data change events need to display listening attributes and conditions
   if (interaction.event === 'dataChange') {
     const watchedProperty = interaction.watchedProperty || t('interaction.empty.notSpecified')
     let conditionDesc = t('interaction.empty.noCondition')
@@ -659,7 +659,7 @@ const getSummaryDesc = (interaction: any) => {
 
     let baseDesc = `${t('interaction.summary.listening')} ${watchedProperty} (${conditionDesc})`
 
-    // 添加动作描述
+    // Add action description
     if (actionType === 'jump') {
       const url = interaction.responses?.[0]?.value || ''
       if (url.startsWith('http') || url.startsWith('https')) {
@@ -672,7 +672,7 @@ const getSummaryDesc = (interaction: any) => {
     } else if (actionType === 'modify') {
       const target = interaction.responses?.[0]?.targetComponentId || t('interaction.empty.component')
       const property = interaction.responses?.[0]?.targetProperty || t('interaction.empty.property')
-      baseDesc += ` → ${t('interaction.summary.modify')}${target}的${property}`
+      baseDesc += ` → ${t('interaction.summary.modify')}${target}of${property}`
     }
 
     return baseDesc
@@ -680,7 +680,7 @@ const getSummaryDesc = (interaction: any) => {
 
   if (actionType === 'jump') {
     const url = interaction.responses?.[0]?.value || ''
-    // 🔥 区分内部菜单和外部链接
+    // 🔥 Differentiate between internal menus and external links
     if (url.startsWith('http') || url.startsWith('https')) {
       return `${event}${t('interaction.summary.whenClick')}: ${url}`
     } else if (url.startsWith('/')) {
@@ -690,34 +690,34 @@ const getSummaryDesc = (interaction: any) => {
   } else if (actionType === 'modify') {
     const target = interaction.responses?.[0]?.targetComponentId || t('interaction.empty.component')
     const property = interaction.responses?.[0]?.targetProperty || t('interaction.empty.property')
-    return `${event}${t('interaction.summary.whenEventModify')}${target}的${property}`
+    return `${event}${t('interaction.summary.whenEventModify')}${target}of${property}`
   }
 
   return `${event}${t('interaction.summary.whenEventCustom')}`
 }
 
-// 获取动作类型
+// Get action type
 const getActionType = (interaction: any) => {
   const firstResponse = interaction.responses?.[0]
   if (!firstResponse) return 'none'
 
-  // 支持新的动作类型
+  // Support new action types
   if (firstResponse.action === 'jump') return 'jump'
   if (firstResponse.action === 'modify') return 'modify'
 
-  // 向后兼容旧的动作类型
+  // Backward compatibility with older action types
   if (firstResponse.action === 'navigateToUrl') return 'jump'
   if (firstResponse.action === 'updateComponentData') return 'modify'
 
   return 'custom'
 }
 
-// 🔒 安全的属性获取函数 - 基于白名单访问组件属性
+// 🔒 Safe attribute getter function - Access component properties based on whitelist
 const getWhitelistedProperties = async (targetComponent: any, groups: Record<string, any[]>) => {
   if (!targetComponent?.type) return
 
   try {
-    // 获取组件的白名单属性配置
+    // Get the component's whitelist property configuration
     const whitelistedProperties = propertyExposureManager.getWhitelistedProperties(
       targetComponent.type,
       'public',
@@ -728,20 +728,20 @@ const getWhitelistedProperties = async (targetComponent: any, groups: Record<str
       return
     }
 
-    const whitelistGroup = '🔒 白名单属性 (安全)'
+    const whitelistGroup = '🔒 Whitelist attributes (Safety)'
 
     if (!groups[whitelistGroup]) {
       groups[whitelistGroup] = []
     }
 
-    // 从组件的暴露属性中获取当前值
+    // Get the current value from the component's exposed property
     const exposedProps = targetComponent.metadata?.exposedProperties || {}
 
     for (const [propertyName, config] of Object.entries(whitelistedProperties)) {
       const exposedName = config.alias || propertyName
       const currentValue = exposedProps[exposedName]
 
-      // 使用属性暴露管理器验证访问权限
+      // Verify access using attribute exposure manager
       const accessContext: PropertyAccessContext = {
         accessType: 'read',
         timestamp: Date.now(),
@@ -758,7 +758,7 @@ const getWhitelistedProperties = async (targetComponent: any, groups: Record<str
 
       if (accessResult.allowed) {
         groups[whitelistGroup].push({
-          label: `${exposedName} (${config.description})${currentValue !== undefined ? ` - 当前: ${String(currentValue)}` : ''}`,
+          label: `${exposedName} (${config.description})${currentValue !== undefined ? ` - current: ${String(currentValue)}` : ''}`,
           value: exposedName,
           property: {
             name: exposedName,
@@ -774,16 +774,16 @@ const getWhitelistedProperties = async (targetComponent: any, groups: Record<str
     }
 
   } catch (error) {
-    console.error(`❌ [InteractionCardWizard] 获取白名单属性失败: ${targetComponent.type}`, error)
+    console.error(`❌ [InteractionCardWizard] Failed to get whitelist attributes: ${targetComponent.type}`, error)
   }
 }
 
-// 编辑交互
+// Edit interaction
 const editInteraction = (index: number) => {
   editingIndex.value = index
   const interaction = interactions.value[index]
 
-  // 填充当前表单
+  // Populate current form
   currentInteraction.value = {
     event: interaction.event,
     enabled: interaction.enabled,
@@ -795,17 +795,17 @@ const editInteraction = (index: number) => {
     updateValue: ''
   }
 
-  // 🔥 重置数据变化相关状态
+  // 🔥 Reset status related to data changes
   currentWatchedProperty.value = ''
   currentConditionType.value = ''
   currentConditionOperator.value = ''
   currentConditionValue.value = ''
 
-  // 🔥 重置目标属性绑定状态
+  // 🔥 Reset target property binding state
   currentTargetPropertyBinding.value = ''
   currentTargetPropertyInfo.value = null
 
-  // 🔥 如果是数据变化事件，加载监听属性和条件配置
+  // 🔥 If it is a data change event，Load listening properties and condition configuration
   if (interaction.event === 'dataChange') {
     currentWatchedProperty.value = interaction.watchedProperty || ''
 
@@ -821,15 +821,15 @@ const editInteraction = (index: number) => {
     }
   }
 
-  // 根据响应类型填充表单
+  // Populate form based on response type
   const firstResponse = interaction.responses?.[0]
   if (firstResponse) {
-    // 处理新的跳转格式
+    // Handling new jump formats
     if (firstResponse.action === 'jump') {
       currentActionType.value = 'jump'
 
       if (firstResponse.jumpConfig) {
-        // 新格式：使用 jumpConfig
+        // new format：use jumpConfig
         const jumpConfig = firstResponse.jumpConfig
         urlType.value = jumpConfig.jumpType
         currentInteraction.value.target = jumpConfig.target || '_self'
@@ -842,7 +842,7 @@ const editInteraction = (index: number) => {
           loadMenuOptions()
         }
       } else {
-        // 向后兼容旧格式
+        // Backwards compatible with older formats
         const url = firstResponse.value || ''
         currentInteraction.value.url = url
         currentInteraction.value.target = firstResponse.target || '_blank'
@@ -856,7 +856,7 @@ const editInteraction = (index: number) => {
         }
       }
     }
-    // 处理旧的跳转格式
+    // Handle old jump format
     else if (firstResponse.action === 'navigateToUrl') {
       currentActionType.value = 'jump'
       const url = firstResponse.value || ''
@@ -871,41 +871,41 @@ const editInteraction = (index: number) => {
         loadMenuOptions()
       }
     }
-    // 处理新的修改格式
+    // Handle new modified formats
     else if (firstResponse.action === 'modify') {
       currentActionType.value = 'modify'
 
       if (firstResponse.modifyConfig) {
-        // 新格式：使用 modifyConfig
+        // new format：use modifyConfig
         const modifyConfig = firstResponse.modifyConfig
         currentInteraction.value.targetComponentId = modifyConfig.targetComponentId || ''
         currentInteraction.value.targetProperty = modifyConfig.targetProperty || ''
         currentInteraction.value.updateValue = modifyConfig.updateValue || ''
 
-        // 🔥 构建目标属性绑定路径
+        // 🔥 Build target attribute binding path
         if (modifyConfig.targetComponentId && modifyConfig.targetProperty) {
           currentTargetPropertyBinding.value = `${modifyConfig.targetComponentId}.${modifyConfig.targetProperty}`
         }
       } else {
-        // 向后兼容旧格式
+        // Backwards compatible with older formats
         currentInteraction.value.targetComponentId = firstResponse.targetComponentId || ''
         currentInteraction.value.targetProperty = firstResponse.targetProperty || ''
         currentInteraction.value.updateValue = firstResponse.updateValue || ''
 
-        // 🔥 构建目标属性绑定路径
+        // 🔥 Build target attribute binding path
         if (firstResponse.targetComponentId && firstResponse.targetProperty) {
           currentTargetPropertyBinding.value = `${firstResponse.targetComponentId}.${firstResponse.targetProperty}`
         }
       }
     }
-    // 处理旧的修改格式
+    // Handling old modified formats
     else if (firstResponse.action === 'updateComponentData') {
       currentActionType.value = 'modify'
       currentInteraction.value.targetComponentId = firstResponse.targetComponentId || ''
       currentInteraction.value.targetProperty = firstResponse.targetProperty || ''
       currentInteraction.value.updateValue = firstResponse.updateValue || ''
 
-      // 🔥 构建目标属性绑定路径
+      // 🔥 Build target attribute binding path
       if (firstResponse.targetComponentId && firstResponse.targetProperty) {
         currentTargetPropertyBinding.value = `${firstResponse.targetComponentId}.${firstResponse.targetProperty}`
       }
@@ -915,28 +915,28 @@ const editInteraction = (index: number) => {
   showAddModal.value = true
 }
 
-// 删除交互
+// Delete interaction
 const deleteInteraction = (index: number) => {
   interactions.value.splice(index, 1)
   emit('update:modelValue', interactions.value)
 }
 
-// 🔥 数据变化相关处理函数
+// 🔥 Data change related processing functions
 const handleWatchedPropertyChange = (bindingPath: string, propertyInfo?: any) => {
   currentWatchedProperty.value = bindingPath
 
-  // 🔥 可选：如果需要使用属性信息进行额外处理
+  // 🔥 Optional：If additional processing using attribute information is required
   if (propertyInfo) {
   }
 }
 
-// 🔥 新增：目标属性绑定变化处理
+// 🔥 New：Target attribute binding change processing
 const handleTargetPropertyChange = (bindingPath: string, propertyInfo?: any) => {
   currentTargetPropertyBinding.value = bindingPath
   currentTargetPropertyInfo.value = propertyInfo
 
 
-  // 解析绑定路径更新原有字段（向后兼容）
+  // Parse the binding path and update the original fields（backwards compatible）
   if (bindingPath && propertyInfo) {
     currentInteraction.value.targetComponentId = propertyInfo.componentId
     currentInteraction.value.targetProperty = `${propertyInfo.layer}.${propertyInfo.propertyName}`
@@ -948,22 +948,22 @@ const handleTargetPropertyChange = (bindingPath: string, propertyInfo?: any) => 
 
 const handleConditionTypeChange = (value: string) => {
   currentConditionType.value = value
-  // 重置条件值
+  // reset condition value
   currentConditionOperator.value = ''
   currentConditionValue.value = ''
 }
 
-// 🔥 内部菜单相关处理函数
+// 🔥 Internal menu related processing functions
 const handleUrlTypeChange = () => {
   if (urlType.value === 'internal') {
-    // 切换到内部菜单时，加载菜单选项
-    // 强制重新加载菜单（不检查缓存）
-    menuOptions.value = [] // 清空缓存
+    // When switching to internal menu，Load menu options
+    // Force menu reload（Do not check cache）
+    menuOptions.value = [] // Clear cache
     loadMenuOptions()
-    // 清空外部链接
+    // Clear external links
     currentInteraction.value.url = ''
   } else {
-    // 切换到外部链接时，清空菜单选择
+    // When switching to external link，Clear menu selections
     selectedMenuPath.value = ''
   }
 }
@@ -977,11 +977,11 @@ const loadMenuOptions = async () => {
   try {
     const result = await fetchGetUserRoutes()
     if (result && result.data && result.data.list) {
-      // 将路由数据转换为选项格式
+      // Convert routing data to options format
       const flattened = flattenRoutes(result.data.list)
       menuOptions.value = flattened
 
-      // 如果没有菜单项，说明扁平化函数有问题
+      // If there is no menu item，Explain that there is a problem with the flattening function
       if (flattened.length === 0) {
         message.error(t('interaction.messages.menuDataProcessFailed'))
       }
@@ -995,38 +995,38 @@ const loadMenuOptions = async () => {
   }
 }
 
-// 扁平化路由数据，适配新的数据结构（path + meta.title）
+// Flatten routing data，Adapt to new data structures（path + meta.title）
 const flattenRoutes = (routes: any[]): { label: string; value: string }[] => {
   const options: { label: string; value: string }[] = []
 
-  // 递归处理函数
+  // recursive processing function
   const processRoute = (route: any, parentTitle = '') => {
-    // 新数据结构：path 作为路径，meta.title 作为标题
+    // new data structure：path as path，meta.title as title
     const path = route.path
     const title = route.meta?.title || route.meta?.i18nKey || route.name
 
-    // 生成显示标签（如果有父级，用 / 分隔）
+    // Generate display labels（if there is a parent，use / separate）
     const displayLabel = parentTitle ? `${parentTitle} / ${title}` : title
-    // 如果有路径和标题，并且不是隐藏菜单项，就添加到选项中
+    // If there is a path and title，and not hiding menu items，Just add it to the options
     if (path && title && !route.meta?.hideInMenu) {
       const option = { label: displayLabel, value: path }
       options.push(option)
     }
-    // 递归处理所有子路由
+    // Process all child routes recursively
     if (route.children && Array.isArray(route.children) && route.children.length > 0) {
       route.children.forEach(child => processRoute(child, displayLabel))
     }
   }
 
-  // 处理所有顶级路由
+  // Handles all top-level routes
   routes.forEach(route => processRoute(route))
   return options
 }
 
-// 处理动作类型变化
+// Handling action type changes
 const handleActionTypeChange = (value: string) => {
   currentActionType.value = value
-  // 重置相关字段
+  // Reset related fields
   if (value === 'jump') {
     urlType.value = 'external'
     currentInteraction.value.url = 'https://example.com'
@@ -1039,7 +1039,7 @@ const handleActionTypeChange = (value: string) => {
   }
 }
 
-// 保存交互
+// Save interaction
 const saveInteraction = () => {
   const interaction: any = {
     event: currentInteraction.value.event,
@@ -1048,11 +1048,11 @@ const saveInteraction = () => {
     responses: []
   }
 
-  // 🔥 如果是数据变化事件，保存监听属性和条件配置
+  // 🔥 If it is a data change event，Save listening properties and condition configurations
   if (currentInteraction.value.event === 'dataChange') {
     interaction.watchedProperty = currentWatchedProperty.value
 
-    // 构建条件配置
+    // Build conditional configuration
     if (currentConditionType.value) {
       interaction.condition = {
         type: currentConditionType.value
@@ -1067,9 +1067,9 @@ const saveInteraction = () => {
     }
   }
 
-  // 根据动作类型构建响应
+  // Build responses based on action type
   if (currentActionType.value === 'jump') {
-    // 生成新的跳转配置格式
+    // Generate new jump configuration format
     const jumpConfig = {
       jumpType: urlType.value === 'external' ? 'external' : 'internal',
       target: currentInteraction.value.target || '_self'
@@ -1085,30 +1085,30 @@ const saveInteraction = () => {
       {
         action: 'jump',
         jumpConfig: jumpConfig,
-        // 向后兼容旧格式
+        // Backwards compatible with older formats
         value: currentInteraction.value.url,
         target: currentInteraction.value.target
       }
     ]
   } else if (currentActionType.value === 'modify') {
-    // 🔥 优先使用新的绑定路径，解析出组件ID和属性路径
+    // 🔥 Give priority to new binding paths，Parse out componentsIDand attribute path
     let targetComponentId = currentInteraction.value.targetComponentId
     let targetProperty = currentInteraction.value.targetProperty
 
     if (currentTargetPropertyBinding.value && currentTargetPropertyInfo.value) {
-      // 使用新的绑定路径信息
+      // Use new binding path information
       targetComponentId = currentTargetPropertyInfo.value.componentId
       targetProperty = `${currentTargetPropertyInfo.value.layer}.${currentTargetPropertyInfo.value.propertyName}`
 
     }
 
-    // 生成新的修改配置格式
+    // Generate new modified configuration format
     const modifyConfig = {
       targetComponentId: targetComponentId,
       targetProperty: targetProperty,
       updateValue: currentInteraction.value.updateValue,
       updateMode: 'replace',
-      // 🔥 新增：保存完整的绑定路径信息
+      // 🔥 New：Save complete binding path information
       bindingPath: currentTargetPropertyBinding.value
     }
 
@@ -1116,7 +1116,7 @@ const saveInteraction = () => {
       {
         action: 'modify',
         modifyConfig: modifyConfig,
-        // 向后兼容旧格式
+        // Backwards compatible with older formats
         targetComponentId: targetComponentId,
         targetProperty: targetProperty,
         updateValue: currentInteraction.value.updateValue
@@ -1125,18 +1125,18 @@ const saveInteraction = () => {
   }
 
   if (editingIndex.value >= 0) {
-    // 编辑模式
+    // edit mode
     interactions.value[editingIndex.value] = interaction
     editingIndex.value = -1
   } else {
-    // 添加模式
+    // Add mode
     interactions.value.push(interaction)
   }
 
   emit('update:modelValue', interactions.value)
   showAddModal.value = false
 
-  // 重置表单
+  // Reset form
   currentInteraction.value = {
     event: 'click',
     enabled: true,
@@ -1151,13 +1151,13 @@ const saveInteraction = () => {
   urlType.value = 'external'
   selectedMenuPath.value = ''
 
-  // 🔥 重置数据变化相关状态
+  // 🔥 Reset status related to data changes
   currentWatchedProperty.value = ''
   currentConditionType.value = ''
   currentConditionOperator.value = ''
   currentConditionValue.value = ''
 
-  // 🔥 重置目标属性绑定状态
+  // 🔥 Reset target property binding state
   currentTargetPropertyBinding.value = ''
   currentTargetPropertyInfo.value = null
 }
@@ -1183,7 +1183,7 @@ const saveInteraction = () => {
   color: var(--text-color);
 }
 
-/* 空状态 */
+/* Empty state */
 .empty-state {
   text-align: center;
   padding: 40px 20px;
@@ -1206,7 +1206,7 @@ const saveInteraction = () => {
   font-size: 12px;
 }
 
-/* 交互列表 */
+/* interactive list */
 .interactions-list {
   display: flex;
   flex-direction: column;

@@ -150,7 +150,7 @@ function init() {
   getTableData()
 }
 
-// 初始化
+// initialization
 init()
 </script>
 
@@ -162,11 +162,11 @@ init()
       <!--
  <n-button type="error">
           <icon-ic-round-delete class="mr-4px text-20px" />
-          删除
+          delete
         </n-button>
         <n-button type="success">
           <icon-uil:export class="mr-4px text-20px" />
-          导出Excel
+          ExportExcel
         </n-button>
 -->
     </template>

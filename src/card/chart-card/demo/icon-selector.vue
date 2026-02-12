@@ -20,7 +20,7 @@ export default {
     }
 
     return {
-      selectedIcon, // 实际上这个在当前组件内部未使用，但保留以防扩展
+      selectedIcon, // In fact, this is not used inside the current component.，but reserved in case of expansion
       iconOptions,
       selectIcon
     }
@@ -50,7 +50,7 @@ export default {
 }
 
 .icon-cell {
-  width: calc(10% - 10px); /* 调整宽度以适应10列，减去间隔 */
-  margin: 5px; /* 控制间距 */
+  width: calc(10% - 10px); /* Adjust width to fit10List，subtract interval */
+  margin: 5px; /* control spacing */
 }
 </style>

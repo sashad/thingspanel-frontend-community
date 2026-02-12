@@ -4,20 +4,20 @@ import type { DataTableBaseColumn, DataTableExpandColumn, DataTableSelectionColu
 import type { TableColumnGroup } from 'naive-ui/es/data-table/src/interface'
 import useLoadingEmpty from '../common/use-loading-empty'
 
-/** 接口请求函数 */
+/** Interface request function */
 type ApiFn<T = any, R = any> = (args: T) => Promise<App.Service.DEVResponse<R>>
 
-/** 接口请求函数的参数 */
+/** Parameters of interface request function */
 type GetApiFnParameters<T extends ApiFn, R = any> = T extends (args: infer P) => Promise<App.Service.DEVResponse<R>>
   ? P
   : never
 
-/** 接口请求函数的返回值 */
+/** The return value of the interface request function */
 type GetApiFnReturnType<T extends ApiFn, P = any> = T extends (args: P) => Promise<App.Service.DEVResponse<infer R>>
   ? R
   : never
 
-/** 表格接口请求后转换后的数据 */
+/** Converted data after table interface request */
 type Transformer<TableData, Response> = (response: Response) => {
   data: TableData[]
   pageNum: number
@@ -25,42 +25,42 @@ type Transformer<TableData, Response> = (response: Response) => {
   total: number
 }
 
-/** 列表接口参数更新 */
+/** List interface parameter update */
 type ApiParamsUpdater<P, R> = (params: P) => R
 
-/** 分页参数 */
+/** Paging parameters */
 type PagePropsOfPagination = Pick<PaginationProps, 'page' | 'pageSize'>
 
-/** 自定义的列 key */
+/** Custom columns key */
 type CustomColumnKey<K = never> = K | 'action'
 
-/** 表格的列 */
+/** table columns */
 type HookTableColumn<T = Record<string, unknown>> =
   | (Omit<TableColumnGroup<T>, 'key'> & { key: CustomColumnKey<keyof T> })
   | (Omit<DataTableBaseColumn<T>, 'key'> & { key: CustomColumnKey<keyof T> })
   | DataTableSelectionColumn<T>
   | DataTableExpandColumn<T>
 
-/** 表格配置 */
+/** Table configuration */
 type HookTableConfig<TableData, Fn extends ApiFn> = {
-  /** 列表接口参数 */
+  /** List interface parameters */
   apiParams: GetApiFnParameters<Fn>
-  /** 列表接口返回数据转换 */
+  /** List interface returns data conversion */
   transformer: Transformer<TableData, GetApiFnReturnType<Fn>>
-  /** 列表列 */
+  /** list column */
   columns: () => HookTableColumn<TableData>[]
   /**
-   * 列表接口参数更新
+   * List interface parameter update
    *
-   * 用于更新分页参数, 如果列表接口的参数不包含同名分页参数属性 `page` 和 `pageSize`, 需要通过此函数更新
+   * Used to update paging parameters, If the parameters of the list interface do not contain the paging parameter attribute with the same name `page` and `pageSize`, Need to be updated through this function
    *
    * @default p => p
    */
   apiParamsUpdater?: ApiParamsUpdater<GetApiFnParameters<Fn> & Partial<PagePropsOfPagination>, GetApiFnParameters<Fn>>
-  /** 列表分页参数 */
+  /** List paging parameters */
   pagination?: PaginationProps
   /**
-   * 是否立即请求
+   * Whether to request immediately
    *
    * @default true
    */
@@ -68,10 +68,10 @@ type HookTableConfig<TableData, Fn extends ApiFn> = {
 }
 
 /**
- * 通用表格 hook
+ * General form hook
  *
- * @param apiFn 接口请求函数
- * @param config 表格配置
+ * @param apiFn Interface request function
+ * @param config Table configuration
  */
 export default function useHookTable<TableData, Fn extends ApiFn>(apiFn: Fn, config: HookTableConfig<TableData, Fn>) {
   const { loading, startLoading, endLoading, empty, setEmpty } = useLoadingEmpty()

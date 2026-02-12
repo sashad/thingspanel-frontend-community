@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * 模板查看器主组件
- * 顶部：模板基本信息
- * 底部：Tab切换（遥测、属性、事件、命令、Web图表、App图表）
+ * Template viewer main component
+ * top：Template basic information
+ * bottom：Tabswitch（telemetry、property、event、Order、Webchart、Appchart）
  */
 
 import { ref, onMounted, provide, computed } from 'vue'
@@ -22,37 +22,37 @@ import AppChartTab from './tab-app-chart.vue'
 const router = useRouter()
 const route = useRoute()
 
-// 从路由参数获取模板ID
+// Get template from route parametersID
 const templateId = computed(() => {
   const id = route.query.id
   return typeof id === 'string' ? id : ''
 })
 
-// 当前激活的tab
+// currently activetab
 const activeTab = ref('telemetry')
 
-// 加载状态
+// Loading status
 const loading = ref(false)
 
-// 编辑弹窗
+// Edit pop-up window
 const showEditModal = ref(false)
 
-// 模板数据
+// template data
 const templateData = ref<any>(null)
 
-// 完整JSON数据（用于复制）
+// wholeJSONdata（for copying）
 const fullTemplateJson = ref<string>('')
 
-// 提供给子组件访问
+// Provide access to child components
 provide('templateData', templateData)
 provide('fullTemplateJson', fullTemplateJson)
 
 /**
- * 加载模板数据
+ * Load template data
  */
 const loadTemplateData = async () => {
   if (!templateId.value) {
-    window.$message?.warning('模板ID不能为空')
+    window.$message?.warning('templateIDcannot be empty')
     return
   }
 
@@ -62,17 +62,17 @@ const loadTemplateData = async () => {
     if (!res.error && res.data) {
       templateData.value = res.data
 
-      // 生成完整JSON（和编辑器第5步一样的处理）
+      // Generate completeJSON（and editor section5Step by step processing）
       const jsonData = { ...res.data }
       try {
         jsonData.app_chart_config = JSON.parse(jsonData.app_chart_config)
       } catch (e) {
-        // 保持原样
+        // stay as is
       }
       try {
         jsonData.web_chart_config = JSON.parse(jsonData.web_chart_config)
       } catch (e) {
-        // 保持原样
+        // stay as is
       }
       fullTemplateJson.value = JSON.stringify(jsonData, null, 2)
     } else {
@@ -87,18 +87,18 @@ const loadTemplateData = async () => {
 }
 
 /**
- * 打开编辑弹窗
+ * Open the edit popup window
  */
 const handleEdit = () => {
   showEditModal.value = true
 }
 
 /**
- * 编辑成功回调
+ * Edit success callback
  */
 const handleEditSuccess = () => {
   showEditModal.value = false
-  loadTemplateData() // 重新加载数据
+  loadTemplateData() // Reload data
 }
 
 onMounted(() => {
@@ -108,43 +108,43 @@ onMounted(() => {
 
 <template>
   <div class="template-viewer">
-    <!-- 内容区 -->
+    <!-- content area -->
     <NCard>
       <NSpin :show="loading">
-        <!-- 顶部：模板基本信息 -->
+        <!-- top：Template basic information -->
         <TemplateOverviewSection @edit="handleEdit" />
 
-        <!-- 分隔线 -->
+        <!-- divider -->
         <n-divider />
 
-        <!-- 底部：Tab 切换 -->
+        <!-- bottom：Tab switch -->
         <NTabs v-model:value="activeTab" type="line" animated>
-          <!-- 遥测 -->
+          <!-- telemetry -->
           <NTabPane name="telemetry" :tab="$t('device_template.telemetry')">
             <TelemetryTabContent />
           </NTabPane>
 
-          <!-- 属性 -->
+          <!-- property -->
           <NTabPane name="attributes" :tab="$t('device_template.attributes')">
             <AttributesTabContent />
           </NTabPane>
 
-          <!-- 事件 -->
+          <!-- event -->
           <NTabPane name="events" :tab="$t('device_template.events')">
             <EventsTabContent />
           </NTabPane>
 
-          <!-- 命令 -->
+          <!-- Order -->
           <NTabPane name="commands" :tab="$t('device_template.commands')">
             <CommandsTabContent />
           </NTabPane>
 
-          <!-- Web图表 -->
+          <!-- Webchart -->
           <NTabPane name="web-chart" :tab="$t('device_template.webChartConfiguration')">
             <WebChartTab />
           </NTabPane>
 
-          <!-- App图表 -->
+          <!-- Appchart -->
           <NTabPane name="app-chart" :tab="$t('device_template.appChartConfiguration')">
             <AppChartTab />
           </NTabPane>
@@ -152,7 +152,7 @@ onMounted(() => {
       </NSpin>
     </NCard>
 
-    <!-- 编辑弹窗 -->
+    <!-- Edit pop-up window -->
     <NModal v-model:show="showEditModal" :title="$t('device_template.editTemplateInfo')" preset="card" class="edit-modal">
       <TemplateEditForm :template-id="templateId" @success="handleEditSuccess" @cancel="showEditModal = false" />
     </NModal>

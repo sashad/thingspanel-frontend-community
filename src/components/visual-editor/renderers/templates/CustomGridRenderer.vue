@@ -1,7 +1,7 @@
 <!--
-  自定义网格渲染器模板
-  适用于固定网格布局的需求
-  支持自定义行列数和网格样式
+  Custom mesh renderer template
+  Suitable for fixed grid layout needs
+  Support customized number of rows and columns and grid style
 -->
 <template>
   <BaseRendererComponent
@@ -21,7 +21,7 @@
       :style="getGridStyle()"
       @click="handleCanvasClick"
     >
-      <!-- 网格项 -->
+      <!-- Grid items -->
       <div
         v-for="gridItem in gridItems"
         :key="gridItem.node?.id || `empty-${gridItem.row}-${gridItem.col}`"
@@ -34,14 +34,14 @@
         :style="getGridCellStyle(gridItem)"
         @click.stop="handleGridCellClick(gridItem)"
       >
-        <!-- 有节点的单元格 -->
+        <!-- cells with nodes -->
         <template v-if="gridItem.node">
-          <!-- 节点标题 -->
+          <!-- Node title -->
           <div v-if="showWidgetTitles && !readonly" class="node-title">
             {{ gridItem.node.label || gridItem.node.type }}
           </div>
 
-          <!-- 节点内容 -->
+          <!-- Node content -->
           <div class="node-content">
             <Card2Wrapper
               v-if="isCard2Component(gridItem.node.type)"
@@ -55,13 +55,13 @@
           </div>
         </template>
 
-        <!-- 空单元格 -->
+        <!-- empty cell -->
         <div v-else-if="!readonly" class="empty-cell">
           <div class="empty-placeholder">
             <n-icon :size="24" class="empty-icon">
               <AddOutline />
             </n-icon>
-            <span class="empty-text">点击添加</span>
+            <span class="empty-text">Click to add</span>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@ import { globalPreviewMode } from '@/components/visual-editor/hooks/usePreviewMo
 import BaseRendererComponent from '@/components/visual-editor/renderers/base/BaseRendererComponent.vue'
 import { Card2Wrapper } from '@/components/visual-editor/renderers/base'
 
-// 网格配置
+// Grid configuration
 interface GridConfig {
   showGrid?: boolean
   rows?: number
@@ -90,7 +90,7 @@ interface GridConfig {
   autoResize?: boolean
 }
 
-// 网格项接口
+// Grid item interface
 interface GridItem {
   row: number
   col: number
@@ -98,7 +98,7 @@ interface GridItem {
   span?: { rowSpan: number; colSpan: number }
 }
 
-// 组件 Props
+// components Props
 interface Props {
   readonly?: boolean
   config?: GridConfig
@@ -119,7 +119,7 @@ const props = withDefaults(defineProps<Props>(), {
   showWidgetTitles: false
 })
 
-// 组件 Emits
+// components Emits
 interface Emits {
   (e: 'ready'): void
   (e: 'error', error: Error): void
@@ -130,11 +130,11 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 使用原始 store
+// Use original store
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
 
-// 适配旧接口
+// Adapt to old interface
 const selectNode = (nodeId: string) => {
   if (nodeId) {
     widgetStore.selectNodes([nodeId])
@@ -144,7 +144,7 @@ const selectNode = (nodeId: string) => {
 }
 
 const isCard2Component = (type: string) => {
-  // 简单的Card2组件检测
+  // simpleCard2Component detection
   return type.includes('card2') || type.includes('Card2')
 }
 
@@ -153,19 +153,19 @@ const addNode = async (node: any) => {
 }
 const { isPreviewMode } = globalPreviewMode
 
-// 计算属性
+// Computed properties
 const nodes = computed(() => editorStore.nodes || [])
 const selectedIds = computed(() => widgetStore.selectedNodeIds || [])
 
-// 网格布局计算
+// Grid layout calculation
 const gridItems = computed<GridItem[]>(() => {
   const config = props.config!
   const items: GridItem[] = []
 
-  // 创建网格矩阵
+  // Create grid matrix
   for (let row = 0; row < config.rows!; row++) {
     for (let col = 0; col < config.columns!; col++) {
-      // 查找是否有节点占据这个位置
+      // Find if there is a node occupying this position
       const node = nodes.value.find(n => {
         const gridPos = n.metadata?.gridPosition
         return gridPos && gridPos.row === row && gridPos.col === col
@@ -183,7 +183,7 @@ const gridItems = computed<GridItem[]>(() => {
   return items
 })
 
-// 事件处理器
+// event handler
 const onRendererReady = () => {
   emit('ready')
 }
@@ -210,16 +210,16 @@ const handleGridCellClick = (gridItem: GridItem) => {
   if (isPreviewMode.value) return
 
   if (gridItem.node) {
-    // 选择现有节点
+    // Select an existing node
     if (!props.readonly) {
       selectNode(gridItem.node.id)
       emit('node-select', gridItem.node.id)
     }
   } else {
-    // 空单元格，触发添加事件
+    // empty cell，trigger add event
     if (!props.readonly) {
       emit('cell-click', gridItem.row, gridItem.col)
-      // 可以在这里添加默认组件创建逻辑
+      // Default component creation logic can be added here
     }
   }
 }
@@ -229,7 +229,7 @@ const handleComponentError = (error: Error) => {
   emit('error', error)
 }
 
-// 样式计算
+// style calculation
 const getGridStyle = () => {
   const config = props.config!
   return {
@@ -250,10 +250,10 @@ const getGridCellStyle = (gridItem: GridItem) => {
   }
 }
 
-// 组件获取
+// Component acquisition
 const getWidgetComponent = (type: string) => {
   const components: Record<string, any> = {
-    // 在这里添加您的组件映射
+    // Add your component mapping here
   }
   return components[type]
 }
@@ -366,7 +366,7 @@ const getWidgetComponent = (type: string) => {
   font-weight: 500;
 }
 
-/* 预览模式样式 */
+/* Preview mode style */
 .custom-grid-renderer.preview-mode .grid-cell {
   cursor: default;
 }
@@ -384,7 +384,7 @@ const getWidgetComponent = (type: string) => {
   display: none;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 768px) {
   .custom-grid-renderer {
     min-height: 400px;

@@ -1,65 +1,65 @@
 /**
- * 全局轮询管理器
- * 统一管理所有组件的轮询任务，避免重复定时器，提高性能
+ * Global Poll Manager
+ * Unified management of polling tasks for all components，Avoid repeating timers，Improve performance
  */
 
 import { reactive, ref, type Ref } from 'vue'
 
 export interface PollingTask {
-  /** 任务唯一标识 */
+  /** Task unique identifier */
   id: string
-  /** 关联的组件ID */
+  /** associated componentsID */
   componentId: string
-  /** 组件显示名称 */
+  /** Component display name */
   componentName: string
-  /** 轮询间隔（毫秒） */
+  /** Polling interval（millisecond） */
   interval: number
-  /** 是否激活 */
+  /** Whether to activate */
   active: boolean
-  /** 上次执行时间 */
+  /** Last execution time */
   lastExecutedAt?: number
-  /** 下次执行时间 */
+  /** Next execution time */
   nextExecuteAt?: number
-  /** 执行回调函数 */
+  /** Execute callback function */
   callback: () => Promise<void> | void
 }
 
 export interface PollingStatistics {
-  /** 总任务数 */
+  /** Total number of tasks */
   totalTasks: number
-  /** 活跃任务数 */
+  /** Number of active tasks */
   activeTasks: number
-  /** 平均间隔时间 */
+  /** average interval */
   averageInterval: number
-  /** 最小间隔时间 */
+  /** Minimum interval */
   minInterval: number
-  /** 全局定时器状态 */
+  /** Global timer status */
   globalTimerActive: boolean
-  /** 总执行次数 */
+  /** Total execution times */
   totalExecutions: number
 }
 
 /**
- * 全局轮询管理器类
- * 使用单一定时器统一调度所有轮询任务
+ * Global poll manager class
+ * Use a single timer to schedule all polling tasks uniformly
  */
 export class GlobalPollingManager {
-  /** 所有轮询任务 */
+  /** All polling tasks */
   private tasks = reactive<Map<string, PollingTask>>(new Map())
 
-  /** 全局定时器ID */
+  /** Global timerID */
   private globalTimerId: number | null = null
 
-  /** 全局轮询总开关 - 控制是否执行任何轮询任务 */
+  /** Global polling master switch - Controls whether any polling tasks are performed */
   private globalEnabled = ref<boolean>(false)
 
-  /** 全局定时器间隔（毫秒），设置为最小公约数 */
-  private readonly GLOBAL_TIMER_INTERVAL = 5000 // 🔥 性能优化：改为5秒，减少CPU占用
+  /** global timer interval（millisecond），Set to lowest common denominator */
+  private readonly GLOBAL_TIMER_INTERVAL = 5000 // 🔥 Performance optimization：Change to5Second，reduceCPUoccupy
 
-  /** 管理器是否已启动 */
+  /** Is the manager started? */
   private isRunning = ref(false)
 
-  /** 统计信息 */
+  /** Statistics */
   private statistics = reactive<PollingStatistics>({
     totalTasks: 0,
     activeTasks: 0,
@@ -72,9 +72,9 @@ export class GlobalPollingManager {
   constructor() {}
 
   /**
-   * 添加轮询任务
-   * @param taskConfig 任务配置
-   * @returns 任务ID
+   * Add polling task
+   * @param taskConfig Task configuration
+   * @returns TaskID
    */
   addTask(taskConfig: {
     componentId: string
@@ -89,14 +89,14 @@ export class GlobalPollingManager {
       id: taskId,
       componentId: taskConfig.componentId,
       componentName: taskConfig.componentName,
-      interval: Math.max(taskConfig.interval, 2000), // 最小2秒间隔
+      interval: Math.max(taskConfig.interval, 2000), // smallest2seconds interval
       active: false,
       callback: taskConfig.callback
     }
 
     this.tasks.set(taskId, task)
     this.updateStatistics()
-    // 如果设置了自动启动
+    // If automatic startup is set
     if (taskConfig.autoStart) {
       this.startTask(taskId)
     } else {
@@ -106,8 +106,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 启动指定任务
-   * @param taskId 任务ID
+   * Start the specified task
+   * @param taskId TaskID
    */
   startTask(taskId: string): boolean {
     const task = this.tasks.get(taskId)
@@ -117,15 +117,15 @@ export class GlobalPollingManager {
 
     task.active = true
     task.nextExecuteAt = Date.now() + task.interval
-    // 启动全局定时器（如果还没启动）
+    // Start global timer（If it hasn't started yet）
     this.startGlobalTimer()
     this.updateStatistics()
     return true
   }
 
   /**
-   * 停止指定任务
-   * @param taskId 任务ID
+   * Stop specified task
+   * @param taskId TaskID
    */
   stopTask(taskId: string): boolean {
     const task = this.tasks.get(taskId)
@@ -137,7 +137,7 @@ export class GlobalPollingManager {
     task.nextExecuteAt = undefined
     this.updateStatistics()
 
-    // 如果没有活跃任务，停止全局定时器
+    // If there are no active tasks，Stop global timer
     if (this.getActiveTasks().length === 0) {
       this.stopGlobalTimer()
     }
@@ -146,8 +146,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 移除指定任务
-   * @param taskId 任务ID
+   * Remove specified task
+   * @param taskId TaskID
    */
   removeTask(taskId: string): boolean {
     const task = this.tasks.get(taskId)
@@ -155,26 +155,26 @@ export class GlobalPollingManager {
       return false
     }
 
-    // 先停止任务
+    // Stop the task first
     this.stopTask(taskId)
 
-    // 从列表中移除
+    // Remove from list
     this.tasks.delete(taskId)
     this.updateStatistics()
     return true
   }
 
   /**
-   * 根据组件ID获取任务
-   * @param componentId 组件ID
+   * According to componentsIDGet tasks
+   * @param componentId componentsID
    */
   getTasksByComponent(componentId: string): PollingTask[] {
     return Array.from(this.tasks.values()).filter(task => task.componentId === componentId)
   }
 
   /**
-   * 启动指定组件的所有轮询任务
-   * @param componentId 组件ID
+   * Start all polling tasks for the specified component
+   * @param componentId componentsID
    */
   startComponentTasks(componentId: string): boolean {
     const tasks = this.getTasksByComponent(componentId)
@@ -192,7 +192,7 @@ export class GlobalPollingManager {
     })
 
     if (startedCount > 0) {
-      // 启动全局定时器（如果还没启动）
+      // Start global timer（If it hasn't started yet）
       this.startGlobalTimer()
       this.updateStatistics()
     }
@@ -201,8 +201,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 停止指定组件的所有轮询任务
-   * @param componentId 组件ID
+   * Stops all polling tasks for the specified component
+   * @param componentId componentsID
    */
   stopComponentTasks(componentId: string): boolean {
     const tasks = this.getTasksByComponent(componentId)
@@ -222,7 +222,7 @@ export class GlobalPollingManager {
     if (stoppedCount > 0) {
       this.updateStatistics()
 
-      // 如果没有活跃任务，停止全局定时器
+      // If there are no active tasks，Stop global timer
       if (this.getActiveTasks().length === 0) {
         this.stopGlobalTimer()
       }
@@ -232,8 +232,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 切换指定组件的轮询状态
-   * @param componentId 组件ID
+   * Toggle the polling status of the specified component
+   * @param componentId componentsID
    */
   toggleComponentPolling(componentId: string): boolean {
     const tasks = this.getTasksByComponent(componentId)
@@ -247,8 +247,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 检查组件是否有活跃的轮询任务
-   * @param componentId 组件ID
+   * Check if the component has active polling tasks
+   * @param componentId componentsID
    */
   isComponentPollingActive(componentId: string): boolean {
     const tasks = this.getTasksByComponent(componentId)
@@ -256,8 +256,8 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 获取组件轮询统计信息
-   * @param componentId 组件ID
+   * Get component polling statistics
+   * @param componentId componentsID
    */
   getComponentStatistics(componentId: string): PollingStatistics {
     const tasks = this.getTasksByComponent(componentId)
@@ -279,28 +279,28 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 获取所有任务
+   * Get all tasks
    */
   getAllTasks(): PollingTask[] {
     return Array.from(this.tasks.values())
   }
 
   /**
-   * 获取活跃任务
+   * Get active tasks
    */
   getActiveTasks(): PollingTask[] {
     return this.getAllTasks().filter(task => task.active)
   }
 
   /**
-   * 获取统计信息
+   * Get statistics
    */
   getStatistics(): PollingStatistics {
     return { ...this.statistics }
   }
 
   /**
-   * 停止所有任务
+   * Stop all tasks
    */
   stopAllTasks(): void {
     for (const task of this.tasks.values()) {
@@ -315,7 +315,7 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 清除所有任务
+   * Clear all tasks
    */
   clearAllTasks(): void {
     this.stopAllTasks()
@@ -324,12 +324,12 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 启用全局轮询
+   * Enable global polling
    */
   enableGlobalPolling(): void {
     this.globalEnabled.value = true
 
-    // 详细状态报告
+    // Detailed status report
     const allTasks = this.getAllTasks()
     const activeTasks = this.getActiveTasks()
 
@@ -339,12 +339,12 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 禁用全局轮询
+   * Disable global polling
    */
   disableGlobalPolling(): void {
     this.globalEnabled.value = false
 
-    // 停止全局定时器但不清除任务
+    // Stop global timer without clearing task
     if (this.globalTimerId !== null) {
       clearInterval(this.globalTimerId)
       this.globalTimerId = null
@@ -354,14 +354,14 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 获取全局轮询开关状态
+   * Get global polling switch status
    */
   isGlobalPollingEnabled(): boolean {
     return this.globalEnabled.value
   }
 
   /**
-   * 切换全局轮询开关状态
+   * Toggle global polling switch state
    */
   toggleGlobalPolling(): boolean {
     if (this.globalEnabled.value) {
@@ -373,7 +373,7 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 销毁管理器
+   * destroy manager
    */
   destroy(): void {
     this.clearAllTasks()
@@ -382,11 +382,11 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 启动全局定时器
+   * Start global timer
    */
   private startGlobalTimer(): void {
     if (this.globalTimerId !== null) {
-      return // 已经启动
+      return // Already started
     }
     this.globalTimerId = window.setInterval(() => {
       this.executeScheduledTasks()
@@ -397,7 +397,7 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 停止全局定时器
+   * Stop global timer
    */
   private stopGlobalTimer(): void {
     if (this.globalTimerId !== null) {
@@ -410,72 +410,72 @@ export class GlobalPollingManager {
   }
 
   /**
-   * 执行计划中的任务 - 🔥 优化版本：批量处理和智能调度
+   * Execute planned tasks - 🔥 Optimized version：Batch processing and intelligent scheduling
    */
   private executeScheduledTasks(): void {
-    // 🔴 检查全局轮询开关
+    // 🔴 Check global polling switch
     if (!this.globalEnabled.value) {
-      // 全局轮询关闭时，不执行任何任务，但保持定时器运行以便随时恢复
+      // When global polling is turned off，Do not perform any tasks，But keep the timer running so it can be resumed at any time
       return
     }
 
     const now = Date.now()
     const readyTasks: PollingTask[] = []
 
-    // 🔥 性能优化：收集所有准备执行的任务
+    // 🔥 Performance optimization：Collect all tasks ready to be executed
     for (const task of this.getActiveTasks()) {
       if (task.nextExecuteAt && now >= task.nextExecuteAt) {
         readyTasks.push(task)
       }
     }
 
-    // 🔥 性能优化：批量执行，避免单个任务堵塞
+    // 🔥 Performance optimization：Batch execution，Avoid single task blockage
     if (readyTasks.length > 0) {
-      // 按优先级排序：间隔时间短的任务优先执行
+      // Sort by priority：Tasks with short intervals are executed first
       readyTasks.sort((a, b) => a.interval - b.interval)
 
-      // 并行执行任务（但限制并发数避免过载）
-      const batchSize = Math.min(readyTasks.length, 5) // 最多同时执行5个任务
+      // Execute tasks in parallel（But limit the number of concurrencies to avoid overload）
+      const batchSize = Math.min(readyTasks.length, 5) // Execute at most simultaneously5tasks
       const batch = readyTasks.slice(0, batchSize)
       Promise.allSettled(batch.map(task => this.executeTask(task, now))).catch(error => {})
     } else {
-      // 当前时间检查
+      // Current time check
       this.getActiveTasks()
     }
   }
 
   /**
-   * 执行单个任务
-   * @param task 任务对象
-   * @param now 当前时间戳
+   * Perform a single task
+   * @param task Task object
+   * @param now current timestamp
    */
   private async executeTask(task: PollingTask, now: number): Promise<void> {
     try {
-      // 🔍 调试：总是输出执行日志
-      // 更新执行时间
+      // 🔍 debug：Always output execution log
+      // Update execution time
       task.lastExecutedAt = now
       task.nextExecuteAt = now + task.interval
 
-      // 执行回调
+      // Execute callback
       await task.callback()
 
-      // 更新统计
+      // Update statistics
       this.statistics.totalExecutions++
     } catch (error) {
-      error(`❌ [GlobalPollingManager] 任务执行失败: ${task.componentName}`, error)
+      error(`❌ [GlobalPollingManager] Task execution failed: ${task.componentName}`, error)
     }
   }
 
   /**
-   * 生成任务ID
-   * @param componentId 组件ID
+   * Generate tasksID
+   * @param componentId componentsID
    */
   private generateTaskId(componentId: string): string {
     return `polling_${componentId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   /**
-   * 更新统计信息
+   * Update statistics
    */
   private updateStatistics(): void {
     const allTasks = this.getAllTasks()
@@ -495,17 +495,17 @@ export class GlobalPollingManager {
   }
 }
 
-// 创建全局单例实例
+// Create a global singleton instance
 let globalPollingManagerInstance: GlobalPollingManager | null = null
 
 /**
- * 获取全局轮询管理器单例
+ * Get the global poll manager singleton
  */
 export function useGlobalPollingManager(): GlobalPollingManager {
   if (!globalPollingManagerInstance) {
     globalPollingManagerInstance = new GlobalPollingManager()
 
-    // 在页面卸载时清理
+    // Clean up when page unloads
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', () => {
         globalPollingManagerInstance?.destroy()
@@ -517,7 +517,7 @@ export function useGlobalPollingManager(): GlobalPollingManager {
 }
 
 /**
- * 销毁全局轮询管理器实例（主要用于测试）
+ * Destroy the global poll manager instance（Mainly used for testing）
  */
 export function destroyGlobalPollingManager(): void {
   if (globalPollingManagerInstance) {

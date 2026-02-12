@@ -1,42 +1,42 @@
 <!--
-  原始数据配置弹窗
-  用于配置原始数据项
+  Original data configuration pop-up window
+  Used to configure raw data items
 -->
 <script setup lang="ts">
 /**
- * RawDataConfigModal - 原始数据配置弹窗
- * 实现JSON/HTTP/脚本数据录入和预览
+ * RawDataConfigModal - Original data configuration pop-up window
+ * accomplishJSON/HTTP/Script data entry and preview
  */
 
 import { ref, reactive, computed, watch, nextTick, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
 import { DataItemFetcher, type DataItem } from '@/core/data-architecture/executors'
 import HttpConfigForm from '@/core/data-architecture/components/modals/HttpConfigForm.vue'
-// 🔥 简洁脚本编辑器
+// 🔥 Simple script editor
 import SimpleScriptEditor from '@/core/script-engine/components/SimpleScriptEditor.vue'
-// 导入示例数据图标
+// Import sample data icon
 import { DocumentTextOutline } from '@vicons/ionicons5'
 
-// Props接口
+// Propsinterface
 interface Props {
-  /** 数据源Key */
+  /** data sourceKey */
   dataSourceKey?: string
-  /** 编辑数据 */
+  /** Edit data */
   editData?: any
-  /** 是否为编辑模式 */
+  /** Is it in edit mode? */
   isEditMode?: boolean
-  /** 示例数据 */
+  /** Sample data */
   exampleData?: any
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
-// Emits接口
+// Emitsinterface
 interface Emits {
   (e: 'confirm', data: DataItem): void
   (e: 'close'): void
   (e: 'cancel'): void
-  (e: 'method-change', method: 'json' | 'http' | 'script'): void // 新增：当录入方式改变时通知父组件
+  (e: 'method-change', method: 'json' | 'http' | 'script'): void // New：Notify the parent component when the input method changes
 }
 
 const props = defineProps<Props>()
@@ -45,20 +45,20 @@ const emit = defineEmits<Emits>()
 const message = useMessage()
 
 /**
- * 录入方式选项
+ * Entry options
  */
 const inputMethods = [
-  { label: 'JSON数据', value: 'json', available: true },
-  { label: 'HTTP接口', value: 'http', available: true },
-  { label: 'JavaScript脚本', value: 'script', available: true }
+  { label: 'JSONdata', value: 'json', available: true },
+  { label: 'HTTPinterface', value: 'http', available: true },
+  { label: 'JavaScriptscript', value: 'script', available: true }
 ]
 
 /**
- * 表单状态
+ * form status
  */
 const formState = reactive({
-  selectedMethod: 'http' as 'json' | 'http' | 'script' | 'websocket', // 🔥 修改默认值从 json 改为 http
-  jsonData: '', // 初始为空，由watch或mounted设置
+  selectedMethod: 'http' as 'json' | 'http' | 'script' | 'websocket', // 🔥 Change the default value from json Change to http
+  jsonData: '', // Initially empty，Depend onwatchormountedset up
   httpUrl: 'https://api.example.com/data',
   httpMethod: 'GET' as 'GET' | 'POST' | 'PUT' | 'DELETE',
   httpHeaders: '{\n  "Authorization": "Bearer your-token",\n  "Content-Type": "application/json"\n}',
@@ -68,7 +68,7 @@ const formState = reactive({
 })
 
 /**
- * HTTP配置状态 - 新版HttpConfigForm集成
+ * HTTPconfiguration status - new versionHttpConfigFormintegrated
  */
 const httpConfig = ref({
   url: 'https://api.example.com/data',
@@ -98,13 +98,13 @@ const httpConfig = ref({
 })
 
 /**
- * HTTP配置更新处理 - 添加完整调试
+ * HTTPConfiguration update handling - Add full debugging
  */
 const onHttpConfigUpdate = (newConfig: typeof httpConfig.value) => {
-  // 🔥 关键修复：确保响应式更新
+  // 🔥 critical fix：Ensure responsive updates
   httpConfig.value = { ...newConfig }
 
-  // 同步更新到旧版formState（兼容现有代码）
+  // Synchronously update to the old versionformState（Compatible with existing code）
   formState.httpUrl = newConfig.url || ''
   formState.httpMethod = newConfig.method || 'GET'
   formState.httpHeaders = JSON.stringify(
@@ -114,13 +114,13 @@ const onHttpConfigUpdate = (newConfig: typeof httpConfig.value) => {
 }
 
 /**
- * 预览数据状态
+ * Preview data status
  */
 const previewData = ref<any>(null)
 const previewLoading = ref(false)
 
 /**
- * 处理配置状态
+ * Handle configuration status
  */
 const processingState = reactive({
   jsonPath: '',
@@ -129,46 +129,46 @@ const processingState = reactive({
 })
 
 /**
- * 脚本模板
+ * script template
  */
 const scriptTemplates = [
   {
-    name: '提取字段',
+    name: 'Extract fields',
     code: 'return {\n  value: data.temperature || data.value,\n  unit: "°C",\n  timestamp: new Date().toISOString()\n}'
   },
   {
-    name: '数组转换',
+    name: 'Array conversion',
     code: 'if (Array.isArray(data)) {\n  return data.map(item => ({\n    id: item.id,\n    value: item.value,\n    isOnline: item.status === "online"\n  }))\n}\nreturn data'
   },
   {
-    name: '数据统计',
-    code: 'if (Array.isArray(data)) {\n  return {\n    total: data.length,\n    online: data.filter(item => item.status === "online").length,\n    avgValue: data.reduce((sum, item) => sum + (item.value || 0), 0) / data.length\n  }\n}\nreturn { error: "需要数组数据" }'
+    name: 'Statistics',
+    code: 'if (Array.isArray(data)) {\n  return {\n    total: data.length,\n    online: data.filter(item => item.status === "online").length,\n    avgValue: data.reduce((sum, item) => sum + (item.value || 0), 0) / data.length\n  }\n}\nreturn { error: "Array data required" }'
   },
   {
-    name: '条件过滤',
+    name: 'Conditional filtering',
     code: 'if (Array.isArray(data)) {\n  return data.filter(item => item.status === "online")\n}\nreturn data'
   }
 ]
 
 /**
- * 处理预览状态
+ * Handle preview status
  */
 const processingPreviewData = ref<any>(null)
 const processingPreviewLoading = ref(false)
 
 /**
- * 数据获取器实例
+ * Data getter instance
  */
 const fetcher = new DataItemFetcher()
 
 /**
- * 辅助函数：将 HttpParameter[] 转换为 Record<string, string>
+ * Helper function：Will HttpParameter[] Convert to Record<string, string>
  *
- * 用途：兼容旧的 headers 格式要求，将新的HttpParameter数组格式
- * 转换为旧的Record对象格式，确保数据流兼容性
+ * use：Compatible with older headers Format requirements，will newHttpParameterarray format
+ * Convert to oldRecordobject format，Ensure data flow compatibility
  *
- * @param params HttpParameter数组，包含key、value、enabled等属性
- * @returns Record<string, string> 转换后的键值对对象，如果没有启用的参数则返回undefined
+ * @param params HttpParameterarray，Includekey、value、enabledproperties
+ * @returns Record<string, string> Converted key-value pair object，Returns if there are no enabled parametersundefined
  */
 const convertHttpParametersToRecord = (
   params: Array<{
@@ -193,19 +193,19 @@ const convertHttpParametersToRecord = (
 }
 
 /**
- * 处理关闭
+ * processing closed
  */
 const handleClose = () => {
-  // 重置表单状态
+  // Reset form state
   resetFormState()
 
-  // 发送取消和关闭事件
+  // Send cancellation and close events
   emit('cancel')
   emit('close')
 }
 
 /**
- * 获取当前数据项配置
+ * Get the current data item configuration
  */
 const getCurrentDataItem = (): DataItem => {
   switch (formState.selectedMethod) {
@@ -215,7 +215,7 @@ const getCurrentDataItem = (): DataItem => {
         config: { jsonString: formState.jsonData }
       }
     case 'http':
-      // 修复：使用新的 HttpConfig 格式，兼容 HttpConfigForm，包含脚本字段
+      // repair：use new HttpConfig Format，compatible HttpConfigForm，Contains script fields
       return {
         type: 'http',
         config: {
@@ -224,11 +224,11 @@ const getCurrentDataItem = (): DataItem => {
           timeout: httpConfig.value.timeout,
           headers: convertHttpParametersToRecord(httpConfig.value.headers),
           body: httpConfig.value.body ? JSON.parse(httpConfig.value.body) : undefined,
-          // 扩展：支持新的 params 数组格式
+          // Expand：Support new params array format
           params: httpConfig.value.params,
-          // 🔥 关键修复：包含路径参数字段
+          // 🔥 critical fix：Contains path parameter fields
           pathParameter: httpConfig.value.pathParameter,
-          // 🔥 关键修复：包含脚本字段
+          // 🔥 critical fix：Contains script fields
           preRequestScript: httpConfig.value.preRequestScript,
           postResponseScript: httpConfig.value.postResponseScript
         }
@@ -239,12 +239,12 @@ const getCurrentDataItem = (): DataItem => {
         config: { script: formState.scriptCode }
       }
     default:
-      throw new Error(`不支持的录入方式: ${formState.selectedMethod}`)
+      throw new Error(`Unsupported entry method: ${formState.selectedMethod}`)
   }
 }
 
 /**
- * 执行数据预览
+ * Perform data preview
  */
 const executePreview = async () => {
   if (previewLoading.value) return
@@ -255,9 +255,9 @@ const executePreview = async () => {
     const result = await fetcher.fetchData(dataItem)
     previewData.value = result
 
-    message.success('数据预览成功')
+    message.success('Data preview successful')
   } catch (error) {
-    message.error('数据预览失败: ' + error.message)
+    message.error('Data preview failed: ' + error.message)
     previewData.value = null
   } finally {
     previewLoading.value = false
@@ -265,29 +265,29 @@ const executePreview = async () => {
 }
 
 /**
- * 处理确认按钮
+ * Handling confirmation button
  */
 const handleConfirm = async () => {
   try {
     const dataItem = getCurrentDataItem()
 
-    // 构建完整配置，包括处理配置
+    // Build full configuration，Includes processing configuration
     const fullConfig = {
       type: formState.selectedMethod,
       ...dataItem.config,
-      // 原始数据配置
+      // Original data configuration
       jsonData: formState.selectedMethod === 'json' ? formState.jsonData : undefined,
       scriptCode: formState.selectedMethod === 'script' ? formState.scriptCode : undefined,
       url: formState.selectedMethod === 'http' ? formState.httpUrl : undefined,
       method: formState.selectedMethod === 'http' ? formState.httpMethod : undefined,
       headers: formState.selectedMethod === 'http' ? formState.httpHeaders : undefined,
       body: formState.selectedMethod === 'http' ? formState.httpBody : undefined,
-      // 🔥 关键修复：保存新的 httpConfig 完整状态，包含所有地址类型和参数信息
+      // 🔥 critical fix：save new httpConfig complete state，Contains all address type and parameter information
       httpConfigData:
         formState.selectedMethod === 'http'
           ? {
               ...httpConfig.value,
-              // 确保保存地址类型相关的关键信息
+              // Make sure to save key information about the address type
               addressType: httpConfig.value.addressType,
               selectedInternalAddress: httpConfig.value.selectedInternalAddress,
               enableParams: httpConfig.value.enableParams,
@@ -295,7 +295,7 @@ const handleConfirm = async () => {
               pathParameter: httpConfig.value.pathParameter
             }
           : undefined,
-      // 处理配置
+      // Handle configuration
       processingConfig: {
         jsonPath: processingState.jsonPath.trim() || undefined,
         defaultValue: processingState.defaultValue.trim() || undefined,
@@ -304,14 +304,14 @@ const handleConfirm = async () => {
     }
 
     emit('confirm', fullConfig)
-    message.success('原始数据配置已保存')
+    message.success('Original data configuration saved')
   } catch (error) {
-    message.error('配置保存失败: ' + error.message)
+    message.error('Configuration save failed: ' + error.message)
   }
 }
 
 /**
- * 简单的JSONPath实现
+ * simpleJSONPathaccomplish
  */
 const executeJsonPath = (data: any, path: string, defaultValue: any = null): any => {
   try {
@@ -326,7 +326,7 @@ const executeJsonPath = (data: any, path: string, defaultValue: any = null): any
     let result = data
 
     for (const key of keys) {
-      // 处理数组索引 key[0]
+      // Handle array index key[0]
       if (key.includes('[') && key.includes(']')) {
         const arrayKey = key.split('[')[0]
         const indexMatch = key.match(/\[(\d+)\]/)
@@ -350,7 +350,7 @@ const executeJsonPath = (data: any, path: string, defaultValue: any = null): any
 }
 
 /**
- * 执行数据处理
+ * Perform data processing
  */
 const executeDataProcessing = (inputData: any): any => {
   if (!inputData) return null
@@ -358,7 +358,7 @@ const executeDataProcessing = (inputData: any): any => {
   let processedData = inputData
 
   try {
-    // 第一步: JSONPath过滤
+    // first step: JSONPathfilter
     if (processingState.jsonPath.trim()) {
       processedData = executeJsonPath(
         processedData,
@@ -367,7 +367,7 @@ const executeDataProcessing = (inputData: any): any => {
       )
     }
 
-    // 第二步: 脚本处理
+    // Step 2: Script processing
     if (processingState.scriptCode.trim()) {
       const func = new Function('data', processingState.scriptCode)
       processedData = func(processedData)
@@ -376,14 +376,14 @@ const executeDataProcessing = (inputData: any): any => {
     return processedData
   } catch (error) {
     return {
-      _error: '处理失败: ' + error.message,
+      _error: 'Processing failed: ' + error.message,
       _originalData: inputData
     }
   }
 }
 
 /**
- * 实时处理数据
+ * Process data in real time
  */
 const updateProcessedData = () => {
   if (!previewData.value) {
@@ -396,7 +396,7 @@ const updateProcessedData = () => {
 }
 
 /**
- * 执行处理预览
+ * Execution processing preview
  */
 const executeProcessingPreview = async () => {
   if (!previewData.value || processingPreviewLoading.value) return
@@ -405,9 +405,9 @@ const executeProcessingPreview = async () => {
   try {
     const result = executeDataProcessing(previewData.value)
     processingPreviewData.value = result
-    message.success('数据处理预览成功')
+    message.success('Data processing preview successful')
   } catch (error) {
-    message.error('处理预览失败: ' + error.message)
+    message.error('Failed to process preview: ' + error.message)
     processingPreviewData.value = null
   } finally {
     processingPreviewLoading.value = false
@@ -415,12 +415,12 @@ const executeProcessingPreview = async () => {
 }
 
 /**
- * 自动预览开关
+ * Auto preview switch
  */
 const autoPreviewEnabled = ref(true)
 
 /**
- * 防抖执行预览（用于自动更新）
+ * Anti-shake execution preview（for automatic updates）
  */
 const debouncePreview = (() => {
   let timer: NodeJS.Timeout | null = null
@@ -435,24 +435,24 @@ const debouncePreview = (() => {
 })()
 
 /**
- * 监听录入方式变化，自动预览并通知父组件
+ * Monitor changes in input methods，Automatically preview and notify parent components
  */
 watch(
   () => formState.selectedMethod,
   (newMethod) => {
     previewData.value = null
     processingPreviewData.value = null
-    // 通知父组件录入方式已改变
+    // Notify the parent component that the input method has changed
     emit('method-change', newMethod)
   },
   { immediate: true }
 )
 
 /**
- * 🔥 智能自动更新策略
+ * 🔥 Intelligent automatic update strategy
  */
 
-// JSON数据变化 - 立即自动更新（无性能损耗）
+// JSONData changes - Automatically update now（No performance loss）
 watch(
   () => formState.jsonData,
   () => {
@@ -462,17 +462,17 @@ watch(
   }
 )
 
-// Script代码变化 - 延迟自动更新（轻量计算）
+// ScriptCode changes - Delay automatic updates（lightweight computing）
 watch(
   () => formState.scriptCode,
   () => {
     if (formState.selectedMethod === 'script' && autoPreviewEnabled.value) {
-      debouncePreview(1000) // 脚本类型延迟1秒
+      debouncePreview(1000) // Script type delay1Second
     }
   }
 )
 
-// HTTP配置变化监听
+// HTTPConfiguration change monitoring
 watch(
   [() => formState.httpUrl, () => formState.httpMethod, () => formState.httpHeaders, () => formState.httpBody],
   () => {
@@ -482,7 +482,7 @@ watch(
 )
 
 /**
- * 监听原始数据变化，实时处理
+ * Monitor changes in raw data，real time processing
  */
 watch(
   () => previewData.value,
@@ -492,7 +492,7 @@ watch(
 )
 
 /**
- * 监听处理配置变化，实时处理
+ * Monitor and handle configuration changes，real time processing
  */
 watch(
   [() => processingState.jsonPath, () => processingState.defaultValue, () => processingState.scriptCode],
@@ -503,22 +503,22 @@ watch(
 )
 
 /**
- * 🔥 修复：重置所有表单状态
- * 弹窗打开时调用，确保每次都是新的干净状态
- * 🔥 统一标准：优先使用组件示例数据，回退到通用数据
+ * 🔥 repair：Reset all form states
+ * Called when the pop-up window opens，Ensure it is in a new and clean state every time
+ * 🔥 unified standards：Prefer component sample data，Fallback to common data
  */
 const resetFormState = () => {
-  // 重置表单数据
+  // Reset form data
   formState.selectedMethod = 'json'
   
-  // 如果有组件示例数据就用，否则用通用数据
+  // If there is component sample data, use it，Otherwise use general data
   if (props.exampleData) {
     formState.jsonData = JSON.stringify(props.exampleData, null, 2)
   } else {
     formState.jsonData = JSON.stringify({
       value: 45,
       unit: '%',
-      metricsName: '湿度',
+      metricsName: 'humidity',
       timestamp: new Date().toISOString()
     }, null, 2)
   }
@@ -529,67 +529,67 @@ const resetFormState = () => {
   formState.scriptCode =
     'return {\n  timestamp: new Date().toISOString(),\n  randomValue: Math.random(),\n  message: "Hello from script"\n}'
 
-  // 重置预览状态
+  // Reset preview status
   previewData.value = null
   previewLoading.value = false
   processingPreviewData.value = null
   processingPreviewLoading.value = false
 
-  // 重置处理配置
+  // Reset processing configuration
   processingState.jsonPath = ''
   processingState.defaultValue = ''
   processingState.scriptCode = ''
 }
 
 /**
- * 使用示例数据（仅JSON模式，用于调试）
+ * Use sample data（onlyJSONmodel，for debugging）
  */
 const loadExampleData = (showMessage = false) => {
   if (!props.exampleData) {
-    if (showMessage) message.warning('当前组件没有提供示例数据')
+    if (showMessage) message.warning('The current component does not provide sample data')
     return
   }
 
   if (formState.selectedMethod === 'json') {
     formState.jsonData = JSON.stringify(props.exampleData, null, 2)
-    if (showMessage) message.success('已加载组件示例数据')
+    if (showMessage) message.success('Component sample data loaded')
   } else {
-    if (showMessage) message.info('示例数据仅在JSON模式下可用')
+    if (showMessage) message.info('Sample data is only available inJSONAvailable in mode')
   }
 }
 
 /**
- * 获取示例按钮的提示文本
+ * Get the tooltip text of the sample button
  */
 const getExampleButtonTitle = () => {
   return formState.selectedMethod === 'json' 
-    ? '加载组件示例数据（用于调试）' 
-    : '示例数据仅在JSON模式下可用'
+    ? 'Load component sample data（for debugging）' 
+    : 'Sample data is only available inJSONAvailable in mode'
 }
 
 /**
- * 🔥 修复：根据编辑数据加载状态
- * 接收来自父组件的编辑数据并填充表单
+ * 🔥 repair：Load status based on edit data
+ * Receive edit data from parent component and populate the form
  */
 const loadEditData = (editData: any) => {
   if (!editData) {
     return
   }
 
-  // 加载基本配置
+  // Load basic configuration
   formState.selectedMethod = editData.type || 'json'
 
-  // 根据类型加载对应数据
+  // Load corresponding data according to type
   switch (editData.type) {
     case 'json':
-      // 🔥 关键修复：支持多种JSON数据字段名，优先使用实际保存的字段
+      // 🔥 critical fix：Support multipleJSONData field name，Prioritize actual saved fields
       if (editData.jsonData) {
         formState.jsonData = editData.jsonData
       } else if (editData.jsonString) {
-        // 从config.jsonString中恢复
+        // fromconfig.jsonStringmedium recovery
         formState.jsonData = editData.jsonString
       } else if (editData.config?.jsonString) {
-        // 从嵌套的config.jsonString中恢复
+        // from nestedconfig.jsonStringmedium recovery
         formState.jsonData = editData.config.jsonString
       }
       break
@@ -599,19 +599,19 @@ const loadEditData = (editData: any) => {
       }
       break
     case 'http':
-      // 更新旧格式字段（保持兼容）
+      // Update old format fields（stay compatible）
       if (editData.url) formState.httpUrl = editData.url
       if (editData.method) formState.httpMethod = editData.method
       if (editData.headers) formState.httpHeaders = editData.headers
       if (editData.body) formState.httpBody = editData.body
 
-      // 🔥 关键修复：优先从 httpConfigData 完整加载，回退到基本字段
+      // 🔥 critical fix：Prioritize from httpConfigData Full load，fallback to basic fields
       if (editData.httpConfigData) {
-        // 完整的HTTP配置数据存在，直接加载
+        // completeHTTPConfiguration data exists，Direct loading
         httpConfig.value = {
           ...httpConfig.value,
           ...editData.httpConfigData,
-          // 确保关键字段有默认值
+          // Make sure key fields have default values
           url: editData.httpConfigData.url || editData.url || '',
           method: editData.httpConfigData.method || editData.method || 'GET',
           timeout: editData.httpConfigData.timeout || editData.timeout || 10000,
@@ -619,21 +619,21 @@ const loadEditData = (editData: any) => {
           selectedInternalAddress: editData.httpConfigData.selectedInternalAddress || '',
           enableParams: editData.httpConfigData.enableParams || false,
           pathParameter: editData.httpConfigData.pathParameter,
-          // 确保数组字段不为空
+          // Make sure the array field is not empty
           headers: editData.httpConfigData.headers || [],
           params: editData.httpConfigData.params || [],
           pathParams: editData.httpConfigData.pathParams || []
         }
       } else {
-        // 没有复杂配置数据，从基本字段恢复
+        // No complex configuration data，Recover from basic fields
         httpConfig.value.url = editData.url || ''
         httpConfig.value.method = editData.method || 'GET'
         httpConfig.value.timeout = editData.timeout || 10000
-        httpConfig.value.addressType = 'external' // 默认外部地址
+        httpConfig.value.addressType = 'external' // Default external address
         httpConfig.value.selectedInternalAddress = ''
         httpConfig.value.enableParams = false
 
-        // 从旧格式恢复基础配置
+        // Restoring base configuration from old format
         try {
           if (editData.headers && typeof editData.headers === 'string') {
             const headersObj = JSON.parse(editData.headers)
@@ -655,7 +655,7 @@ const loadEditData = (editData: any) => {
       break
   }
 
-  // 加载处理配置
+  // Load processing configuration
   if (editData.processingConfig) {
     processingState.jsonPath = editData.processingConfig.jsonPath || ''
     processingState.defaultValue = editData.processingConfig.defaultValue || ''
@@ -664,46 +664,46 @@ const loadEditData = (editData: any) => {
 }
 
 /**
- * 组件挂载时初始化
+ * Initialized when component is mounted
  */
 onMounted(() => {
-  // 🔥 关键修复：只在非编辑模式下重置状态，避免覆盖用户数据
+  // 🔥 critical fix：Reset state only in non-edit mode，Avoid overwriting user data
   if (props.isEditMode && props.editData) {
-    // 编辑模式：先设置基础状态，然后加载编辑数据
-    formState.selectedMethod = 'json' // 基础状态
+    // edit mode：Set the basic status first，Then load the edit data
+    formState.selectedMethod = 'json' // base state
     nextTick(() => {
       loadEditData(props.editData)
     })
   } else {
-    // 非编辑模式：重置为初始状态（包含示例数据）
+    // non-editing mode：Reset to initial state（Contains sample data）
     resetFormState()
     nextTick(() => {
-      resetFormState() // 确保状态一致性
+      resetFormState() // Ensure state consistency
     })
   }
 })
 
 /**
- * 暴露方法和状态给父组件使用
+ * Expose methods and state to parent components
  */
 defineExpose({
   resetFormState,
   loadEditData,
-  formState // 暴露表单状态，让父组件可以访问 selectedMethod
+  formState // Expose form state，Make the parent component accessible selectedMethod
 })
 </script>
 
 <template>
-  <!-- 🔥 抽屉模式：直接渲染内容区域 -->
+  <!-- 🔥 Drawer mode：Render content area directly -->
   <div class="drawer-content-wrapper">
-    <!-- 左右分割布局 -->
+    <!-- Split layout left and right -->
     <div class="modal-content drawer-mode">
-      <!-- 左侧区域 - 数据配置 -->
+      <!-- left area - Data configuration -->
       <div class="left-panel">
-        <!-- 上部分 - 录入表单 (2/3高度) -->
+        <!-- upper part - Entry form (2/3high) -->
         <div class="input-form-section">
           <div class="form-content">
-            <!-- Tag选择器录入方式 -->
+            <!-- TagSelector entry method -->
             <div class="method-selector">
               <n-space>
                 <n-tag
@@ -714,7 +714,7 @@ defineExpose({
                   class="method-tag"
                   @click="formState.selectedMethod = 'http'"
                 >
-                  HTTP接口
+                  HTTPinterface
                 </n-tag>
                 <n-tag
                   :type="formState.selectedMethod === 'json' ? 'primary' : 'default'"
@@ -724,7 +724,7 @@ defineExpose({
                   class="method-tag"
                   @click="formState.selectedMethod = 'json'"
                 >
-                  JSON数据
+                  JSONdata
                 </n-tag>
 
                 <n-tag
@@ -735,32 +735,32 @@ defineExpose({
                   class="method-tag"
                   @click="formState.selectedMethod = 'script'"
                 >
-                  JavaScript脚本
+                  JavaScriptscript
                 </n-tag>
               </n-space>
             </div>
 
-            <!-- 内容区域 -->
+            <!-- content area -->
             <div class="content-area">
-              <!-- 自动预览开关 -->
+              <!-- Auto preview switch -->
               <n-space align="center" justify="space-between" style="margin-bottom: 8px">
                 <n-space align="center" size="small">
                   <n-switch v-model:value="autoPreviewEnabled" size="small" />
-                  <n-text style="font-size: 11px">自动预览</n-text>
+                  <n-text style="font-size: 11px">Automatic preview</n-text>
                   <n-popover trigger="hover" placement="top">
                     <template #trigger>
                       <span style="color: var(--text-color-3); cursor: help; font-size: 11px">❓</span>
                     </template>
                     <div style="max-width: 200px; font-size: 12px">
-                      <p>JSON/Script类型会自动更新预览</p>
-                      <p>HTTP类型需要手动点击（避免频繁请求）</p>
+                      <p>JSON/ScriptThe type automatically updates the preview</p>
+                      <p>HTTPType needs to be manually clicked（Avoid frequent requests）</p>
                     </div>
                   </n-popover>
                 </n-space>
 
-                <!-- 按钮组 -->
+                <!-- button group -->
               <n-space size="small">
-                <!-- 使用示例数据按钮 -->
+                <!-- Use the sample data button -->
                 <n-button
                   v-if="props.exampleData"
                   type="info"
@@ -769,29 +769,29 @@ defineExpose({
                   @click="() => loadExampleData(true)"
                   :title="getExampleButtonTitle()"
                 >
-                  使用示例数据
+                  Use sample data
                 </n-button>
                 
-                <!-- 预览按钮 -->
+                <!-- preview button -->
                 <n-button type="primary" size="small" :loading="previewLoading" @click="executePreview">
-                  预览数据
+                  Preview data
                 </n-button>
               </n-space>
               </n-space>
 
-              <!-- JSON数据录入 -->
+              <!-- JSONdata entry -->
               <div v-if="formState.selectedMethod === 'json'" class="editor-container">
                 <n-input
                   v-model:value="formState.jsonData"
                   type="textarea"
                   :rows="12"
-                  placeholder="请输入JSON格式数据"
+                  placeholder="Please enterJSONformat data"
                   show-count
                   :input-props="{ style: 'font-family: Monaco, Consolas, monospace; font-size: 12px;' }"
                 />
               </div>
 
-              <!-- HTTP接口配置 -->
+              <!-- HTTPInterface configuration -->
               <div v-if="formState.selectedMethod === 'http'" class="editor-container">
                 <HttpConfigForm
                   v-model:model-value="httpConfig"
@@ -800,12 +800,12 @@ defineExpose({
                 />
               </div>
 
-              <!-- 脚本录入 -->
+              <!-- Script entry -->
               <div v-if="formState.selectedMethod === 'script'" class="editor-container">
                 <SimpleScriptEditor
                   v-model:model-value="formState.scriptCode"
                   template-category="data-generation"
-                  placeholder="请输入数据生成脚本，可通过 context 参数访问上下文..."
+                  placeholder="Please enter the data generation script，Passable context Parameter access context..."
                   height="320px"
                 />
               </div>
@@ -814,27 +814,27 @@ defineExpose({
         </div>
       </div>
 
-      <!-- 右侧区域 - 三段式布局 -->
+      <!-- right area - three-stage layout -->
       <div class="right-panel">
-        <!-- 第一段 - 原始数据预览 -->
+        <!-- first paragraph - Raw data preview -->
         <div class="right-section raw-data-section">
           <div class="compact-header">
             <span class="section-icon">📊</span>
-            <span>原始数据预览</span>
+            <span>Raw data preview</span>
           </div>
           <div class="section-content">
-            <!-- 加载状态 -->
+            <!-- Loading status -->
             <div v-if="previewLoading" class="preview-loading">
               <n-spin size="small" />
-              <span>正在执行数据获取...</span>
+              <span>Executing data acquisition...</span>
             </div>
-            <!-- 预览结果 -->
+            <!-- Preview results -->
             <div v-else-if="previewData" class="preview-result">
               <n-code :code="JSON.stringify(previewData, null, 2)" language="json" :hljs="false" word-wrap />
             </div>
-            <!-- 空状态 -->
+            <!-- Empty state -->
             <div v-else class="preview-empty">
-              <n-empty description="请完成左侧配置并点击预览数据获取原始数据" size="small">
+              <n-empty description="Please complete the configuration on the left and click Preview Data to obtain the original data" size="small">
                 <template #icon>
                   <span style="font-size: 18px">📭</span>
                 </template>
@@ -843,21 +843,21 @@ defineExpose({
           </div>
         </div>
 
-        <!-- 第二段 - 数据处理配置 -->
+        <!-- Second paragraph - Data processing configuration -->
         <div class="right-section processing-config-section">
           <div class="compact-header">
             <span class="section-icon">⚙️</span>
-            <span>数据处理配置</span>
+            <span>Data processing configuration</span>
           </div>
           <div class="section-content">
-            <!-- JSONPath过滤 -->
+            <!-- JSONPathfilter -->
             <div class="processing-item">
               <div class="flex">
-                <span class="mr-4">JSONPath 过滤:</span>
+                <span class="mr-4">JSONPath filter:</span>
                 <div class="w-[240px]">
                   <n-input
                     v-model:value="processingState.jsonPath"
-                    placeholder="例如: $.temperature 或 $.sensors[0] (留空不过滤)"
+                    placeholder="For example: $.temperature or $.sensors[0] (Leave blank to not filter)"
                     size="small"
                   />
                 </div>
@@ -866,53 +866,53 @@ defineExpose({
                     <span class="help-icon">❓</span>
                   </template>
                   <div>
-                    <p>使用JSONPath语法提取数据片段</p>
+                    <p>useJSONPathSyntax for extracting data fragments</p>
                     <p>
-                      例如:
+                      For example:
                       <code>$.temperature</code>
-                      提取温度
+                      Extraction temperature
                     </p>
                     <p>
-                      或:
+                      or:
                       <code>$.sensors[0]</code>
-                      提取第一个传感器
+                      Extract the first sensor
                     </p>
-                    <p>留空表示不过滤，使用原始数据</p>
+                    <p>Leave blank to indicate no filtering，Use raw data</p>
                   </div>
                 </n-popover>
               </div>
             </div>
 
-            <!-- 脚本处理 -->
+            <!-- Script processing -->
             <div class="processing-item">
               <SimpleScriptEditor
                 v-model:model-value="processingState.scriptCode"
                 template-category="data-processing"
-                placeholder="请输入数据处理脚本，可通过 data 参数访问原始数据..."
+                placeholder="Please enter the data processing script，Passable data Parameter access to raw data..."
                 height="140px"
               />
             </div>
           </div>
         </div>
 
-        <!-- 第三段 - 处理结果展示 -->
+        <!-- Paragraph 3 - Display of processing results -->
         <div class="right-section processing-result-section">
           <div class="compact-header">
             <span class="section-icon">✨</span>
-            <span>处理结果展示</span>
+            <span>Display of processing results</span>
             <span class="realtime-indicator">
               <span class="indicator-dot"></span>
-              实时处理
+              real time processing
             </span>
           </div>
           <div class="section-content">
-            <!-- 处理结果 -->
+            <!-- Processing results -->
             <div v-if="processingPreviewData" class="processing-result">
               <n-code :code="JSON.stringify(processingPreviewData, null, 2)" language="json" :hljs="false" word-wrap />
             </div>
-            <!-- 空状态 -->
+            <!-- Empty state -->
             <div v-else class="processing-empty">
-              <n-empty description="配置处理规则后自动显示结果" size="small">
+              <n-empty description="Automatically display results after configuring processing rules" size="small">
                 <template #icon>
                   <span style="font-size: 18px">⚙️</span>
                 </template>
@@ -923,18 +923,18 @@ defineExpose({
       </div>
     </div>
 
-    <!-- 抽屉模式底部操作区 -->
+    <!-- Drawer mode bottom operating area -->
     <div class="drawer-footer">
       <n-space justify="end">
-        <n-button @click="handleClose">取消</n-button>
-        <n-button type="primary" :disabled="!previewData" @click="handleConfirm">确定</n-button>
+        <n-button @click="handleClose">Cancel</n-button>
+        <n-button type="primary" :disabled="!previewData" @click="handleConfirm">Sure</n-button>
       </n-space>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 🔥 抽屉模式专用包装器 */
+/* 🔥 Drawer mode dedicated wrapper */
 .drawer-content-wrapper {
   display: flex;
   flex-direction: column;
@@ -949,14 +949,14 @@ defineExpose({
   padding: 0;
 }
 
-/* 🔥 抽屉模式下的布局调整 */
+/* 🔥 Layout adjustment in drawer mode */
 .modal-content.drawer-mode {
   flex: 1;
   height: auto;
   min-height: 0;
 }
 
-/* 🔥 抽屉底部操作区 */
+/* 🔥 Drawer bottom operating area */
 .drawer-footer {
   padding: 16px;
   border-top: 1px solid var(--border-color);
@@ -977,9 +977,9 @@ defineExpose({
 .right-panel {
   flex: 3;
 }
-/* 面板标题 */
+/* Panel title */
 
-/* 左侧面板内部布局 */
+/* Left panel internal layout */
 .left-panel {
   gap: 0;
 }
@@ -999,7 +999,7 @@ defineExpose({
   min-height: 0;
 }
 
-/* 子区域标题 */
+/* subarea title */
 .compact-header {
   display: flex;
   justify-content: space-between;
@@ -1025,7 +1025,7 @@ defineExpose({
   overflow-y: auto;
 }
 
-/* 右侧区域 */
+/* right area */
 .processing-area {
   flex: 1;
   padding: 12px;
@@ -1035,7 +1035,7 @@ defineExpose({
   gap: 16px;
 }
 
-/* 处理区域样式 */
+/* Handle area styles */
 .processing-description {
   flex-shrink: 0;
 }
@@ -1068,7 +1068,7 @@ defineExpose({
   margin-top: 4px;
 }
 
-/* 处理预览区域 */
+/* Process preview area */
 .processing-preview {
   height: 200px;
   border: 1px solid var(--border-color);
@@ -1104,14 +1104,14 @@ defineExpose({
   background: var(--body-color);
 }
 
-/* 脚本模板下拉框样式 */
+/* Script template drop-down box style */
 .script-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* 实时处理指示器 */
+/* Real-time processing indicator */
 .realtime-indicator {
   display: flex;
   align-items: center;
@@ -1143,7 +1143,7 @@ defineExpose({
   }
 }
 
-/* Tag选择器样式 */
+/* TagSelector style */
 .method-selector {
   margin-bottom: 16px;
   padding: 8px 0;
@@ -1175,7 +1175,7 @@ defineExpose({
   flex: 1;
 }
 
-/* 表单相关样式 */
+/* Form related styles */
 .code-editor-container {
   width: 100%;
 }
@@ -1184,7 +1184,7 @@ defineExpose({
   flex-shrink: 0;
 }
 
-/* 预览区域样式 */
+/* Preview area style */
 .preview-loading {
   display: flex;
   flex-direction: column;
@@ -1225,7 +1225,7 @@ defineExpose({
   justify-content: center;
 }
 
-/* 表单项样式优化 */
+/* Form item style optimization */
 :deep(.n-form-item) {
   margin-bottom: 12px;
 }
@@ -1236,7 +1236,7 @@ defineExpose({
   font-weight: 500;
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .form-content::-webkit-scrollbar,
 .data-preview-content::-webkit-scrollbar,
 .processing-area::-webkit-scrollbar {
@@ -1262,8 +1262,8 @@ defineExpose({
   background: var(--text-color-3);
 }
 
-/* 🔥 三段式布局增强样式 */
-/* 子处理区域样式 */
+/* 🔥 Three-section layout enhanced style */
+/* Sub-processing area style */
 .sub-processing-section {
   margin-bottom: 16px;
 }
@@ -1280,12 +1280,12 @@ defineExpose({
   border-bottom: 1px solid var(--divider-color);
 }
 
-/* 抽屉模式下隐藏左侧的数据预览，移动到右侧 */
+/* Hide the data preview on the left in drawer mode，move to right */
 .drawer-mode .left-panel .data-preview-section {
   display: none;
 }
 
-/* 🔥 右侧三段式布局样式 */
+/* 🔥 Three-section layout style on the right */
 .drawer-mode .right-panel {
   display: flex;
   flex-direction: column;
@@ -1303,7 +1303,7 @@ defineExpose({
   min-height: 0;
 }
 
-/* 三个区域的高度分配 */
+/* Height distribution in three areas */
 .raw-data-section {
   flex: 1.2;
   min-height: 180px;
@@ -1333,7 +1333,7 @@ defineExpose({
   margin-right: 6px;
 }
 
-/* 处理配置项样式 */
+/* Handling configuration item styles */
 .processing-item {
   margin-bottom: 8px;
   display: flex;
@@ -1358,7 +1358,7 @@ defineExpose({
   margin-top: 8px;
 }
 
-/* 数据预览内容区域优化 */
+/* Data preview content area optimization */
 .drawer-mode .data-preview-content {
   height: 180px;
   overflow-y: auto;

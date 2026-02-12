@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 /**
- * Gridstack 渲染器组件
- * 已迁移到新的统一架构
+ * Gridstack renderer component
+ * Migrated to new unified architecture
  */
 
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -35,11 +35,11 @@ import { useWidgetStore } from '@/store/modules/widget'
 import { globalPreviewMode } from '@/components/visual-editor/hooks/usePreviewMode'
 import BaseRendererComponent from '@/components/visual-editor/renderers/base/BaseRendererComponent.vue'
 import GridLayoutPlusWrapper from '@/components/visual-editor/renderers/gridstack/GridLayoutPlusWrapper.vue'
-// 添加配置事件监听
+// Add configuration event listening
 import { configEventBus, type ConfigChangeEvent } from '@/core/data-architecture/ConfigEventBus'
-// 添加数据源直接获取
+// Add data source to obtain directly
 import { simpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
-// 添加配置管理器，用于数据源配置更新
+// Add configuration manager，For data source configuration updates
 import { configurationIntegrationBridge } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 
 const props = defineProps<{
@@ -50,18 +50,18 @@ const props = defineProps<{
 
 const emit = defineEmits(['ready', 'error', 'node-select', 'canvas-click', 'request-settings'])
 
-// 使用原始的 store
+// Use the original store
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
 
-// 为兼容旧组件接口，创建stateManager适配
+// For compatibility with old component interfaces，createstateManageradaptation
 const stateManager = computed(() => ({
   nodes: editorStore.nodes || [],
   selectedIds: widgetStore.selectedNodeIds || [],
   viewport: editorStore.viewport || { zoom: 1, offsetX: 0, offsetY: 0 }
 }))
 
-// 选择节点方法适配
+// Select node method adaptation
 const selectNode = (nodeId: string) => {
   if (nodeId) {
     widgetStore.selectNodes([nodeId])
@@ -70,86 +70,86 @@ const selectNode = (nodeId: string) => {
   }
 }
 
-// 全局预览模式
+// Global preview mode
 const { isPreviewMode } = globalPreviewMode
 
-// 数据源管理 - 直接从 data-architecture 获取
+// Data source management - directly from data-architecture Get
 const multiDataSourceStore = ref<Record<string, Record<string, any>>>({})
 const multiDataSourceConfigStore = ref<Record<string, any>>({})
 
-// 配置事件监听 - 让渲染器直接响应配置变更
+// Configure event listening - Let the renderer respond directly to configuration changes
 let configChangeListener: ((event: ConfigChangeEvent) => void) | null = null
 
 onMounted(() => {
-  // 监听配置变更事件，自动更新组件
+  // Listen for configuration change events，Automatically update components
   configChangeListener = async (event: ConfigChangeEvent) => {
-    // 根据配置变更类型进行相应处理
+    // Process accordingly based on the type of configuration change
     if (event.section === 'base' || event.section === 'component') {
-      // 基础配置或组件配置变更，需要更新组件状态
+      // Basic configuration or component configuration changes，Need to update component status
 
-      // 关键修复：基础配置变更时，自动更新数据源配置中的属性绑定
+      // critical fix：When basic configuration changes，Automatically update property bindings in data source configuration
       if (event.section === 'base' && event.newConfig) {
         await updateDataSourceConfigForBaseConfigChange(event.componentId, event.newConfig, event.oldConfig)
       }
 
-      // 关键修复：确保组件配置变更能触发组件重新渲染
-      // 通过更新组件的properties来触发响应式更新
+      // critical fix：Ensure that component configuration changes trigger component re-rendering
+      // By updating the componentpropertiesto trigger responsive updates
       const node = stateManager.nodes.find(n => n.id === event.componentId)
       if (node && event.newConfig) {
-        // 更新组件的properties，触发重新渲染
+        // Update componentsproperties，Trigger re-rendering
         if (event.section === 'component' && event.newConfig.properties) {
           Object.assign(node.properties || {}, event.newConfig.properties)
         }
-        // 强制触发响应式更新
+        // Force triggering of responsive updates
         editorStore.updateNode(event.componentId, { ...node })
       }
     } else if (event.section === 'dataSource') {
-      // 数据源配置变更，直接通过 data-architecture 处理
+      // Data source configuration changes，pass directly data-architecture deal with
 
       try {
-        // 构建数据需求
+        // Build data requirements
         const requirement = {
           componentId: event.componentId,
           dataSources: event.newConfig ? [event.newConfig] : []
         }
 
-        // 直接通过 simpleDataBridge 执行数据获取
+        // pass directly simpleDataBridge Perform data acquisition
         const result = await simpleDataBridge.executeComponent(requirement)
 
         if (result.success && result.data) {
-          // 更新数据源存储
+          // Update data source storage
           multiDataSourceStore.value[event.componentId] = result.data
           multiDataSourceConfigStore.value[event.componentId] = event.newConfig
         } else {
-    if (import.meta.env.DEV) console.error(`⚠️ 组件 ${event.componentId} 数据获取失败:`, result.error)
+    if (import.meta.env.DEV) console.error(`⚠️ components ${event.componentId} Data acquisition failed:`, result.error)
         }
       } catch (error) {
-    if (import.meta.env.DEV) console.error(`❌ 组件 ${event.componentId} 数据处理异常:`, error)
+    if (import.meta.env.DEV) console.error(`❌ components ${event.componentId} Data processing exception:`, error)
       }
     }
   }
 
-  // 修复：使用正确的API注册监听器
+  // repair：use the correctAPIRegister listener
   if (configEventBus && typeof configEventBus.onConfigChange === 'function') {
     const unsubscribe = configEventBus.onConfigChange('config-changed', configChangeListener)
-    // 存储取消订阅函数以便清理
+    // Store unsubscribe function for cleanup
     ;(configChangeListener as any).__unsubscribe = unsubscribe
   }
 
-  // 初始化数据源数据 - 检查现有组件的数据
+  // Initialize data source data - Check the data of existing components
   initializeDataSources()
 })
 
 /**
- * 初始化数据源数据
- * 为现有组件从 simpleDataBridge 获取缓存数据
+ * Initialize data source data
+ * For existing components from simpleDataBridge Get cached data
  */
 const initializeDataSources = () => {
   const nodes = stateManager.nodes
   if (!nodes || !Array.isArray(nodes)) return
 
   nodes.forEach(node => {
-    // 尝试从 simpleDataBridge 获取缓存数据
+    // try to start from simpleDataBridge Get cached data
     const cachedData = simpleDataBridge.getComponentData(node.id)
     if (cachedData) {
       multiDataSourceStore.value[node.id] = cachedData
@@ -158,8 +158,8 @@ const initializeDataSources = () => {
 }
 
 /**
- * 关键修复：基础配置变更时更新数据源配置中的属性绑定
- * 当deviceId等基础配置变更时，自动更新数据源配置中依赖这些字段的绑定值
+ * critical fix：Update property bindings in the data source configuration when the underlying configuration changes
+ * whendeviceIdWaiting for basic configuration changes，Automatically update binding values ​​that depend on these fields in the data source configuration
  */
 const updateDataSourceConfigForBaseConfigChange = async (
   componentId: string,
@@ -167,17 +167,17 @@ const updateDataSourceConfigForBaseConfigChange = async (
   oldBaseConfig: any
 ) => {
   try {
-    // 获取当前组件的完整配置
+    // Get the complete configuration of the current component
     const fullConfig = configurationIntegrationBridge.getConfiguration(componentId)
     if (!fullConfig || !fullConfig.dataSource) {
       return
     }
 
-    // 检查是否需要更新数据源配置
+    // Check if data source configuration needs to be updated
     let needsUpdate = false
-    const updatedDataSourceConfig = JSON.parse(JSON.stringify(fullConfig.dataSource)) // 深克隆
+    const updatedDataSourceConfig = JSON.parse(JSON.stringify(fullConfig.dataSource)) // deep clone
 
-    // 检查基础配置中的关键字段变化
+    // Check for key field changes in the base configuration
     const baseConfigFields = ['deviceId', 'metricsList']
     const changes: Array<{ field: string; oldValue: any; newValue: any }> = []
 
@@ -194,7 +194,7 @@ const updateDataSourceConfigForBaseConfigChange = async (
       return
     }
 
-    // 修复：递归更新数据源配置中的属性绑定引用，支持多种绑定格式
+    // repair：Recursively update property binding references in data source configuration，Supports multiple binding formats
     const updateBindingReferences = (obj: any, path: string = '') => {
       if (!obj || typeof obj !== 'object') return
 
@@ -204,41 +204,41 @@ const updateDataSourceConfigForBaseConfigChange = async (
           const currentPath = path ? `${path}.${key}` : key
 
           if (typeof value === 'string') {
-            // 关键修复：绝对不要替换绑定路径！
-            // 字符串类型的 value 字段如果包含绑定路径，说明这是一个绑定关系，
-            // 必须保持绑定路径格式，不能用实际值替换
+            // critical fix：Never replace the binding path！
+            // string type value If the field contains the binding path，Explain that this is a binding relationship，
+            // Bind path format must be maintained，cannot be replaced with actual value
             changes.forEach(({ field, newValue }) => {
               const bindingPattern = `${componentId}.base.${field}`
               if (value.includes(bindingPattern)) {
-                // 修复：不修改绑定路径，让运行时动态解析
-                // obj[key] = newValue // 删除这个破坏性操作
-                // needsUpdate = true // 也不需要更新，因为绑定路径保持不变
+                // repair：Do not modify the binding path，Let the runtime parse dynamically
+                // obj[key] = newValue // Remove this destructive operation
+                // needsUpdate = true // No need to update，Because the binding path remains the same
               }
             })
           } else if (Array.isArray(value)) {
-            // 2. 处理数组（如pathParams）
+            // 2. Processing arrays（likepathParams）
             value.forEach((item, index) => {
               if (item && typeof item === 'object') {
                 updateBindingReferences(item, `${currentPath}[${index}]`)
               }
             })
           } else if (typeof value === 'object') {
-            // 3. 检查HTTP参数对象是否使用组件属性绑定
+            // 3. examineHTTPWhether the parameter object uses component attribute binding
             if (value.selectedTemplate === 'component-property-binding' && value.valueMode === 'component') {
               changes.forEach(({ field, newValue }) => {
-                // 检查是否绑定到基础配置字段
-                // 这里需要更智能的检测逻辑
+                // Check if bound to base configuration field
+                // Smarter detection logic is needed here
                 const isBaseConfigBinding = path.includes('pathParam') || path.includes('Param')
                 if (isBaseConfigBinding && field === 'deviceId') {
-                  // 关键修复：不要修改value（绑定路径），只更新defaultValue
-                  // value字段必须保持绑定路径格式：componentId.layer.propertyName
-                  // 只更新defaultValue作为预览值，实际请求时会动态解析绑定路径
+                  // critical fix：Do not modifyvalue（binding path），Update onlydefaultValue
+                  // valueFields must remain in bind path format：componentId.layer.propertyName
+                  // Update onlydefaultValueas preview value，The binding path will be dynamically resolved during the actual request.
                   value.defaultValue = newValue
                   needsUpdate = true
                 }
               })
             }
-            // 继续递归处理子对象
+            // Continue recursively processing sub-objects
             updateBindingReferences(value, currentPath)
           }
         }
@@ -247,13 +247,13 @@ const updateDataSourceConfigForBaseConfigChange = async (
 
     updateBindingReferences(updatedDataSourceConfig)
 
-    // 如果有更新，触发数据源配置变更
+    // If there is an update，Trigger data source configuration changes
     if (needsUpdate) {
-      // 通过ConfigurationIntegrationBridge更新数据源配置，这会触发ConfigEventBus事件
+      // passConfigurationIntegrationBridgeUpdate data source configuration，this will triggerConfigEventBusevent
       configurationIntegrationBridge.updateConfiguration(componentId, 'dataSource', updatedDataSourceConfig)
     }
   } catch (error) {
-    if (import.meta.env.DEV) console.error(`❌ [GridstackRenderer] 基础配置变更处理失败`, {
+    if (import.meta.env.DEV) console.error(`❌ [GridstackRenderer] Basic configuration change processing failed`, {
       componentId,
       error: error instanceof Error ? error.message : error
     })
@@ -261,7 +261,7 @@ const updateDataSourceConfigForBaseConfigChange = async (
 }
 
 onUnmounted(() => {
-  // 修复：使用正确的API清理事件监听器
+  // repair：use the correctAPIClean up event listeners
   if (configChangeListener && (configChangeListener as any).__unsubscribe) {
     ;(configChangeListener as any).__unsubscribe()
   }

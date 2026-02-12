@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted, computed } from 'vue'
 import { telemetryDataHistoryList } from '@/service/api/device'
-import { useLoading } from '~/packages/hooks' // 假设 useLoading hook 可用
-import { createLogger } from '@/utils/logger' // 引入日志
-import { NSpace, NDatePicker, NButton, NTooltip, NPopselect, NIcon } from 'naive-ui' // 引入 Naive UI 组件
+import { useLoading } from '~/packages/hooks' // hypothesis useLoading hook Available
+import { createLogger } from '@/utils/logger' // Introduce log
+import { NSpace, NDatePicker, NButton, NTooltip, NPopselect, NIcon } from 'naive-ui' // introduce Naive UI components
 import { WorkspacesFilled, DateRangeSharp, FormatOverlineFilled, ImportExportOutlined } from '@vicons/material' // Import new icons
 
 const logger = createLogger('TelemetryFilter')
 
-// 定义 Props
+// definition Props
 const props = withDefaults(
   defineProps<{
     deviceId: string
     theKey: string
-    showExportButton?: boolean // 控制是否显示导出按钮
+    showExportButton?: boolean // Controls whether the export button is displayed
     displayMode?: 'detailed' | 'simple' // 'detailed' for button, 'simple' for icon
   }>(),
   {
@@ -22,15 +22,15 @@ const props = withDefaults(
   }
 )
 
-// 定义 Emits
+// definition Emits
 const emit = defineEmits<{
-  (event: 'update:data', data: TimeSeriesItem[]): void // 数据更新事件
-  (event: 'update:loading', isLoading: boolean): void // 加载状态更新事件
-  (event: 'update:filterParams', params: FilterParams): void // 筛选参数更新事件
+  (event: 'update:data', data: TimeSeriesItem[]): void // data update event
+  (event: 'update:loading', isLoading: boolean): void // Load status update event
+  (event: 'update:filterParams', params: FilterParams): void // Filter parameter update events
 }>()
 
-// --- 类型定义 ---
-// 定义筛选参数的接口类型 (不包含 device_id, key, is_export)
+// --- type definition ---
+// Interface type that defines filter parameters (Not included device_id, key, is_export)
 interface FilterParams {
   aggregate_function?: 'avg' | 'max' | 'min' | 'sum' | 'diff'
   aggregate_window?:
@@ -69,12 +69,12 @@ interface FilterParams {
     | 'last_1y'
 }
 
-// 定义时间序列数据项的类型
+// Define the type of time series data item
 interface TimeSeriesItem {
-  // x: string; // 时间戳字符串 (e.g., "2024-03-20T16:31:10.508174Z")
-  x: number // 时间戳 (数字)
-  x2?: number // 可选的第二个时间戳
-  y: number // 数值
+  // x: string; // timestamp string (e.g., "2024-03-20T16:31:10.508174Z")
+  x: number // Timestamp (number)
+  x2?: number // Optional second timestamp
+  y: number // numerical value
 }
 
 // --- Constants and Helper Functions (Moved Up) ---
@@ -104,19 +104,19 @@ const windowToSeconds = (window: string): number => {
 type AggregateWindowValue = NonNullable<FilterParams['aggregate_window']> // Alias for clarity
 
 const allAggregateWindowOptions: Array<{ label: string; value: AggregateWindowValue; seconds: number }> = [
-  { label: '不聚合', value: 'no_aggregate' as AggregateWindowValue, seconds: windowToSeconds('no_aggregate') },
-  { label: '30秒', value: '30s' as AggregateWindowValue, seconds: windowToSeconds('30s') },
-  { label: '1分钟', value: '1m' as AggregateWindowValue, seconds: windowToSeconds('1m') },
-  { label: '2分钟', value: '2m' as AggregateWindowValue, seconds: windowToSeconds('2m') },
-  { label: '5分钟', value: '5m' as AggregateWindowValue, seconds: windowToSeconds('5m') },
-  { label: '10分钟', value: '10m' as AggregateWindowValue, seconds: windowToSeconds('10m') },
-  { label: '30分钟', value: '30m' as AggregateWindowValue, seconds: windowToSeconds('30m') },
-  { label: '1小时', value: '1h' as AggregateWindowValue, seconds: windowToSeconds('1h') },
-  { label: '3小时', value: '3h' as AggregateWindowValue, seconds: windowToSeconds('3h') },
-  { label: '6小时', value: '6h' as AggregateWindowValue, seconds: windowToSeconds('6h') },
-  { label: '1天', value: '1d' as AggregateWindowValue, seconds: windowToSeconds('1d') },
-  { label: '7天', value: '7d' as AggregateWindowValue, seconds: windowToSeconds('7d') },
-  { label: '1个月', value: '1mo' as AggregateWindowValue, seconds: windowToSeconds('1mo') }
+  { label: 'No aggregation', value: 'no_aggregate' as AggregateWindowValue, seconds: windowToSeconds('no_aggregate') },
+  { label: '30Second', value: '30s' as AggregateWindowValue, seconds: windowToSeconds('30s') },
+  { label: '1minute', value: '1m' as AggregateWindowValue, seconds: windowToSeconds('1m') },
+  { label: '2minute', value: '2m' as AggregateWindowValue, seconds: windowToSeconds('2m') },
+  { label: '5minute', value: '5m' as AggregateWindowValue, seconds: windowToSeconds('5m') },
+  { label: '10minute', value: '10m' as AggregateWindowValue, seconds: windowToSeconds('10m') },
+  { label: '30minute', value: '30m' as AggregateWindowValue, seconds: windowToSeconds('30m') },
+  { label: '1Hour', value: '1h' as AggregateWindowValue, seconds: windowToSeconds('1h') },
+  { label: '3Hour', value: '3h' as AggregateWindowValue, seconds: windowToSeconds('3h') },
+  { label: '6Hour', value: '6h' as AggregateWindowValue, seconds: windowToSeconds('6h') },
+  { label: '1sky', value: '1d' as AggregateWindowValue, seconds: windowToSeconds('1d') },
+  { label: '7sky', value: '7d' as AggregateWindowValue, seconds: windowToSeconds('7d') },
+  { label: '1months', value: '1mo' as AggregateWindowValue, seconds: windowToSeconds('1mo') }
 ].sort((a, b) => a.seconds - b.seconds)
 
 type TimeRangeKey = NonNullable<FilterParams['time_range']>
@@ -157,51 +157,51 @@ const getMinWindowSecondsForDuration = (durationMs: number): number => {
   return timeRangeMinWindowSeconds.last_1y
 }
 
-// --- 响应式状态 ---
+// --- Responsive state ---
 const { loading: isLoading, startLoading, endLoading } = useLoading(false)
 const { loading: isExporting, startLoading: startExporting, endLoading: endExporting } = useLoading(false) // Separate loading state for export
 const timeSeriesData = ref<TimeSeriesItem[]>([])
 
-// 初始化筛选条件的响应式状态
+// Initialize the reactive state of filter conditions
 const filterParams = reactive<FilterParams>({
-  time_range: 'last_1h', // 默认时间范围
-  aggregate_window: 'no_aggregate' // 默认聚合间隔
+  time_range: 'last_1h', // Default time range
+  aggregate_window: 'no_aggregate' // Default aggregation interval
 })
 
-// 用于绑定日期时间范围选择器
+// Used to bind date and time range selectors
 const dateRangeRef = ref<[number, number] | null>(null)
 
-// --- 下拉选项 ---
-// TODO: 使用 $t 进行国际化
+// --- drop down options ---
+// TODO: use $t internationalize
 const timeRangeOptions = ref([
-  { label: '自定义', value: 'custom' },
-  { label: '最近5分钟', value: 'last_5m' },
-  { label: '最近15分钟', value: 'last_15m' },
-  { label: '最近30分钟', value: 'last_30m' },
-  { label: '最近1小时', value: 'last_1h' },
-  { label: '最近3小时', value: 'last_3h' },
-  { label: '最近6小时', value: 'last_6h' },
-  { label: '最近12小时', value: 'last_12h' },
-  { label: '最近24小时', value: 'last_24h' },
-  { label: '最近3天', value: 'last_3d' },
-  { label: '最近7天', value: 'last_7d' },
-  { label: '最近15天', value: 'last_15d' },
-  { label: '最近30天', value: 'last_30d' },
-  { label: '最近60天', value: 'last_60d' },
-  { label: '最近90天', value: 'last_90d' },
-  { label: '最近6个月', value: 'last_6m' },
-  { label: '最近1年', value: 'last_1y' }
+  { label: 'Customize', value: 'custom' },
+  { label: 'recent5minute', value: 'last_5m' },
+  { label: 'recent15minute', value: 'last_15m' },
+  { label: 'recent30minute', value: 'last_30m' },
+  { label: 'recent1Hour', value: 'last_1h' },
+  { label: 'recent3Hour', value: 'last_3h' },
+  { label: 'recent6Hour', value: 'last_6h' },
+  { label: 'recent12Hour', value: 'last_12h' },
+  { label: 'recent24Hour', value: 'last_24h' },
+  { label: 'recent3sky', value: 'last_3d' },
+  { label: 'recent7sky', value: 'last_7d' },
+  { label: 'recent15sky', value: 'last_15d' },
+  { label: 'recent30sky', value: 'last_30d' },
+  { label: 'recent60sky', value: 'last_60d' },
+  { label: 'recent90sky', value: 'last_90d' },
+  { label: 'recent6months', value: 'last_6m' },
+  { label: 'recent1Year', value: 'last_1y' }
 ])
 
 const aggregateFunctionOptions = ref([
-  { label: '平均值', value: 'avg' },
-  { label: '最大值', value: 'max' },
-  { label: '最小值', value: 'min' },
-  { label: '总和', value: 'sum' },
-  { label: '差值', value: 'diff' }
+  { label: 'average value', value: 'avg' },
+  { label: 'maximum value', value: 'max' },
+  { label: 'minimum value', value: 'min' },
+  { label: 'sum', value: 'sum' },
+  { label: 'Difference', value: 'diff' }
 ])
 
-// --- 计算属性 ---
+// --- Computed properties ---
 const currentMinWindowSeconds = computed(() => {
   if (filterParams.time_range === 'custom') {
     if (dateRangeRef.value && dateRangeRef.value.length === 2) {
@@ -232,25 +232,25 @@ const aggregateWindowOptions = computed<AggregateWindowOption[]>(() => {
   }))
 })
 
-// 计算属性：判断是否显示聚合函数选择器
+// Computed properties：Determine whether to display the aggregate function selector
 const showAggregateFunction = computed(() => filterParams.aggregate_window !== 'no_aggregate')
 
 // *** ADDED: Computed properties for selected labels ***
 const selectedTimeRangeLabel = computed(() => {
-  return timeRangeOptions.value.find(opt => opt.value === filterParams.time_range)?.label ?? '选择时间' // Fallback text
+  return timeRangeOptions.value.find(opt => opt.value === filterParams.time_range)?.label ?? 'Select time' // Fallback text
 })
 
 const selectedAggregateWindowLabel = computed(() => {
   // Use allAggregateWindowOptions to find the label based on value
-  return allAggregateWindowOptions.find(opt => opt.value === filterParams.aggregate_window)?.label ?? '选择间隔' // Fallback text
+  return allAggregateWindowOptions.find(opt => opt.value === filterParams.aggregate_window)?.label ?? 'Select interval' // Fallback text
 })
 
 const selectedAggregateFunctionLabel = computed(() => {
   if (!showAggregateFunction.value) return '' // Don't compute if not shown
-  return aggregateFunctionOptions.value.find(opt => opt.value === filterParams.aggregate_function)?.label ?? '选择方法' // Fallback text
+  return aggregateFunctionOptions.value.find(opt => opt.value === filterParams.aggregate_function)?.label ?? 'Select method' // Fallback text
 })
 
-// --- 数据获取逻辑 ---
+// --- Data acquisition logic ---
 const fetchData = async (isExport = false) => {
   if (!props.deviceId || !props.theKey) {
     logger.warn('Device ID or Key is missing, skipping fetch.')
@@ -262,14 +262,14 @@ const fetchData = async (isExport = false) => {
   startLoading()
   emit('update:loading', true)
 
-  // 构造请求参数
+  // Construct request parameters
   const params: any = {
     device_id: props.deviceId,
     key: props.theKey,
     ...filterParams
   }
 
-  // 清理无效的参数组合
+  // Clean up invalid parameter combinations
   if (params.time_range !== 'custom') {
     delete params.start_time
     delete params.end_time
@@ -277,7 +277,7 @@ const fetchData = async (isExport = false) => {
   if (params.aggregate_window === 'no_aggregate') {
     delete params.aggregate_function
   } else if (!params.aggregate_function) {
-    params.aggregate_function = 'avg' // 默认聚合函数
+    params.aggregate_function = 'avg' // Default aggregate function
   }
 
   if (isExport) {
@@ -289,7 +289,7 @@ const fetchData = async (isExport = false) => {
       `Fetching telemetry data (${isExport ? 'Export' : 'Display'}). Params:`,
       JSON.parse(JSON.stringify(params))
     ) // Log clean params
-    // 修改：API响应类型现在假设为 { data: TimeSeriesItem[] | null, error: any } 或导出时的结构
+    // Revise：APIThe response type is now assumed to be { data: TimeSeriesItem[] | null, error: any } Or the structure when exporting
     const response: { data: TimeSeriesItem[] | null; error: any } = await telemetryDataHistoryList(params)
     logger.info('API Response:', response)
 
@@ -297,34 +297,34 @@ const fetchData = async (isExport = false) => {
       if (isExport) {
         // TODO: Handle export file download (e.g., using response.data.filePath)
         logger.info('Export successful:', response.data)
-        window.$message?.success('导出任务已启动') // Example user feedback
+        window.$message?.success('Export task started') // Example user feedback
       } else {
-        // --- 修改数据提取逻辑 ---
-        // 直接从 response.data 获取数组，并断言类型
+        // --- Modify data extraction logic ---
+        // directly from response.data Get array，and assert the type
         const receivedData: TimeSeriesItem[] = (response.data || []) as TimeSeriesItem[]
         timeSeriesData.value = receivedData
-        emit('update:data', timeSeriesData.value) // 确保发出的是处理后的数据
-        // --- 修改结束 ---
+        emit('update:data', timeSeriesData.value) // Ensure that the processed data is sent out
+        // --- End of modification ---
       }
     } else {
       logger.error('API Error or invalid response:', response?.error)
       if (!isExport) {
         // Only clear data/show error for display fetches
         timeSeriesData.value = []
-        emit('update:data', []) // 确保错误时也发出空数组
-        window.$message?.error(`获取数据失败: ${response?.error?.message || '未知错误'}`)
+        emit('update:data', []) // Make sure an empty array is also emitted on error
+        window.$message?.error(`Failed to get data: ${response?.error?.message || 'unknown error'}`)
       } else {
-        window.$message?.error(`导出失败: ${response?.error?.message || '未知错误'}`)
+        window.$message?.error(`Export failed: ${response?.error?.message || 'unknown error'}`)
       }
     }
   } catch (error: any) {
     logger.error('Fetch exception:', error)
     if (!isExport) {
       timeSeriesData.value = []
-      emit('update:data', []) // 确保异常时也发出空数组
-      window.$message?.error(`获取数据异常: ${error.message}`)
+      emit('update:data', []) // Make sure an empty array is also emitted on exception
+      window.$message?.error(`Exception in getting data: ${error.message}`)
     } else {
-      window.$message?.error(`导出异常: ${error.message}`)
+      window.$message?.error(`Export exception: ${error.message}`)
     }
   } finally {
     endLoading()
@@ -332,7 +332,7 @@ const fetchData = async (isExport = false) => {
   }
 }
 
-// --- 监听器和生命周期钩子 ---
+// --- Listeners and lifecycle hooks ---
 // Watcher for custom date range selection
 watch(
   dateRangeRef,
@@ -487,11 +487,11 @@ onMounted(() => {
   validateAndFetch() // Use central validation function
 })
 
-// --- 事件处理 ---
-// 导出按钮点击处理函数
+// --- event handling ---
+// Export button click handler function
 const handleExport = () => {
   if (filterParams.time_range === 'custom' && (!filterParams.start_time || !filterParams.end_time)) {
-    window.$message?.warning('请先选择自定义时间范围后再导出')
+    window.$message?.warning('Please select a custom time range before exporting')
     return
   }
   logger.info('Export button clicked.')
@@ -500,7 +500,7 @@ const handleExport = () => {
   fetchData(true)
 }
 
-// TODO: 添加表单元素，并将其绑定到 filterParams
+// TODO: Add form elements，and bind it to filterParams
 </script>
 
 <template>
@@ -542,7 +542,7 @@ const handleExport = () => {
       type="datetimerange"
       clearable
       format="yyyy-MM-dd HH:mm:ss"
-      placeholder="选择自定义时间范围"
+      placeholder="Select a custom time range"
       size="small"
       style="min-width: 280px"
       :disabled="filterParams.time_range !== 'custom'"
@@ -631,7 +631,7 @@ const handleExport = () => {
         ghost
         @click="handleExport"
       >
-        导出
+        Export
       </n-button>
       <!-- Simple Export Button (Icon with Tooltip) -->
       <n-tooltip v-else trigger="hover">
@@ -646,7 +646,7 @@ const handleExport = () => {
             <n-icon :component="ImportExportOutlined" />
           </n-button>
         </template>
-        导出
+        Export
       </n-tooltip>
     </template>
   </n-space>

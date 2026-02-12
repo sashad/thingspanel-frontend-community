@@ -1,6 +1,6 @@
 <template>
   <div>
-    请您期待
+    Please look forward to it
   </div>
 </template>
 

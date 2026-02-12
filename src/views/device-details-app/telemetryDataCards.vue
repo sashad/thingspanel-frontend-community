@@ -5,7 +5,7 @@ import { Activity } from '@vicons/tabler';
 import { DocumentOnePage24Regular } from '@vicons/fluent';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
-import { telemetryDataCurrent } from '@/service/api/device'; // 假设此路径正确
+import { telemetryDataCurrent } from '@/service/api/device'; // Assuming this path is correct
 import { createLogger } from '@/utils/logger';
 import HistoryData from '../device/details/modules/telemetry/modules/history-data.vue';
 import TimeSeriesData from '../device/details/modules/telemetry/modules/time-series-data.vue';
@@ -55,7 +55,7 @@ const onTapTableTools = (i: any) => {
   }
 };
 
-// 在组件挂载时调用 fetchTelemetry 获取数据
+// Called when the component is mounted fetchTelemetry Get data
 onMounted(() => {
   fetchTelemetry();
 });

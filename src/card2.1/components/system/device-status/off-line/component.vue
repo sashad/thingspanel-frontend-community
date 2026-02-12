@@ -23,25 +23,25 @@ import { $t } from '@/locales';
 import { sumData, totalNumber } from '@/service/api';
 import GenericCard from '@/card2.1/components/common/generic-card/component.vue';
 
-// 与原版保持1:1一致
+// Keep with the original1:1consistent
 const logger = createLogger('OffLine');
 
 defineOptions({ name: 'NumCard' });
 
 const authStore = useAuthStore();
 
-// 卡片数据配置，与原版保持1:1一致
+// Card data configuration，Keep with the original1:1consistent
 const cardData = ref<any>({
   id: 'download',
   title: $t('card.offlineDev'),
   value: 0,
   unit: $t('card.deviceUnit'),
-  colors: ['#56cdf3', '#719de3'], // 与原版保持一致的颜色
+  colors: ['#56cdf3', '#719de3'], // Colors consistent with the original
   icon: 'fa-ban'
 });
 
 /**
- * @description 获取数据
+ * @description Get data
  */
 const getData = async () => {
   try {
@@ -53,12 +53,12 @@ const getData = async () => {
       logger.error('Data does not contain the required properties or they are not numbers.');
     }
   } catch (error) {
-    // 处理请求数据时的错误
+    // Error while processing request data
     logger.error('Error fetching data:', error);
   }
 };
 
-// 获取数据
+// Get data
 getData();
 </script>
 

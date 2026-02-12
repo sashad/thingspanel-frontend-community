@@ -9,7 +9,7 @@ interface EditorState {
   mode: EditorMode
 }
 
-// 生成唯一ID的辅助函数
+// generate uniqueIDauxiliary function
 const generateId = (type: WidgetType) => `${type}_${Date.now()}`
 
 export const useEditorStore = defineStore('editor', {
@@ -22,7 +22,7 @@ export const useEditorStore = defineStore('editor', {
     addNode(...nodes: GraphData[]) {
       this.nodes.push(...nodes)
 
-      // 添加节点后，自动选中最后一个节点
+      // After adding node，Automatically select the last node
       if (nodes.length > 0) {
         const widgetStore = useWidgetStore()
         widgetStore.selectNodes([nodes[nodes.length - 1].id])
@@ -30,7 +30,7 @@ export const useEditorStore = defineStore('editor', {
     },
     removeNode(id: string) {
       this.nodes = this.nodes.filter(node => node.id !== id)
-      // 移除节点后，从选中项中也移除
+      // After removing the node，Also remove from selection
       const widgetStore = useWidgetStore()
       widgetStore.removeNodeFromSelection(id)
     },

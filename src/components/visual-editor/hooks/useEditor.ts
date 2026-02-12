@@ -1,8 +1,8 @@
 /**
  * @file useEditor.ts
  * @description
- * 编辑器核心 Hook，提供状态管理、组件操作等核心功能。
- * 使用了统一的 WidgetRegistry 来管理所有组件。
+ * Editor core Hook，Provide status management、Core functions such as component operations。
+ * Used a unified WidgetRegistry to manage all components。
  */
 
 import { inject, provide, watchEffect } from 'vue'
@@ -10,22 +10,22 @@ import { useEditorStore } from '@/components/visual-editor/store/editor'
 import { useWidgetStore, type WidgetDefinition } from '@/components/visual-editor/store/widget'
 import { useComponentTree as useCard2Integration } from '@/card2.1/hooks/useComponentTree'
 import { configRegistry } from '@/core/interaction-system'
-// 数据源注册已移除
+// Data source registration removed
 import type { GraphData, WidgetType } from '@/components/visual-editor/types'
 import type { ComponentDefinition } from '@/card2.1/core2'
 
-// 拖拽数据接口
+// Drag and drop data interface
 export interface WidgetDragData {
   type: string
   name: string
   icon?: string
 }
 
-// 编辑器上下文接口
+// Editor context interface
 export interface EditorContext {
   editorStore: ReturnType<typeof useEditorStore>
   widgetStore: ReturnType<typeof useWidgetStore>
-  stateManager: ReturnType<typeof useEditorStore> // stateManager 别名，指向 editorStore
+  stateManager: ReturnType<typeof useEditorStore> // stateManager Alias，point to editorStore
   addWidget: (type: string, position?: { x: number; y: number }) => Promise<void>
   selectNode: (id: string) => void
   updateNode: (id: string, updates: Partial<GraphData>) => void
@@ -36,19 +36,19 @@ export interface EditorContext {
   isCard2Component: (type: string) => boolean
 }
 
-// 不自动注册基础组件，只注册Card2.1组件
+// Do not automatically register basic components，Register onlyCard2.1components
 // registerAllWidgets()
 
 /**
- * 将 Card2.1 组件定义转换为 WidgetDefinition 格式
+ * Will Card2.1 The component definition is converted to WidgetDefinition Format
  */
 function convertCard2ToWidgetDefinition(card2Definition: ComponentDefinition): WidgetDefinition {
-  // 获取默认尺寸
+  // Get default size
   const defaultSize = { width: 4, height: 3 }
-  const canvasWidth = defaultSize.width * 120 // 每个网格单元约120px
-  const canvasHeight = defaultSize.height * 80 // 每个网格单元约80px
+  const canvasWidth = defaultSize.width * 120 // Each grid cell is approx.120px
+  const canvasHeight = defaultSize.height * 80 // Each grid cell is approx.80px
 
-  // 从 properties 中提取默认属性值
+  // from properties Extract default attribute values ​​from
   const defaultProperties: Record<string, any> = {}
   if (card2Definition.properties) {
     for (const [key, prop] of Object.entries(card2Definition.properties)) {
@@ -102,32 +102,32 @@ export function createEditor() {
   let stopWatch: (() => void) | null = null
 
   stopWatch = watchEffect(() => {
-    // 修改条件：只要不在加载中就可以继续
+    // Modify conditions：You can continue as long as it is not loading
     if (!card2Integration.isLoading.value) {
-      // 清理注册表，只保留Card2.1组件
+      // Clean the registry，only keepCard2.1components
       const allWidgets = widgetStore.getAllWidgets()
 
       allWidgets.forEach(widget => {
         if (!widget.metadata?.isCard2Component) {
-          // 移除非Card2.1组件
+          // Remove nonCard2.1components
           widgetStore.unregister(widget.type)
         }
       })
-      // 安全检查：确保 availableComponents 存在且有 value 属性
+      // security check：make sure availableComponents exist and have value property
       const availableComponents = card2Integration.filteredComponents.value || []
       availableComponents.forEach(componentDef => {
         if (!widgetStore.getWidget(componentDef.type)) {
-          // 🔥 修复：正确处理Card2.1的配置结构
+          // 🔥 repair：Handle it correctlyCard2.1configuration structure
           const defaultProperties: Record<string, any> = {}
 
-          // 检查config是否是Card2.1格式（有customize字段）
+          // examineconfigwhether it isCard2.1Format（havecustomizeField）
           if (componentDef.config && componentDef.config.customize) {
-            // Card2.1格式：保持结构化的config用于customConfig
+            // Card2.1Format：keep it structuredconfigused forcustomConfig
             if (process.env.NODE_ENV === 'development') {
             }
-            // 不放入defaultProperties，让Card2Wrapper直接使用structured config
+            // Do not put indefaultProperties，letCard2WrapperUse directlystructured config
           } else if (componentDef.config) {
-            // 扁平化格式：放入defaultProperties
+            // flat format：put indefaultProperties
             Object.assign(defaultProperties, componentDef.config)
           }
 
@@ -150,14 +150,14 @@ export function createEditor() {
             metadata: {
               isCard2Component: true,
               card2ComponentId: componentDef.type,
-              card2Definition: componentDef // 🔥 修复：componentDef本身就是定义
+              card2Definition: componentDef // 🔥 repair：componentDefitself is the definition
             }
           }
 
           widgetStore.register(widgetDef)
           if (process.env.NODE_ENV === 'development') {
           }
-          // 🔥 修复：注册配置组件到 configRegistry
+          // 🔥 repair：Register configuration components to configRegistry
           if (componentDef.configComponent) {
             if (!configRegistry.has(componentDef.type)) {
               configRegistry.register(componentDef.type, componentDef.configComponent)
@@ -180,20 +180,20 @@ export function createEditor() {
   }
 
   const addWidget = async (type: string, position?: { x: number; y: number }) => {
-    // 强制触发 availableWidgets 计算
-    // 如果初始化 Promise 还没有被解析，手动触发
+    // force trigger availableWidgets calculate
+    // If initialized Promise not yet parsed，manual trigger
     if (card2Integration.isLoading.value) {
       await card2Integration.initialize()
     }
 
     await initialization
-    // 首先尝试从 widgetStore 获取传统组件定义
+    // First try from widgetStore Get traditional component definition
     let widgetDef = widgetStore.getWidget(type)
     let isCard2Component = false
 
-    // 如果在传统注册表中没有找到，检查是否是 Card2.1 组件
+    // If not found in traditional registry，Check if it is Card2.1 components
     if (!widgetDef) {
-      // 检查是否是 card21- 前缀的类型
+      // Check if it is card21- type of prefix
       let card2Type = type
       if (type.startsWith('card21-')) {
         card2Type = type.replace('card21-', '')
@@ -204,28 +204,28 @@ export function createEditor() {
       if (process.env.NODE_ENV === 'development') {
       }
 
-      // 从组件列表中查找指定类型的组件定义
+      // Find the component definition of the specified type from the component list
       const card2Definition = card2Integration.filteredComponents.value?.find(comp => comp.type === card2Type)
       if (process.env.NODE_ENV === 'development') {
       }
 
       if (card2Definition) {
         isCard2Component = true
-        // 🔥 修复：正确处理Card2.1的配置结构
+        // 🔥 repair：Handle it correctlyCard2.1configuration structure
         const defaultProperties: Record<string, any> = {}
 
-        // 检查config是否是Card2.1格式（有customize字段）
+        // examineconfigwhether it isCard2.1Format（havecustomizeField）
         if (card2Definition.config && card2Definition.config.customize) {
-          // Card2.1格式：保持结构化的config用于customConfig
+          // Card2.1Format：keep it structuredconfigused forcustomConfig
           if (process.env.NODE_ENV === 'development') {
           }
-          // 不放入defaultProperties，让Card2Wrapper直接使用structured config
+          // Do not put indefaultProperties，letCard2WrapperUse directlystructured config
         } else if (card2Definition.config) {
-          // 扁平化格式：放入defaultProperties
+          // flat format：put indefaultProperties
           Object.assign(defaultProperties, card2Definition.config)
         }
 
-        // 从layout配置中获取默认尺寸
+        // fromlayoutGet the default size in configuration
         const defaultSize = card2Definition.layout?.defaultSize || { width: 4, height: 3 }
 
         widgetDef = {
@@ -238,8 +238,8 @@ export function createEditor() {
           source: 'card2',
           defaultLayout: {
             canvas: {
-              width: defaultSize.width * 120, // 每个网格单元约120px
-              height: defaultSize.height * 80 // 每个网格单元约80px
+              width: defaultSize.width * 120, // Each grid cell is approx.120px
+              height: defaultSize.height * 80 // Each grid cell is approx.80px
             },
             gridstack: {
               w: defaultSize.width,
@@ -256,18 +256,18 @@ export function createEditor() {
         if (process.env.NODE_ENV === 'development') {
         }
       } else {
-        console.error(`❌ [useEditor] Card2组件未找到: ${card2Type}`)
+        console.error(`❌ [useEditor] Card2Component not found: ${card2Type}`)
         if (process.env.NODE_ENV === 'development') {
         }
       }
     }
 
     if (!widgetDef) {
-      console.error(`❌ [Editor] 组件类型 "${type}" 未注册。`)
-      throw new Error(`组件类型 "${type}" 未注册。`)
+      console.error(`❌ [Editor] Component type "${type}" Not registered。`)
+      throw new Error(`Component type "${type}" Not registered。`)
     }
 
-    // 🔥 修复：安全访问 defaultLayout，提供默认值
+    // 🔥 repair：secure access defaultLayout，Provide default value
     const defaultLayout = widgetDef.defaultLayout || {
       canvas: { width: 300, height: 200 },
       gridstack: { w: 4, h: 4 }
@@ -281,15 +281,15 @@ export function createEditor() {
     const { x, y } = findNextAvailablePosition(editorStore.nodes, newItemW, newItemH, colNum)
     const finalPos = position || { x, y }
 
-    // 修复：正确提取属性值而不是属性定义
+    // repair：Correctly extract attribute values ​​instead of attribute definitions
     const defaultProperties: Record<string, any> = {}
     if (widgetDef.defaultProperties) {
       for (const [key, prop] of Object.entries(widgetDef.defaultProperties)) {
         if (typeof prop === 'object' && prop !== null && 'default' in prop) {
-          // 如果是属性定义对象，提取 default 值
+          // If it is a property definition object，extract default value
           defaultProperties[key] = (prop as any).default
         } else {
-          // 如果已经是值，直接使用
+          // if already the value，Use directly
           defaultProperties[key] = prop
         }
       }
@@ -304,7 +304,7 @@ export function createEditor() {
       height: defaultLayout.canvas.height,
       label: widgetDef.name,
       showLabel: false,
-      properties: defaultProperties, // 使用修复后的属性值
+      properties: defaultProperties, // Use the repaired property values
       renderer: ['canvas', 'gridstack'],
       layout: {
         canvas: { ...defaultLayout.canvas, ...finalPos },
@@ -314,10 +314,10 @@ export function createEditor() {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         version: widgetDef.version,
-        isCard2Component, // 标记是否为 Card2.1 组件
+        isCard2Component, // Is the mark Card2.1 components
         ...widgetDef.metadata
       },
-      dataSource: null // 初始化数据源为空
+      dataSource: null // The initial data source is empty
     }
 
     editorStore.addNode(node)
@@ -331,7 +331,7 @@ export function createEditor() {
   editorInstance = {
     editorStore,
     widgetStore,
-    stateManager: editorStore, // 添加 stateManager 别名，指向 editorStore
+    stateManager: editorStore, // Add to stateManager Alias，point to editorStore
     addWidget,
     selectNode,
     updateNode,
@@ -339,7 +339,7 @@ export function createEditor() {
     addNode,
     getNodeById,
     card2Integration,
-    // 检查是否为Card2组件的函数
+    // Check if it isCard2Component functions
     isCard2Component: (type: string) => {
       return card2Integration.filteredComponents.value?.some(comp => comp.type === type) || false
     }
@@ -350,7 +350,7 @@ export function createEditor() {
 
 export function useEditor(): EditorContext {
   if (!editorInstance) {
-    throw new Error('useEditor 必须在 createEditor 调用之后使用')
+    throw new Error('useEditor must be in createEditor Use after calling')
   }
   return editorInstance
 }

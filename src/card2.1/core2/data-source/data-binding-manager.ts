@@ -1,6 +1,6 @@
 /**
- * 数据绑定管理器
- * 负责将数据源与组件进行绑定和同步
+ * data binding manager
+ * Responsible for binding and synchronizing data sources and components
  */
 
 import type { StaticDataSource } from './static-data-source'
@@ -11,12 +11,12 @@ type DataSource = StaticDataSource | DeviceApiDataSource
 
 export interface ComponentDataBinding {
   componentId: string
-  componentInstanceId?: string // 同一组件可能有多个实例
+  componentInstanceId?: string // There may be multiple instances of the same component
   dataSourceId: string
   bindingConfig: {
     [componentField: string]: {
       dataPath: string
-      transform?: (value: any) => any // 可选的数据转换函数
+      transform?: (value: any) => any // Optional data conversion functions
       fallbackValue?: any
     }
   }
@@ -33,7 +33,7 @@ export interface DataBindingStatus {
 }
 
 /**
- * 数据绑定管理器
+ * data binding manager
  */
 export class DataBindingManager {
   private dataSources = new Map<string, DataSource>()
@@ -42,19 +42,19 @@ export class DataBindingManager {
   private updateCallbacks = new Map<string, Array<(data: any) => void>>()
 
   /**
-   * 注册数据源
+   * Register data source
    */
   registerDataSource(dataSource: DataSource) {
     this.dataSources.set(dataSource.getId(), dataSource)
   }
 
   /**
-   * 移除数据源
+   * Remove data source
    */
   removeDataSource(dataSourceId: string) {
     this.dataSources.delete(dataSourceId)
 
-    // 清理相关绑定
+    // Clean up related bindings
     const bindingsToRemove: string[] = []
     for (const [bindingId, binding] of this.bindings.entries()) {
       if (binding.dataSourceId === dataSourceId) {
@@ -68,7 +68,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 创建组件数据绑定
+   * Create component data binding
    */
   createBinding(binding: ComponentDataBinding): string {
     const bindingId = `${binding.componentId}-${binding.componentInstanceId || 'default'}`
@@ -76,14 +76,14 @@ export class DataBindingManager {
     this.bindings.set(bindingId, binding)
     this.bindingStatuses.set(bindingId, {})
 
-    // 立即更新绑定状态
+    // Update binding status now
     this.updateBinding(bindingId)
 
     return bindingId
   }
 
   /**
-   * 移除绑定
+   * Remove binding
    */
   removeBinding(bindingId: string) {
     this.bindings.delete(bindingId)
@@ -92,7 +92,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 更新绑定配置
+   * Update binding configuration
    */
   updateBindingConfig(bindingId: string, newConfig: Partial<ComponentDataBinding>) {
     const existingBinding = this.bindings.get(bindingId)
@@ -102,12 +102,12 @@ export class DataBindingManager {
 
     const updatedBinding = { ...existingBinding, ...newConfig }
     this.bindings.set(bindingId, updatedBinding)
-    // 立即更新绑定状态
+    // Update binding status now
     this.updateBinding(bindingId)
   }
 
   /**
-   * 订阅数据更新
+   * Subscribe to data updates
    */
   subscribe(bindingId: string, callback: (data: any) => void) {
     if (!this.updateCallbacks.has(bindingId)) {
@@ -116,7 +116,7 @@ export class DataBindingManager {
 
     this.updateCallbacks.get(bindingId)!.push(callback)
 
-    // 立即触发一次回调
+    // Trigger a callback immediately
     const currentData = this.getCurrentData(bindingId)
     if (currentData) {
       callback(currentData)
@@ -124,7 +124,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 取消订阅
+   * Unsubscribe
    */
   unsubscribe(bindingId: string, callback: (data: any) => void) {
     const callbacks = this.updateCallbacks.get(bindingId)
@@ -137,21 +137,21 @@ export class DataBindingManager {
   }
 
   /**
-   * 手动刷新绑定数据
+   * Manually refresh binding data
    */
   async refreshBinding(bindingId: string) {
     await this.updateBinding(bindingId)
   }
 
   /**
-   * 获取绑定状态
+   * Get binding status
    */
   getBindingStatus(bindingId: string): DataBindingStatus | undefined {
     return this.bindingStatuses.get(bindingId)
   }
 
   /**
-   * 获取当前绑定数据
+   * Get current binding data
    */
   getCurrentData(bindingId: string): any {
     const status = this.bindingStatuses.get(bindingId)
@@ -168,7 +168,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 更新绑定状态（核心方法）
+   * Update binding status（core methods）
    */
   private async updateBinding(bindingId: string) {
     const binding = this.bindings.get(bindingId)
@@ -180,27 +180,27 @@ export class DataBindingManager {
     }
 
     try {
-      // 获取组件数据需求
+      // Get component data requirements
       const componentSchema = componentSchemaManager.getSchema(binding.componentId)
       if (!componentSchema) {
         return
       }
 
-      // 从数据源获取原始数据
+      // Get raw data from data source
       const sourceData = await dataSource.getValue()
       const newStatus: DataBindingStatus = {}
       const componentData: any = {}
 
-      // 处理每个组件字段
+      // Process each component field
       for (const [componentField, fieldDef] of Object.entries(componentSchema.fields)) {
         const bindingConfig = binding.bindingConfig[componentField]
 
         if (bindingConfig) {
-          // 有绑定配置，从数据源提取值
+          // There is a binding configuration，Extract values ​​from data source
           const rawValue = sourceData[componentField]
           let finalValue = rawValue
 
-          // 应用数据转换
+          // Apply data transformation
           if (bindingConfig.transform && rawValue !== undefined) {
             try {
               finalValue = bindingConfig.transform(rawValue)
@@ -209,7 +209,7 @@ export class DataBindingManager {
             }
           }
 
-          // 如果值为undefined，使用fallback或默认值
+          // If the value isundefined，usefallbackor default value
           if (finalValue === undefined) {
             finalValue = bindingConfig.fallbackValue ?? fieldDef.defaultValue
           }
@@ -223,7 +223,7 @@ export class DataBindingManager {
 
           componentData[componentField] = finalValue
         } else {
-          // 没有绑定配置，使用默认值
+          // No binding configuration，Use default value
           const defaultValue = fieldDef.defaultValue
 
           newStatus[componentField] = {
@@ -237,12 +237,12 @@ export class DataBindingManager {
         }
       }
 
-      // 更新绑定状态
+      // Update binding status
       this.bindingStatuses.set(bindingId, newStatus)
 
-      // 验证数据
+      // Validate data
       const validation = componentSchemaManager.validateComponentData(binding.componentId, componentData)
-      // 通知订阅者
+      // Notify subscribers
       const callbacks = this.updateCallbacks.get(bindingId)
       if (callbacks) {
         callbacks.forEach(callback => {
@@ -255,7 +255,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 获取所有绑定
+   * Get all bindings
    */
   getAllBindings(): Array<{ id: string; binding: ComponentDataBinding; status: DataBindingStatus }> {
     const result: Array<{ id: string; binding: ComponentDataBinding; status: DataBindingStatus }> = []
@@ -269,7 +269,7 @@ export class DataBindingManager {
   }
 
   /**
-   * 获取数据源列表
+   * Get a list of data sources
    */
   getDataSourceList(): Array<{ id: string; type: string; name?: string }> {
     return Array.from(this.dataSources.values()).map(ds => ({
@@ -280,6 +280,6 @@ export class DataBindingManager {
   }
 }
 
-// 导出单例
+// Export singleton
 export const dataBindingManager = new DataBindingManager()
 export default dataBindingManager

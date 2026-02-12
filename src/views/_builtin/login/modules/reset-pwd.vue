@@ -31,10 +31,10 @@ const model: FormModel = reactive({
   password: ''
 })
 
-// 常用邮箱后缀列表
+// List of commonly used email suffixes
 const commonDomains = ['qq.com', '163.com', 'gmail.com', 'outlook.com', 'sina.com', 'hotmail.com', 'yahoo.com']
 
-// 计算邮箱自动补全选项
+// Calculate email autocomplete options
 const emailOptions = computed(() => {
   const email = model.email
   if (!email || !email.includes('@')) {
@@ -56,7 +56,7 @@ const emailOptions = computed(() => {
 
 const { label, isCounting, loading: smsLoading, start, isValidEmail } = useSmsCode()
 
-// 判断表单是否可以提交
+// Determine whether the form can be submitted
 const canSubmit = computed(() => {
   return (
     model.email.trim() !== '' &&
@@ -194,7 +194,7 @@ setTimeout(() => {
 </template>
 
 <style scoped>
-/* 保留这个样式，防止自动填充背景变黄 */
+/* keep this style，Prevent autofill background from turning yellow */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,

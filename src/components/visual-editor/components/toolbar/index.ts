@@ -1,9 +1,9 @@
-// 可视化编辑器工具栏组件入口文件
+// Visual editor toolbar component entry file
 
 export { default as VisualEditorToolbar } from '@/components/visual-editor/components/toolbar/VisualEditorToolbar.vue'
 export { default as CommonToolbar } from '@/components/visual-editor/components/toolbar/CommonToolbar.vue'
 
-// 工具栏相关类型定义
+// Toolbar related type definitions
 export interface RendererOption {
   value: string
   label: string

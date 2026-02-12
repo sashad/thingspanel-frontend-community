@@ -85,7 +85,7 @@ function hashLayout(layout: GridLayoutPlusItem[]): string {
       y: Number(item.y) || 0,
       w: Number(item.w) || 0,
       h: Number(item.h) || 0,
-      // ✅ 添加锁定状态到hash中，使得锁定变化能触发更新
+      // ✅ Add lock status tohashmiddle，Enable locked changes to trigger updates
       locked: (item as any).locked || false,
       static: (item as any).static || false
     }))
@@ -126,8 +126,8 @@ function createOptions(resolved: ReturnType<typeof resolveConfig>): GridStackOpt
   const disableDrag = isStatic || rawConfig.isDraggable === false
   const disableResize = isStatic || rawConfig.isResizable === false
 
-  // 🔥 关键调试：输出配置信息
-  console.log('🔧🔧🔧 [GridV2] createOptions 配置:', {
+  // 🔥 critical debugging：Output configuration information
+  console.log('🔧🔧🔧 [GridV2] createOptions Configuration:', {
     'props.readonly': props.readonly,
     'rawConfig.staticGrid': rawConfig.staticGrid,
     'rawConfig.isDraggable': rawConfig.isDraggable,
@@ -148,8 +148,8 @@ function createOptions(resolved: ReturnType<typeof resolveConfig>): GridStackOpt
     styleInHead: true,
     animate: false,
     resizable: { handles: 'se' },
-    // 🔥 最终修复：完全移除 handle 配置，让 GridStack 使用默认拖拽行为
-    // GridStack 默认会让整个 grid-stack-item 可拖拽，同时保护内部交互元素
+    // 🔥 final fix：Completely remove handle Configuration，let GridStack Use default drag behavior
+    // GridStack By default, the entire grid-stack-item Draggable，Also protect internal interactive elements
     draggable: { appendTo: 'parent', scroll: false }
   }
 }
@@ -210,7 +210,7 @@ function normalizeLayout(layout: GridLayoutPlusItem[]): GridStackNode[] {
     minH: item.minH,
     maxW: item.maxW,
     maxH: item.maxH,
-    // ✅ 添加锁定属性支持
+    // ✅ Add lock attribute support
     locked: (item as any).locked || false,
     noMove: (item as any).locked || (item as any).static || false,
     noResize: (item as any).locked || (item as any).static || false
@@ -227,40 +227,40 @@ function destroyGrid(): void {
 
 function applyLayoutInternal(layout: GridLayoutPlusItem[]): void {
   if (!grid) return
-  console.log('🔥🔥🔥 [GridV2] applyLayoutInternal 开始执行，组件数:', layout.length)
+  console.log('🔥🔥🔥 [GridV2] applyLayoutInternal Start execution，Number of components:', layout.length)
 
   try {
-    // 🔥 终极修复：完全销毁并重新初始化 GridStack
-    // 这是热更新能正常工作的原因 - 它会完全重新初始化
-    console.log('🔥🔥🔥 [GridV2] 销毁并重新初始化 GridStack')
+    // 🔥 ultimate repair：completely destroyed and reinitialized GridStack
+    // This is why hot updates work properly - it will completely reinitialize
+    console.log('🔥🔥🔥 [GridV2] Destroy and reinitialize GridStack')
     const resolved = resolveConfig()
     const currentColumn = resolved.column
 
-    // 保存当前的事件监听器
+    // Save current event listener
     const changeHandler = handleGridChange
 
-    // 销毁旧的 grid
+    // destroy old ones grid
     destroyGrid()
 
-    // 重新初始化
+    // Reinitialize
     ensureColumnStyles(currentColumn)
     grid = GridStack.init(createOptions(resolved), gridEl.value!)
     grid.on('change', changeHandler)
     applyColumnClass(currentColumn)
 
-    // 加载布局
+    // Load layout
     grid.batchUpdate()
     grid.load(normalizeLayout(layout), true)
     grid.batchUpdate(false)
     layoutHashSnapshot = hashLayout(layout)
 
-    // 同步交互性
+    // Synchronous interactivity
     syncInteractivity()
 
-    console.log('🔥🔥🔥 [GridV2] GridStack 重新初始化完成')
+    console.log('🔥🔥🔥 [GridV2] GridStack Reinitialization completed')
 
-    // 🔥 深度调试：检查每个元素的拖拽状态
-    console.log('🔍🔍🔍 [GridV2] 检查所有元素的拖拽状态:')
+    // 🔥 Deep debugging：Check the drag status of each element
+    console.log('🔍🔍🔍 [GridV2] Check the drag status of all elements:')
     const items = grid.getGridItems()
     items.forEach((el, index) => {
       const node = el.gridstackNode
@@ -268,24 +268,24 @@ function applyLayoutInternal(layout: GridLayoutPlusItem[]): void {
       const hasResizable = el.classList.contains('ui-resizable')
       const hasGridStackItem = el.classList.contains('grid-stack-item')
 
-      console.log(`  元素 ${index} [${node?.id}]:`, {
+      console.log(`  element ${index} [${node?.id}]:`, {
         hasDraggable,
         hasResizable,
         hasGridStackItem,
         noMove: node?.noMove,
         noResize: node?.noResize,
         locked: node?.locked,
-        '所有class': el.className
+        'allclass': el.className
       })
     })
 
     isReady = true
   } catch (error) {
-    console.error('❌❌❌ [GridV2] applyLayoutInternal 执行出错:', error)
+    console.error('❌❌❌ [GridV2] applyLayoutInternal Execution error:', error)
     throw error
   }
 
-  console.log('🔥🔥🔥 [GridV2] applyLayoutInternal 执行完成')
+  console.log('🔥🔥🔥 [GridV2] applyLayoutInternal Execution completed')
 }
 
 function initializeGrid(): void {
@@ -301,8 +301,8 @@ function initializeGrid(): void {
   applyLayoutInternal(props.layout ?? [])
   syncInteractivity()
 
-  // 🔥 初始化后检查拖拽状态
-  console.log('🔍🔍🔍 [GridV2] 初始化完成后检查拖拽状态:')
+  // 🔥 Check drag status after initialization
+  console.log('🔍🔍🔍 [GridV2] Check the drag status after initialization is completed:')
   const items = grid.getGridItems()
   items.forEach((el, index) => {
     const node = el.gridstackNode
@@ -310,14 +310,14 @@ function initializeGrid(): void {
     const hasResizable = el.classList.contains('ui-resizable')
     const hasGridStackItem = el.classList.contains('grid-stack-item')
 
-    console.log(`  初始元素 ${index} [${node?.id}]:`, {
+    console.log(`  initial element ${index} [${node?.id}]:`, {
       hasDraggable,
       hasResizable,
       hasGridStackItem,
       noMove: node?.noMove,
       noResize: node?.noResize,
       locked: node?.locked,
-      '所有class': el.className
+      'allclass': el.className
     })
   })
 
@@ -399,22 +399,22 @@ onBeforeUnmount(() => destroyGrid())
 watch(
   () => props.layout,
   (layout) => {
-    console.log('👀 [GridV2] props.layout 变化检测到，isReady:', isReady)
+    console.log('👀 [GridV2] props.layout Change detected，isReady:', isReady)
     if (!isReady) {
-      console.log('❌ [GridV2] GridStack 未就绪，跳过处理')
+      console.log('❌ [GridV2] GridStack Not ready，Skip processing')
       return
     }
     const incomingHash = hashLayout(layout ?? [])
-    console.log('👀 [GridV2] 布局 hash 对比:', { incomingHash, layoutHashSnapshot })
+    console.log('👀 [GridV2] layout hash contrast:', { incomingHash, layoutHashSnapshot })
     if (incomingHash === layoutHashSnapshot) {
-      console.log('❌ [GridV2] 布局未变化，跳过处理')
+      console.log('❌ [GridV2] Layout unchanged，Skip processing')
       return
     }
-    console.log('✅ [GridV2] 布局已变化，准备调用 applyLayoutInternal')
-    // 🔥 关键修复：等待 Vue 的 DOM 更新完成后再调用 GridStack
-    // 因为新组件是通过 v-for 添加的，需要等 DOM 真正渲染后 GridStack 才能识别
+    console.log('✅ [GridV2] The layout has changed，ready to call applyLayoutInternal')
+    // 🔥 critical fix：wait Vue of DOM Call after the update is complete GridStack
+    // Because the new component is passed v-for added，need to wait DOM After actual rendering GridStack to identify
     nextTick(() => {
-      console.log('✅ [GridV2] nextTick 执行，调用 applyLayoutInternal')
+      console.log('✅ [GridV2] nextTick implement，call applyLayoutInternal')
       applyLayoutInternal(layout ?? [])
     })
   },
@@ -487,28 +487,28 @@ watch(
   z-index: 1000;
 }
 
-/* 🔥 修复：调整 resize handle 位置，确保在元素的最右下角 */
+/* 🔥 repair：Adjustment resize handle Location，Make sure it's in the far bottom right corner of the element */
 :deep(.grid-stack-item > .ui-resizable-handle) {
-  /* 确保句柄不受 padding 影响 */
+  /* Make sure the handle is not padding Influence */
   box-sizing: border-box;
   position: absolute !important;
 }
 
 :deep(.grid-stack-item > .ui-resizable-se) {
-  /* 右下角句柄 - 让图标的右下角对齐元素的右下角 */
+  /* Lower right corner handle - Align the lower right corner of the icon with the lower right corner of the element */
   right: 14px !important;
   bottom: 0 !important;
-  /* GridStack 的 resize handle 默认尺寸约为 20x20，边缘留 2px 视觉效果更好 */
+  /* GridStack of resize handle The default size is approx. 20x20，Leave the edge 2px better visual effect */
 }
 
 :deep(.grid-stack-item > .ui-resizable-s) {
-  /* 底部句柄 */
+  /* bottom handle */
   bottom: 0 !important;
   transform: translateY(-2px) !important;
 }
 
 :deep(.grid-stack-item > .ui-resizable-e) {
-  /* 右侧句柄 */
+  /* right handle */
   right: 0 !important;
   transform: translateX(-2px) !important;
 }

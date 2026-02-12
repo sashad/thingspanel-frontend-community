@@ -1,13 +1,13 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 -->
+    <!-- card title bar -->
     <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
           <Icon icon="mdi:alert-circle-outline" class="text-lg text-red-600 dark:text-red-400" />
         </div>
         <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100">
-          {{ $t('card.alarmInfo.title', '告警信息') }}
+          {{ $t('card.alarmInfo.title', 'Alarm information') }}
         </h3>
       </div>
       <n-button
@@ -20,7 +20,7 @@
         <template #icon>
           <Icon icon="mdi:arrow-right" />
         </template>
-        {{ $t('card.alarmInfo.viewAll', '查看全部') }}
+        {{ $t('card.alarmInfo.viewAll', 'View all') }}
       </n-button>
     </div>
 
@@ -44,8 +44,8 @@
 
 <script setup lang="ts">
 /**
- * 告警信息组件
- * 显示最新的告警信息列表，包含告警名称、状态、内容和时间
+ * Alarm information component
+ * Display the latest alarm information list，Contains the alarm name、state、content and time
  */
 import { ref, onMounted, h } from 'vue'
 import { useRouter } from 'vue-router'
@@ -69,14 +69,14 @@ const alarmList = ref<AlarmData[]>([])
 const router = useRouter()
 
 /**
- * 格式化时间显示，与原版保持1:1一致
+ * Format time display，Keep with the original1:1consistent
  */
 const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
 }
 
 /**
- * 获取告警状态信息
+ * Get alarm status information
  */
 const getStatusInfo = (
   status: string
@@ -96,7 +96,7 @@ const getStatusInfo = (
 }
 
 /**
- * 数据表格列定义
+ * Data table column definition
  */
 const columns: DataTableColumns<AlarmData> = [
   {
@@ -135,14 +135,14 @@ const columns: DataTableColumns<AlarmData> = [
 ]
 
 /**
- * 获取告警数据
+ * Get alarm data
  */
 const fetchData = async () => {
   loading.value = true
   try {
     const params = {
       page: 1,
-      page_size: 10, // 与原版保持1:1一致
+      page_size: 10, // Keep with the original1:1consistent
       alarm_status: '',
       start_time: '',
       end_time: ''
@@ -151,14 +151,14 @@ const fetchData = async () => {
     const { data } = response
     alarmList.value = data?.list || []
   } catch (error) {
-    console.error('Failed to fetch alarm history:', error) // 与原版保持一致的错误信息
+    console.error('Failed to fetch alarm history:', error) // Error messages consistent with the original
     alarmList.value = []
   }
-  loading.value = false // 与原版保持1:1一致的loading处理方式
+  loading.value = false // Keep with the original1:1consistentloadingProcessing method
 }
 
 /**
- * 查看所有告警
+ * View all alerts
  */
 const viewAllAlarms = () => {
   router.push('/alarm/warning-message')
@@ -174,7 +174,7 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 自定义表格样式 */
+/* Custom table style */
 :deep(.n-data-table-thead) {
   background-color: theme('colors.gray.50');
 }
@@ -191,7 +191,7 @@ defineOptions({
   background-color: theme('colors.blue.900/20');
 }
 
-/* 优化表格行高和间距 */
+/* Optimize table row height and spacing */
 :deep(.n-data-table-td) {
   padding: 8px 12px;
 }

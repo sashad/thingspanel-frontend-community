@@ -1,32 +1,32 @@
 <!--
-  HTTP配置第2步 - 请求头配置组件
-  使用DynamicParameterEditor配置HTTP请求头
-  ✨ 优化：添加接口模板智能推荐卡片
+  HTTPConfiguration section2step - Request header configuration component
+  useDynamicParameterEditorConfigurationHTTPRequest header
+  ✨ optimization：Add interface template intelligent recommendation card
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep2 - HTTP请求头配置步骤（UI优化版）
- * 使用通用的动态参数编辑器配置请求头
+ * HttpConfigStep2 - HTTPRequest header configuration steps（UIOptimized version）
+ * Configure request headers using the universal dynamic parameter editor
  *
- * 🎯 优化3：接口模板智能推荐
- * - 检测currentApiInfo是否有预制参数
- * - 显示智能推荐卡片
- * - 应用模板后高亮提示
+ * 🎯 optimization3：Intelligent recommendation of interface templates
+ * - DetectioncurrentApiInfoAre there any prefabricated parameters?
+ * - Show smart recommendation cards
+ * - Highlight after applying template
  */
 
 import { ref, computed, watch } from 'vue'
 import type { HttpConfig } from '@/core/data-architecture/types/http-config'
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 import DynamicParameterEditor from '@/core/data-architecture/components/common/DynamicParameterEditor.vue'
-// 导入图标
+// import icon
 import { Sparkles as SparkleIcon } from '@vicons/ionicons5'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 当前选择的内部接口信息 */
+  /** Currently selected internal interface information */
   currentApiInfo?: any
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
@@ -38,18 +38,18 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 /**
- * 🎯 优化3：智能推荐卡片显示状态
+ * 🎯 optimization3：Smart recommendation card display status
  */
 const showTemplateRecommend = ref(false)
 const hasAppliedTemplate = ref(false)
 
 /**
- * 🎯 优化3：检测是否有可用的请求头模板
+ * 🎯 optimization3：Check if there is an available request header template
  */
 const hasHeaderTemplate = computed(() => {
   if (!props.currentApiInfo || !props.currentApiInfo.commonParams) return false
 
-  // 检查是否有请求头类型的参数
+  // Check whether there are parameters of request header type
   const headerParams = props.currentApiInfo.commonParams.filter(
     (param: any) => param.type === 'header' || param.paramType === 'header'
   )
@@ -58,7 +58,7 @@ const hasHeaderTemplate = computed(() => {
 })
 
 /**
- * 🎯 优化3：获取请求头模板参数
+ * 🎯 optimization3：Get request header template parameters
  */
 const headerTemplateParams = computed(() => {
   if (!props.currentApiInfo || !props.currentApiInfo.commonParams) return []
@@ -69,7 +69,7 @@ const headerTemplateParams = computed(() => {
 })
 
 /**
- * 🎯 优化3：监听currentApiInfo变化，自动显示推荐卡片
+ * 🎯 optimization3：monitorcurrentApiInfochange，Automatically display recommendation cards
  */
 watch(
   () => props.currentApiInfo,
@@ -82,12 +82,12 @@ watch(
 )
 
 /**
- * 🎯 优化3：应用接口模板
+ * 🎯 optimization3：Application interface template
  */
 const applyTemplate = () => {
   if (!headerTemplateParams.value || headerTemplateParams.value.length === 0) return
 
-  // 生成模板参数
+  // Generate template parameters
   const templateHeaders: EnhancedParameter[] = headerTemplateParams.value.map((param: any) => ({
     key: param.name,
     value: param.example || param.defaultValue || '',
@@ -96,12 +96,12 @@ const applyTemplate = () => {
     valueMode: 'manual',
     selectedTemplate: 'manual',
     variableName: '',
-    description: param.description || `${param.name}请求头`,
+    description: param.description || `${param.name}Request header`,
     dataType: 'string',
     _id: `header_template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }))
 
-  // 合并到现有请求头（避免重复）
+  // Merge into existing request headers（avoid duplication）
   const existingKeys = new Set((props.modelValue.headers || []).map(h => h.key))
   const newHeaders = templateHeaders.filter(h => !existingKeys.has(h.key))
 
@@ -109,21 +109,21 @@ const applyTemplate = () => {
     const updatedHeaders = [...(props.modelValue.headers || []), ...newHeaders]
     updateHeaders(updatedHeaders)
 
-    // 标记已应用模板
+    // Mark template applied
     hasAppliedTemplate.value = true
     showTemplateRecommend.value = false
   }
 }
 
 /**
- * 🎯 优化3：关闭推荐卡片
+ * 🎯 optimization3：Close recommendation card
  */
 const dismissRecommend = () => {
   showTemplateRecommend.value = false
 }
 
 /**
- * 更新请求头配置
+ * Update request header configuration
  */
 const updateHeaders = (headers: EnhancedParameter[]) => {
   const updatedValue = {
@@ -137,19 +137,19 @@ const updateHeaders = (headers: EnhancedParameter[]) => {
 
 <template>
   <div class="http-config-step2">
-    <!-- 🎯 优化3：接口模板智能推荐卡片 -->
+    <!-- 🎯 optimization3：Interface template intelligent recommendation card -->
     <n-alert v-if="showTemplateRecommend" type="success" closable style="margin-bottom: 16px" @close="dismissRecommend">
       <template #header>
         <n-space align="center">
           <n-icon size="18"><sparkle-icon /></n-icon>
-          <span>检测到内部接口模板可用</span>
+          <span>Internal interface template available detected</span>
         </n-space>
       </template>
 
       <n-space vertical size="small">
         <n-text depth="3">
-          接口 "<n-text type="success" strong>{{ currentApiInfo?.label }}</n-text>" 包含
-          <n-text type="success" strong>{{ headerTemplateParams.length }}</n-text> 个预制请求头参数
+          interface "<n-text type="success" strong>{{ currentApiInfo?.label }}</n-text>" Include
+          <n-text type="success" strong>{{ headerTemplateParams.length }}</n-text> prefabricated request header parameters
         </n-text>
 
         <n-space size="small">
@@ -163,7 +163,7 @@ const updateHeaders = (headers: EnhancedParameter[]) => {
             {{ param.name }}
           </n-tag>
           <n-text v-if="headerTemplateParams.length > 3" depth="3" style="font-size: 12px">
-            +{{ headerTemplateParams.length - 3 }} 个
+            +{{ headerTemplateParams.length - 3 }} indivual
           </n-text>
         </n-space>
 
@@ -172,21 +172,21 @@ const updateHeaders = (headers: EnhancedParameter[]) => {
             <template #icon>
               <n-icon><sparkle-icon /></n-icon>
             </template>
-            应用模板
+            Apply template
           </n-button>
-          <n-button size="small" @click="dismissRecommend">稍后手动配置</n-button>
+          <n-button size="small" @click="dismissRecommend">Configure manually later</n-button>
         </n-space>
       </n-space>
     </n-alert>
 
-    <!-- 请求头配置 -->
+    <!-- Request header configuration -->
     <DynamicParameterEditor
       :model-value="modelValue.headers || []"
       parameter-type="header"
-      title="请求头配置"
-      add-button-text="添加请求头"
-      key-placeholder="头部名称（如：Content-Type）"
-      value-placeholder="头部值（如：application/json）"
+      title="Request header configuration"
+      add-button-text="Add request header"
+      key-placeholder="Header name（like：Content-Type）"
+      value-placeholder="header value（like：application/json）"
       :current-api-info="currentApiInfo"
       :current-component-id="componentId"
       @update:model-value="updateHeaders"

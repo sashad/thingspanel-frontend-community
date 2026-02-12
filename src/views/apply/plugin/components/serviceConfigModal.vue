@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { $t } from '@/locales'
 import { putRegisterService } from '@/service/api/plugin'
-const serviceType = ref<any>('接入协议')
+const serviceType = ref<any>('access protocol')
 const emit = defineEmits(['getList'])
 const serviceModal = ref<any>(false)
 const formRef = ref<any>(null)
@@ -102,13 +102,13 @@ defineExpose({ openModal })
           <n-form-item :label="$t('card.httpServerAddress')" path="http_address">
             <n-input v-model:value="form.http_address" placeholder="127.0.0.1:503" />
           </n-form-item>
-          <n-form-item v-if="serviceType === '接入协议'" :label="$t('generate.device-type')" path="device_type">
+          <n-form-item v-if="serviceType === 'access protocol'" :label="$t('generate.device-type')" path="device_type">
             <n-select v-model:value="form.device_type" :placeholder="$t('card.chooseDeviceType')" :options="options" />
           </n-form-item>
           <n-form-item :label="$t('card.serverSubscribeSubjectPrefix')" path="sub_topic_prefix">
             <n-input v-model:value="form.sub_topic_prefix" placeholder="plugin/xxx/" />
           </n-form-item>
-          <n-form-item v-if="serviceType === '接入协议'" :label="$t('card.deviceAccessAddress')" path="access_address">
+          <n-form-item v-if="serviceType === 'access protocol'" :label="$t('card.deviceAccessAddress')" path="access_address">
             <n-input
               v-model:value="form.access_address"
               :placeholder="$t('card.fillDeviceAccessAddress')"

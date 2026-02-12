@@ -1,9 +1,9 @@
 /**
- * 安全配置统一导出
+ * Unified export of security configurations
  * Security Configuration Unified Exports
  */
 
-// 导出 RSA 配置
+// Export RSA Configuration
 export { 
   rsaPublicKey, 
   rsaConfig, 
@@ -11,7 +11,7 @@ export {
   validateRSAPublicKey 
 } from './rsa'
 
-// 导出类型定义
+// Export type definition
 export type {
   RSASecurityConfig,
   SecurityConfig,
@@ -22,7 +22,7 @@ export type {
 } from './types'
 
 /**
- * 安全配置对象
+ * security configuration object
  * Security Configuration Object
  */
 export const securityConfig = {
@@ -36,9 +36,9 @@ export const securityConfig = {
 } as const
 
 /**
- * 获取完整的安全配置
+ * Get complete security configuration
  * Get Complete Security Configuration
- * @returns 完整的安全配置对象
+ * @returns Complete security configuration object
  */
 export function getSecurityConfig() {
   return {

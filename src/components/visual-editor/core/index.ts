@@ -1,8 +1,8 @@
-// 导出配置发现器
+// Export configuration discoverer
 export { ConfigDiscovery } from '@/components/visual-editor/core/ConfigDiscovery'
 
-// 🔥 已迁移：组件数据需求系统已迁移到核心数据架构系统
-// 使用 @/core/data-architecture/ 中的统一实现
+// 🔥 Migrated：组件数据需求系统Migrated到核心数据架构系统
+// use @/core/data-architecture/ unified implementation in
 
-// 注意：旧的widgetRegistry和stateManager已迁移到新的统一架构
-// 请使用 useVisualEditor() 替代
+// Notice：oldwidgetRegistryandstateManagerMigrated to new unified architecture
+// Please use useVisualEditor() substitute

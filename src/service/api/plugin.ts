@@ -1,72 +1,72 @@
 import { request } from '../request'
 
-// 获取服务列表数据
+// Get service list data
 export const getServices = async (params: any) => {
   return await request.get<Panel.Data>('/service/list', { params })
 }
 
-// 注册服务
+// Registration service
 export const registerService = async (params: any) => {
   return await request.post<Panel.Data>('/service', params)
 }
 
-// 更新服务
+// Update service
 export const putRegisterService = async (params: any) => {
   return await request.put<Panel.Data>('/service', params)
 }
 
-// 删除服务
+// Delete service
 export const delRegisterService = async (id: any) => {
   return await request.delete<Panel.Data>(`/service/${id}`)
 }
 
-// 获取租户三方接入点列表
+// Get the tenant's third-party access point list
 export const getServiceAccess = async (params: any) => {
   return await request.get<Panel.Data>('/service/access/list', { params })
 }
 
-// 获取租户三方接入点表单
+// Obtain tenant third-party access point form
 export const getServiceAccessForm = async (params: any) => {
   return await request.get<Panel.Data>('/service/access/voucher/form', {
     params
   })
 }
 
-// 删除租户三方接入点
+// Delete a tenant's third-party access point
 export const delServiceAccess = async (id: any) => {
   return await request.delete<Panel.Data>(`/service/access/${id}`)
 }
 
-// 创建三方接入点
+// Create a three-party access point
 export const createServiceDrop = async (params: any) => {
   return await request.post<Panel.Data>('/service/access', params)
 }
 
-// 更新三方接入点
+// Update third-party access points
 export const putServiceDrop = async (params: any) => {
   return await request.put<Panel.Data>('/service/access', params)
 }
 
-// 三方服务设备列表查询
+// Third-party service equipment list query
 export const getServiceListDrop = async (params: any) => {
   return await request.get<Panel.Data>('/service/access/device/list', {
     params
   })
 }
 
-// 设备配置下拉菜单✅
+// Device configuration drop-down menu✅
 export const getSelectServiceMenuList = async (params: any) => {
   return await request.get<Panel.Data>('/device_config/menu', {
     params
   })
 }
 
-// 批量添加服务
+// Add services in batches
 export const batchAddServiceMenuList = async (params: any) => {
   return await request.post<Panel.Data>('/device/service/access/batch', params)
 }
 
-// // 修改三方接入点
+// // Modify third-party access point
 // export const putServiceMenuDrop = async (params: any) => {
 //   return await request.put<Panel.Data>("/service/access", params);
 // };

@@ -44,7 +44,7 @@ function renderPieChart() {
     showMarkers: false
   })
   chart.legend({ position: 'top' })
-  chart.axis(false) // 关闭坐标轴
+  chart.axis(false) // Turn off axis
   chart
     .interval()
     .adjust('stack')
@@ -202,7 +202,7 @@ function renderBarChart() {
   chart.interval().position('type*value')
   chart.interaction('element-active')
 
-  // 添加文本标注
+  // Add text annotation
   data.forEach(item => {
     chart
       .annotation()
@@ -244,7 +244,7 @@ function renderScatterChart() {
         height: 500
       })
       chart.data(data)
-      // 为各个字段设置别名
+      // Set aliases for each field
       chart.scale({
         LifeExpectancy: {
           alias: $t('custom.plugin.lifeExpectancy'),
@@ -266,14 +266,14 @@ function renderScatterChart() {
         label: {
           formatter(value) {
             return `${(Number(value) / 1000).toFixed(0)}k`
-          } // 格式化坐标轴的显示
+          } // Format axis display
         }
       })
       chart.tooltip({
         showTitle: false,
         showMarkers: false
       })
-      chart.legend('Population', false) // 该图表默认会生成多个图例，设置不展示 Population 和 Country 两个维度的图例
+      chart.legend('Population', false) // This chart will generate multiple legends by default，Set not to display Population and Country Legend in two dimensions
       chart
         .point()
         .position('GDP*LifeExpectancy')
@@ -379,9 +379,9 @@ function renderRadarChart() {
   const dv = new DataView().source(data)
   dv.transform({
     type: 'fold',
-    fields: ['a', 'b'], // 展开字段集
-    key: 'user', // key字段
-    value: 'score' // value字段
+    fields: ['a', 'b'], // Expand fieldset
+    key: 'user', // keyField
+    value: 'score' // valueField
   })
 
   const chart = new Chart({

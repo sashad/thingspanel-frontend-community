@@ -1,29 +1,29 @@
 /**
- * 统一的栅格背景样式
- * 用于所有渲染器组件的栅格背景显示
+ * Uniform grid background style
+ * Raster background display for all renderer components
  */
 
-/* CSS 变量定义 */
+/* CSS variable definition */
 :root {
-  /* 浅色主题栅格样式 */
+  /* Light theme grid style */
   --grid-line-color: rgba(0, 0, 0, 0.1);
   --grid-line-width: 1px;
   --grid-size: 20px;
   --grid-bg-color: #f8f9fa;
   
-  /* 深色主题栅格样式 */
+  /* Dark theme grid style */
   --grid-line-color-dark: rgba(255, 255, 255, 0.15);
   --grid-bg-color-dark: #1a1a1a;
 }
 
-/* 栅格背景基础类 */
+/* Raster background basic class */
 .grid-background-base {
-  /* 移除背景色以提高透明度 */
+  /* Remove background color to increase transparency */
   /* background-color: var(--grid-bg-color); */
   transition: background-color 0.3s ease;
 }
 
-/* 显示栅格的类 */
+/* Class for displaying rasters */
 .show-grid {
   background-image: 
     linear-gradient(to right, var(--grid-line-color) var(--grid-line-width), transparent var(--grid-line-width)),
@@ -32,10 +32,10 @@
   background-position: -1px -1px;
 }
 
-/* 深色主题适配 */
+/* Dark theme adaptation */
 [data-theme="dark"] .grid-background-base,
 .dark-theme .grid-background-base {
-  /* 移除深色主题背景色以提高透明度 */
+  /* Remove dark theme background color to increase transparency */
   /* background-color: var(--grid-bg-color-dark); */
 }
 
@@ -46,18 +46,18 @@
     linear-gradient(to bottom, var(--grid-line-color-dark) var(--grid-line-width), transparent var(--grid-line-width));
 }
 
-/* 预览模式和只读模式下隐藏栅格 */
+/* Hide grid in preview mode and read-only mode */
 .preview-mode .show-grid,
 .readonly .show-grid {
   background-image: none !important;
 }
 
-/* 隐藏栅格的类 */
+/* Class to hide the grid */
 .hide-grid {
   background-image: none !important;
 }
 
-/* 不同栅格大小的变体 */
+/* Variants with different grid sizes */
 .grid-size-small {
   --grid-size: 10px;
 }
@@ -70,7 +70,7 @@
   --grid-size: 40px;
 }
 
-/* 栅格透明度变体 */
+/* Raster transparency variant */
 .grid-subtle {
   --grid-line-color: rgba(0, 0, 0, 0.05);
   --grid-line-color-dark: rgba(255, 255, 255, 0.08);

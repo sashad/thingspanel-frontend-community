@@ -1,5 +1,5 @@
 /**
- * 柱状图组件定义
+ * Bar chart component definition
  */
 import BarChart from './index.vue'
 import BarChartSetting from './setting.vue'
@@ -8,27 +8,27 @@ import type { BarChartCustomize } from './settingConfig'
 
 const barChartDefinition: ComponentDefinition = {
   type: 'bar-chart',
-  name: '柱状图',
-  description: 'ECharts柱状图，用于展示分类数据的比较',
+  name: 'bar chart',
+  description: 'EChartsbar chart，Used to display comparisons of categorical data',
   icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/></svg>',
   version: '1.0.0',
   author: 'ThingsPanel',
   component: BarChart,
   configComponent: BarChartSetting,
 
-  // 默认配置
+  // Default configuration
   defaultConfig: {
     type: 'bar-chart',
     root: {
       transform: { rotate: 0, scale: 1 }
     },
     customize: {
-      title: '数据对比',
+      title: 'Data comparison',
       showLegend: true,
       barWidth: '60%',
       showLabel: false,
-      xAxisLabel: '类别',
-      yAxisLabel: '数值',
+      xAxisLabel: 'category',
+      yAxisLabel: 'numerical value',
       showGrid: true,
       barColor: '#5470c6',
       barGradient: true,
@@ -44,12 +44,12 @@ const barChartDefinition: ComponentDefinition = {
       transform: { rotate: 0, scale: 1 }
     },
     customize: {
-      title: '数据对比',
+      title: 'Data comparison',
       showLegend: true,
       barWidth: '60%',
       showLabel: false,
-      xAxisLabel: '类别',
-      yAxisLabel: '数值',
+      xAxisLabel: 'category',
+      yAxisLabel: 'numerical value',
       showGrid: true,
       barColor: '#5470c6',
       barGradient: true,
@@ -59,7 +59,7 @@ const barChartDefinition: ComponentDefinition = {
     }
   },
 
-  // 布局配置
+  // layout configuration
   defaultLayout: {
     gridstack: {
       w: 4,
@@ -80,36 +80,36 @@ const barChartDefinition: ComponentDefinition = {
     resizable: true
   },
 
-  // 权限控制
-  permission: '不限',
+  // Permission control
+  permission: 'NO_LIMIT',
 
-  // 分类信息
-  tags: ['图表', '柱状图', 'ECharts', '对比'],
+  // Classified information
+  tags: ['chart', 'bar chart', 'ECharts', 'contrast'],
 
-  // 功能特性
+  // Features
   features: {
     realtime: true,
     dataBinding: true,
     configurable: true
   },
 
-  // 数据源定义
+  // Data source definition
   dataSources: [
     {
       key: 'main',
-      name: '数据源',
-      description: '柱状图的分类数据',
+      name: 'data source',
+      description: 'Categorical data for bar charts',
       supportedTypes: ['static', 'api', 'websocket'],
       required: false,
       example: {
-        xData: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        xData: ['on Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         yData: [120, 200, 150, 80, 70, 110, 130],
         timestamp: '2025-10-15T10:30:00.000Z'
       }
     }
   ],
 
-  // 交互能力
+  // Interactive capabilities
   interactionCapabilities: {
     supportedEvents: ['click', 'dataChange'],
     availableActions: ['navigateToUrl', 'updateComponentData', 'showNotification'],

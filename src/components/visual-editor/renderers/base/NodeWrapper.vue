@@ -8,11 +8,11 @@
     @click="onClick"
     @contextmenu="onContextMenu"
   >
-    <!-- 内容包装器 - 控制可见性但保持事件响应 -->
+    <!-- content wrapper - Control visibility but remain event responsive -->
     <div v-show="baseConfig?.visible !== false" class="node-content-wrapper">
-      <!-- 标题栏 -->
+      <!-- title bar -->
       <div v-if="shouldShowTitle" class="node-title-bar" :style="titleBarStyles" @dblclick="startTitleEdit">
-        <!-- 编辑模式 -->
+        <!-- edit mode -->
         <n-input
           v-if="isEditingTitle"
           ref="titleInputRef"
@@ -24,11 +24,11 @@
           @keyup.enter="finishTitleEdit"
           @keyup.escape="cancelTitleEdit"
         />
-        <!-- 显示模式 -->
+        <!-- display mode -->
         <span v-else class="title-text">{{ displayTitle }}</span>
       </div>
 
-      <!-- 内容区域 -->
+      <!-- content area -->
       <div class="node-content" :style="contentStyles">
         <Card2Wrapper
           v-if="node.metadata?.isCard2Component"
@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <!-- 调整大小控制句柄 - 始终响应事件，便于编辑隐藏组件 -->
+    <!-- resize control handle - Always respond to events，Easy to edit hidden components -->
     <div v-if="showResizeHandles" class="resize-handles">
       <div
         v-for="handle in resizeHandles"
@@ -60,16 +60,16 @@
       />
     </div>
 
-    <!-- 选中状态指示器 - 始终响应，便于编辑隐藏组件 -->
+    <!-- Check status indicator - always responsive，Easy to edit hidden components -->
     <div v-if="isSelected && !readonly" class="selection-indicator" />
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * 统一的节点外框组件
- * 为Canvas和GridLayoutPlus渲染器提供一致的节点包装
- * 负责标题显示/编辑、基础配置应用、选中状态等
+ * Unified node frame component
+ * forCanvasandGridLayoutPlusRenderer provides consistent node wrapping
+ * Responsible for title display/edit、Basic configuration application、Selected status, etc.
  */
 
 import { ref, computed, nextTick, watch, watchEffect, onMounted, onUnmounted, h } from 'vue'
@@ -84,28 +84,28 @@ import type { BaseConfiguration, WidgetConfiguration } from '@/components/visual
 import type { VisualEditorWidget } from '@/components/visual-editor/types'
 
 interface Props {
-  /** 节点数据 */
+  /** Node data */
   node: VisualEditorWidget
-  /** 节点ID */
+  /** nodeID */
   nodeId: string
-  /** 是否只读模式 */
+  /** Whether to read-only mode */
   readonly?: boolean
-  /** 是否显示调整大小句柄 */
+  /** Whether to show resize handles */
   showResizeHandles?: boolean
-  /** 是否选中 */
+  /** Check or not */
   isSelected?: boolean
-  /** 强制显示标题（忽略配置） */
+  /** Force display of title（Ignore configuration） */
   forceShowTitle?: boolean
-  /** 获取组件的方法（用于非Card2组件） */
+  /** How to get the component（Used for nonCard2components） */
   getWidgetComponent?: (type: string) => any
-  /** 多数据源数据 */
+  /** Multiple data sources */
   multiDataSourceData?: Record<string, any>
-  /** 多数据源配置 */
+  /** Multiple data source configuration */
   multiDataSourceConfig?: any
   /**
-   * 事件传播控制开关（默认 true）：
-   * - true：调用内部交互时阻止事件冒泡（适用于 Canvas 渲染器交互）
-   * - false：允许事件冒泡到父级（GridStack 需要在整卡片区域接收 mousedown 以触发拖拽）
+   * event propagation control switch（default true）：
+   * - true：Prevent event bubbling when calling internal interactions（Applicable to Canvas Renderer interaction）
+   * - false：Allow events to bubble up to the parent（GridStack Need to be received in the entire card area mousedown to trigger drag）
    */
   eventStopPropagation?: boolean
 }
@@ -121,47 +121,47 @@ interface Emits {
 
 const props = defineProps<Props>()
 
-// 计算属性，从props中提取多数据源数据和配置，提供给组件
+// Computed properties，frompropsExtract data and configuration from multiple data sources，Provided to components
 const multiDataSourceData = computed(() => props.multiDataSourceData || {})
 const multiDataSourceConfig = computed(() => props.multiDataSourceConfig || {})
 const emit = defineEmits<Emits>()
 
 /**
- * 🔥 优化的事件处理函数：确保GridStack拖拽流畅性
- * - 在 GridStack 集成场景下，允许整卡片区域的 mousedown 冒泡到 .grid-stack-item，触发拖拽
- * - 在 Canvas 集成场景下，默认阻止冒泡以防止被背景层捕获
- * - 避免在拖拽过程中的不必要事件处理
+ * 🔥 Optimized event handling function：make sureGridStackDrag and drop fluidity
+ * - exist GridStack In the integration scenario，The entire card area is allowed mousedown bubble to .grid-stack-item，Trigger drag
+ * - exist Canvas In the integration scenario，Bubbling is blocked by default to prevent being captured by the background layer
+ * - Avoid unnecessary event handling during dragging and dropping
  */
 const onMouseDown = (event: MouseEvent): void => {
-  // 🔥 关键修复：在GridStack环境下，优先保证拖拽流畅性
+  // 🔥 critical fix：existGridStackenvironment，Prioritize drag and drop smoothness
   if (props.eventStopPropagation === false) {
-    // GridStack模式：不阻止冒泡，让GridStack处理拖拽
+    // GridStackmodel：Does not prevent bubbling，letGridStackHandling drag and drop
     emit('node-mousedown', props.nodeId, event)
     return
   }
   
-  // Canvas模式：阻止冒泡，自行处理
+  // Canvasmodel：Stop bubbling，Handle it yourself
   event.stopPropagation()
   emit('node-mousedown', props.nodeId, event)
 }
 
 const onClick = (event: MouseEvent): void => {
-  // 🔥 关键修复：点击事件优化，避免干扰拖拽
+  // 🔥 critical fix：Click event optimization，Avoid interfering with dragging
   if (props.eventStopPropagation === false) {
-    // GridStack模式：延迟处理点击，避免干扰拖拽
+    // GridStackmodel：Delay processing of clicks，Avoid interfering with dragging
     setTimeout(() => {
       emit('node-click', props.nodeId, event)
     }, 0)
     return
   }
   
-  // Canvas模式：立即处理
+  // Canvasmodel：Process immediately
   event.stopPropagation()
   emit('node-click', props.nodeId, event)
 }
 
 const onContextMenu = (event: MouseEvent): void => {
-  // 始终阻止默认右键菜单，以便自定义菜单展示
+  // Always block default right-click menu，to customize menu display
   event.preventDefault()
   if (props.eventStopPropagation !== false) {
     event.stopPropagation()
@@ -172,7 +172,7 @@ const onContextMenu = (event: MouseEvent): void => {
 const { updateNode } = useEditor()
 const { t } = useI18n()
 
-// 调试：监听node.metadata变化
+// debug：monitornode.metadatachange
 watch(
   () => props.node.metadata,
   newMetadata => {
@@ -182,7 +182,7 @@ watch(
   { deep: true, immediate: true }
 )
 
-// 调试：监听多数据源数据变化
+// debug：Monitor data changes from multiple data sources
 watch(
   () => props.multiDataSourceData,
   newMultiDataSourceData => {
@@ -194,16 +194,16 @@ watch(
   { deep: true, immediate: true }
 )
 
-// 模板引用
+// template reference
 const nodeElement = ref<HTMLElement>()
 const titleInputRef = ref<InstanceType<typeof NInput>>()
 
-// 标题编辑状态
+// Title editing status
 const isEditingTitle = ref(false)
 const editingTitleValue = ref('')
 const originalTitleValue = ref('')
 
-// 调整大小句柄定义
+// resize handle definition
 const resizeHandles = [
   { position: 'nw' },
   { position: 'n' },
@@ -215,7 +215,7 @@ const resizeHandles = [
   { position: 'se' }
 ]
 
-// 🔥 修复：获取基础配置，使用静态默认值避免重复创建对象
+// 🔥 repair：Get basic configuration，Use static defaults to avoid duplicate object creation
 const defaultBaseConfig: BaseConfiguration = {
   showTitle: false,
   title: '',
@@ -225,13 +225,13 @@ const defaultBaseConfig: BaseConfiguration = {
   margin: { top: 0, right: 0, bottom: 0, left: 0 }
 }
 
-// 🔥 修复递归更新：使用ref + watchEffect替代computed，避免在计算属性中触发配置系统
+// 🔥 Fix recursive updates：useref + watchEffectsubstitutecomputed，Avoid triggering configuration system in computed properties
 const baseConfigRef = ref<BaseConfiguration>(defaultBaseConfig)
 
-// 🔥 修复递归更新：将配置获取逻辑移到watchEffect中，并添加防抖
+// 🔥 Fix recursive updates：Move config fetch logic towatchEffectmiddle，and add anti-shake
 const updateBaseConfig = useDebounceFn(() => {
   try {
-    // 🔥 统一使用配置管理器获取配置，无论是否为Card2组件
+    // 🔥 Unified use of configuration manager to obtain configuration，whether it isCard2components
     const widgetConfig = configurationManager.getConfiguration(props.nodeId)
 
     if (!widgetConfig?.base) {
@@ -244,21 +244,21 @@ const updateBaseConfig = useDebounceFn(() => {
       ...widgetConfig.base
     }
   } catch (error) {
-    console.error(`[NodeWrapper] 获取节点 ${props.nodeId} 基础配置失败:`, error)
+    console.error(`[NodeWrapper] Get node ${props.nodeId} Basic configuration failed:`, error)
     baseConfigRef.value = defaultBaseConfig
   }
-}, 50) // 50ms防抖，避免频繁更新
+}, 50) // 50msAnti-shake，Avoid frequent updates
 
-// 🔥 简化的Card2配置获取，使用配置管理器避免DOM操作
+// 🔥 simplifiedCard2Configuration acquisition，Use Configuration Manager to avoidDOMoperate
 const getBaseConfigFromCard2 = (): BaseConfiguration | null => {
   try {
-    // 🔥 优先使用配置管理器获取配置
+    // 🔥 Prefer using the configuration manager to obtain configuration
     const config = configurationManager.getConfiguration(props.nodeId)
     if (config?.base) {
       return config.base
     }
 
-    // 🔥 回退：发送自定义事件请求配置
+    // 🔥 rollback：Send custom event request configuration
     const configRequestEvent = new CustomEvent('card2-config-request', {
       detail: { componentId: props.nodeId, layer: 'base' }
     })
@@ -276,15 +276,15 @@ const getBaseConfigFromCard2 = (): BaseConfiguration | null => {
 
     return receivedConfig
   } catch (error) {
-    console.error(`[NodeWrapper] 获取Card2配置失败 ${props.nodeId}:`, error)
+    console.error(`[NodeWrapper] GetCard2Configuration failed ${props.nodeId}:`, error)
     return null
   }
 }
 
-// 🔥 修复递归更新：使用计算属性引用ref，避免直接在computed中调用配置系统
+// 🔥 Fix recursive updates：Using computed property referencesref，avoid directlycomputedCall the configuration system in
 const baseConfig = computed(() => baseConfigRef.value)
 
-// 🔥 修复递归更新：使用ref避免在computed中调用配置系统
+// 🔥 Fix recursive updates：userefavoid incomputedCall the configuration system in
 const nodeComponentConfigRef = ref<any>(undefined)
 const nodeInteractionConfigsRef = ref<any[]>([])
 const nodeInteractionPermissionsRef = ref<any>({
@@ -292,24 +292,24 @@ const nodeInteractionPermissionsRef = ref<any>({
   allowedEvents: ['click', 'hover', 'focus', 'blur']
 })
 
-// 🔥 修复递归更新：统一的配置更新函数，防抖处理
+// 🔥 Fix recursive updates：Unified configuration update function，Anti-shake processing
 const updateAllConfigs = useDebounceFn(() => {
   try {
     const widgetConfig = configurationManager.getConfiguration(props.nodeId)
     
-    // 更新组件配置
+    // Update component configuration
     nodeComponentConfigRef.value = widgetConfig?.component?.properties || undefined
     
-    // 更新交互配置
+    // Update interaction configuration
     nodeInteractionConfigsRef.value = widgetConfig?.interaction?.configs || []
     
-    // 更新交互权限
+    // Update interaction permissions
     nodeInteractionPermissionsRef.value = widgetConfig?.interaction?.permissions || {
       allowExternalControl: true,
       allowedEvents: ['click', 'hover', 'focus', 'blur']
     }
   } catch (error) {
-    console.error(`[NodeWrapper] 获取节点 ${props.nodeId} 配置失败:`, error)
+    console.error(`[NodeWrapper] Get node ${props.nodeId} Configuration failed:`, error)
     nodeComponentConfigRef.value = undefined
     nodeInteractionConfigsRef.value = []
     nodeInteractionPermissionsRef.value = {
@@ -319,12 +319,12 @@ const updateAllConfigs = useDebounceFn(() => {
   }
 }, 50)
 
-// 🔥 修复递归更新：使用计算属性引用ref
+// 🔥 Fix recursive updates：Using computed property referencesref
 const nodeComponentConfig = computed(() => nodeComponentConfigRef.value)
 const nodeInteractionConfigs = computed(() => nodeInteractionConfigsRef.value)
 const nodeInteractionPermissions = computed(() => nodeInteractionPermissionsRef.value)
 
-// 保持向后兼容的函数版本
+// Maintain backward-compatible function versions
 const getNodeComponentConfig = (nodeId: string): any => {
   if (nodeId === props.nodeId) {
     return nodeComponentConfig.value
@@ -333,7 +333,7 @@ const getNodeComponentConfig = (nodeId: string): any => {
     const widgetConfig = configurationManager.getConfiguration(nodeId)
     return widgetConfig?.component?.properties
   } catch (error) {
-    console.error(`[NodeWrapper] 获取节点 ${nodeId} 组件配置失败:`, error)
+    console.error(`[NodeWrapper] Get node ${nodeId} Component configuration failed:`, error)
     return undefined
   }
 }
@@ -346,7 +346,7 @@ const getNodeInteractionConfigs = (nodeId: string): any[] => {
     const widgetConfig = configurationManager.getConfiguration(nodeId)
     return widgetConfig?.interaction?.configs || []
   } catch (error) {
-    console.error(`[NodeWrapper] 获取节点 ${nodeId} 交互配置失败:`, error)
+    console.error(`[NodeWrapper] Get node ${nodeId} Interactive configuration failed:`, error)
     return []
   }
 }
@@ -364,7 +364,7 @@ const getNodeInteractionPermissions = (nodeId: string): any => {
       }
     )
   } catch (error) {
-    console.error(`[NodeWrapper] 获取节点 ${nodeId} 交互权限失败:`, error)
+    console.error(`[NodeWrapper] Get node ${nodeId} Interaction permission failed:`, error)
     return {
       allowExternalControl: true,
       allowedEvents: ['click', 'hover', 'focus', 'blur']
@@ -372,16 +372,16 @@ const getNodeInteractionPermissions = (nodeId: string): any => {
   }
 }
 
-// 🔥 修复递归更新：使用watchEffect来响应配置变化，而不是在computed中调用
+// 🔥 Fix recursive updates：usewatchEffectto respond to configuration changes，rather than incomputedcall in
 watchEffect(() => {
-  // 监听props.nodeId变化，触发配置更新
+  // monitorprops.nodeIdchange，Trigger configuration update
   if (props.nodeId) {
     updateBaseConfig()
     updateAllConfigs()
   }
 })
 
-// 标题显示逻辑
+// Title display logic
 const shouldShowTitle = computed(() => {
   return props.forceShowTitle || baseConfig.value.showTitle
 })
@@ -390,39 +390,39 @@ const displayTitle = computed(() => {
   return baseConfig.value.title || props.node.label || props.node.type || t('config.base.untitledComponent')
 })
 
-// 样式计算
+// style calculation
 const wrapperStyles = computed(() => {
   const config = baseConfig.value
   const styles: Record<string, string> = {}
 
-  // 🔧 透明度
+  // 🔧 transparency
   if (config.opacity !== undefined && config.opacity !== 1) {
     styles.opacity = config.opacity.toString()
   }
 
-  // 🔧 背景颜色 - 如果配置了则覆盖默认值
+  // 🔧 background color - Overrides default value if configured
   if (config.backgroundColor) {
     styles.backgroundColor = config.backgroundColor
   }
 
-  // 🔧 边框样式 - 完整的边框配置
+  // 🔧 border style - Complete bezel configuration
   if (config.borderWidth !== undefined) {
     styles.borderWidth = `${config.borderWidth}px`
     styles.borderStyle = config.borderStyle || 'solid'
     styles.borderColor = config.borderColor || 'var(--border-color)'
   }
 
-  // 🔧 圆角 - 如果配置了则覆盖默认值
+  // 🔧 rounded corners - Overrides default value if configured
   if (config.borderRadius !== undefined) {
     styles.borderRadius = `${config.borderRadius}px`
   }
 
-  // 🔧 阴影 - 如果配置了则覆盖默认值
+  // 🔧 shadow - Overrides default value if configured
   if (config.boxShadow) {
     styles.boxShadow = config.boxShadow
   }
 
-  // 🔧 外边距配置
+  // 🔧 Margin configuration
   if (config.margin) {
     const { top = 0, right = 0, bottom = 0, left = 0 } = config.margin
     styles.margin = `${top}px ${right}px ${bottom}px ${left}px`
@@ -442,7 +442,7 @@ const wrapperClasses = computed(() => {
     classes.push('readonly')
   }
 
-  // 添加隐藏状态类，用于样式调整（但不影响事件）
+  // Add hidden state class，for style adjustment（but does not affect the event）
   if (baseConfig.value.visible === false) {
     classes.push('content-hidden')
   }
@@ -469,7 +469,7 @@ const contentStyles = computed(() => {
     overflow: 'hidden' as const
   }
 
-  // 内边距 - 应用到内容区域
+  // padding - Apply to content area
   if (config.padding) {
     const { top = 0, right = 0, bottom = 0, left = 0 } = config.padding
     styles.padding = `${top}px ${right}px ${bottom}px ${left}px`
@@ -478,7 +478,7 @@ const contentStyles = computed(() => {
   return styles
 })
 
-// 标题编辑方法
+// Title editing method
 const startTitleEdit = () => {
   if (props.readonly) return
 
@@ -499,7 +499,7 @@ const finishTitleEdit = () => {
   isEditingTitle.value = false
 
   if (newTitle !== originalTitleValue.value) {
-    // 更新到配置管理器
+    // Update to configuration manager
     try {
       const currentConfig = configurationManager.getConfiguration(props.nodeId) || {
         base: {},
@@ -514,14 +514,14 @@ const finishTitleEdit = () => {
         showTitle: true
       })
 
-      // 同时更新节点的label属性以保持兼容性
+      // Update nodes at the same timelabelproperties to maintain compatibility
       updateNode(props.nodeId, { label: newTitle })
 
       emit('title-update', props.nodeId, newTitle)
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[NodeWrapper] 更新标题失败:`, error)
+      console.error(`[NodeWrapper] Failed to update title:`, error)
     }
   }
 }
@@ -531,14 +531,14 @@ const cancelTitleEdit = () => {
   editingTitleValue.value = originalTitleValue.value
 }
 
-// 配置变化监听器取消函数
+// Configuration change listener cancellation function
 let removeConfigListener: (() => void) | null = null
 
-// 🔥 修复递归更新：优化Card2配置变更事件处理，避免触发新的计算循环
+// 🔥 Fix recursive updates：optimizationCard2Configuration change event handling，Avoid triggering new calculation loops
 const handleCard2ConfigChange = (event: CustomEvent) => {
   const { componentId, layer, config } = event.detail
   if (componentId === props.nodeId && layer === 'base') {
-    // 🔥 直接更新ref，避免重新调用配置系统
+    // 🔥 direct updateref，Avoid re-invoking the configuration system
     if (config) {
       baseConfigRef.value = {
         ...defaultBaseConfig,
@@ -548,15 +548,15 @@ const handleCard2ConfigChange = (event: CustomEvent) => {
   }
 }
 
-// 监听配置管理器的配置变化
+// Listen for configuration changes in the configuration manager
 onMounted(() => {
   try {
-    // 🔥 为Card2组件监听配置变更事件
+    // 🔥 forCard2Component listens for configuration change events
     if (props.node.metadata?.isCard2Component) {
       window.addEventListener('card2-config-update', handleCard2ConfigChange as EventListener)
     }
 
-    // 检查节点是否有配置，如果没有则创建默认配置（仅用于非Card2组件）
+    // Check if the node is configured，If not, create a default configuration（Only for non-Card2components）
     if (!props.node.metadata?.isCard2Component) {
       const existingConfig = configurationManager.getConfiguration(props.nodeId)
       if (!existingConfig) {
@@ -582,32 +582,32 @@ onMounted(() => {
       }
     }
   } catch (error) {
-    console.error(`[NodeWrapper] 配置监听器添加失败:`, error)
+    console.error(`[NodeWrapper] Failed to add configuration listener:`, error)
   }
 })
 
 onUnmounted(() => {
-  // 🔥 清理Card2配置变更事件监听器
+  // 🔥 clean upCard2Configure change event listener
   if (props.node.metadata?.isCard2Component) {
     window.removeEventListener('card2-config-update', handleCard2ConfigChange as EventListener)
   }
 
-  // 清理旧的配置监听器（如果存在）
+  // Clean up old configuration listeners（if exists）
   if (removeConfigListener) {
     try {
       removeConfigListener()
     } catch (error) {
-      console.error(`[NodeWrapper] 移除配置监听器失败:`, error)
+      console.error(`[NodeWrapper] Failed to remove configuration listener:`, error)
     }
   }
 })
 
-// 监听节点变化，同步标题
+// Monitor node changes，Sync title
 watch(
   () => props.node.label,
   newLabel => {
     if (!isEditingTitle.value && newLabel && !baseConfig.value.title) {
-      // 如果配置中没有标题但节点有label，尝试同步
+      // If there is no header in the configuration but the node doeslabel，Try to sync
       try {
         const currentConfig = configurationManager.getConfiguration(props.nodeId)
         if (currentConfig && !currentConfig.base?.title) {
@@ -617,7 +617,7 @@ watch(
           })
         }
       } catch (error) {
-        // 忽略同步错误
+        // Ignore sync errors
       }
     }
   }
@@ -626,29 +626,29 @@ watch(
 
 <style scoped>
 .node-wrapper {
-  /* 🔧 基本布局样式，不干扰base配置 */
+  /* 🔧 Basic layout style，do not interferebaseConfiguration */
   width: 100%;
   height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
 
-  /* 保留必要的交互样式 */
+  /* Preserve necessary interaction styles */
   transition:
     opacity 0.3s ease,
     border-color 0.2s ease;
   overflow: hidden;
 
-  /* 🔧 最小的默认样式，保证可见性 */
-  border: 1px solid transparent; /* 最小边框，用于选中状态 */
+  /* 🔧 minimal default style，Ensure visibility */
+  border: 1px solid transparent; /* minimum border，for selected state */
 
-  /* 🔧 确保在grid-item-body透明化后有基本可见样式 */
+  /* 🔧 Make sure togrid-item-bodyThere is a basic visible style after transparency */
   background-color: var(--card-color);
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* 🔧 内容包装器样式 */
+/* 🔧 Content wrapper style */
 .node-content-wrapper {
   width: 100%;
   height: 100%;
@@ -656,15 +656,15 @@ watch(
   flex-direction: column;
 }
 
-/* 🔧 隐藏内容时的视觉反馈（编辑模式） */
+/* 🔧 Visual feedback when hiding content（edit mode） */
 .node-wrapper.content-hidden:not(.readonly) {
-  /* 为编辑模式下的隐藏组件提供视觉提示 */
+  /* Provides visual cues for hidden components in edit mode */
   background-color: rgba(128, 128, 128, 0.1);
   border: 2px dashed rgba(128, 128, 128, 0.3);
 }
 
 .node-wrapper.content-hidden:not(.readonly)::before {
-  content: '隐藏';
+  content: 'hide';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -679,13 +679,13 @@ watch(
 }
 
 .node-wrapper:hover:not(.readonly) {
-  /* 🔧 简化hover效果，不覆盖base配置 */
+  /* 🔧 simplifyhoverEffect，Not coveredbaseConfiguration */
   border-color: rgba(24, 160, 88, 0.3);
 }
 
 .node-wrapper.selected {
-  /* 🔧 简化选中效果，不覆盖base配置 */
-  border-color: var(--primary-color) !important; /* !important保证选中效果 */
+  /* 🔧 Simplify selection effect，Not coveredbaseConfiguration */
+  border-color: var(--primary-color) !important; /* !importantGuaranteed selection effect */
   z-index: 1;
 }
 
@@ -816,7 +816,7 @@ watch(
   box-shadow: 0 0 0 1px rgba(24, 160, 88, 0.1);
 }
 
-/* 主题适配 */
+/* Theme adaptation */
 [data-theme='dark'] .node-wrapper {
   background-color: var(--card-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -832,7 +832,7 @@ watch(
   border-bottom-color: var(--border-color);
 }
 
-/* 自定义类支持 */
+/* Custom class support */
 .node-wrapper.minimal {
   border: none;
   box-shadow: none;
@@ -845,7 +845,7 @@ watch(
   box-shadow: var(--box-shadow);
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .node-title-bar {
     padding: 4px 6px;

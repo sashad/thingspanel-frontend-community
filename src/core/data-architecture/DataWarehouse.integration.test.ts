@@ -1,12 +1,12 @@
 /**
- * 数据仓库集成测试
- * 测试 DataWarehouse 与 SimpleDataBridge 的集成功能
+ * Data warehouse integration testing
+ * test DataWarehouse and SimpleDataBridge Integrated functions
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { simpleDataBridge, type ComponentDataRequirement } from '@/core/data-architecture/SimpleDataBridge'
 import { dataWarehouse } from '@/core/data-architecture/DataWarehouse'
 
-// Mock UnifiedDataExecutor 以避免实际网络请求
+// Mock UnifiedDataExecutor to avoid actual network requests
 vi.mock('./UnifiedDataExecutor', () => ({
   unifiedDataExecutor: {
     execute: vi.fn()
@@ -15,19 +15,19 @@ vi.mock('./UnifiedDataExecutor', () => ({
 
 import { unifiedDataExecutor } from '@/core/data-architecture/UnifiedDataExecutor'
 
-describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
+describe('DataWarehouse and SimpleDataBridge Integration testing', () => {
   beforeEach(() => {
-    // 清理所有缓存和状态
+    // Clear all cache and status
     dataWarehouse.clearAllCache()
     dataWarehouse.resetPerformanceMetrics()
 
-    // 重置mock
+    // resetmock
     vi.clearAllMocks()
   })
 
-  describe('缓存集成功能', () => {
-    it('应该在首次执行后缓存数据', async () => {
-      // Mock 数据执行器返回成功结果
+  describe('Cache integration features', () => {
+    it('Data should be cached after first execution', async () => {
+      // Mock Data executor returns successful result
       const mockData = { temperature: 25, humidity: 60 }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
@@ -47,19 +47,19 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         ]
       }
 
-      // 首次执行
+      // first execution
       const result1 = await simpleDataBridge.executeComponent(requirement)
 
       expect(result1.success).toBe(true)
       expect(result1.data).toEqual({ sensor1: mockData })
       expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(1)
 
-      // 验证数据已缓存
+      // Verification data is cached
       const cachedData = simpleDataBridge.getComponentData('testComponent')
       expect(cachedData).toEqual({ sensor1: mockData })
     })
 
-    it('应该在第二次执行时使用缓存', async () => {
+    it('The cache should be used on the second execution', async () => {
       const mockData = { status: 'active' }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
@@ -79,23 +79,23 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         ]
       }
 
-      // 首次执行 - 会调用执行器
+      // first execution - will call the executor
       await simpleDataBridge.executeComponent(requirement)
       expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(1)
 
-      // 再次执行 - 应该使用缓存，不调用执行器
+      // Execute again - Caching should be used，Do not call the executor
       const result2 = await simpleDataBridge.executeComponent(requirement)
 
       expect(result2.success).toBe(true)
       expect(result2.data).toEqual({ api1: mockData })
-      expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(1) // 仍然是1次
+      expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(1) // still1Second-rate
     })
 
-    it('应该支持多数据源缓存', async () => {
+    it('Multiple data source caching should be supported', async () => {
       const sensorData = { temperature: 22 }
       const apiData = { online: true }
 
-      // Mock 不同调用返回不同数据
+      // Mock Different calls return different data
       ;(unifiedDataExecutor.execute as any)
         .mockResolvedValueOnce({ success: true, data: sensorData })
         .mockResolvedValueOnce({ success: true, data: apiData })
@@ -125,7 +125,7 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
       })
       expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(2)
 
-      // 验证缓存包含所有数据源
+      // Verify cache contains all data sources
       const cachedData = simpleDataBridge.getComponentData('multiSourceComponent')
       expect(cachedData).toEqual({
         sensor1: sensorData,
@@ -134,8 +134,8 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
     })
   })
 
-  describe('缓存管理功能', () => {
-    it('应该支持清除单个组件缓存', async () => {
+  describe('Cache management function', () => {
+    it('Should support clearing individual component caches', async () => {
       const mockData = { value: 100 }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
@@ -153,16 +153,16 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         ]
       }
 
-      // 执行并缓存数据
+      // Execute and cache data
       await simpleDataBridge.executeComponent(requirement)
       expect(simpleDataBridge.getComponentData('clearTestComponent')).not.toBeNull()
 
-      // 清除缓存
+      // clear cache
       simpleDataBridge.clearComponentCache('clearTestComponent')
       expect(simpleDataBridge.getComponentData('clearTestComponent')).toBeNull()
     })
 
-    it('应该支持清除所有缓存', async () => {
+    it('Should support clearing all caches', async () => {
       const mockData1 = { value: 1 }
       const mockData2 = { value: 2 }
 
@@ -170,7 +170,7 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         .mockResolvedValueOnce({ success: true, data: mockData1 })
         .mockResolvedValueOnce({ success: true, data: mockData2 })
 
-      // 创建两个组件的缓存
+      // Create a cache for both components
       await simpleDataBridge.executeComponent({
         componentId: 'comp1',
         dataSources: [{ id: 'data1', type: 'json', config: {} }]
@@ -181,11 +181,11 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         dataSources: [{ id: 'data2', type: 'json', config: {} }]
       })
 
-      // 验证都已缓存
+      // Authentication is cached
       expect(simpleDataBridge.getComponentData('comp1')).not.toBeNull()
       expect(simpleDataBridge.getComponentData('comp2')).not.toBeNull()
 
-      // 清除所有缓存
+      // clear all cache
       simpleDataBridge.clearAllCache()
 
       expect(simpleDataBridge.getComponentData('comp1')).toBeNull()
@@ -193,21 +193,21 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
     })
   })
 
-  describe('性能监控集成', () => {
-    it('应该提供仓库性能指标', async () => {
+  describe('Performance monitoring integration', () => {
+    it('Warehouse performance metrics should be provided', async () => {
       const mockData = { test: 'data' }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
         data: mockData
       })
 
-      // 执行一些操作
+      // perform some actions
       await simpleDataBridge.executeComponent({
         componentId: 'perfTestComp',
         dataSources: [{ id: 'data1', type: 'json', config: {} }]
       })
 
-      // 多次获取数据以生成指标
+      // Fetch data multiple times to generate metrics
       simpleDataBridge.getComponentData('perfTestComp')
       simpleDataBridge.getComponentData('perfTestComp')
       simpleDataBridge.getComponentData('nonexistent') // miss
@@ -219,7 +219,7 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
       expect(warehouseMetrics.totalRequests).toBeGreaterThan(0)
     })
 
-    it('应该提供存储统计信息', async () => {
+    it('Storage statistics should be provided', async () => {
       const mockData = { size: 'test' }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
@@ -242,7 +242,7 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
       expect(storageStats.totalComponents).toBeGreaterThanOrEqual(1)
     })
 
-    it('应该在getStats中包含仓库信息', async () => {
+    it('should be ingetStatsContains warehouse information', async () => {
       const mockData = { info: 'test' }
       ;(unifiedDataExecutor.execute as any).mockResolvedValue({
         success: true,
@@ -264,9 +264,9 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
     })
   })
 
-  describe('缓存过期处理', () => {
-    it('应该在缓存过期后重新执行', async () => {
-      // 设置很短的缓存过期时间
+  describe('Cache expiration processing', () => {
+    it('Should be re-executed after the cache expires', async () => {
+      // Set a very short cache expiration time
       simpleDataBridge.setCacheExpiry(50) // 50ms
 
       const mockData = { timestamp: Date.now() }
@@ -280,22 +280,22 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
         dataSources: [{ id: 'data1', type: 'json', config: {} }]
       }
 
-      // 首次执行
+      // first execution
       await simpleDataBridge.executeComponent(requirement)
       expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(1)
 
-      // 等待缓存过期
+      // Wait for cache to expire
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      // 再次执行，应该重新调用执行器
+      // Execute again，The executor should be re-invoked
       await simpleDataBridge.executeComponent(requirement)
       expect(unifiedDataExecutor.execute).toHaveBeenCalledTimes(2)
     })
   })
 
-  describe('错误处理集成', () => {
-    it('应该在执行器失败时不缓存错误结果', async () => {
-      ;(unifiedDataExecutor.execute as any).mockRejectedValue(new Error('执行失败'))
+  describe('Error handling integration', () => {
+    it('Error results should not be cached on executor failure', async () => {
+      ;(unifiedDataExecutor.execute as any).mockRejectedValue(new Error('Execution failed'))
 
       const requirement: ComponentDataRequirement = {
         componentId: 'errorTestComp',
@@ -304,18 +304,18 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
 
       const result = await simpleDataBridge.executeComponent(requirement)
 
-      expect(result.success).toBe(true) // SimpleDataBridge 使用 Promise.allSettled
-      expect(result.data).toEqual({ data1: null }) // 失败的数据源返回null
+      expect(result.success).toBe(true) // SimpleDataBridge use Promise.allSettled
+      expect(result.data).toEqual({ data1: null }) // Failed data source returnsnull
 
-      // 验证错误结果未被缓存
+      // Validation error results are not cached
       const cachedData = simpleDataBridge.getComponentData('errorTestComp')
-      // 可能缓存了包含null的结果，这是正常行为
+      // May contain cachednullthe result，this is normal behavior
       expect(cachedData).toEqual({ data1: null })
     })
   })
 
-  describe('数据回调通知', () => {
-    it('应该在数据更新时通知回调', async () => {
+  describe('Data callback notification', () => {
+    it('The callback should be notified when the data is updated', async () => {
       const mockCallback = vi.fn()
       const unsubscribe = simpleDataBridge.onDataUpdate(mockCallback)
 
@@ -332,19 +332,19 @@ describe('DataWarehouse 与 SimpleDataBridge 集成测试', () => {
 
       expect(mockCallback).toHaveBeenCalledWith('callbackTestComp', { data1: mockData })
 
-      // 清理
+      // clean up
       unsubscribe()
     })
   })
 
-  describe('销毁和资源清理', () => {
-    it('应该在销毁时清理仓库资源', () => {
-      // 存储一些数据
+  describe('Destruction and resource cleanup', () => {
+    it('Warehouse resources should be cleaned up when destroyed', () => {
+      // store some data
       dataWarehouse.storeComponentData('comp1', 'data1', { test: 1 }, 'json')
 
       expect(dataWarehouse.getStorageStats().totalComponents).toBeGreaterThan(0)
 
-      // 销毁SimpleDataBridge应该同时清理仓库
+      // destroySimpleDataBridgeThe warehouse should be cleaned at the same time
       simpleDataBridge.destroy()
 
       expect(dataWarehouse.getStorageStats().totalComponents).toBe(0)

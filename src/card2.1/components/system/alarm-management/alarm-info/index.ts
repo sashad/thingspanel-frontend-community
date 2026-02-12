@@ -1,7 +1,7 @@
 import definition from './definition'
 
 /**
- * @description 告警信息组件导出
- * @summary 默认导出组件定义，供 `card2.1` 自动注册系统使用。
+ * @description Alarm information component export
+ * @summary Default export component definition，for `card2.1` Automatic registration system use。
  */
 export default definition

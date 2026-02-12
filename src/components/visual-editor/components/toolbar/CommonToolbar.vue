@@ -1,6 +1,6 @@
 <!--
-  公共工具栏组件
-  包含保存、撤销、重做、视图控制等通用功能
+  Common toolbar components
+  Contains save、Cancel、Redo、Common functions such as view control
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -40,17 +40,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 计算属性
+// Computed properties
 const saveButtonType = computed(() => (props.hasChanges ? 'primary' : 'default'))
 const saveButtonText = computed(() => (props.isSaving ? $t('visualEditor.saving') : $t('common.save')))
 
-// 检查是否为Canvas渲染器
+// Check if it isCanvasRenderer
 const isCanvasRenderer = computed(() => props.currentRenderer === 'canvas')
 const isSaveDisabled = computed(
   () => props.readonly || (!props.hasChanges && !props.isSaving) || isCanvasRenderer.value
 )
 
-// 事件处理
+// event handling
 const handleSave = () => emit('save')
 const handleUndo = () => emit('undo')
 const handleRedo = () => emit('redo')
@@ -65,7 +65,7 @@ const handleCenterView = () => emit('center-view')
 <template>
   <div class="common-toolbar">
     <NSpace align="center" :size="8">
-      <!-- 文档操作 -->
+      <!-- Document operations -->
       <NTooltip trigger="hover">
         <template #trigger>
           <NButton
@@ -87,7 +87,7 @@ const handleCenterView = () => emit('center-view')
 
       <NDivider vertical />
 
-      <!-- 撤销/重做 -->
+      <!-- Cancel/Redo -->
       <NTooltip trigger="hover">
         <template #trigger>
           <NButton size="small" type="tertiary" :disabled="readonly || !canUndo" @click="handleUndo">
@@ -112,7 +112,7 @@ const handleCenterView = () => emit('center-view')
 
       <NDivider vertical />
 
-      <!-- 视图控制 -->
+      <!-- View control -->
       <NTooltip trigger="hover">
         <template #trigger>
           <NButton size="small" type="tertiary" @click="handleZoomOut">
@@ -148,7 +148,7 @@ const handleCenterView = () => emit('center-view')
 
       <NDivider vertical />
 
-      <!-- 画布控制 -->
+      <!-- Canvas control -->
       <NTooltip trigger="hover">
         <template #trigger>
           <NButton size="small" type="tertiary" @click="handleFitContent">
@@ -173,7 +173,7 @@ const handleCenterView = () => emit('center-view')
 
       <NDivider vertical />
 
-      <!-- 重置 -->
+      <!-- reset -->
       <NTooltip trigger="hover">
         <template #trigger>
           <NButton size="small" type="warning" secondary :disabled="readonly" @click="handleReset">
@@ -196,7 +196,7 @@ const handleCenterView = () => emit('center-view')
   justify-content: center;
 }
 
-/* 按钮悬停效果 */
+/* Button hover effect */
 .n-button {
   transition: all 0.2s var(--n-bezier);
 }
@@ -205,12 +205,12 @@ const handleCenterView = () => emit('center-view')
   transform: translateY(-1px);
 }
 
-/* 图标样式 */
+/* icon style */
 .n-button .svg-icon {
   font-size: 16px;
 }
 
-/* 分割线样式 */
+/* Divider style */
 .n-divider {
   margin: 0 4px;
 }

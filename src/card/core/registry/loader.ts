@@ -1,27 +1,27 @@
 /**
- * 组件动态加载器
- * 实现组件的懒加载和缓存管理
+ * Component dynamic loader
+ * Implement lazy loading and cache management of components
  */
 
 import type { IComponentLoader, IComponentDefinition } from '../types/component'
 import { componentRegistry } from './index'
 
 /**
- * 加载状态类型
+ * Loading status type
  */
 type LoadingState = 'loading' | 'loaded' | 'error' | 'not-found'
 
 /**
- * 组件加载器实现类
+ * Component loader implementation class
  */
 export class ComponentLoader implements IComponentLoader {
-  /** 加载状态缓存 */
+  /** Load state cache */
   private loadingStates = new Map<string, LoadingState>()
-  /** 加载Promise缓存 */
+  /** loadPromisecache */
   private loadingPromises = new Map<string, Promise<IComponentDefinition>>()
-  /** 错误信息缓存 */
+  /** Error message cache */
   private errors = new Map<string, Error>()
-  /** 组件路径映射 */
+  /** Component path mapping */
   private componentPaths = new Map<string, string>()
 
   constructor() {
@@ -29,25 +29,25 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 动态加载组件
-   * @param componentId 组件ID
-   * @returns 组件定义Promise
+   * Dynamically load components
+   * @param componentId componentsID
+   * @returns Component definitionPromise
    */
   async load(componentId: string): Promise<IComponentDefinition> {
-    // 检查是否已经加载
+    // Check if it has been loaded
     const existingDefinition = componentRegistry.getDefinition(componentId)
     if (existingDefinition) {
       this.loadingStates.set(componentId, 'loaded')
       return existingDefinition
     }
 
-    // 检查是否正在加载
+    // Check if loading
     const existingPromise = this.loadingPromises.get(componentId)
     if (existingPromise) {
       return existingPromise
     }
 
-    // 开始加载
+    // Start loading
     this.loadingStates.set(componentId, 'loading')
 
     const loadPromise = this.performLoad(componentId)
@@ -59,7 +59,7 @@ export class ComponentLoader implements IComponentLoader {
       this.loadingPromises.delete(componentId)
       this.errors.delete(componentId)
 
-      // 注册到组件注册表
+      // Register to the component registry
       componentRegistry.register(definition)
 
       if (process.env.NODE_ENV === 'development') {
@@ -70,14 +70,14 @@ export class ComponentLoader implements IComponentLoader {
       this.loadingPromises.delete(componentId)
       this.errors.set(componentId, error as Error)
 
-      console.error(`[ComponentLoader] 组件 ${componentId} 加载失败:`, error)
+      console.error(`[ComponentLoader] components ${componentId} Loading failed:`, error)
       throw error
     }
   }
 
   /**
-   * 预加载组件
-   * @param componentIds 组件ID数组
+   * Preload components
+   * @param componentIds componentsIDarray
    */
   async preload(componentIds: string[]): Promise<void> {
     if (process.env.NODE_ENV === 'development') {
@@ -87,7 +87,7 @@ export class ComponentLoader implements IComponentLoader {
       try {
         await this.load(componentId)
       } catch (error) {
-        console.error(`[ComponentLoader] 预加载组件 ${componentId} 失败:`, error)
+        console.error(`[ComponentLoader] Preload components ${componentId} fail:`, error)
       }
     })
 
@@ -97,14 +97,14 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 卸载组件
-   * @param componentId 组件ID
+   * Uninstall components
+   * @param componentId componentsID
    */
   unload(componentId: string): void {
-    // 从注册表中注销
+    // Log out of the registry
     componentRegistry.unregister(componentId)
 
-    // 清理加载状态
+    // Clean loading status
     this.loadingStates.delete(componentId)
     this.loadingPromises.delete(componentId)
     this.errors.delete(componentId)
@@ -114,16 +114,16 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 获取加载状态
-   * @param componentId 组件ID
-   * @returns 加载状态
+   * Get loading status
+   * @param componentId componentsID
+   * @returns Loading status
    */
   getLoadingState(componentId: string): LoadingState {
     return this.loadingStates.get(componentId) || 'not-found'
   }
 
   /**
-   * 清理缓存
+   * clear cache
    */
   clearCache(): void {
     this.loadingStates.clear()
@@ -134,17 +134,17 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 获取错误信息
-   * @param componentId 组件ID
-   * @returns 错误信息或null
+   * Get error message
+   * @param componentId componentsID
+   * @returns error message ornull
    */
   getError(componentId: string): Error | null {
     return this.errors.get(componentId) || null
   }
 
   /**
-   * 获取加载统计信息
-   * @returns 统计信息
+   * Get loading statistics
+   * @returns Statistics
    */
   getStats() {
     const states = Array.from(this.loadingStates.values())
@@ -158,59 +158,59 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 执行实际的加载操作
-   * @param componentId 组件ID
-   * @returns 组件定义Promise
+   * Perform the actual loading operation
+   * @param componentId componentsID
+   * @returns Component definitionPromise
    */
   private async performLoad(componentId: string): Promise<IComponentDefinition> {
     const componentPath = this.componentPaths.get(componentId)
 
     if (!componentPath) {
-      throw new Error(`未找到组件 ${componentId} 的路径配置`)
+      throw new Error(`Component not found ${componentId} path configuration`)
     }
 
     try {
-      // 动态导入组件模块
+      // Dynamically import component modules
       const module = await import(componentPath)
       const definition = module.default || module
 
-      // 验证组件定义
+      // Verify component definition
       this.validateLoadedDefinition(definition, componentId)
 
       return definition
     } catch (error) {
       if (error instanceof Error && error.message.includes('Cannot resolve module')) {
         this.loadingStates.set(componentId, 'not-found')
-        throw new Error(`组件文件不存在: ${componentPath}`)
+        throw new Error(`Component file does not exist: ${componentPath}`)
       }
       throw error
     }
   }
 
   /**
-   * 验证加载的组件定义
-   * @param definition 组件定义
-   * @param componentId 组件ID
+   * Verify loaded component definition
+   * @param definition Component definition
+   * @param componentId componentsID
    */
   private validateLoadedDefinition(definition: any, componentId: string): void {
     if (!definition) {
-      throw new Error(`组件 ${componentId} 导出为空`)
+      throw new Error(`components ${componentId} Export is empty`)
     }
 
     if (!definition.meta || !definition.logic || !definition.views) {
-      throw new Error(`组件 ${componentId} 定义不完整，缺少必要的 meta、logic 或 views 属性`)
+      throw new Error(`components ${componentId} incomplete definition，missing necessary meta、logic or views property`)
     }
 
     if (definition.meta.id !== componentId) {
-      throw new Error(`组件 ${componentId} 的 meta.id 与文件名不匹配`)
+      throw new Error(`components ${componentId} of meta.id Does not match file name`)
     }
   }
 
   /**
-   * 初始化组件路径映射
+   * Initialize component path mapping
    */
   private initializeComponentPaths(): void {
-    // Chart组件路径映射
+    // ChartComponent path mapping
     const chartComponents = [
       'chart-bar',
       'chart-curve',
@@ -232,7 +232,7 @@ export class ComponentLoader implements IComponentLoader {
       this.componentPaths.set(componentId, `@/card/components/chart/${componentName}/index.ts`)
     })
 
-    // Builtin组件路径映射
+    // BuiltinComponent path mapping
     const builtinComponents = [
       'access-num',
       'alarm-count',
@@ -264,9 +264,9 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 注册自定义组件路径
-   * @param componentId 组件ID
-   * @param path 组件路径
+   * Register custom component path
+   * @param componentId componentsID
+   * @param path component path
    */
   registerComponentPath(componentId: string, path: string): void {
     this.componentPaths.set(componentId, path)
@@ -275,8 +275,8 @@ export class ComponentLoader implements IComponentLoader {
   }
 
   /**
-   * 批量注册组件路径
-   * @param pathMap 路径映射
+   * Batch registration component path
+   * @param pathMap path mapping
    */
   registerComponentPaths(pathMap: Record<string, string>): void {
     Object.entries(pathMap).forEach(([componentId, path]) => {
@@ -287,8 +287,8 @@ export class ComponentLoader implements IComponentLoader {
   }
 }
 
-// 创建全局加载器实例
+// Create a global loader instance
 export const componentLoader = new ComponentLoader()
 
-// 导出加载器类型
+// Export loader type
 export type { IComponentLoader }

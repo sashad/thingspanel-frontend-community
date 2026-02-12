@@ -135,7 +135,7 @@ function onChangeStatistics() {
 }
 
 function getWeightNumber(diffHours, diffDays, diffMonths) {
-  if (diffHours <= 1) return timeWeighting.last_1h // 处理小于1小时的情况
+  if (diffHours <= 1) return timeWeighting.last_1h // Handle less than1hour situation
   if (diffHours <= 3) return timeWeighting.last_3h
   if (diffHours <= 6) return timeWeighting.last_6h
   if (diffHours <= 12) return timeWeighting.last_12h
@@ -149,7 +149,7 @@ function getWeightNumber(diffHours, diffDays, diffMonths) {
   if (diffMonths <= 6) return timeWeighting.last_6m
   if (diffMonths <= 12) return timeWeighting.last_1y
 
-  return timeWeighting.last_1y // 对于超过1年的情况，默认返回最后一个权重
+  return timeWeighting.last_1y // For more than1year situation，Returns the last weight by default
 }
 
 const checkDateRange = value => {

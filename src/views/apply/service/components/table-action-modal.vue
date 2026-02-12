@@ -7,11 +7,11 @@ import { createRequiredFormRule } from '@/utils/form/rule'
 import { $t } from '@/locales'
 
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 弹窗类型 add: 新增 edit: 编辑 */
+  /** Popup type add: New edit: edit */
   type?: 'add' | 'edit'
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   editData?: ServiceManagement.Service | null
 }
 

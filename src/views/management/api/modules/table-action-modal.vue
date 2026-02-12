@@ -9,13 +9,13 @@ import { addKey, updateKey } from '@/service/api'
 import { $t } from '@/locales'
 import { useAuthStore } from '@/store/modules/auth'
 const authStore = useAuthStore()
-// dom树形结构数据
+// domtree structured data
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 弹窗类型 add: 新增 edit: 编辑 */
+  /** Popup type add: New edit: edit */
   type?: 'add' | 'edit'
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   editData?: UserManagement.UserKey | null
 }
 
@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'update:visible', visible: boolean): void
 
-  /** 点击协议 */
+  /** Click Agreement */
   (e: 'success'): void
 }
 
@@ -64,7 +64,7 @@ type FormModel = Pick<UserManagement.UserKey, 'name' | 'tenant_id'>
 const formModel = reactive<FormModel>(createDefaultFormModel())
 
 const rules: Record<keyof FormModel, FormItemRule | FormItemRule[]> = {
-  name: createRequiredFormRule('请输入名称'),
+  name: createRequiredFormRule('Please enter name'),
   tenant_id: createRequiredFormRule('')
 }
 

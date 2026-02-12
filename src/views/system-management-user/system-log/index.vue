@@ -123,7 +123,7 @@ const columns: Ref<DataTableColumns<DataService.Data>> = ref([
   },
   {
     key: '',
-    title: '操作',
+    title: 'operate',
     minWidth: '140px',
     align: 'left',
     render: row => {
@@ -157,9 +157,9 @@ function pickerChange(value: [number, number] | null) {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 检查用户是否可能只选了日期（时间部分为 00:00:00）
-    // 如果是，则将结束时间调整到 23:59:59.999
-    // 如果用户明确选择了时间，则尊重用户的选择
+    // Check if the user may have only selected a date（The time part is 00:00:00）
+    // in the case of，Then adjust the end time to 23:59:59.999
+    // If the user explicitly selects a time，respect the user’s choice
     let adjustedEndDateMoment
     if (
       endDateMoment.hour() === 0 &&
@@ -171,7 +171,7 @@ function pickerChange(value: [number, number] | null) {
       if (process.env.NODE_ENV === 'development') {
       }
     } else {
-      adjustedEndDateMoment = endDateMoment // 用户选择了具体时间，保持不变
+      adjustedEndDateMoment = endDateMoment // The user selected a specific time，remain unchanged
       if (process.env.NODE_ENV === 'development') {
       }
     }
@@ -181,9 +181,9 @@ function pickerChange(value: [number, number] | null) {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 尝试更新 range ref 本身以改变输入框显示
-    // 注意：这可能会触发组件更新，需要测试
-    // @ts-ignore // 忽略类型检查，因为我们在可变元组中修改元素
+    // try to update range ref itself to change the input box display
+    // Notice：This may trigger component updates，Need to test
+    // @ts-ignore // Ignore type checking，Because we modify elements in a mutable tuple
     range.value[1] = adjustedEndDateMoment.valueOf()
   } else {
     queryParams.start_time = ''

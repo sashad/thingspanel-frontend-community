@@ -1,19 +1,19 @@
 /**
- * 内置脚本模板库
- * 为 data-architecture 系统提供预制的脚本模板
+ * Built-in script template library
+ * for data-architecture The system provides pre-made script templates
  */
 
 import type { ScriptTemplate, TemplateCategory } from '@/core/script-engine/types'
 
 /**
- * 数据获取器脚本模板
+ * Data Getter Script Template
  */
 export const DATA_FETCHER_TEMPLATES: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
-    name: '模拟设备数据',
-    description: '生成模拟的IoT设备数据，包含温度、湿度、状态等信息',
+    name: 'Analog device data',
+    description: 'generate simulatedIoTDevice data，Contains temperature、humidity、Status and other information',
     category: 'data-generation',
-    code: `// 生成模拟设备数据
+    code: `// Generate simulated device data
 const deviceId = context.deviceId || 'device_001'
 const timestamp = Date.now()
 
@@ -37,7 +37,7 @@ return {
       {
         name: 'deviceId',
         type: 'string',
-        description: '设备ID',
+        description: 'equipmentID',
         required: false,
         defaultValue: 'device_001'
       }
@@ -47,20 +47,20 @@ return {
   },
 
   {
-    name: '随机时序数据',
-    description: '生成时序数据数组，适用于图表展示',
+    name: 'Random time series data',
+    description: 'Generate time series data array，Suitable for chart display',
     category: 'data-generation',
-    code: `// 生成时序数据
+    code: `// Generate time series data
 const points = context.points || 24
 const startTime = context.startTime || (Date.now() - 24 * 60 * 60 * 1000)
-const interval = context.interval || (60 * 60 * 1000) // 1小时间隔
+const interval = context.interval || (60 * 60 * 1000) // 1hour interval
 
 const data = []
 let baseValue = context.baseValue || 20
 let currentTime = startTime
 
 for (let i = 0; i < points; i++) {
-  // 添加随机波动
+  // Add random fluctuations
   const variation = (Math.random() - 0.5) * context.variation || 5
   const value = Math.max(0, baseValue + variation + Math.sin(i / points * Math.PI * 2) * 10)
   
@@ -71,7 +71,7 @@ for (let i = 0; i < points; i++) {
   })
   
   currentTime += interval
-  baseValue += (Math.random() - 0.5) * 2 // 趋势变化
+  baseValue += (Math.random() - 0.5) * 2 // Trend changes
 }
 
 return data`,
@@ -79,21 +79,21 @@ return data`,
       {
         name: 'points',
         type: 'number',
-        description: '数据点数量',
+        description: 'Number of data points',
         required: false,
         defaultValue: 24
       },
       {
         name: 'baseValue',
         type: 'number',
-        description: '基础数值',
+        description: 'Basic value',
         required: false,
         defaultValue: 20
       },
       {
         name: 'variation',
         type: 'number',
-        description: '波动范围',
+        description: 'Fluctuation range',
         required: false,
         defaultValue: 5
       }
@@ -103,10 +103,10 @@ return data`,
   },
 
   {
-    name: 'HTTP API 数据获取',
-    description: '从HTTP API获取数据的模板',
+    name: 'HTTP API data acquisition',
+    description: 'fromHTTP APITemplate to get data',
     category: 'api-integration',
-    code: `// HTTP API数据获取
+    code: `// HTTP APIdata acquisition
 const url = context.url || 'https://api.example.com/data'
 const method = context.method || 'GET'
 const headers = context.headers || { 'Content-Type': 'application/json' }
@@ -131,7 +131,7 @@ try {
     source: url
   }
 } catch (error) {
-  console.error('API调用失败:', error)
+  console.error('APIcall failed:', error)
   return {
     success: false,
     error: error.message,
@@ -143,13 +143,13 @@ try {
       {
         name: 'url',
         type: 'string',
-        description: 'API地址',
+        description: 'APIaddress',
         required: true
       },
       {
         name: 'method',
         type: 'string',
-        description: 'HTTP方法',
+        description: 'HTTPmethod',
         required: false,
         defaultValue: 'GET'
       }
@@ -160,25 +160,25 @@ try {
 ]
 
 /**
- * 数据处理器脚本模板
+ * Data Processor Script Template
  */
 export const DATA_PROCESSOR_TEMPLATES: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
-    name: '数值计算处理',
-    description: '对数值数据进行计算处理，如平均值、最大值、最小值等',
+    name: 'Numerical calculation processing',
+    description: 'Perform calculations on numerical data，as average、maximum value、Minimum value etc.',
     category: 'data-processing',
-    code: `// 数值计算处理
+    code: `// Numerical calculation processing
 if (!data || typeof data !== 'object') {
-  return { error: '数据格式不正确' }
+  return { error: 'Data format is incorrect' }
 }
 
-// 提取数值字段
+// Extract numeric fields
 const numericFields = Object.keys(data).filter(key => 
   typeof data[key] === 'number' && !isNaN(data[key])
 )
 
 if (numericFields.length === 0) {
-  return { error: '未找到数值字段' }
+  return { error: 'Numeric field not found' }
 }
 
 const result = {
@@ -194,7 +194,7 @@ const result = {
   timestamp: Date.now()
 }
 
-// 添加计算标志
+// Add calculation flag
 result.processed.isValid = result.processed.average > 0
 result.processed.level = result.processed.average > 50 ? 'high' : 
                         result.processed.average > 20 ? 'medium' : 'low'
@@ -206,19 +206,19 @@ return result`,
   },
 
   {
-    name: '数组数据过滤',
-    description: '对数组数据进行过滤、排序和分组处理',
+    name: 'Array data filtering',
+    description: 'Filter array data、Sorting and grouping',
     category: 'data-processing',
-    code: `// 数组数据过滤处理
+    code: `// Array data filtering
 if (!Array.isArray(data)) {
-  return { error: '输入数据不是数组' }
+  return { error: 'Input data is not an array' }
 }
 
 const filterValue = context?.filterValue || 0
 const sortField = context?.sortField || 'value'
 const groupField = context?.groupField || 'type'
 
-// 过滤数据
+// Filter data
 const filtered = data.filter(item => {
   if (typeof item === 'number') return item > filterValue
   if (typeof item === 'object' && item.value !== undefined) {
@@ -227,14 +227,14 @@ const filtered = data.filter(item => {
   return true
 })
 
-// 排序数据
+// Sort data
 const sorted = filtered.sort((a, b) => {
   const aVal = typeof a === 'object' ? a[sortField] : a
   const bVal = typeof b === 'object' ? b[sortField] : b
   return (aVal || 0) - (bVal || 0)
 })
 
-// 分组数据
+// grouped data
 const grouped = {}
 sorted.forEach(item => {
   const groupKey = typeof item === 'object' ? 
@@ -263,21 +263,21 @@ return {
       {
         name: 'filterValue',
         type: 'number',
-        description: '过滤阈值',
+        description: 'filter threshold',
         required: false,
         defaultValue: 0
       },
       {
         name: 'sortField',
         type: 'string',
-        description: '排序字段',
+        description: 'sort field',
         required: false,
         defaultValue: 'value'
       },
       {
         name: 'groupField',
         type: 'string',
-        description: '分组字段',
+        description: 'grouping field',
         required: false,
         defaultValue: 'type'
       }
@@ -287,14 +287,14 @@ return {
   },
 
   {
-    name: '时间数据格式化',
-    description: '对包含时间戳的数据进行格式化和时间计算',
+    name: 'Time data formatting',
+    description: 'Formatting and time calculation of data containing timestamps',
     category: 'transformation',
-    code: `// 时间数据格式化处理
+    code: `// Time data formatting
 const now = Date.now()
 const timezone = context?.timezone || 'Asia/Shanghai'
 
-// 处理时间戳字段
+// Processing timestamp fields
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp)
   return {
@@ -303,7 +303,7 @@ function formatTimestamp(timestamp) {
     local: date.toLocaleString('zh-CN', { timeZone: timezone }),
     date: date.toLocaleDateString('zh-CN'),
     time: date.toLocaleTimeString('zh-CN'),
-    age: now - timestamp, // 数据年龄（毫秒）
+    age: now - timestamp, // Data age（millisecond）
     ageText: getAgeText(now - timestamp)
   }
 }
@@ -314,18 +314,18 @@ function getAgeText(age) {
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
   
-  if (days > 0) return \`\${days}天前\`
-  if (hours > 0) return \`\${hours}小时前\`
-  if (minutes > 0) return \`\${minutes}分钟前\`
-  return \`\${seconds}秒前\`
+  if (days > 0) return \`\${days}days ago\`
+  if (hours > 0) return \`\${hours}hours ago\`
+  if (minutes > 0) return \`\${minutes}minutes ago\`
+  return \`\${seconds}seconds ago\`
 }
 
-// 处理输入数据
+// Process input data
 if (typeof data === 'number') {
-  // 单个时间戳
+  // single timestamp
   return formatTimestamp(data)
 } else if (Array.isArray(data)) {
-  // 时间戳数组
+  // timestamp array
   return data.map(item => {
     if (typeof item === 'number') {
       return formatTimestamp(item)
@@ -335,14 +335,14 @@ if (typeof data === 'number') {
     return item
   })
 } else if (typeof data === 'object' && data.timestamp) {
-  // 包含时间戳的对象
+  // An object containing a timestamp
   return {
     ...data,
     timeInfo: formatTimestamp(data.timestamp)
   }
 }
 
-// 添加当前时间信息
+// Add current time information
 return {
   originalData: data,
   currentTime: formatTimestamp(now),
@@ -352,7 +352,7 @@ return {
       {
         name: 'timezone',
         type: 'string',
-        description: '时区',
+        description: 'time zone',
         required: false,
         defaultValue: 'Asia/Shanghai'
       }
@@ -363,14 +363,14 @@ return {
 ]
 
 /**
- * 数据合并器脚本模板
+ * Data Merger Script Template
  */
 export const DATA_MERGER_TEMPLATES: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
-    name: '智能对象合并',
-    description: '智能合并多个对象，处理重复字段和数据类型转换',
+    name: 'Smart object merge',
+    description: 'Smart merge of multiple objects，Handle duplicate fields and data type conversion',
     category: 'data-processing',
-    code: `// 智能对象合并
+    code: `// Smart object merge
 if (!Array.isArray(items) || items.length === 0) {
   return {}
 }
@@ -389,7 +389,7 @@ items.forEach((item, index) => {
   Object.keys(item).forEach(key => {
     const value = item[key]
     
-    // 记录数据类型
+    // Record data type
     const valueType = Array.isArray(value) ? 'array' : typeof value
     if (!metadata.dataTypes[key]) {
       metadata.dataTypes[key] = []
@@ -399,11 +399,11 @@ items.forEach((item, index) => {
     }
     
     if (result[key] === undefined) {
-      // 首次赋值
+      // first assignment
       result[key] = value
       metadata.mergedFields.push(key)
     } else {
-      // 处理冲突
+      // handling conflicts
       if (result[key] !== value) {
         metadata.conflicts.push({
           field: key,
@@ -411,18 +411,18 @@ items.forEach((item, index) => {
           sources: [\`item_\${index-1}\`, \`item_\${index}\`]
         })
         
-        // 合并策略
+        // merge strategy
         if (typeof result[key] === 'number' && typeof value === 'number') {
-          // 数值求平均
+          // Averaging values
           result[key] = (result[key] + value) / 2
         } else if (Array.isArray(result[key]) && Array.isArray(value)) {
-          // 数组合并去重
+          // Array merging and deduplication
           result[key] = [...new Set([...result[key], ...value])]
         } else if (typeof result[key] === 'string' && typeof value === 'string') {
-          // 字符串拼接
+          // String concatenation
           result[key] = \`\${result[key]}, \${value}\`
         } else {
-          // 保持原值或使用最新值
+          // Keep the original value or use the latest value
           result[key] = value
         }
       }
@@ -437,7 +437,7 @@ return {
     timestamp: Date.now(),
     strategy: 'intelligent',
     itemsProcessed: items.length,
-    fieldsCount: Object.keys(result).length - 2 // 排除元数据
+    fieldsCount: Object.keys(result).length - 2 // Exclude metadata
   }
 }`,
     parameters: [],
@@ -446,21 +446,21 @@ return {
   },
 
   {
-    name: '时序数据合并',
-    description: '按时间戳合并多个时序数据数组',
+    name: 'Time series data merging',
+    description: 'Merge multiple time series data arrays by timestamp',
     category: 'time-series',
-    code: `// 时序数据合并
+    code: `// Time series data merging
 if (!Array.isArray(items) || items.length === 0) {
   return []
 }
 
-// 收集所有时序数据点
+// Collect all time series data points
 const allPoints = []
 const sources = []
 
 items.forEach((item, index) => {
   if (Array.isArray(item)) {
-    // 直接是时序数组
+    // Directly time series array
     item.forEach(point => {
       if (point && typeof point.timestamp === 'number') {
         allPoints.push({
@@ -473,7 +473,7 @@ items.forEach((item, index) => {
     sources.push(\`array_\${index}\`)
   } else if (item && typeof item === 'object') {
     if (typeof item.timestamp === 'number') {
-      // 单个时序点
+      // single timing point
       allPoints.push({
         ...item,
         sourceIndex: index,
@@ -481,7 +481,7 @@ items.forEach((item, index) => {
       })
       sources.push(\`object_\${index}\`)
     } else if (item.data && Array.isArray(item.data)) {
-      // 包含data字段的对象
+      // Includedatafield object
       item.data.forEach(point => {
         if (point && typeof point.timestamp === 'number') {
           allPoints.push({
@@ -496,10 +496,10 @@ items.forEach((item, index) => {
   }
 })
 
-// 按时间戳排序
+// Sort by timestamp
 allPoints.sort((a, b) => a.timestamp - b.timestamp)
 
-// 合并相同时间戳的数据点
+// Merge data points with the same timestamp
 const merged = []
 const timeGroups = {}
 
@@ -511,7 +511,7 @@ allPoints.forEach(point => {
   timeGroups[timeKey].push(point)
 })
 
-// 生成合并后的数据
+// Generate merged data
 Object.keys(timeGroups).forEach(timestamp => {
   const points = timeGroups[timestamp]
   const mergedPoint = {
@@ -524,7 +524,7 @@ Object.keys(timeGroups).forEach(timestamp => {
   points.forEach(point => {
     mergedPoint.sources.push(point.sourceName)
     
-    // 合并数值字段
+    // Merge numeric fields
     Object.keys(point).forEach(key => {
       if (key !== 'timestamp' && key !== 'sourceIndex' && key !== 'sourceName') {
         if (typeof point[key] === 'number') {
@@ -533,13 +533,13 @@ Object.keys(timeGroups).forEach(timestamp => {
           }
           mergedPoint.values[key].push(point[key])
         } else if (point[key] !== undefined) {
-          mergedPoint[key] = point[key] // 保留非数值字段
+          mergedPoint[key] = point[key] // Keep non-numeric fields
         }
       }
     })
   })
   
-  // 计算数值字段的统计值
+  // Calculate statistics for numeric fields
   Object.keys(mergedPoint.values).forEach(key => {
     const values = mergedPoint.values[key]
     mergedPoint.values[key] = {
@@ -561,10 +561,10 @@ return merged`,
   },
 
   {
-    name: '条件选择合并',
-    description: '根据条件选择最佳数据项进行合并',
+    name: 'Conditional selection merge',
+    description: 'Select the best data items for merging based on conditions',
     category: 'data-processing',
-    code: `// 条件选择合并
+    code: `// Conditional selection merge
 if (!Array.isArray(items) || items.length === 0) {
   return null
 }
@@ -579,40 +579,40 @@ let reason = ''
 
 switch (criteria) {
   case 'latest':
-    // 选择时间戳最新的
+    // Select the latest timestamp
     selected = items.reduce((latest, item) => {
       if (!latest) return item
       const itemTime = item[timestampField] || 0
       const latestTime = latest[timestampField] || 0
       return itemTime > latestTime ? item : latest
     }, null)
-    reason = '选择时间戳最新的数据项'
+    reason = 'Select the data item with the latest timestamp'
     break
     
   case 'highest':
-    // 选择数值最高的
+    // Choose the one with the highest value
     selected = items.reduce((highest, item) => {
       if (!highest) return item
       const itemValue = item[valueField] || 0
       const highestValue = highest[valueField] || 0
       return itemValue > highestValue ? item : highest
     }, null)
-    reason = \`选择\${valueField}字段值最高的数据项\`
+    reason = \`choose\${valueField}The data item with the highest field value\`
     break
     
   case 'lowest':
-    // 选择数值最低的
+    // Choose the one with the lowest value
     selected = items.reduce((lowest, item) => {
       if (!lowest) return item
       const itemValue = item[valueField] || Number.MAX_VALUE
       const lowestValue = lowest[valueField] || Number.MAX_VALUE
       return itemValue < lowestValue ? item : lowest
     }, null)
-    reason = \`选择\${valueField}字段值最低的数据项\`
+    reason = \`choose\${valueField}The data item with the lowest field value\`
     break
     
   case 'quality':
-    // 选择质量最好的
+    // Choose the best quality
     const qualityOrder = ['excellent', 'good', 'fair', 'poor']
     selected = items.reduce((best, item) => {
       if (!best) return item
@@ -622,15 +622,15 @@ switch (criteria) {
       const bestIndex = qualityOrder.indexOf(bestQuality)
       return (itemIndex !== -1 && (bestIndex === -1 || itemIndex < bestIndex)) ? item : best
     }, null)
-    reason = \`选择\${qualityField}字段质量最好的数据项\`
+    reason = \`choose\${qualityField}Data items with the best field quality\`
     break
     
   default:
     selected = items[0]
-    reason = '使用默认选择（第一个数据项）'
+    reason = 'Use default selection（first data item）'
 }
 
-// 添加选择信息
+// Add selection information
 return {
   ...selected,
   _selectionInfo: {
@@ -646,7 +646,7 @@ return {
       {
         name: 'criteria',
         type: 'string',
-        description: '选择条件',
+        description: 'Selection criteria',
         required: false,
         defaultValue: 'latest',
         validation: {
@@ -656,7 +656,7 @@ return {
       {
         name: 'valueField',
         type: 'string',
-        description: '比较的数值字段',
+        description: 'Numeric fields to compare',
         required: false,
         defaultValue: 'value'
       }
@@ -667,14 +667,14 @@ return {
 ]
 
 /**
- * 通用工具脚本模板
+ * Universal tool script template
  */
 export const UTILITY_TEMPLATES: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
-    name: '数据验证器',
-    description: '验证数据格式和完整性',
+    name: 'Data validator',
+    description: 'Verify data format and integrity',
     category: 'validation',
-    code: `// 数据验证器
+    code: `// Data validator
 const rules = context?.rules || {}
 const result = {
   valid: true,
@@ -683,26 +683,26 @@ const result = {
   summary: {}
 }
 
-// 基础类型检查
+// Basic type checking
 if (rules.type) {
   const actualType = Array.isArray(data) ? 'array' : typeof data
   if (actualType !== rules.type) {
     result.valid = false
-    result.errors.push(\`类型错误: 期望 \${rules.type}, 实际 \${actualType}\`)
+    result.errors.push(\`type error: expect \${rules.type}, actual \${actualType}\`)
   }
 }
 
-// 必需字段检查
+// Required field check
 if (rules.required && Array.isArray(rules.required)) {
   rules.required.forEach(field => {
     if (data[field] === undefined || data[field] === null) {
       result.valid = false
-      result.errors.push(\`缺少必需字段: \${field}\`)
+      result.errors.push(\`Missing required field: \${field}\`)
     }
   })
 }
 
-// 数值范围检查
+// Numeric range check
 if (rules.ranges && typeof data === 'object') {
   Object.keys(rules.ranges).forEach(field => {
     if (data[field] !== undefined) {
@@ -711,29 +711,29 @@ if (rules.ranges && typeof data === 'object') {
       
       if (typeof value === 'number') {
         if (range.min !== undefined && value < range.min) {
-          result.errors.push(\`\${field} 值 \${value} 小于最小值 \${range.min}\`)
+          result.errors.push(\`\${field} value \${value} less than minimum \${range.min}\`)
         }
         if (range.max !== undefined && value > range.max) {
-          result.errors.push(\`\${field} 值 \${value} 大于最大值 \${range.max}\`)
+          result.errors.push(\`\${field} value \${value} greater than maximum \${range.max}\`)
         }
       }
     }
   })
 }
 
-// 格式检查
+// Format check
 if (rules.formats && typeof data === 'object') {
   Object.keys(rules.formats).forEach(field => {
     if (data[field] !== undefined) {
       const pattern = new RegExp(rules.formats[field])
       if (!pattern.test(String(data[field]))) {
-        result.warnings.push(\`\${field} 格式可能不正确\`)
+        result.warnings.push(\`\${field} The format may be incorrect\`)
       }
     }
   })
 }
 
-// 生成摘要
+// Generate summary
 result.summary = {
   fieldsChecked: Object.keys(data || {}).length,
   errorsCount: result.errors.length,
@@ -746,7 +746,7 @@ return result`,
       {
         name: 'rules',
         type: 'object',
-        description: '验证规则配置',
+        description: 'Validation rule configuration',
         required: false,
         defaultValue: {}
       }
@@ -756,17 +756,17 @@ return result`,
   },
 
   {
-    name: '性能监控',
-    description: '监控脚本执行性能和资源使用',
+    name: 'Performance monitoring',
+    description: 'Monitor script execution performance and resource usage',
     category: 'utility',
-    code: `// 性能监控脚本
+    code: `// Performance monitoring script
 const startTime = performance.now()
 const memoryBefore = performance.memory ? performance.memory.usedJSHeapSize : 0
 
-// 执行主要逻辑（这里放置实际的数据处理代码）
+// Execute main logic（The actual data processing code is placed here）
 const processedData = data
 
-// 性能测量
+// Performance measurement
 const endTime = performance.now()
 const memoryAfter = performance.memory ? performance.memory.usedJSHeapSize : 0
 
@@ -797,15 +797,15 @@ const metrics = {
   }
 }
 
-// 性能建议
+// Performance recommendations
 if (metrics.execution.duration > 1000) {
-  metrics.performance.recommendations.push('执行时间过长，考虑优化算法')
+  metrics.performance.recommendations.push('Execution time is too long，Consider optimization algorithms')
 }
 if (metrics.memory.used > 10 * 1024 * 1024) {
-  metrics.performance.recommendations.push('内存使用过多，考虑分批处理')
+  metrics.performance.recommendations.push('Too much memory usage，Consider batching')
 }
 if (metrics.data.outputSize > metrics.data.inputSize * 2) {
-  metrics.performance.recommendations.push('输出数据膨胀过多，考虑数据压缩')
+  metrics.performance.recommendations.push('Output data is too bloated，Consider data compression')
 }
 
 return {
@@ -814,13 +814,13 @@ return {
   timestamp: Date.now()
 }`,
     parameters: [],
-    example: '// 自动测量任何数据处理操作的性能',
+    example: '// Automatically measure the performance of any data processing operation',
     isSystem: true
   }
 ]
 
 /**
- * 所有内置模板
+ * All built-in templates
  */
 export const ALL_BUILT_IN_TEMPLATES = [
   ...DATA_FETCHER_TEMPLATES,
@@ -830,7 +830,7 @@ export const ALL_BUILT_IN_TEMPLATES = [
 ]
 
 /**
- * 初始化内置模板到模板管理器
+ * Initialize built-in templates into the template manager
  */
 export function initializeBuiltInTemplates(templateManager: any) {
   let successCount = 0
@@ -845,7 +845,7 @@ export function initializeBuiltInTemplates(templateManager: any) {
     }
   })
 
-  // 返回统计信息
+  // Return statistics
   return {
     total: ALL_BUILT_IN_TEMPLATES.length,
     success: successCount,

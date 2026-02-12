@@ -1,6 +1,6 @@
 /**
- * 权限变更监听器
- * 在用户权限发生变化时通知组件系统重新加载
+ * Permission change listener
+ * Notify components of system reloading when user permissions change
  */
 
 type PermissionChangeCallback = (newAuthority: string, oldAuthority: string) => void
@@ -15,20 +15,20 @@ class PermissionWatcher {
   }
 
   /**
-   * 开始监听权限变更
+   * Start monitoring permission changes
    */
   private startWatching() {
-    // 检查当前权限
+    // Check current permissions
     this.updateCurrentAuthority()
 
-    // 🔥 优化：减少轮询频率到每5秒检查一次
+    // 🔥 optimization：Reduce polling frequency to every5Check once every second
     this.intervalId = window.setInterval(() => {
       this.checkPermissionChange()
     }, 5000)
   }
 
   /**
-   * 停止监听
+   * Stop listening
    */
   stopWatching() {
     if (this.intervalId) {
@@ -38,7 +38,7 @@ class PermissionWatcher {
   }
 
   /**
-   * 更新当前权限
+   * Update current permissions
    */
   private updateCurrentAuthority() {
     try {
@@ -55,7 +55,7 @@ class PermissionWatcher {
   }
 
   /**
-   * 检查权限是否变更
+   * Check if permissions have changed
    */
   private checkPermissionChange() {
     const oldAuthority = this.currentAuthority
@@ -63,24 +63,24 @@ class PermissionWatcher {
 
     if (oldAuthority !== this.currentAuthority) {
 
-      // 通知所有监听器
+      // Notify all listeners
       this.callbacks.forEach(callback => {
         try {
-          callback(this.currentAuthority!, oldAuthority || '未知')
+          callback(this.currentAuthority!, oldAuthority || 'unknown')
         } catch (error) {
-          console.error('[PermissionWatcher] 权限变更回调执行失败:', error)
+          console.error('[PermissionWatcher] Permission change callback execution failed:', error)
         }
       })
     }
   }
 
   /**
-   * 添加权限变更监听器
+   * Add permission change listener
    */
   onPermissionChange(callback: PermissionChangeCallback) {
     this.callbacks.push(callback)
 
-    // 返回取消监听的函数
+    // Returns the function to cancel listening
     return () => {
       const index = this.callbacks.indexOf(callback)
       if (index > -1) {
@@ -90,35 +90,35 @@ class PermissionWatcher {
   }
 
   /**
-   * 获取当前权限
+   * Get current permissions
    */
   getCurrentAuthority(): string {
     return this.currentAuthority || 'TENANT_USER'
   }
 }
 
-// 全局单例
+// Global singleton
 export const permissionWatcher = new PermissionWatcher()
 
 /**
- * 手动触发权限检查（用于登录后立即更新）
+ * Manually trigger permission checks（Used to update immediately after logging in）
  */
 export function triggerPermissionCheck() {
-  // 使用私有方法访问
+  // Access using private methods
   ;(permissionWatcher as any).checkPermissionChange()
 }
 
 /**
- * 优化：监听 localStorage 变化事件（更高效）
+ * optimization：monitor localStorage change event（more efficient）
  */
 export function setupStorageListener() {
-  // 监听同一标签页内的 localStorage 变化
+  // Listen to the same tab localStorage change
   const originalSetItem = localStorage.setItem
   localStorage.setItem = function(key: string, value: string) {
     const oldValue = localStorage.getItem(key)
     originalSetItem.call(this, key, value)
 
-    // 如果是 userInfo 变化，立即触发权限检查
+    // in the case of userInfo change，Trigger permission check immediately
     if (key === 'userInfo' && oldValue !== value) {
       triggerPermissionCheck()
     }

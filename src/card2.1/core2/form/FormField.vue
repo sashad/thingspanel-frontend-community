@@ -1,6 +1,6 @@
 <template>
   <div class="form-field">
-    <!-- 文本输入框 -->
+    <!-- Text input box -->
     <n-form-item
       v-if="setting.type === 'input'"
       :label="setting.label"
@@ -17,7 +17,7 @@
       </template>
     </n-form-item>
 
-    <!-- 文本域 -->
+    <!-- text field -->
     <n-form-item
       v-else-if="setting.type === 'textarea'"
       :label="setting.label"
@@ -36,7 +36,7 @@
       </template>
     </n-form-item>
 
-    <!-- 数字输入框 -->
+    <!-- Number input box -->
     <n-form-item
       v-else-if="setting.type === 'input-number'"
       :label="setting.label"
@@ -57,7 +57,7 @@
       </template>
     </n-form-item>
 
-    <!-- 颜色选择器 -->
+    <!-- color picker -->
     <n-form-item
       v-else-if="setting.type === 'color-picker'"
       :label="setting.label"
@@ -73,7 +73,7 @@
       </template>
     </n-form-item>
 
-    <!-- 滑块 -->
+    <!-- slider -->
     <n-form-item
       v-else-if="setting.type === 'slider'"
       :label="setting.label"
@@ -92,7 +92,7 @@
       </template>
     </n-form-item>
 
-    <!-- 开关 -->
+    <!-- switch -->
     <n-form-item
       v-else-if="setting.type === 'switch'"
       :label="setting.label"
@@ -108,7 +108,7 @@
       </template>
     </n-form-item>
 
-    <!-- 下拉选择 -->
+    <!-- drop down selection -->
     <n-form-item
       v-else-if="setting.type === 'select'"
       :label="setting.label"
@@ -126,7 +126,7 @@
       </template>
     </n-form-item>
 
-    <!-- 多选框 -->
+    <!-- checkbox -->
     <n-form-item
       v-else-if="setting.type === 'checkbox'"
       :label="setting.label"
@@ -142,7 +142,7 @@
       </template>
     </n-form-item>
 
-    <!-- 单选框组 -->
+    <!-- radio button group -->
     <n-form-item
       v-else-if="setting.type === 'radio-group'"
       :label="setting.label"
@@ -168,7 +168,7 @@
       </template>
     </n-form-item>
 
-    <!-- 日期选择器 -->
+    <!-- date picker -->
     <n-form-item
       v-else-if="setting.type === 'date-picker'"
       :label="setting.label"
@@ -186,7 +186,7 @@
       </template>
     </n-form-item>
 
-    <!-- 动态标签 -->
+    <!-- Dynamic tags -->
     <n-form-item
       v-else-if="setting.type === 'dynamic-tags'"
       :label="setting.label"
@@ -202,7 +202,7 @@
       </template>
     </n-form-item>
 
-    <!-- Vue 组件渲染器 -->
+    <!-- Vue component renderer -->
     <n-form-item
       v-else-if="setting.type === 'vue-component'"
       :label="setting.label"
@@ -220,7 +220,7 @@
       </template>
     </n-form-item>
 
-    <!-- 未知类型的字段 -->
+    <!-- Field of unknown type -->
     <n-form-item
       v-else
       :label="setting.label"
@@ -241,9 +241,9 @@
 
 <script setup lang="ts">
 /**
- * FormField - 表单字段组件
- * 根据设置项类型渲染对应的表单控件
- * 支持所有标准的表单控件类型和 Vue 组件渲染
+ * FormField - form field component
+ * Render the corresponding form control according to the setting item type
+ * Supports all standard form control types and Vue Component rendering
  */
 
 import { computed } from 'vue'
@@ -265,11 +265,11 @@ import {
 import type { Setting } from '@/card2.1/types/setting-config'
 
 interface Props {
-  // 设置项配置
+  // Setting item configuration
   setting: Setting
-  // 当前值
+  // current value
   modelValue?: unknown
-  // 是否只读
+  // Is it read-only?
   readonly?: boolean
 }
 
@@ -283,12 +283,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 处理值变化
+// Handling value changes
 const handleValueChange = (value: unknown) => {
   emit('update:modelValue', value)
 }
 
-// 下拉选择器选项
+// Dropdown selector options
 const selectOptions = computed(() => {
   if (!props.setting.options) return []
 

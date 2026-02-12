@@ -2,11 +2,11 @@
 defineOptions({ name: 'DashboardWorkbenchMainShortcutsCard' })
 
 interface Props {
-  /** 快捷操作名称 */
+  /** Shortcut operation name */
   label: string
-  /** 图标 */
+  /** icon */
   icon: string
-  /** 图标颜色 */
+  /** icon color */
   iconColor: string
 }
 

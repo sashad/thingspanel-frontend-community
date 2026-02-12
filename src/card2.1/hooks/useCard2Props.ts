@@ -1,48 +1,48 @@
 /**
- * 🔥 Card 2.1 统一配置管理中心 - 全新重构版本
+ * 🔥 Card 2.1 Unified configuration management center - New refactored version
  * 
- * 核心职责：
- * 1. 作为唯一的配置数据源头
- * 2. 管理基础、组件、数据源、交互四层配置
- * 3. 提供配置更新和事件通信机制
- * 4. 与编辑器保持配置同步
+ * Core responsibilities：
+ * 1. Serves as the only source of configuration data
+ * 2. management basics、components、data source、Interactive four-layer configuration
+ * 3. Provides configuration update and event communication mechanisms
+ * 4. Keep configuration synchronized with editor
  */
 
 import { computed, ref, watch, inject, type ComputedRef, isRef } from 'vue'
 import { DataSourceMapper } from '@/card2.1/core2/data-source'
 import type { MetricItem } from '@/card2.1/core2'
 
-// 🔥 关键优化：属性绑定检查缓存，避免重复的配置获取和检查
+// 🔥 Key optimization：Property binding check cache，Avoid repeated configuration retrieval and checking
 const propertyBindingCache = new Map<string, {
   hasBinding: boolean
   lastCheck: number
   configHash: string
 }>()
 
-// 缓存有效期：2秒（避免配置变更后的延迟）
+// Cache validity period：2Second（Avoid delays after configuration changes）
 const BINDING_CACHE_TTL = 2000
 
 /**
- * 🔥 高效的属性绑定检查函数
- * 使用缓存避免重复的配置查询和HTTP配置解析
+ * 🔥 Efficient property binding checking function
+ * Use caching to avoid duplicate configuration queries andHTTPConfiguration analysis
  */
 async function checkPropertyBinding(componentId: string, propertyPath: string): Promise<boolean> {
   const cacheKey = `${componentId}:${propertyPath}`
   const now = Date.now()
 
-  // 检查缓存
+  // Check cache
   const cached = propertyBindingCache.get(cacheKey)
   if (cached && (now - cached.lastCheck) < BINDING_CACHE_TTL) {
     return cached.hasBinding
   }
 
   try {
-    // 获取当前组件的数据源配置
+    // Get the data source configuration of the current component
     const { configurationIntegrationBridge } = await import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
     const config = configurationIntegrationBridge.getConfiguration(componentId)
 
     if (!config?.dataSource) {
-      // 缓存"无绑定"结果
+      // cache"No binding"result
       propertyBindingCache.set(cacheKey, {
         hasBinding: false,
         lastCheck: now,
@@ -51,22 +51,22 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
       return false
     }
 
-    // 生成配置哈希以检测变更
+    // Generate configuration hashes to detect changes
     const configHash = JSON.stringify(config.dataSource).substring(0, 100)
 
-    // 如果配置未变更且缓存有效，直接返回缓存结果
+    // If the configuration has not changed and the cache is valid，Return cached results directly
     if (cached && cached.configHash === configHash) {
       return cached.hasBinding
     }
 
-    // 执行绑定检查
+    // Perform binding check
     let hasBinding = false
     const dataSource = config.dataSource
 
-    // 🔥 关键优化：统一的HTTP配置查找逻辑
+    // 🔥 Key optimization：unifiedHTTPConfigure search logic
     const httpConfigs = []
 
-    // 1. 检查新格式：dataSources数组中的HTTP配置
+    // 1. Check new format：dataSourcesin arrayHTTPConfiguration
     if (dataSource?.dataSources && Array.isArray(dataSource.dataSources)) {
       for (const ds of dataSource.dataSources) {
         if (ds.dataItems && Array.isArray(ds.dataItems)) {
@@ -79,12 +79,12 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
       }
     }
 
-    // 2. 检查旧格式：直接的HTTP配置
+    // 2. Check old format：directHTTPConfiguration
     if (dataSource?.type === 'http' && dataSource?.config?.params) {
       httpConfigs.push(dataSource.config)
     }
 
-    // 3. 检查rawDataList格式
+    // 3. examinerawDataListFormat
     if (dataSource?.rawDataList && Array.isArray(dataSource.rawDataList)) {
       for (const item of dataSource.rawDataList) {
         if (item.type === 'http' && item.config?.params) {
@@ -93,7 +93,7 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
       }
     }
 
-    // 🔥 关键优化：在所有找到的HTTP配置中检查参数绑定
+    // 🔥 Key optimization：found in allHTTPCheck parameter binding in configuration
     for (const httpConfig of httpConfigs) {
       if (httpConfig.params && Array.isArray(httpConfig.params)) {
         for (const param of httpConfig.params) {
@@ -106,7 +106,7 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
       if (hasBinding) break
     }
 
-    // 缓存检查结果
+    // Cache check results
     propertyBindingCache.set(cacheKey, {
       hasBinding,
       lastCheck: now,
@@ -116,7 +116,7 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
 
     return hasBinding
   } catch (error) {
-    console.error(`❌ [checkPropertyBinding] 检查失败:`, {
+    console.error(`❌ [checkPropertyBinding] Check failed:`, {
       componentId,
       propertyPath,
       error: error instanceof Error ? error.message : error
@@ -126,13 +126,13 @@ async function checkPropertyBinding(componentId: string, propertyPath: string): 
 }
 
 /**
- * 基础配置接口 - 定义通用的基础配置结构
+ * Basic configuration interface - Define a common basic configuration structure
  */
 export interface BaseConfiguration {
-  // 设备绑定配置（最高优先级）
+  // Device binding configuration（highest priority）
   deviceId?: string
   metricsList?: MetricItem[]
-  // UI基础配置
+  // UIBasic configuration
   title?: string
   showTitle?: boolean
   visible?: boolean
@@ -147,50 +147,50 @@ export interface BaseConfiguration {
 }
 
 /**
- * 统一配置接口 - 四层配置结构
+ * Unified configuration interface - Four-layer configuration structure
  */
 export interface UnifiedCard2Configuration {
-  /** 基础配置 - 设备绑定、UI样式等通用配置 */
+  /** Basic configuration - Device binding、UICommon configurations such as styles */
   base?: BaseConfiguration
-  /** 组件配置 - 组件特定的属性和设置 */
+  /** Component configuration - Component-specific properties and settings */
   component?: Record<string, unknown>
-  /** 数据源配置 - 数据绑定和来源配置 */
+  /** Data source configuration - Data binding and source configuration */
   dataSource?: Record<string, unknown>
-  /** 交互配置 - 组件间交互和行为配置 */
+  /** Interactive configuration - Interaction and behavior configuration between components */
   interaction?: Record<string, unknown>
-  /** 组件ID - 用于配置管理和持久化 */
+  /** componentsID - For configuration management and persistence */
   componentId?: string
 }
 
 /**
- * 配置管理选项
+ * Configure management options
  */
 interface ConfigManagementOptions {
   config: any
   data?: Record<string, unknown> | ComputedRef<Record<string, unknown>>
   componentId?: string
-  /** 从编辑器接收的初始统一配置 */
+  /** Initial unified configuration received from editor */
   initialUnifiedConfig?: UnifiedCard2Configuration
 }
 
 /**
- * 🔥 统一配置管理中心 Hook
+ * 🔥 Unified configuration management center Hook
  */
 export function useCard2Props<T = Record<string, unknown>>(options: ConfigManagementOptions) {
   const { config, data, componentId, initialUnifiedConfig } = options
   
-  // 注入编辑器上下文用于同步
+  // Inject editor context for synchronization
   const editorContext = inject('editorContext', null) as any
   
 
-  // 🔥 统一配置状态 - 唯一的配置数据源
+  // 🔥 Unified configuration status - The only source of configuration data
   const unifiedConfig = ref<UnifiedCard2Configuration>({
-    // 基础配置：设备绑定、UI样式等通用配置
+    // Basic configuration：Device binding、UICommon configurations such as styles
     base: {
-      // 设备绑定配置（最高优先级）
+      // Device binding configuration（highest priority）
       deviceId: initialUnifiedConfig?.base?.deviceId || '',
       metricsList: initialUnifiedConfig?.base?.metricsList || [],
-      // UI基础配置
+      // UIBasic configuration
       title: initialUnifiedConfig?.base?.title || '',
       showTitle: initialUnifiedConfig?.base?.showTitle || false,
       visible: initialUnifiedConfig?.base?.visible ?? true,
@@ -203,56 +203,56 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       padding: initialUnifiedConfig?.base?.padding || { top: 0, right: 0, bottom: 0, left: 0 },
       margin: initialUnifiedConfig?.base?.margin || { top: 0, right: 0, bottom: 0, left: 0 }
     },
-    // 组件配置：来自settingConfig的组件特有属性
+    // Component configuration：fromsettingConfigComponent-specific properties of
     component: initialUnifiedConfig?.component || { ...config },
-    // 数据源配置：数据绑定配置
+    // Data source configuration：Data binding configuration
     dataSource: initialUnifiedConfig?.dataSource || {},
-    // 交互配置：组件间交互配置
+    // Interactive configuration：组件间Interactive configuration
     interaction: initialUnifiedConfig?.interaction || {},
     componentId
   })
 
-  // 🔥 关键调试：显示初始化后的统一配置
+  // 🔥 critical debugging：Display the unified configuration after initialization
 
-  // 🔥 配置变更回调函数
+  // 🔥 Configuration change callback function
   let configChangeCallback: ((config: UnifiedCard2Configuration) => void) | null = null
 
   /**
-   * 🔥 按层级更新配置 - 核心配置管理函数
+   * 🔥 Update configuration by level - Core configuration management functions
    */
   const updateConfig = (layer: keyof UnifiedCard2Configuration, newConfig: any) => {
 
-    // 🔥 强制响应式更新 - 深度合并并触发响应
+    // 🔥 Force responsive updates - Deep merge and trigger responses
     const updatedLayer = { ...unifiedConfig.value[layer], ...newConfig }
 
-    // 🔥 关键修复：使用完全新的对象引用，确保响应式更新
+    // 🔥 critical fix：Use a completely new object reference，Ensure responsive updates
     const newUnifiedConfig = {
       ...unifiedConfig.value,
       [layer]: updatedLayer
     }
 
 
-    // 🔥 直接赋值新对象，确保触发响应式更新
+    // 🔥 Directly assign new objects，Ensure responsive updates are triggered
     unifiedConfig.value = newUnifiedConfig
 
 
-    // 同步到编辑器
+    // Sync to editor
     syncToEditor()
 
-    // 🚀 关键修复：同步到配置管理器，确保VisualEditorBridge能获取到最新值
+    // 🚀 critical fix：Sync to configuration manager，make sureVisualEditorBridgeCan get the latest value
     syncToConfigurationManager()
 
-    // 🔥 关键修复：当配置更新时清理绑定缓存，确保下次检查使用最新配置
+    // 🔥 critical fix：Clean binding cache when configuration is updated，Make sure the next check uses the latest configuration
     if (componentId && (layer === 'dataSource' || layer === 'component')) {
       clearPropertyBindingCache(componentId)
     }
 
-    // 触发配置变更事件
+    // Trigger configuration change event
     emitConfigChange()
   }
 
   /**
-   * 🔥 批量更新配置
+   * 🔥 Batch update configuration
    */
   const updateUnifiedConfig = (partialConfig: Partial<UnifiedCard2Configuration>) => {
     
@@ -266,8 +266,8 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🚀 关键修复：同步配置到配置管理器
-   * 确保 VisualEditorBridge 能获取到最新的属性值
+   * 🚀 critical fix：Synchronize configuration to configuration manager
+   * make sure VisualEditorBridge Ability to obtain the latest attribute values
    */
   const syncToConfigurationManager = () => {
     if (!componentId) {
@@ -276,13 +276,13 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
 
     try {
 
-      // 动态导入配置管理器
+      // Dynamically import configuration manager
       import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
         .then(({ configurationIntegrationBridge }) => {
-          // 获取当前配置
+          // Get current configuration
           const currentConfig = configurationIntegrationBridge.getConfiguration(componentId)
 
-          // 创建更新后的配置
+          // Create updated configuration
           const updatedConfig = {
             ...currentConfig,
             component: unifiedConfig.value.component,
@@ -292,20 +292,20 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
           }
 
 
-          // 🚀 关键：直接更新配置管理器的状态，不触发事件
-          // 使用内部方法确保配置同步但不产生额外的事件循环
+          // 🚀 key：Directly update the status of the configuration manager，Don't trigger event
+          // Use internal methods to ensure configuration synchronization without creating additional event loops
           const configurationStateManager = (configurationIntegrationBridge as any).configurationStateManager
           if (configurationStateManager) {
-            // 直接设置配置状态，绕过事件发送
+            // Set configuration status directly，Bypass event sending
             configurationStateManager.updateConfigurationSection(
               componentId,
               'component',
               updatedConfig.component,
-              'sync', // 标记为同步更新
-              false   // 不强制更新
+              'sync', // Mark for sync updates
+              false   // No forced update
             )
           } else {
-            // 降级方案：使用正常的更新方法
+            // Downgrade plan：Use normal update methods
             configurationIntegrationBridge.updateConfiguration(
               componentId,
               'component',
@@ -316,15 +316,15 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
 
         })
         .catch(error => {
-          console.error(`❌ [useCard2Props] 配置管理器同步失败:`, error)
+          console.error(`❌ [useCard2Props] Configuration manager sync failed:`, error)
         })
     } catch (error) {
-      console.error(`❌ [useCard2Props] syncToConfigurationManager 失败:`, error)
+      console.error(`❌ [useCard2Props] syncToConfigurationManager fail:`, error)
     }
   }
 
   /**
-   * 🔥 同步配置到编辑器
+   * 🔥 Synchronize configuration to editor
    */
   const syncToEditor = () => {
 
@@ -337,17 +337,17 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       return
     }
 
-    // 防止循环更新
+    // Prevent cyclic updates
     const currentUnifiedConfig = currentNode.metadata?.unifiedConfig
     if (JSON.stringify(currentUnifiedConfig) === JSON.stringify(unifiedConfig.value)) {
       return
     }
 
 
-    // 🚨 创建一个没有 interaction 配置的版本，避免保存僵尸交互配置
+    // 🚨 create a without interaction Configured version，Avoid saving zombie interaction configuration
     const configWithoutInteraction = {
       ...unifiedConfig.value,
-      interaction: {} // 🔥 清空 interaction，避免僵尸配置
+      interaction: {} // 🔥 Clear interaction，Avoid zombie configurations
     }
 
 
@@ -355,7 +355,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       properties: unifiedConfig.value.component || {},
       metadata: {
         ...currentNode.metadata,
-        unifiedConfig: configWithoutInteraction, // 🔥 保存时移除 interaction
+        unifiedConfig: configWithoutInteraction, // 🔥 Remove on save interaction
         updatedAt: Date.now()
       }
     })
@@ -363,14 +363,14 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🔥 设置配置变更回调
+   * 🔥 Set configuration change callback
    */
   const setConfigChangeCallback = (callback: (config: UnifiedCard2Configuration) => void) => {
     configChangeCallback = callback
   }
 
   /**
-   * 🔥 触发配置变更事件
+   * 🔥 Trigger configuration change event
    */
   const emitConfigChange = () => {
     if (configChangeCallback) {
@@ -379,60 +379,60 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🔥 获取完整配置
+   * 🔥 Get full configuration
    */
   const getFullConfiguration = (): UnifiedCard2Configuration => {
     return { ...unifiedConfig.value }
   }
 
   /**
-   * 🔥 修复：显示数据计算 - 确保完全响应统一配置变化
+   * 🔥 repair：Display data calculation - Ensure full response to unified configuration changes
    */
   const displayData = computed(() => {
-    // 🔥 关键修复：先直接访问data以建立响应式依赖
-    // 无论data是什么类型，都先访问一次，让Vue追踪到依赖关系
+    // 🔥 critical fix：Visit directly firstdatato build reactive dependencies
+    // regardlessdatawhat type，Visit once first，letVuetrace dependencies
     const rawData = data
 
-    // 🔥 关键修复：正确获取data值，无论它是响应式引用还是普通值
+    // 🔥 critical fix：Get it correctlydatavalue，Whether it's a reactive reference or a normal value
     let currentData: Record<string, unknown>
 
     if (isRef(rawData)) {
-      // 如果是 ref，直接获取 .value
+      // in the case of ref，Get it directly .value
       currentData = rawData.value as Record<string, unknown>
     } else if (typeof rawData === 'object' && rawData !== null && 'value' in rawData) {
-      // 如果是计算属性对象，获取 .value
+      // If it is a computed property object，Get .value
       currentData = (rawData as any).value as Record<string, unknown>
     } else if (typeof rawData === 'function') {
-      // 如果是函数（某些情况下计算属性可能表现为函数），调用它获取值
+      // If it is a function（In some cases computed properties may behave as functions），Call it to get the value
       try {
         currentData = (rawData as any)() as Record<string, unknown>
       } catch (error) {
-        console.warn(`🔥 [useCard2Props] 函数调用失败，使用空对象:`, error)
+        console.warn(`🔥 [useCard2Props] Function call failed，Use empty object:`, error)
         currentData = {}
       }
     } else {
-      // 普通对象或值
+      // ordinary object or value
       currentData = (rawData as Record<string, unknown>) || {}
     }
 
-    // 🔥 修复逻辑：检查是否有有效的数据源执行结果
+    // 🔥 fix logic：Check if there is a valid data source execution result
     const hasValidDataSource = currentData &&
       typeof currentData === 'object' &&
       Object.keys(currentData).length > 0
 
-    // 🔥 关键修复：检查数据是否来自DataWarehouse且包含组件需要的字段
-    // 支持嵌套结构（如 { main: { data: { value, ... } } }）
+    // 🔥 critical fix：Check if the data comes fromDataWarehouseAnd contains the fields required by the component
+    // Support nested structures（like { main: { data: { value, ... } } }）
     const isDataFromWarehouse = hasValidDataSource && (() => {
       const dataKeys = Object.keys(currentData)
 
-      // 检查顶层是否包含组件需要的基本字段
+      // Check if the top level contains the basic fields required by the component
       const hasDirectFields = dataKeys.some(key =>
         ['value', 'unit', 'metricsName', 'data', 'title', 'amount', 'description', 'timestamp'].includes(key)
       )
 
       if (hasDirectFields) return true
 
-      // 🔥 关键修复：检查是否是数据源嵌套结构（如 { main: { data: {...} }, secondary: {...} }）
+      // 🔥 critical fix：Check if it is a data source nested structure（like { main: { data: {...} }, secondary: {...} }）
       const hasNestedData = dataKeys.some(key => {
         const value = currentData[key]
         return value && typeof value === 'object' && ('data' in value || 'type' in value)
@@ -442,21 +442,21 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
     })()
 
     if (isDataFromWarehouse) {
-      // 🔥 直接返回DataWarehouse的数据，这已经是组件需要的格式
+      // 🔥 Return directlyDataWarehousedata，This is already the format required by the component
       return currentData
     }
 
-    // 🔥 核心修复：没有数据源结果时，直接使用统一配置的组件配置
-    // 移除对初始config的依赖，确保完全响应unifiedConfig.component的变化
+    // 🔥 Core fix：When there is no data source result，Directly use unified configuration component configuration
+    // remove initialconfigdependency，Ensure full responseunifiedConfig.componentchanges
     const result = {
-      ...unifiedConfig.value.component  // 🔥 关键：只使用统一配置，移除初始config的干扰
+      ...unifiedConfig.value.component  // 🔥 key：Only use unified configuration，remove initialconfiginterference
     }
 
     return result
   })
 
   /**
-   * 🔥 监听初始配置变化
+   * 🔥 Listen for initial configuration changes
    */
   watch(() => config, (newConfig) => {
     if (newConfig && typeof newConfig === 'object') {
@@ -464,66 +464,66 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
     }
   }, { deep: true, immediate: false })
 
-  // 🔥 新增：属性暴露映射表，记录组件内部属性的当前值
+  // 🔥 New：Attribute exposure mapping table，Record the current value of the component's internal property
   const exposedProperties = ref<Record<string, any>>({})
 
   /**
-   * 🔒 安全暴露属性值 - 经过白名单验证的属性暴露
+   * 🔒 Security exposure attribute value - Whitelist verified attribute exposure
    */
   const exposeProperty = (propertyName: string, value: any) => {
-    console.warn(`⚠️ [useCard2Props] exposeProperty 已废弃，请使用 exposeWhitelistedProperties()`)
-    console.warn(`⚠️ 尝试暴露属性: ${componentId}.${propertyName} = ${value}`)
+    console.warn(`⚠️ [useCard2Props] exposeProperty Deprecated，Please use exposeWhitelistedProperties()`)
+    console.warn(`⚠️ Try exposing properties: ${componentId}.${propertyName} = ${value}`)
 
-    // 🔒 不再直接暴露属性，转而调用白名单机制
-    // 这是为了防止组件绕过白名单直接暴露属性
+    // 🔒 No longer expose properties directly，Call the whitelist mechanism instead
+    // This is to prevent components from directly exposing properties by bypassing the whitelist.
     exposeWhitelistedProperties()
   }
 
   /**
-   * 🔒 安全批量暴露属性 - 只有白名单验证通过的属性才会被暴露
+   * 🔒 Safe batch exposure of attributes - Only attributes that pass whitelist verification will be exposed
    */
   const exposeProperties = (properties: Record<string, any>) => {
-    console.warn(`⚠️ [useCard2Props] exposeProperties 已废弃，请使用 exposeWhitelistedProperties()`)
-    console.warn(`⚠️ 尝试批量暴露属性: ${componentId}:`, Object.keys(properties))
+    console.warn(`⚠️ [useCard2Props] exposeProperties Deprecated，Please use exposeWhitelistedProperties()`)
+    console.warn(`⚠️ Try exposing attributes in batches: ${componentId}:`, Object.keys(properties))
 
-    // 🔒 不再直接暴露属性，转而调用白名单机制
-    // 这是为了防止组件绕过白名单直接暴露属性
+    // 🔒 No longer expose properties directly，Call the whitelist mechanism instead
+    // This is to prevent components from directly exposing properties by bypassing the whitelist.
     exposeWhitelistedProperties()
   }
 
   /**
-   * 🔥 新增：获取暴露的属性值
+   * 🔥 New：Get exposed attribute values
    */
   const getExposedProperty = (propertyName: string) => {
     return exposedProperties.value[propertyName]
   }
 
   /**
-   * 🔥 新增：获取所有暴露的属性
+   * 🔥 New：Get all exposed properties
    */
   const getAllExposedProperties = () => {
     return { ...exposedProperties.value }
   }
 
   /**
-   * 🔥 新增：属性变化监听器映射表
+   * 🔥 New：Property change listener mapping table
    */
   const propertyWatchers = ref<Record<string, ((newValue: any, oldValue: any) => void)[]>>({})
 
   /**
-   * 🔥 自动配置同步：监听外部配置更新事件
+   * 🔥 Automatic configuration synchronization：Listen for external configuration update events
    */
   const handleExternalConfigUpdate = (event: CustomEvent) => {
     const { componentId: eventComponentId, layer, config } = event.detail
     if (eventComponentId === componentId && layer === 'component') {
 
-      // 获取旧的配置值，用于触发属性变化监听器
+      // Get old configuration values，Used to trigger property change listeners
       const oldConfig = { ...unifiedConfig.value.component }
 
-      // 自动同步到内部统一配置
+      // Automatically synchronize to internal unified configuration
       updateUnifiedConfig({ component: config })
 
-      // 🔥 关键修复：对于跨组件交互，需要手动触发属性变化监听器
+      // 🔥 critical fix：For cross-component interactions，You need to manually trigger the property change listener
       if (config && typeof config === 'object') {
         Object.keys(config).forEach(propertyName => {
           const oldValue = oldConfig[propertyName]
@@ -531,20 +531,20 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
 
           if (oldValue !== newValue) {
 
-            // 🔥 触发属性监听器 - 这是交互系统需要的
+            // 🔥 Trigger property listener - This is required for interactive systems
             const watchers = propertyWatchers.value[propertyName]
             if (watchers && watchers.length > 0) {
               watchers.forEach(callback => {
                 try {
                   callback(newValue, oldValue)
                 } catch (error) {
-                  console.error(`❌ [useCard2Props] 属性监听器执行失败 ${componentId}.${propertyName}:`, error)
+                  console.error(`❌ [useCard2Props] Property listener execution failed ${componentId}.${propertyName}:`, error)
                 }
               })
             } else {
             }
 
-            // 🔥 发送属性变化事件给交互系统
+            // 🔥 Send attribute change events to the interactive system
             window.dispatchEvent(new CustomEvent('property-change', {
               detail: {
                 componentId,
@@ -561,14 +561,14 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🔥 增强的配置更新：自动同步到配置管理器
+   * 🔥 Enhanced configuration updates：Automatic synchronization to configuration manager
    */
   const updateUnifiedConfigWithSync = (partialConfig: Partial<UnifiedCard2Configuration>) => {
 
-    // 1. 更新本地统一配置
+    // 1. Update local unified configuration
     updateUnifiedConfig(partialConfig)
 
-    // 2. 自动同步到配置管理器（如果有组件配置更新）
+    // 2. Automatic synchronization to configuration manager（If there is a component configuration update）
     if (partialConfig.component && componentId) {
       import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
         .then(({ configurationIntegrationBridge }) => {
@@ -580,13 +580,13 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
           )
         })
         .catch(error => {
-          console.error(`❌ [useCard2Props] 自动同步配置失败:`, error)
+          console.error(`❌ [useCard2Props] Automatic synchronization configuration failed:`, error)
         })
     }
   }
 
   /**
-   * 🔥 新增：监听属性变化
+   * 🔥 New：Listen for property changes
    */
   const watchProperty = (propertyName: string, callback: (newValue: any, oldValue: any) => void) => {
     if (!propertyWatchers.value[propertyName]) {
@@ -595,7 +595,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
     propertyWatchers.value[propertyName].push(callback)
 
 
-    // 返回取消监听的函数
+    // Returns the function to cancel listening
     return () => {
       const watchers = propertyWatchers.value[propertyName]
       if (watchers) {
@@ -608,16 +608,16 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🔒 废弃：暴露属性值并触发监听器（已被白名单机制替代）
+   * 🔒 abandoned：Expose property values ​​and trigger listeners（Has been replaced by the whitelist mechanism）
    */
   const exposePropertyWithWatch = (propertyName: string, newValue: any) => {
-    console.warn(`⚠️ [useCard2Props] exposePropertyWithWatch 已废弃，请使用 exposeWhitelistedProperties()`)
-    console.warn(`⚠️ 尝试暴露并监听属性: ${componentId}.${propertyName} = ${newValue}`)
+    console.warn(`⚠️ [useCard2Props] exposePropertyWithWatch Deprecated，Please use exposeWhitelistedProperties()`)
+    console.warn(`⚠️ Try exposing and listening properties: ${componentId}.${propertyName} = ${newValue}`)
 
-    // 🔒 触发白名单机制来重新暴露所有安全属性
+    // 🔒 Trigger the whitelist mechanism to re-expose all security attributes
     exposeWhitelistedProperties()
 
-    // 保留监听器功能，因为这是合法的内部机制
+    // Keep listener functionality，Because this is a legitimate internal mechanism
     const oldValue = exposedProperties.value[propertyName]
     const watchers = propertyWatchers.value[propertyName]
     if (watchers && watchers.length > 0) {
@@ -625,31 +625,31 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
         try {
           callback(newValue, oldValue)
         } catch (error) {
-          console.error(`🔥 [useCard2Props] 属性监听器执行失败 ${componentId}.${propertyName}:`, error)
+          console.error(`🔥 [useCard2Props] Property listener execution failed ${componentId}.${propertyName}:`, error)
         }
       })
     }
   }
 
   /**
-   * 🔒 安全的基于白名单的属性暴露
-   * 只暴露组件定义中明确声明的属性
+   * 🔒 Secure whitelist-based attribute exposure
+   * Expose only properties explicitly declared in the component definition
    */
   const exposeWhitelistedProperties = async () => {
     if (!unifiedConfig.value.component || !componentId) return
 
     try {
-      // 🔒 导入属性暴露管理器
+      // 🔒 Import attribute exposure manager
       const { propertyExposureManager } = await import('@/card2.1/core2/property')
 
-      // 获取组件类型（从注入的上下文或其他方式获取）
+      // Get component type（Obtained from injected context or other means）
       const componentType = getComponentType()
       if (!componentType) {
-        console.warn(`⚠️ [useCard2Props] 无法确定组件类型，跳过属性暴露: ${componentId}`)
+        console.warn(`⚠️ [useCard2Props] Unable to determine component type，Skip attribute exposure: ${componentId}`)
         return
       }
 
-      // 获取白名单属性配置
+      // Get whitelist attribute configuration
       const whitelistedProperties = propertyExposureManager.getWhitelistedProperties(
         componentType,
         'public',
@@ -660,7 +660,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
         return
       }
 
-      // 🔒 安全暴露白名单中的属性
+      // 🔒 Security exposure whitelisted attributes
       const safeExposedProperties: Record<string, any> = {}
       const componentConfig = unifiedConfig.value.component
 
@@ -687,15 +687,15 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
         }
       }
 
-      // 添加安全的元数据
+      // Add secure metadata
       safeExposedProperties.lastUpdated = new Date().toISOString()
       safeExposedProperties.componentId = componentId
 
-      // 🔒 直接设置经过白名单过滤的属性，绕过旧的暴露函数
+      // 🔒 Directly set properties filtered by whitelist，Bypassing old exposed functions
       exposedProperties.value = { ...safeExposedProperties }
 
-      // 🔒 注释掉编辑器节点更新，避免循环依赖
-      // 编辑器节点的 metadata 更新应该由编辑器自身管理，而不是在这里触发
+      // 🔒 Comment out editor node update，Avoid circular dependencies
+      // editor node's metadata Updates should be managed by the editor itself，instead of triggering here
       // if (editorContext?.updateNode && componentId) {
       //   const currentNode = editorContext.getNodeById(componentId)
       //   if (currentNode) {
@@ -710,16 +710,16 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       // }
 
     } catch (error) {
-      console.error(`❌ [useCard2Props] 属性白名单暴露失败 ${componentId}:`, error)
+      console.error(`❌ [useCard2Props] Attribute whitelist exposure failed ${componentId}:`, error)
     }
   }
 
   /**
-   * 🔍 获取组件类型
-   * 尝试从多个来源获取组件类型信息
+   * 🔍 Get component type
+   * Try to get component type information from multiple sources
    */
   const getComponentType = (): string | null => {
-    // 1. 从编辑器上下文获取
+    // 1. Get from editor context
     if (editorContext?.getNodeById && componentId) {
       const node = editorContext.getNodeById(componentId)
       if (node?.type) {
@@ -727,7 +727,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       }
     }
 
-    // 2. 从DOM属性获取
+    // 2. fromDOMProperty acquisition
     if (typeof window !== 'undefined' && componentId) {
       const element = document.querySelector(`[data-component-id="${componentId}"]`)
       const componentType = element?.getAttribute('data-component-type')
@@ -736,7 +736,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       }
     }
 
-    // 3. 从初始配置获取（如果有的话）
+    // 3. Obtained from initial configuration（if any）
     if (initialUnifiedConfig?.componentType) {
       return initialUnifiedConfig.componentType as string
     }
@@ -745,33 +745,33 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   }
 
   /**
-   * 🔥 生命周期管理：自动监听和清理
+   * 🔥 life cycle management：Automatic monitoring and cleaning
    */
   const setupAutoSync = () => {
     if (typeof window !== 'undefined') {
-      // 自动监听配置更新事件
+      // Automatically listen for configuration update events
       window.addEventListener('card2-config-update', handleExternalConfigUpdate as EventListener)
     }
 
-    // 返回增强的清理函数
+    // Returns enhanced cleanup function
     return () => {
-      // 清理防抖定时器
+      // Clear anti-shake timer
       if (exposePropertiesTimer) {
         clearTimeout(exposePropertiesTimer)
         exposePropertiesTimer = null
       }
       
-      // 清理事件监听器
+      // Clean up event listeners
       if (typeof window !== 'undefined') {
         window.removeEventListener('card2-config-update', handleExternalConfigUpdate as EventListener)
       }
     }
   }
 
-  // 🔥 自动设置同步和属性暴露
+  // 🔥 Automatic settings synchronization and property exposure
   const cleanupAutoSync = setupAutoSync()
 
-  // 🔒 防抖机制：避免无限循环调用
+  // 🔒 Anti-shake mechanism：Avoid infinite loop calls
   let exposePropertiesTimer: NodeJS.Timeout | null = null
   const debouncedExposeProperties = () => {
     if (exposePropertiesTimer) {
@@ -779,17 +779,17 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
     }
     exposePropertiesTimer = setTimeout(() => {
       exposeWhitelistedProperties()
-    }, 100) // 100ms 防抖延迟
+    }, 100) // 100ms Anti-shake delay
   }
 
-  // 🔒 监听统一配置变化，安全地重新暴露白名单属性，并触发数据源更新
+  // 🔒 Monitor unified configuration changes，Safely re-expose whitelisted attributes，and trigger data source update
   watch(
     () => unifiedConfig.value.component,
     (newComponent, oldComponent) => {
-      // 🔒 使用防抖机制重新暴露白名单属性，避免无限循环
+      // 🔒 Use anti-shake mechanism to re-expose whitelist attributes，Avoid infinite loops
       debouncedExposeProperties()
 
-      // 🔥 新增：检查属性变化并触发数据源更新
+      // 🔥 New：Check for property changes and trigger data source updates
       if (componentId && newComponent && oldComponent) {
         Object.keys(newComponent).forEach(async propertyName => {
           const newValue = newComponent[propertyName]
@@ -797,35 +797,35 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
 
           if (newValue !== oldValue) {
 
-            // 🔥 关键修复：触发内部属性监听器（这个总是需要的）
+            // 🔥 critical fix：Trigger internal property listener（This is always needed）
             const watchers = propertyWatchers.value[propertyName]
             if (watchers && watchers.length > 0) {
               watchers.forEach(callback => {
                 try {
                   callback(newValue, oldValue)
                 } catch (error) {
-                  console.error(`❌ [useCard2Props] 属性监听器执行失败 ${componentId}.${propertyName}:`, error)
+                  console.error(`❌ [useCard2Props] Property listener execution failed ${componentId}.${propertyName}:`, error)
                 }
               })
             }
 
-            // 🚀 关键修复：只有当属性真正被绑定到数据源时，才触发数据源重新执行
+            // 🚀 critical fix：Only if the property is actually bound to the data source，before triggering the data source to re-execute
 
             try {
-              // 🔥 关键优化：提前构造属性绑定路径
+              // 🔥 Key optimization：Construct property binding paths in advance
               const propertyPath = `${componentId}.component.${propertyName}`
 
-              // 🔥 第一步优化：使用缓存的绑定检查函数，避免重复获取配置
+              // 🔥 First step optimization：Using cached binding check functions，Avoid repeated configuration retrieval
               const hasBinding = await checkPropertyBinding(componentId, propertyPath)
 
 
               if (hasBinding) {
 
-                // 只有真正绑定的属性才调用交互管理器
+                // The interaction manager is called only for properties that are actually bound
                 const { interactionManager } = await import('@/card2.1/core2/interaction')
                 interactionManager.notifyPropertyUpdate(componentId, propertyPath, newValue, oldValue)
 
-                // 发送全局属性变化事件（只对绑定的属性）
+                // Send global attribute change event（Only for bound properties）
                 window.dispatchEvent(new CustomEvent('property-change', {
                   detail: {
                     componentId,
@@ -840,7 +840,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
                 }))
               } else {
 
-                // 发送全局属性变化事件（标记为未绑定）
+                // Send global attribute change event（Mark as unbound）
                 window.dispatchEvent(new CustomEvent('property-change', {
                   detail: {
                     componentId,
@@ -855,7 +855,7 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
                 }))
               }
             } catch (error) {
-              console.error(`❌ [useCard2Props] 检查属性绑定失败:`, {
+              console.error(`❌ [useCard2Props] Check property binding failed:`, {
                 componentId,
                 propertyName,
                 error: error instanceof Error ? error.message : error
@@ -869,12 +869,12 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
   )
 
   /**
-   * 🔥 清理属性绑定缓存
-   * 当配置更新时需要清理相关缓存，确保绑定检查的准确性
+   * 🔥 Clear property binding cache
+   * When the configuration is updated, the relevant cache needs to be cleared，Ensure the accuracy of binding checks
    */
   const clearPropertyBindingCache = (componentId?: string) => {
     if (componentId) {
-      // 清理特定组件的缓存
+      // Clear the cache of a specific component
       const keysToDelete = []
       for (const [key] of propertyBindingCache) {
         if (key.startsWith(`${componentId}:`)) {
@@ -883,30 +883,30 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
       }
       keysToDelete.forEach(key => propertyBindingCache.delete(key))
     } else {
-      // 清理所有缓存
+      // clear all cache
       const cacheSize = propertyBindingCache.size
       propertyBindingCache.clear()
     }
   }
 
-  // 返回配置管理接口
+  // Return to configuration management interface
   return {
-    // 配置数据
+    // Configuration data
     config: computed(() => unifiedConfig.value.component || {}),
     displayData,
     unifiedConfig: computed(() => unifiedConfig.value),
 
-    // 配置管理功能
+    // Configuration management functions
     updateConfig,
     updateUnifiedConfig,
     getFullConfiguration,
 
-    // 事件管理
+    // event management
     setConfigChangeCallback,
     emitConfigChange,
     syncToEditor,
 
-    // 🔥 新增：属性暴露功能
+    // 🔥 New：Attribute exposure function
     exposeProperty,
     exposeProperties,
     exposePropertyWithWatch,
@@ -914,10 +914,10 @@ export function useCard2Props<T = Record<string, unknown>>(options: ConfigManage
     getAllExposedProperties,
     watchProperty,
 
-    // 🔥 增强功能：自动同步配置管理
-    updateUnifiedConfigWithSync,  // 增强版配置更新，自动同步到配置管理器
-    exposeWhitelistedProperties,  // 🔒 安全的白名单属性暴露（替换自动全量暴露）
-    cleanupAutoSync,              // 清理函数，用于组件卸载时调用
-    clearPropertyBindingCache     // 🔥 新增：清理绑定缓存函数
+    // 🔥 Enhanced functionality：Automatic synchronization configuration management
+    updateUnifiedConfigWithSync,  // Enhanced version configuration update，Automatic synchronization to configuration manager
+    exposeWhitelistedProperties,  // 🔒 Safe whitelist attribute exposure（Replace automatic full exposure）
+    cleanupAutoSync,              // Cleanup function，Used to be called when the component is uninstalled
+    clearPropertyBindingCache     // 🔥 New：Clear binding cache function
   }
 }

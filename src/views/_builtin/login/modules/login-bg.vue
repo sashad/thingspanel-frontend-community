@@ -4,7 +4,7 @@ import { computed } from 'vue'
 // import { CornerBottom, CornerTop } from './components'
 type SysSetting = Omit<Api.GeneralSetting.ThemeSetting, 'id'>
 interface Props {
-  /** 主题颜色 */
+  /** theme color */
   themeColor: string
   sysSetting: SysSetting
 }

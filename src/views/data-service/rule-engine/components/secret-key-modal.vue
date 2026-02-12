@@ -4,9 +4,9 @@ import { useClipboard } from '@vueuse/core'
 import { $t } from '@/locales'
 
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   secretKey?: string
 }
 

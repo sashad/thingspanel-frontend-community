@@ -1,15 +1,15 @@
 /**
- * 增强版数据架构类型定义
- * 基于现有架构扩展，保持向后兼容性
+ * Enhanced data schema type definition
+ * Extend based on existing architecture，Maintain backward compatibility
  *
- * 设计目标：
- * 1. 泛型化数据项配置，支持扩展
- * 2. 保持现有类型系统100%兼容
- * 3. 为动态参数系统预留接口
- * 4. 支持配置版本管理和自动适配
+ * design goals：
+ * 1. Generic data item configuration，Support extension
+ * 2. Keep the existing type system100%compatible
+ * 3. Reserved interface for dynamic parameter system
+ * 4. Support configuration version management and automatic adaptation
  */
 
-// ==================== 基础类型导入 ====================
+// ==================== Basic type import ====================
 import type {
   DataItem as LegacyDataItem,
   JsonDataItemConfig as LegacyJsonDataItemConfig,
@@ -27,786 +27,786 @@ import type {
   ExecutionResult
 } from '../executors/MultiLayerExecutorChain'
 
-// ==================== 泛型化数据项配置 ====================
+// ==================== Generic data item configuration ====================
 
 /**
- * 泛型化数据项配置基础接口
- * 支持任意类型的配置结构扩展
+ * Generic data item configuration basic interface
+ * Support any type of configuration structure extension
  */
 export interface DataItemConfig<T = any> {
-  /** 数据项类型标识 */
+  /** Data item type identifier */
   type: string
 
-  /** 数据项唯一标识符 */
+  /** data item unique identifier */
   id: string
 
-  /** 类型特定的配置参数 */
+  /** Type-specific configuration parameters */
   config: T
 
-  /** 数据处理配置（复用现有ProcessingConfig） */
+  /** Data processing configuration（Reuse existingProcessingConfig） */
   processing?: ProcessingConfig
 
-  /** 数据项元数据 */
+  /** Data item metadata */
   metadata?: DataItemMetadata
 }
 
 /**
- * 数据项元数据接口
- * 用于存储额外的配置信息和状态
+ * Data item metadata interface
+ * Used to store additional configuration information and status
  */
 export interface DataItemMetadata {
-  /** 数据项显示名称 */
+  /** Data item display name */
   displayName?: string
 
-  /** 数据项描述 */
+  /** Data item description */
   description?: string
 
-  /** 创建时间 */
+  /** creation time */
   createdAt?: number
 
-  /** 最后更新时间 */
+  /** Last updated */
   lastUpdated?: number
 
-  /** 数据项启用状态 */
+  /** Data item enabled status */
   enabled?: boolean
 
-  /** 自定义标签 */
+  /** Custom labels */
   tags?: string[]
 }
 
-// ==================== 具体数据项类型实现 ====================
+// ==================== Specific data item type implementation ====================
 
 /**
- * JSON数据项配置（增强版）
- * 保持与现有JsonDataItemConfig的兼容性
+ * JSONData item configuration（Enhanced version）
+ * keep and existingJsonDataItemConfigCompatibility
  */
 export interface EnhancedJsonDataItemConfig {
-  /** JSON数据内容 */
+  /** JSONData content */
   jsonData: string
 
-  /** 数据验证选项 */
+  /** Data validation options */
   validation?: {
-    /** 是否启用JSON格式验证 */
+    /** Whether to enableJSONFormat validation */
     enableFormat: boolean
-    /** 是否启用数据结构验证 */
+    /** Whether to enable data structure validation */
     enableStructure: boolean
-    /** JSON Schema（可选） */
+    /** JSON Schema（Optional） */
     schema?: any
   }
 
-  /** 数据预处理选项 */
+  /** Data preprocessing options */
   preprocessing?: {
-    /** 是否去除注释 */
+    /** Whether to remove comments */
     removeComments: boolean
-    /** 是否格式化输出 */
+    /** Whether to format the output */
     formatOutput: boolean
   }
 }
 
 /**
- * HTTP数据项配置（增强版）
- * 为动态参数系统预留扩展接口
+ * HTTPData item configuration（Enhanced version）
+ * Reserve expansion interface for dynamic parameter system
  */
 export interface EnhancedHttpDataItemConfig {
-  /** 请求URL（支持模板语法 {{paramName}}） */
+  /** askURL（Support template syntax {{paramName}}） */
   url: string
 
-  /** HTTP请求方法 */
+  /** HTTPRequest method */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
-  /** 请求头配置（数组格式，支持动态参数） */
+  /** Request header configuration（array format，Support dynamic parameters） */
   headers: HttpHeader[]
 
-  /** URL参数配置（新增，支持动态参数） */
+  /** URLParameter configuration（New，Support dynamic parameters） */
   params: HttpParam[]
 
-  /** 请求体配置 */
+  /** Request body configuration */
   body?: HttpBody
 
-  /** 请求超时时间（毫秒） */
+  /** Request timeout（millisecond） */
   timeout?: number
 
-  /** 请求前脚本（预留） */
+  /** pre-request script（reserved） */
   preRequestScript?: string
 
-  /** 响应后脚本（预留） */
+  /** Post-response script（reserved） */
   responseScript?: string
 
-  /** 重试配置 */
+  /** Retry configuration */
   retry?: {
-    /** 最大重试次数 */
+    /** Maximum number of retries */
     maxRetries: number
-    /** 重试间隔（毫秒） */
+    /** Retry interval（millisecond） */
     retryDelay: number
   }
 }
 
 /**
- * HTTP头部配置
- * 支持静态值和动态参数两种模式
+ * HTTPHead configuration
+ * Supports both static value and dynamic parameter modes
  */
 export interface HttpHeader {
-  /** 头部字段名 */
+  /** Header field name */
   key: string
 
-  /** 头部字段值（静态时为实际值，动态时为示例值） */
+  /** Header field value（Actual value when static，Example value when dynamic） */
   value: string
 
-  /** 是否启用此头部 */
+  /** Whether to enable this header */
   enabled: boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 自动生成的变量名（格式：http_${key}） */
+  /** Automatically generated variable names（Format：http_${key}） */
   variableName: string
 
-  /** 参数说明（动态参数必填，静态参数可选） */
+  /** Parameter description（Dynamic parameters are required，Static parameters are optional） */
   description?: string
 }
 
 /**
- * HTTP参数配置
- * 支持静态值和动态参数两种模式
+ * HTTPParameter configuration
+ * Supports both static value and dynamic parameter modes
  */
 export interface HttpParam {
-  /** 参数名 */
+  /** Parameter name */
   key: string
 
-  /** 参数值（静态时为实际值，动态时为示例值） */
+  /** Parameter value（Actual value when static，Example value when dynamic） */
   value: string
 
-  /** 是否启用此参数 */
+  /** Whether to enable this parameter */
   enabled: boolean
 
-  /** 是否为动态参数 */
+  /** Whether it is a dynamic parameter */
   isDynamic: boolean
 
-  /** 数据类型，用于类型转换和验证 */
+  /** data type，for type conversion and validation */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 自动生成的变量名（格式：http_${key}） */
+  /** Automatically generated variable names（Format：http_${key}） */
   variableName: string
 
-  /** 参数说明（动态参数必填，静态参数可选） */
+  /** Parameter description（Dynamic parameters are required，Static parameters are optional） */
   description?: string
 }
 
 /**
- * HTTP请求体配置
+ * HTTPRequest body configuration
  */
 export interface HttpBody {
-  /** 请求体类型 */
+  /** Request body type */
   type: 'json' | 'form' | 'text' | 'binary'
 
-  /** 请求体内容 */
+  /** Request body content */
   content: any
 
-  /** 内容类型 */
+  /** Content type */
   contentType?: string
 }
 
-// ==================== 动态参数系统与占位符解析 ====================
+// ==================== Dynamic parameter system and placeholder parsing ====================
 
 /**
- * 动态参数定义（预留接口）
- * 用于HTTP动态参数系统
+ * Dynamic parameter definition（Reserved interface）
+ * used forHTTPdynamic parameter system
  */
 export interface DynamicParam {
-  /** 参数名称 */
+  /** Parameter name */
   name: string
 
-  /** 参数类型 */
+  /** Parameter type */
   type: 'string' | 'number' | 'boolean' | 'object'
 
-  /** 当前参数值 */
+  /** Current parameter value */
   currentValue: any
 
-  /** 示例值 */
+  /** Example value */
   exampleValue?: any
 
-  /** 参数描述 */
+  /** Parameter description */
   description?: string
 
-  /** 是否必填参数 */
+  /** Is the parameter required? */
   required?: boolean
 
-  /** 参数验证规则 */
+  /** Parameter validation rules */
   validation?: {
-    /** 最小值/最小长度 */
+    /** minimum value/minimum length */
     min?: number
-    /** 最大值/最大长度 */
+    /** maximum value/maximum length */
     max?: number
-    /** 正则表达式 */
+    /** regular expression */
     pattern?: string
-    /** 枚举值 */
+    /** enumeration value */
     enum?: any[]
   }
 }
 
 /**
- * 占位符配置接口
- * 用于{{variableName}}占位符系统
+ * Placeholder configuration interface
+ * used for{{variableName}}placeholder system
  */
 export interface PlaceholderConfig {
-  /** 占位符名称（不包含{{}}） */
+  /** placeholder name（Not included{{}}） */
   name: string
 
-  /** 占位符当前值 */
+  /** placeholder current value */
   value: any
 
-  /** 数据类型 */
+  /** data type */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 是否为必填占位符 */
+  /** Is it a required placeholder? */
   required: boolean
 
-  /** 占位符描述 */
+  /** Placeholder description */
   description?: string
 
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
 
-  /** 验证规则 */
+  /** Validation rules */
   validation?: PlaceholderValidationRule
 }
 
 /**
- * 占位符验证规则
+ * Placeholder validation rules
  */
 export interface PlaceholderValidationRule {
-  /** 最小值/最小长度 */
+  /** minimum value/minimum length */
   min?: number
 
-  /** 最大值/最大长度 */
+  /** maximum value/maximum length */
   max?: number
 
-  /** 正则表达式（字符串类型时使用） */
+  /** regular expression（Used when string type） */
   pattern?: string
 
-  /** 枚举值列表 */
+  /** List of enumeration values */
   enum?: any[]
 
-  /** 自定义验证函数名称 */
+  /** Custom validation function name */
   customValidator?: string
 }
 
 /**
- * 占位符依赖分析结果
+ * Placeholder dependency analysis results
  */
 export interface PlaceholderDependencyAnalysis {
-  /** 分析的配置对象标识 */
+  /** Analyzed configuration object ID */
   configId: string
 
-  /** 发现的所有占位符名称列表 */
+  /** List of all placeholder names found */
   placeholders: string[]
 
-  /** 占位符详细信息映射 */
+  /** Placeholder details map */
   placeholderDetails: Map<string, PlaceholderDependencyDetail>
 
-  /** 是否检测到循环依赖 */
+  /** Whether circular dependencies are detected */
   hasCircularDependency: boolean
 
-  /** 循环依赖路径（如果存在） */
+  /** circular dependency path（if exists） */
   circularDependencyPaths?: string[][]
 }
 
 /**
- * 单个占位符的依赖详情
+ * Dependency details for a single placeholder
  */
 export interface PlaceholderDependencyDetail {
-  /** 占位符名称 */
+  /** placeholder name */
   name: string
 
-  /** 在配置中出现的位置路径 */
+  /** The location path that appears in the configuration */
   occurrences: PlaceholderOccurrence[]
 
-  /** 依赖的其他占位符 */
+  /** Other placeholders for dependencies */
   dependencies: string[]
 
-  /** 被依赖的占位符 */
+  /** Dependent placeholder */
   dependents: string[]
 }
 
 /**
- * 占位符出现位置信息
+ * Placeholder location information
  */
 export interface PlaceholderOccurrence {
-  /** 配置对象路径（如: "config.url", "config.headers[0].value"） */
+  /** Configure object path（like: "config.url", "config.headers[0].value"） */
   path: string
 
-  /** 原始值（包含占位符的字符串） */
+  /** original value（String containing placeholders） */
   originalValue: string
 
-  /** 在该值中的占位符位置 */
+  /** The placeholder position in the value */
   position: {
     start: number
     end: number
   }
 }
 
-// ==================== 组件映射系统 ====================
+// ==================== component mapping system ====================
 
 /**
- * 组件映射配置接口
- * 用于Card2.1组件属性与HTTP参数的映射
+ * Component mapping configuration interface
+ * used forCard2.1Component properties andHTTPParameter mapping
  */
 export interface ComponentMappingConfig {
-  /** 映射配置唯一标识 */
+  /** Mapping configuration unique identifier */
   id: string
 
-  /** 映射名称 */
+  /** Mapping name */
   name: string
 
-  /** 源组件信息 */
+  /** Source component information */
   sourceComponent: ComponentMappingSource
 
-  /** 目标HTTP配置信息 */
+  /** TargetHTTPConfiguration information */
   targetHttpConfig: HttpConfigMappingTarget
 
-  /** 映射关系列表 */
+  /** Mapping relationship list */
   mappings: PropertyToParameterMapping[]
 
-  /** 映射状态 */
+  /** Mapping status */
   status: 'active' | 'inactive' | 'error'
 
-  /** 映射创建时间 */
+  /** Mapping creation time */
   createdAt: number
 
-  /** 最后更新时间 */
+  /** Last updated */
   lastUpdated: number
 
-  /** 映射描述 */
+  /** Mapping description */
   description?: string
 }
 
 /**
- * 组件映射源信息
+ * Component mapping source information
  */
 export interface ComponentMappingSource {
-  /** 组件/卡片ID */
+  /** components/cardID */
   componentId: string
 
-  /** 组件类型 */
+  /** Component type */
   componentType: string
 
-  /** 组件显示名称 */
+  /** Component display name */
   displayName?: string
 
-  /** 可映射的属性列表 */
+  /** List of mappable properties */
   availableProperties: ComponentProperty[]
 }
 
 /**
- * HTTP配置映射目标信息
+ * HTTPConfigure mapping target information
  */
 export interface HttpConfigMappingTarget {
-  /** HTTP配置标识 */
+  /** HTTPConfiguration ID */
   configId: string
 
-  /** HTTP配置名称 */
+  /** HTTPConfiguration name */
   configName?: string
 
-  /** 可映射的参数列表 */
+  /** mappable parameter list */
   availableParameters: HttpMappableParameter[]
 }
 
 /**
- * 组件属性定义
+ * Component property definition
  */
 export interface ComponentProperty {
-  /** 属性名称 */
+  /** Property name */
   name: string
 
-  /** 属性显示名称 */
+  /** Property display name */
   displayName: string
 
-  /** 属性数据类型 */
+  /** Property data type */
   dataType: 'string' | 'number' | 'boolean' | 'object' | 'array'
 
-  /** 属性当前值 */
+  /** Property current value */
   currentValue?: any
 
-  /** 属性描述 */
+  /** Property description */
   description?: string
 
-  /** 是否为只读属性 */
+  /** Whether it is a read-only attribute */
   readonly?: boolean
 
-  /** 属性路径（用于嵌套对象） */
+  /** Property path（for nested objects） */
   path?: string
 }
 
 /**
- * HTTP可映射参数信息
+ * HTTPMapping parameter information
  */
 export interface HttpMappableParameter {
-  /** 参数标识（对应variableName或占位符名称） */
+  /** Parameter identification（correspondvariableNameor placeholder name） */
   parameterId: string
 
-  /** 参数显示名称 */
+  /** Parameter display name */
   displayName: string
 
-  /** 参数类型（header/param/url/body） */
+  /** Parameter type（header/param/url/body） */
   parameterType: 'header' | 'param' | 'url' | 'body'
 
-  /** 数据类型 */
+  /** data type */
   dataType: 'string' | 'number' | 'boolean' | 'json'
 
-  /** 参数描述 */
+  /** Parameter description */
   description?: string
 
-  /** 是否为必填参数 */
+  /** Is it a required parameter? */
   required?: boolean
 
-  /** 参数在配置中的路径 */
+  /** The path of the parameter in the configuration */
   configPath: string
 }
 
 /**
- * 属性到参数的映射关系
+ * Mapping relationship from attributes to parameters
  */
 export interface PropertyToParameterMapping {
-  /** 映射关系唯一标识 */
+  /** Mapping relationship unique identifier */
   id: string
 
-  /** 源组件属性 */
+  /** Source component properties */
   sourceProperty: ComponentProperty
 
-  /** 目标HTTP参数 */
+  /** TargetHTTPparameter */
   targetParameter: HttpMappableParameter
 
-  /** 映射类型 */
+  /** Mapping type */
   mappingType: 'direct' | 'transform' | 'conditional'
 
-  /** 数据转换配置（mappingType为transform时使用） */
+  /** Data conversion configuration（mappingTypefortransformused when） */
   transformation?: DataTransformationConfig
 
-  /** 条件映射配置（mappingType为conditional时使用） */
+  /** Conditional mapping configuration（mappingTypeforconditionalused when） */
   condition?: ConditionalMappingConfig
 
-  /** 映射状态 */
+  /** Mapping status */
   status: 'active' | 'inactive' | 'error'
 
-  /** 最后同步时间 */
+  /** Last sync time */
   lastSyncTime?: number
 }
 
 /**
- * 数据转换配置
+ * Data conversion configuration
  */
 export interface DataTransformationConfig {
-  /** 转换类型 */
+  /** conversion type */
   type: 'format' | 'calculate' | 'lookup' | 'script'
 
-  /** 转换参数 */
+  /** Conversion parameters */
   parameters: Record<string, any>
 
-  /** 转换脚本（type为script时使用） */
+  /** conversion script（typeforscriptused when） */
   script?: string
 }
 
 /**
- * 条件映射配置
+ * Conditional mapping configuration
  */
 export interface ConditionalMappingConfig {
-  /** 条件表达式 */
+  /** conditional expression */
   condition: string
 
-  /** 条件成立时的值 */
+  /** The value when the condition is met */
   trueValue: any
 
-  /** 条件不成立时的值 */
+  /** The value when the condition is not true */
   falseValue: any
 
-  /** 条件评估上下文 */
+  /** conditional evaluation context */
   context?: Record<string, any>
 }
 
-// ==================== 增强版配置系统 ====================
+// ==================== Enhanced version configuration system ====================
 
 /**
- * EnhancedHttpConfig接口
- * 用于UnifiedDataConfig的HTTP配置部分，基于SUBTASK-008设计
+ * EnhancedHttpConfiginterface
+ * used forUnifiedDataConfigofHTTPConfiguration section，based onSUBTASK-008design
  */
 export interface EnhancedHttpConfig {
-  /** 请求URL（支持{{占位符}}） */
+  /** askURL（support{{placeholder}}） */
   url: string
 
-  /** HTTP请求方法 */
+  /** HTTPRequest method */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
-  /** 请求超时时间（毫秒，默认5000） */
+  /** Request timeout（millisecond，default5000） */
   timeout?: number
 
-  /** 请求头配置数组 */
+  /** Request header configuration array */
   headers?: HttpHeader[]
 
-  /** URL参数配置数组 */
+  /** URLParameter configuration array */
   params?: HttpParam[]
 
-  /** 请求体配置 */
+  /** Request body configuration */
   body?: HttpBody
 
-  /** 请求前脚本（调整配置） */
+  /** pre-request script（Adjust configuration） */
   preRequestScript?: string
 
-  /** 响应后脚本（修改响应结果） */
+  /** Post-response script（Modify response results） */
   postResponseScript?: string
 
-  /** 重试配置 */
+  /** Retry configuration */
   retry?: {
-    /** 最大重试次数 */
+    /** Maximum number of retries */
     maxRetries: number
-    /** 重试间隔（毫秒） */
+    /** Retry interval（millisecond） */
     retryDelay: number
   }
 
-  /** 组件映射配置 */
+  /** Component mapping configuration */
   componentMappings?: ComponentMappingConfig[]
 }
 
 /**
- * ConfigurationManager扩展接口
- * 支持占位符解析和模板管理
+ * ConfigurationManagerExtended interface
+ * Support placeholder parsing and template management
  */
 export interface EnhancedConfigurationManager {
   /**
-   * 分析配置中的占位符依赖
-   * @param config 配置对象
-   * @returns 依赖分析结果
+   * Analyze placeholder dependencies in configuration
+   * @param config Configuration object
+   * @returns Dependence analysis results
    */
   analyzePlaceholderDependencies(config: any): PlaceholderDependencyAnalysis
 
   /**
-   * 提取配置中的所有占位符
-   * @param config 配置对象
-   * @returns 占位符名称列表
+   * Extract all placeholders in the configuration
+   * @param config Configuration object
+   * @returns List of placeholder names
    */
   extractPlaceholders(config: any): string[]
 
   /**
-   * 替换配置中的占位符值
-   * @param config 配置对象
-   * @param placeholderValues 占位符值映射
-   * @returns 替换后的配置
+   * Replace placeholder values ​​in configuration
+   * @param config Configuration object
+   * @param placeholderValues placeholder value mapping
+   * @returns Configuration after replacement
    */
   replacePlaceholders(config: any, placeholderValues: Map<string, any>): any
 
   /**
-   * 验证占位符配置
-   * @param config 配置对象
-   * @param placeholderConfigs 占位符配置映射
-   * @returns 验证结果
+   * Verify placeholder configuration
+   * @param config Configuration object
+   * @param placeholderConfigs Placeholder configuration mapping
+   * @returns Verification results
    */
   validatePlaceholders(config: any, placeholderConfigs: Map<string, PlaceholderConfig>): PlaceholderValidationResult
 
   /**
-   * 检测循环依赖
-   * @param dependencies 依赖关系映射
-   * @returns 循环依赖检测结果
+   * Detect circular dependencies
+   * @param dependencies Dependency mapping
+   * @returns Circular dependency detection results
    */
   detectCircularDependencies(dependencies: Map<string, string[]>): CircularDependencyResult
 }
 
 /**
- * 占位符验证结果
+ * Placeholder verification results
  */
 export interface PlaceholderValidationResult {
-  /** 验证是否通过 */
+  /** Verification passed */
   isValid: boolean
 
-  /** 验证错误列表 */
+  /** Validation error list */
   errors: PlaceholderValidationError[]
 
-  /** 验证警告列表 */
+  /** Validation warning list */
   warnings: PlaceholderValidationWarning[]
 
-  /** 缺失的必填占位符 */
+  /** Missing required placeholder */
   missingRequired: string[]
 
-  /** 未定义的占位符 */
+  /** undefined placeholder */
   undefined: string[]
 }
 
 /**
- * 占位符验证错误
+ * Placeholder validation error
  */
 export interface PlaceholderValidationError {
-  /** 占位符名称 */
+  /** placeholder name */
   placeholder: string
 
-  /** 错误类型 */
+  /** Error type */
   type: 'missing' | 'invalid_type' | 'validation_failed' | 'circular_dependency'
 
-  /** 错误信息 */
+  /** error message */
   message: string
 
-  /** 错误位置路径 */
+  /** Error location path */
   path?: string
 }
 
 /**
- * 占位符验证警告
+ * Placeholder validation warning
  */
 export interface PlaceholderValidationWarning {
-  /** 占位符名称 */
+  /** placeholder name */
   placeholder: string
 
-  /** 警告类型 */
+  /** warning type */
   type: 'unused' | 'deprecated' | 'performance'
 
-  /** 警告信息 */
+  /** warning message */
   message: string
 }
 
 /**
- * 循环依赖检测结果
+ * Circular dependency detection results
  */
 export interface CircularDependencyResult {
-  /** 是否存在循环依赖 */
+  /** Are there circular dependencies? */
   hasCircularDependency: boolean
 
-  /** 循环依赖路径列表 */
+  /** Circular dependency path list */
   circularPaths: string[][]
 
-  /** 涉及循环依赖的占位符 */
+  /** Placeholders involving circular dependencies */
   affectedPlaceholders: string[]
 }
 
 /**
- * 增强版数据源配置
- * 继承现有配置，增加版本管理和动态参数支持
+ * Enhanced data source configuration
+ * Inherit existing configuration，Add version management and dynamic parameter support
  */
 export interface EnhancedDataSourceConfiguration extends LegacyDataSourceConfiguration {
-  /** 配置版本标识 */
+  /** Configuration version identifier */
   version: string
 
-  /** 动态参数定义（预留） */
+  /** Dynamic parameter definition（reserved） */
   dynamicParams?: DynamicParam[]
 
-  /** 增强功能开关 */
+  /** Enhanced function switch */
   enhancedFeatures?: EnhancedFeatureFlags
 
-  /** 配置元数据 */
+  /** Configuration metadata */
   metadata?: ConfigurationMetadata
 
-  /** 占位符配置映射 */
+  /** Placeholder configuration mapping */
   placeholderConfigs?: Map<string, PlaceholderConfig>
 
-  /** 组件映射配置列表 */
+  /** Component mapping configuration list */
   componentMappings?: ComponentMappingConfig[]
 }
 
 /**
- * 增强功能开关
+ * Enhanced function switch
  */
 export interface EnhancedFeatureFlags {
-  /** 启用HTTP数组格式 */
+  /** enableHTTParray format */
   httpArrayFormat: boolean
 
-  /** 启用动态参数支持 */
+  /** Enable dynamic parameter support */
   dynamicParameterSupport: boolean
 
-  /** 启用安全脚本执行 */
+  /** Enable secure script execution */
   secureScriptExecution: boolean
 
-  /** 启用配置验证 */
+  /** Enable configuration verification */
   configurationValidation: boolean
 
-  /** 启用性能监控 */
+  /** Enable performance monitoring */
   performanceMonitoring: boolean
 }
 
 /**
- * 配置元数据
+ * Configuration metadata
  */
 export interface ConfigurationMetadata {
-  /** 配置名称 */
+  /** Configuration name */
   name?: string
 
-  /** 配置描述 */
+  /** Configuration description */
   description?: string
 
-  /** 配置创建者 */
+  /** Configuration creator */
   author?: string
 
-  /** 配置版本历史 */
+  /** Configuration version history */
   versionHistory?: ConfigurationVersion[]
 
-  /** 配置标签 */
+  /** Configure tags */
   tags?: string[]
 }
 
 /**
- * 配置版本信息
+ * Configure version information
  */
 export interface ConfigurationVersion {
-  /** 版本号 */
+  /** version number */
   version: string
 
-  /** 变更时间 */
+  /** Change time */
   timestamp: number
 
-  /** 变更说明 */
+  /** Change description */
   changelog: string
 
-  /** 变更作者 */
+  /** Change author */
   author?: string
 }
 
-// ==================== 配置适配器系统 ====================
+// ==================== Configure adapter system ====================
 
 /**
- * 配置版本适配器
- * 处理新旧配置格式的自动转换
+ * Configure version adapter
+ * Handles automatic conversion of old and new configuration formats
  */
 export interface ConfigurationAdapter {
   /**
-   * 检测配置版本
-   * @param config 配置对象
-   * @returns 版本标识
+   * Check configuration version
+   * @param config Configuration object
+   * @returns Version ID
    */
   detectVersion(config: any): 'v1.0' | 'v2.0'
 
   /**
-   * 适配配置到指定版本
-   * @param config 源配置
-   * @param targetVersion 目标版本
-   * @returns 适配后的配置
+   * Adapt configuration to specified version
+   * @param config Source configuration
+   * @param targetVersion target version
+   * @returns Configuration after adaptation
    */
   adaptToVersion(config: any, targetVersion: 'v1.0' | 'v2.0'): any
 
   /**
-   * v1升级到v2（无损升级）
-   * @param v1Config v1格式配置
-   * @returns v2格式配置
+   * v1upgrade tov2（Lossless upgrade）
+   * @param v1Config v1Format configuration
+   * @returns v2Format configuration
    */
   upgradeV1ToV2(v1Config: LegacyDataSourceConfiguration): EnhancedDataSourceConfiguration
 
   /**
-   * v2降级到v1（功能裁剪）
-   * @param v2Config v2格式配置
-   * @returns v1格式配置
+   * v2downgrade tov1（Functional tailoring）
+   * @param v2Config v2Format configuration
+   * @returns v1Format configuration
    */
   downgradeV2ToV1(v2Config: EnhancedDataSourceConfiguration): LegacyDataSourceConfiguration
 }
 
-// ==================== 类型工具和辅助函数 ====================
+// ==================== Type tools and helper functions ====================
 
 /**
- * 数据类型转换器
- * 用于HttpHeader和HttpParam的值转换
+ * data type converter
+ * used forHttpHeaderandHttpParamvalue conversion
  */
 export class DataTypeConverter {
   /**
-   * 将字符串值转换为指定类型
-   * @param value 原始字符串值
-   * @param dataType 目标数据类型
-   * @returns 转换后的值
+   * Convert a string value to a specified type
+   * @param value raw string value
+   * @param dataType target data type
+   * @returns converted value
    */
   static convertValue(value: string, dataType: 'string' | 'number' | 'boolean' | 'json'): any {
     if (value === null || value === undefined || value === '') {
@@ -820,7 +820,7 @@ export class DataTypeConverter {
       case 'number': {
         const num = Number(value)
         if (isNaN(num)) {
-          throw new Error(`无法将值 "${value}" 转换为数字类型`)
+          throw new Error(`Unable to convert value "${value}" Convert to numeric type`)
         }
         return num
       }
@@ -833,14 +833,14 @@ export class DataTypeConverter {
         if (lowerValue === 'false' || lowerValue === '0') {
           return false
         }
-        throw new Error(`无法将值 "${value}" 转换为布尔类型`)
+        throw new Error(`Unable to convert value "${value}" Convert to boolean type`)
       }
 
       case 'json': {
         try {
           return JSON.parse(value)
         } catch (error) {
-          throw new Error(`无法将值 "${value}" 转换为JSON类型: ${error.message}`)
+          throw new Error(`Unable to convert value "${value}" Convert toJSONtype: ${error.message}`)
         }
       }
 
@@ -850,10 +850,10 @@ export class DataTypeConverter {
   }
 
   /**
-   * 验证值是否符合指定类型
-   * @param value 要验证的值
-   * @param dataType 期望的数据类型
-   * @returns 验证结果
+   * Verify that the value conforms to the specified type
+   * @param value value to verify
+   * @param dataType expected data type
+   * @returns Verification results
    */
   static validateType(value: any, dataType: 'string' | 'number' | 'boolean' | 'json'): boolean {
     switch (dataType) {
@@ -872,7 +872,7 @@ export class DataTypeConverter {
             JSON.parse(value)
             return true
           }
-          // 如果已经是对象，检查是否可序列化
+          // If it is already an object，Check if serializable
           JSON.stringify(value)
           return true
         } catch {
@@ -885,9 +885,9 @@ export class DataTypeConverter {
   }
 
   /**
-   * 获取值的实际数据类型
-   * @param value 要检查的值
-   * @returns 数据类型字符串
+   * Get the actual data type of the value
+   * @param value value to check
+   * @returns data type string
    */
   static getActualType(value: any): 'string' | 'number' | 'boolean' | 'json' | 'unknown' {
     if (typeof value === 'string') {
@@ -907,17 +907,17 @@ export class DataTypeConverter {
 }
 
 /**
- * 占位符工具类
- * 用于处理{{variableName}}占位符
+ * Placeholder tool class
+ * for processing{{variableName}}placeholder
  */
 export class PlaceholderUtils {
-  /** 占位符正则表达式 */
+  /** Placeholder regular expression */
   private static readonly PLACEHOLDER_REGEX = /\{\{([^}]+)\}\}/g
 
   /**
-   * 提取字符串中的所有占位符
-   * @param text 包含占位符的文本
-   * @returns 占位符名称数组
+   * Extract all placeholders in a string
+   * @param text Text containing placeholders
+   * @returns Array of placeholder names
    */
   static extractPlaceholders(text: string): string[] {
     if (typeof text !== 'string') {
@@ -927,7 +927,7 @@ export class PlaceholderUtils {
     const matches: string[] = []
     let match: RegExpExecArray | null
 
-    // 重置正则表达式状态
+    // Reset regular expression status
     this.PLACEHOLDER_REGEX.lastIndex = 0
 
     while ((match = this.PLACEHOLDER_REGEX.exec(text)) !== null) {
@@ -941,10 +941,10 @@ export class PlaceholderUtils {
   }
 
   /**
-   * 替换字符串中的占位符
-   * @param text 包含占位符的文本
-   * @param values 占位符值映射
-   * @returns 替换后的文本
+   * Replace placeholders in string
+   * @param text Text containing placeholders
+   * @param values placeholder value mapping
+   * @returns Replaced text
    */
   static replacePlaceholders(text: string, values: Map<string, any>): string {
     if (typeof text !== 'string') {
@@ -957,43 +957,43 @@ export class PlaceholderUtils {
         const value = values.get(trimmedName)
         return value !== null && value !== undefined ? String(value) : match
       }
-      return match // 保持原占位符如果没有找到值
+      return match // Keep the original placeholder if no value is found
     })
   }
 
   /**
-   * 验证占位符名称格式
-   * @param name 占位符名称
-   * @returns 是否为有效名称
+   * Validate placeholder name format
+   * @param name placeholder name
+   * @returns Is it a valid name?
    */
   static isValidPlaceholderName(name: string): boolean {
     if (!name || typeof name !== 'string') {
       return false
     }
 
-    // 占位符名称规则：字母开头，可包含字母、数字、下划线
+    // Placeholder name rules：Beginning with letters，Can contain letters、number、Underline
     const nameRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/
     return nameRegex.test(name.trim())
   }
 
   /**
-   * 生成HTTP参数的占位符名称
-   * @param parameterKey 参数键名
-   * @returns 标准化的占位符名称
+   * generateHTTPPlaceholder name for parameter
+   * @param parameterKey Parameter key name
+   * @returns Standardized placeholder names
    */
   static generateHttpPlaceholderName(parameterKey: string): string {
     if (!parameterKey || typeof parameterKey !== 'string') {
-      throw new Error('参数键名不能为空')
+      throw new Error('Parameter key name cannot be empty')
     }
 
-    // 清理参数键名，只保留字母数字和下划线
+    // Clean up parameter key names，Keep only letters, numbers and underscores
     const cleanKey = parameterKey
       .replace(/[^a-zA-Z0-9_]/g, '_')
-      .replace(/_+/g, '_') // 合并连续的下划线
-      .replace(/^_+|_+$/g, '') // 移除开头和结尾的下划线
+      .replace(/_+/g, '_') // Combine consecutive underscores
+      .replace(/^_+|_+$/g, '') // Remove leading and trailing underscores
 
     if (!cleanKey) {
-      throw new Error(`无效的参数键名: ${parameterKey}`)
+      throw new Error(`Invalid parameter key name: ${parameterKey}`)
     }
 
     return `http_${cleanKey}`
@@ -1001,28 +1001,28 @@ export class PlaceholderUtils {
 }
 
 /**
- * 类型守卫：检查是否为增强版配置
+ * type guard：Check whether it is an enhanced version configuration
  */
 export function isEnhancedConfiguration(config: any): config is EnhancedDataSourceConfiguration {
   return config && typeof config.version === 'string' && config.version.startsWith('2.')
 }
 
 /**
- * 类型守卫：检查是否为泛型数据项配置
+ * type guard：Check whether it is configured for generic data items
  */
 export function isGenericDataItemConfig(item: any): item is DataItemConfig {
   return item && typeof item.type === 'string' && typeof item.id === 'string' && item.config
 }
 
 /**
- * 类型守卫：检查是否为增强版HTTP配置
+ * type guard：Check if it is an enhanced versionHTTPConfiguration
  */
 export function isEnhancedHttpConfig(config: any): config is EnhancedHttpDataItemConfig {
   return config && Array.isArray(config.headers) && Array.isArray(config.params)
 }
 
 /**
- * 类型守卫：检查是否为EnhancedHttpConfig（用于UnifiedDataConfig）
+ * type guard：Check if it isEnhancedHttpConfig（used forUnifiedDataConfig）
  */
 export function isUnifiedHttpConfig(config: any): config is EnhancedHttpConfig {
   return (
@@ -1035,7 +1035,7 @@ export function isUnifiedHttpConfig(config: any): config is EnhancedHttpConfig {
 }
 
 /**
- * 类型守卫：检查是否为有效的HttpHeader
+ * type guard：Check if it is validHttpHeader
  */
 export function isValidHttpHeader(header: any): header is HttpHeader {
   return (
@@ -1050,7 +1050,7 @@ export function isValidHttpHeader(header: any): header is HttpHeader {
 }
 
 /**
- * 类型守卫：检查是否为有效的HttpParam
+ * type guard：Check if it is validHttpParam
  */
 export function isValidHttpParam(param: any): param is HttpParam {
   return (
@@ -1065,7 +1065,7 @@ export function isValidHttpParam(param: any): param is HttpParam {
 }
 
 /**
- * 类型守卫：检查是否为有效的PlaceholderConfig
+ * type guard：Check if it is validPlaceholderConfig
  */
 export function isValidPlaceholderConfig(config: any): config is PlaceholderConfig {
   return (
@@ -1078,7 +1078,7 @@ export function isValidPlaceholderConfig(config: any): config is PlaceholderConf
 }
 
 /**
- * 类型守卫：检查是否为有效的ComponentMappingConfig
+ * type guard：Check if it is validComponentMappingConfig
  */
 export function isValidComponentMappingConfig(config: any): config is ComponentMappingConfig {
   return (
@@ -1092,10 +1092,10 @@ export function isValidComponentMappingConfig(config: any): config is ComponentM
   )
 }
 
-// ==================== 向后兼容性保证 ====================
+// ==================== Backward compatibility guaranteed ====================
 
 /**
- * 配置类型版本枚举
+ * Configuration type version enum
  */
 export enum ConfigurationVersionEnum {
   V1_0 = 'v1.0',
@@ -1103,7 +1103,7 @@ export enum ConfigurationVersionEnum {
 }
 
 /**
- * 默认的增强功能开关配置
+ * Default enhanced feature switch configuration
  */
 export const DEFAULT_ENHANCED_FEATURES: EnhancedFeatureFlags = {
   httpArrayFormat: true,
@@ -1113,27 +1113,27 @@ export const DEFAULT_ENHANCED_FEATURES: EnhancedFeatureFlags = {
   performanceMonitoring: true
 }
 
-// ==================== 导出汇总 ====================
+// ==================== Export summary ====================
 
 export type {
-  // 泛型配置类型
+  // Generic configuration type
   DataItemConfig,
   DataItemMetadata,
 
-  // 具体数据项类型
+  // Specific data item type
   EnhancedJsonDataItemConfig,
   EnhancedHttpDataItemConfig,
   HttpHeader,
   HttpParam,
   HttpBody,
 
-  // 增强HTTP配置（用于UnifiedDataConfig）
+  // EnhanceHTTPConfiguration（used forUnifiedDataConfig）
   EnhancedHttpConfig,
 
-  // 动态参数系统
+  // dynamic parameter system
   DynamicParam,
 
-  // 占位符系统
+  // placeholder system
   PlaceholderConfig,
   PlaceholderValidationRule,
   PlaceholderDependencyAnalysis,
@@ -1143,7 +1143,7 @@ export type {
   PlaceholderValidationError,
   PlaceholderValidationWarning,
 
-  // 组件映射系统
+  // component mapping system
   ComponentMappingConfig,
   ComponentMappingSource,
   HttpConfigMappingTarget,
@@ -1153,15 +1153,15 @@ export type {
   DataTransformationConfig,
   ConditionalMappingConfig,
 
-  // ConfigurationManager扩展
+  // ConfigurationManagerExpand
   EnhancedConfigurationManager,
   CircularDependencyResult,
 
-  // 增强配置系统
+  // Enhanced configuration system
   EnhancedDataSourceConfiguration,
   EnhancedFeatureFlags,
   ConfigurationMetadata,
 
-  // 适配器系统
+  // adapter system
   ConfigurationAdapter
 }

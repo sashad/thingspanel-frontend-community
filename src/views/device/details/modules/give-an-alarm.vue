@@ -142,7 +142,7 @@ const handleDelete = async (item: any) => {
       try {
         await deviceAlarmHistoryDelete(item.id)
         window.$message?.success($t('common.deleteSuccess'))
-        // 从列表中移除已删除的项
+        // Remove deleted items from list
         const index = alarmHistory.value.findIndex(alarm => alarm.id === item.id)
         if (index > -1) {
           alarmHistory.value.splice(index, 1)
@@ -237,7 +237,7 @@ onMounted(() => {
               </NFlex>
               <NFlex>
                 <div>{{ item['name'] }}</div>
-                <!--              <div style="color: #646cff">设备名称</div>-->
+                <!--              <div style="color: #646cff">Device name</div>-->
               </NFlex>
             </NFlex>
             <div>
@@ -360,7 +360,7 @@ onMounted(() => {
       .line-style {
         position: relative;
         height: 20px;
-        /* 线的高度 */
+        /* line height */
         width: 1px;
       }
 

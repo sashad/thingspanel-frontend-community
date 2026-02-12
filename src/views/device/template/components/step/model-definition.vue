@@ -88,7 +88,7 @@ const checkedTabs: (value: string | number) => void = value => {
   tabsCurrent.value = value
 }
 
-// 分页参数
+// Paging parameters
 const pagination: PaginationProps = reactive({
   page: 1,
   pageSize: 1,
@@ -110,20 +110,20 @@ const pagination: PaginationProps = reactive({
   }
 })
 
-// 编辑
+// edit
 let objItem = reactive<any>({})
 const edit: (row: any) => void = row => {
   addAndEditModalVisible.value = true
   objItem = row
 }
 
-// 新增或者编辑成功后的回调函数
+// Callback function after successful addition or editing
 const determine: () => void = () => {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   getTableData(tabsCurrent.value)
 }
 
-// 删除
+// delete
 const del: (id: string) => void = async id => {
   if (tabsCurrent.value === 'telemetry') {
     await delTelemetry(id)
@@ -137,15 +137,15 @@ const del: (id: string) => void = async id => {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   getTableData(tabsCurrent.value)
 }
-// 上一步
+// Previous step
 const next: () => void = async () => {
   emit('update:stepCurrent', 3)
 }
-// 下一步
+// Next step
 const back: () => void = async () => {
   emit('update:stepCurrent', 1)
 }
-// 取消
+// Cancel
 const cancellation: () => void = () => {
   emit('update:modalVisible', false)
 }
@@ -309,9 +309,9 @@ const updateAttributesData = (data: any) => {
   columnsList[1].data = data?.list ?? []
   columnsList[1].total = Math.ceil(data?.total / 5)
   columnsList[1].data?.forEach((item: any) => {
-    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
       item.read_write_flag = $t('device_template.table_header.readOnly')
-    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
       item.read_write_flag = $t('device_template.table_header.readAndWrite')
     }
   })
@@ -336,9 +336,9 @@ const updateTelemetryData = (data: any) => {
   columnsList[0].data = data?.list ?? []
   columnsList[0].total = Math.ceil(data?.total / 5)
   columnsList[0].data.forEach((item: any) => {
-    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
       item.read_write_flag = $t('device_template.table_header.readOnly')
-    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
       item.read_write_flag = $t('device_template.table_header.readAndWrite')
     }
   })

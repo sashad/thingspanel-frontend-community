@@ -5,7 +5,7 @@ import { $t } from '@/locales'
 defineOptions({ name: 'LoginAgreement' })
 
 interface Props {
-  /** 是否勾选 */
+  /** Check or not */
   value?: boolean
 }
 
@@ -16,10 +16,10 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'update:value', value: boolean): void
 
-  /** 点击协议 */
+  /** Click Agreement */
   (e: 'click-protocol'): void
 
-  /** 点击隐私政策 */
+  /** Click Privacy Policy */
   (e: 'click-policy'): void
 }
 

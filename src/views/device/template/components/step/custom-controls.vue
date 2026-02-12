@@ -17,7 +17,7 @@ const props = defineProps<{
   id: string
 }>()
 
-// 主题系统集成
+// Theme system integration
 const themeStore = useThemeStore()
 
 const configFormRules = ref({
@@ -54,7 +54,7 @@ const cmRef = ref()
 
 const setupEditor = () => {
   nextTick(() => {
-    // CodeMirror 6 会自动处理，不需要手动聚焦
+    // CodeMirror 6 will be processed automatically，No need for manual focus
   })
 }
 const openCommandDialog = () => {

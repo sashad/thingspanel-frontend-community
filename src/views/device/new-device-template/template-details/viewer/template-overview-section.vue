@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 模板顶部信息展示 - 对齐设备详情风格
+ * Information display at the top of the template - Align device detail style
  */
 
 import { inject, computed } from 'vue'
@@ -16,11 +16,11 @@ const emit = defineEmits(['edit'])
 const templateData = inject<Ref<any>>('templateData')!
 const fullTemplateJson = inject<Ref<string>>('fullTemplateJson')!
 
-// JSON 弹窗显示状态
+// JSON Pop-up window display status
 const showJsonModal = ref(false)
 
 /**
- * 获取图标URL
+ * Get iconURL
  */
 const getIconUrl = (path: string) => {
   if (!path) return ''
@@ -29,7 +29,7 @@ const getIconUrl = (path: string) => {
 }
 
 /**
- * 标签列表
+ * tag list
  */
 const tags = computed(() => {
   if (!templateData.value || !templateData.value.label) return []
@@ -37,14 +37,14 @@ const tags = computed(() => {
 })
 
 /**
- * 查看完整JSON
+ * View fullJSON
  */
 const viewJson = () => {
   showJsonModal.value = true
 }
 
 /**
- * 复制JSON到剪贴板
+ * copyJSONto clipboard
  */
 const copyJson = (): void => {
   const text = fullTemplateJson.value
@@ -72,7 +72,7 @@ const copyJson = (): void => {
 
 <template>
   <div class="template-overview">
-    <!-- 第一行：图标 + 模板名称 + 小编辑按钮 -->
+    <!-- first line：icon + Template name + small edit button -->
     <div class="header-row">
       <div class="name-with-edit">
         <div class="icon-container">
@@ -90,7 +90,7 @@ const copyJson = (): void => {
       </NSpace>
     </div>
 
-    <!-- 第二行：详细信息（灰色小字） -->
+    <!-- second line：Details（small gray letters） -->
     <NFlex class="info-row">
       <div class="info-item">
         <span class="label">ID:</span>
@@ -120,13 +120,13 @@ const copyJson = (): void => {
       </div>
     </NFlex>
 
-    <!-- 描述（如果有） -->
+    <!-- describe（if there is） -->
     <div v-if="templateData?.description" class="description-row">
       <span class="label">{{ $t('device_template.table_header.description') }}:</span>
       <span class="value">{{ templateData.description }}</span>
     </div>
 
-    <!-- JSON 查看弹窗 -->
+    <!-- JSON View pop-ups -->
     <NModal
       v-model:show="showJsonModal"
       :title="$t('device_template.fullTemplateJson')"
@@ -153,13 +153,13 @@ const copyJson = (): void => {
   justify-content: space-between;
   align-items: center;
   margin-top: -5px;
-  gap: 16px; // 增加间距防止按钮被遮挡
+  gap: 16px; // Increase spacing to prevent buttons from being obscured
 
   .name-with-edit {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0; // 防止被压缩
+    flex-shrink: 0; // prevent compression
 
     .icon-container {
       width: 40px;

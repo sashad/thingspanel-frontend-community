@@ -1,6 +1,6 @@
 /**
  * @file ConfigurationImportExport.ts
- * @description 配置导入导出工具类，处理组件 ID 映射和依赖管理
+ * @description Configure import and export tool classes，Processing components ID Mapping and dependency management
  */
 
 import type { DataSourceConfiguration } from '@/core/data-architecture/index'
@@ -8,68 +8,68 @@ import type { configurationIntegrationBridge } from '@/components/visual-editor/
 import { smartDeepClone } from '@/utils/deep-clone'
 
 /**
- * 导出配置的标准格式
+ * Standard format for exporting configurations
  */
 export interface ExportedConfiguration {
-  /** 导出格式版本 */
+  /** Export format version */
   version: string
-  /** 导出时间戳 */
+  /** Export timestamp */
   exportTime: number
-  /** 组件类型（可选） */
+  /** Component type（Optional） */
   componentType?: string
-  /** 元数据信息 */
+  /** metadata information */
   metadata: {
-    /** 原始组件 ID */
+    /** original component ID */
     originalComponentId: string
-    /** 导出来源 */
+    /** Export source */
     exportSource: string
-    /** 依赖的外部组件 ID 列表 */
+    /** Dependent external components ID list */
     dependencies: string[]
-    /** 配置项统计 */
+    /** Configuration item statistics */
     statistics: {
       dataSourceCount: number
       interactionCount: number
       httpConfigCount: number
     }
   }
-  /** 实际配置数据 */
+  /** Actual configuration data */
   data: {
-    /** 数据源配置 */
+    /** Data source configuration */
     dataSourceConfiguration?: any
-    /** 组件配置 */
+    /** Component configuration */
     componentConfiguration?: any
-    /** 交互配置 */
+    /** Interactive configuration */
     interactionConfiguration?: any[]
   }
-  /** ID 映射信息 */
+  /** ID Mapping information */
   mapping: {
-    /** 占位符映射表 */
+    /** placeholder map */
     placeholders: {
       [placeholder: string]: 'current_component' | 'external_component'
     }
-    /** 组件依赖关系 */
+    /** Component dependencies */
     dependencies: {
       [externalComponentId: string]: {
-        usage: string[] // 使用位置描述
-        required: boolean // 是否必需
+        usage: string[] // Use location description
+        required: boolean // Is it necessary
       }
     }
   }
 }
 
 /**
- * 导入结果接口
+ * Import result interface
  */
 export interface ImportResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 错误信息 */
+  /** error message */
   errors: string[]
-  /** 警告信息 */
+  /** warning message */
   warnings: string[]
-  /** 导入的配置数据 */
+  /** Imported configuration data */
   importedData?: any
-  /** 依赖验证结果 */
+  /** Depend on verification results */
   dependencyValidation?: {
     missing: string[]
     found: string[]
@@ -77,81 +77,81 @@ export interface ImportResult {
 }
 
 /**
- * 导入预览结果
+ * Import preview results
  */
 export interface ImportPreview {
-  /** 基本信息 */
+  /** Basic information */
   basicInfo: {
     version: string
     exportTime: number
     componentType: string
     exportSource: string
   }
-  /** 配置统计 */
+  /** Configuration statistics */
   statistics: {
     dataSourceCount: number
     interactionCount: number
     httpConfigCount: number
   }
-  /** 外部依赖组件ID列表 */
+  /** External dependent componentsIDlist */
   dependencies: string[]
-  /** 冲突描述列表 */
+  /** conflict description list */
   conflicts: string[]
 }
 
 /**
- * 单数据源导出配置的标准格式
+ * Standard format for single data source export configurations
  */
 export interface SingleDataSourceExport {
-  /** 导出格式版本 */
+  /** Export format version */
   version: string
-  /** 导出类型标识 */
+  /** Export type identifier */
   exportType: 'single-datasource'
-  /** 导出时间戳 */
+  /** Export timestamp */
   exportTime: number
-  /** 数据源元数据 */
+  /** Data source metadata */
   sourceMetadata: {
-    /** 原始数据源ID */
+    /** original data sourceID */
     originalSourceId: string
-    /** 在原组件中的索引位置 */
+    /** The index position in the original component */
     sourceIndex: number
-    /** 原始组件ID */
+    /** original componentID */
     originalComponentId: string
-    /** 导出来源 */
+    /** Export source */
     exportSource: string
-    /** 组件类型（可选） */
+    /** Component type（Optional） */
     componentType?: string
   }
-  /** 数据源配置内容 */
+  /** Data source configuration content */
   dataSourceConfig: {
-    /** 数据项配置 */
+    /** Data item configuration */
     dataItems: any[]
-    /** 合并策略 */
+    /** merge strategy */
     mergeStrategy: any
-    /** 数据处理配置 */
+    /** Data processing configuration */
     processing?: any
   }
-  /** 相关配置 */
+  /** Related configuration */
   relatedConfig: {
-    /** 相关的交互配置 */
+    /** Related interaction configurations */
     interactions: any[]
-    /** 相关的HTTP绑定 */
+    /** relevantHTTPbinding */
     httpBindings: any[]
   }
-  /** 组件ID映射信息 */
+  /** componentsIDMapping information */
   mapping: {
-    /** 占位符映射 */
+    /** placeholder mapping */
     placeholders: Record<string, string>
-    /** 外部依赖 */
+    /** external dependencies */
     dependencies: string[]
   }
 }
 
 /**
- * 单数据源导入预览结果
+ * Single data source import preview results
  */
 export interface SingleDataSourceImportPreview {
-  /** 基本信息 */
+  /** Basic information */
   basicInfo: {
     version: string
     exportType: string
@@ -160,22 +160,22 @@ export interface SingleDataSourceImportPreview {
     sourceIndex: number
     exportSource: string
   }
-  /** 数据源配置摘要 */
+  /** Data source configuration summary */
   configSummary: {
     dataItemCount: number
     mergeStrategy: string
     hasProcessing: boolean
   }
-  /** 相关配置统计 */
+  /** Related configuration statistics */
   relatedConfig: {
     interactionCount: number
     httpBindingCount: number
   }
-  /** 外部依赖 */
+  /** external dependencies */
   dependencies: string[]
-  /** 冲突检测 */
+  /** Clash detection */
   conflicts: string[]
-  /** 可用的目标槽位 */
+  /** Available target slots */
   availableSlots: Array<{
     slotId: string
     slotIndex: number
@@ -185,33 +185,33 @@ export interface SingleDataSourceImportPreview {
 }
 
 /**
- * 配置导出器类
+ * Configure exporter class
  */
 export class ConfigurationExporter {
   private readonly CURRENT_COMPONENT_PLACEHOLDER = '__CURRENT_COMPONENT__'
   private readonly EXPORT_VERSION = '1.0.0'
 
   /**
-   * 导出组件配置为 JSON
-   * @param componentId 要导出的组件 ID
-   * @param configurationManager 配置管理器实例
-   * @returns 导出的配置对象
+   * The export component is configured as JSON
+   * @param componentId Component to export ID
+   * @param configurationManager Configuration manager instance
+   * @returns Exported configuration object
    */
   async exportConfiguration(
     componentId: string,
     configurationManager: any,
     componentType?: string
   ): Promise<ExportedConfiguration> {
-    // 获取完整配置
+    // Get full configuration
     const fullConfig = configurationManager.getConfiguration(componentId)
     if (!fullConfig) {
-      throw new Error(`组件 ${componentId} 的配置不存在`)
+      throw new Error(`components ${componentId} The configuration does not exist`)
     }
 
-    // 分析和处理组件 ID
+    // Analysis and processing components ID
     const { processedConfig, dependencies, statistics } = this.processConfigurationForExport(fullConfig, componentId)
 
-    // 构建导出格式
+    // Build export format
     const exportedConfig: ExportedConfiguration = {
       version: this.EXPORT_VERSION,
       exportTime: Date.now(),
@@ -239,7 +239,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 处理配置中的组件 ID 引用
+   * Handle components in configuration ID Quote
    */
   private processConfigurationForExport(
     config: any,
@@ -258,24 +258,24 @@ export class ConfigurationExporter {
         return obj
       }
 
-      // 处理字符串类型的 ID 引用
+      // Processing string types ID Quote
       if (typeof obj === 'string') {
         return this.processStringValue(obj, currentComponentId, dependencies, path)
       }
 
-      // 处理数组
+      // Processing arrays
       if (Array.isArray(obj)) {
         return obj.map((item, index) => processValue(item, `${path}[${index}]`))
       }
 
-      // 处理对象
+      // Processing object
       if (typeof obj === 'object') {
         const processed: any = {}
 
         for (const [key, value] of Object.entries(obj)) {
           const currentPath = path ? `${path}.${key}` : key
 
-          // 统计配置项数量
+          // Count the number of configuration items
           if (key === 'responses' && Array.isArray(value)) {
             interactionCount += (value as any[]).length
           }
@@ -283,7 +283,7 @@ export class ConfigurationExporter {
             httpConfigCount++
           }
 
-          // 特殊处理组件 ID 字段
+          // Special processing components ID Field
           if (this.isComponentIdField(key) && typeof value === 'string') {
             processed[key] = this.processComponentId(value, currentComponentId, dependencies, currentPath)
           } else {
@@ -311,7 +311,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 处理字符串值中的组件 ID 引用
+   * Handle components in string values ID Quote
    */
   private processStringValue(
     value: string,
@@ -319,12 +319,12 @@ export class ConfigurationExporter {
     dependencies: Set<string>,
     path: string
   ): string {
-    // 处理变量名中的组件 ID（如：device_id_comp_123）
+    // Handling components in variable names ID（like：device_id_comp_123）
     if (value.includes(currentComponentId)) {
       return value.replace(new RegExp(currentComponentId, 'g'), this.CURRENT_COMPONENT_PLACEHOLDER)
     }
 
-    // 检测其他组件 ID 引用
+    // Detect other components ID Quote
     const componentIdPattern = /comp_[a-zA-Z0-9_-]+/g
     const matches = value.match(componentIdPattern)
     if (matches) {
@@ -339,7 +339,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 处理组件 ID 字段
+   * Processing components ID Field
    */
   private processComponentId(
     componentId: string,
@@ -356,7 +356,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 判断是否为组件 ID 字段
+   * Determine whether it is a component ID Field
    */
   private isComponentIdField(key: string): boolean {
     const componentIdFields = ['componentId', 'targetComponentId', 'sourceComponentId']
@@ -364,7 +364,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 构建依赖映射信息
+   * Build dependency mapping information
    */
   private buildDependencyMapping(dependencies: string[], processedConfig: any): any {
     const mapping: any = {}
@@ -380,12 +380,12 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 查找组件的使用位置
+   * Find where a component is used
    */
   private findComponentUsage(componentId: string, config: any): string[] {
     const usage: string[] = []
 
-    // 递归查找使用位置
+    // Recursive search using location
     const findUsage = (obj: any, path: string = ''): void => {
       if (typeof obj === 'string' && obj.includes(componentId)) {
         usage.push(path || 'root')
@@ -406,7 +406,7 @@ export class ConfigurationExporter {
   }
 
   /**
-   * 下载配置为 JSON 文件
+   * The download configuration is JSON document
    */
   downloadConfigurationAsJson(config: ExportedConfiguration, filename?: string): void {
     const jsonStr = JSON.stringify(config, null, 2)
@@ -424,17 +424,17 @@ export class ConfigurationExporter {
 }
 
 /**
- * 配置导入器类
+ * Configure importer class
  */
 export class ConfigurationImporter {
   private readonly CURRENT_COMPONENT_PLACEHOLDER = '__CURRENT_COMPONENT__'
 
   /**
-   * 生成导入预览，不实际应用
-   * @param configJson 导入的 JSON 配置
-   * @param targetComponentId 目标组件 ID
-   * @param configurationManager 配置管理器实例
-   * @returns 导入预览结果
+   * Generate import preview，Not practical application
+   * @param configJson imported JSON Configuration
+   * @param targetComponentId target component ID
+   * @param configurationManager Configuration manager instance
+   * @returns Import preview results
    */
   generateImportPreview(
     configJson: string | ExportedConfiguration,
@@ -446,22 +446,22 @@ export class ConfigurationImporter {
       const config = typeof configJson === 'string' ? JSON.parse(configJson) : configJson
 
       if (!this.validateConfigurationFormat(config)) {
-        throw new Error('配置格式无效')
+        throw new Error('Invalid configuration format')
       }
 
-      // 检查依赖组件
+      // Check dependent components
       const dependencies = this.checkDependencies(config, availableComponents)
 
-      // 检查配置冲突
+      // Check for configuration conflicts
       const conflicts = this.checkConfigurationConflicts(config, targetComponentId, configurationManager)
 
       const canImport = dependencies.missing.length === 0 && !conflicts.dataSource && !conflicts.component
 
-      // 格式化为模板期望的结构
+      // Formatted to the structure expected by the template
       const conflictList: string[] = []
-      if (conflicts.dataSource) conflictList.push('数据源配置冲突')
-      if (conflicts.component) conflictList.push('组件配置冲突')
-      if (conflicts.interaction) conflictList.push('交互配置冲突')
+      if (conflicts.dataSource) conflictList.push('Data source configuration conflict')
+      if (conflicts.component) conflictList.push('Component configuration conflict')
+      if (conflicts.interaction) conflictList.push('Interaction configuration conflict')
 
       const preview: ImportPreview = {
         basicInfo: {
@@ -481,18 +481,18 @@ export class ConfigurationImporter {
 
       return preview
     } catch (error) {
-      console.error(`❌ [ConfigurationImporter] 预览失败:`, error)
-      throw new Error(`导入预览失败: ${error.message}`)
+      console.error(`❌ [ConfigurationImporter] Preview failed:`, error)
+      throw new Error(`Import preview failed: ${error.message}`)
     }
   }
 
   /**
-   * 执行配置导入
-   * @param configJson 导入的 JSON 配置
-   * @param targetComponentId 目标组件 ID
-   * @param configurationManager 配置管理器实例
-   * @param options 导入选项
-   * @returns 导入结果
+   * Perform configuration import
+   * @param configJson imported JSON Configuration
+   * @param targetComponentId target component ID
+   * @param configurationManager Configuration manager instance
+   * @param options Import options
+   * @returns Import results
    */
   async importConfiguration(
     configJson: string | ExportedConfiguration,
@@ -507,18 +507,18 @@ export class ConfigurationImporter {
       const config = typeof configJson === 'string' ? JSON.parse(configJson) : configJson
 
       if (!this.validateConfigurationFormat(config)) {
-        throw new Error('配置格式无效')
+        throw new Error('Invalid configuration format')
       }
 
       const errors: string[] = []
       const warnings: string[] = []
 
-      // 处理组件 ID 映射
+      // Processing components ID mapping
       const { processedConfig, missingDependencies } = this.processConfigurationForImport(config, targetComponentId)
 
-      // 检查缺失依赖
+      // Check for missing dependencies
       if (missingDependencies.length > 0 && !options.skipMissingDependencies) {
-        errors.push(`缺失依赖组件: ${missingDependencies.join(', ')}`)
+        errors.push(`Missing dependent components: ${missingDependencies.join(', ')}`)
         return {
           success: false,
           errors,
@@ -527,10 +527,10 @@ export class ConfigurationImporter {
       }
 
       if (missingDependencies.length > 0) {
-        warnings.push(`跳过缺失的依赖组件: ${missingDependencies.join(', ')}`)
+        warnings.push(`Skip missing dependent components: ${missingDependencies.join(', ')}`)
       }
 
-      // 应用配置
+      // Application configuration
       await this.applyConfiguration(processedConfig, targetComponentId, configurationManager, options)
 
       return {
@@ -544,7 +544,7 @@ export class ConfigurationImporter {
         }
       }
     } catch (error) {
-      console.error(`❌ [ConfigurationImporter] 导入失败:`, error)
+      console.error(`❌ [ConfigurationImporter] Import failed:`, error)
       return {
         success: false,
         errors: [error.message],
@@ -554,14 +554,14 @@ export class ConfigurationImporter {
   }
 
   /**
-   * 验证配置格式
+   * Verify configuration format
    */
   private validateConfigurationFormat(config: any): boolean {
     return !!(config && config.version && config.exportTime && config.metadata && config.data)
   }
 
   /**
-   * 检查依赖组件
+   * Check dependent components
    */
   private checkDependencies(
     config: ExportedConfiguration,
@@ -576,13 +576,13 @@ export class ConfigurationImporter {
 
     const found = dependencies.filter(dep => availableIds.includes(dep))
     const missing = dependencies.filter(dep => !availableIds.includes(dep))
-    const conflicts: string[] = [] // TODO: 实现冲突检测逻辑
+    const conflicts: string[] = [] // TODO: Implement conflict detection logic
 
     return { found, missing, conflicts }
   }
 
   /**
-   * 检查配置冲突
+   * Check for configuration conflicts
    */
   private checkConfigurationConflicts(
     config: ExportedConfiguration,
@@ -592,7 +592,7 @@ export class ConfigurationImporter {
     try {
       const existingConfig = configurationManager?.getConfiguration?.(targetComponentId)
 
-      // 如果没有现有配置或配置管理器无效，则没有冲突
+      // If there is no existing configuration or the configuration manager is invalid，then there is no conflict
       if (!existingConfig || !configurationManager) {
         return {
           dataSource: false,
@@ -601,8 +601,8 @@ export class ConfigurationImporter {
         }
       }
 
-      // 检查是否存在会被覆盖的重要配置
-      // 只有在现有配置非空且导入配置也非空时才认为是冲突
+      // Check if there are any important configurations that will be overwritten
+      // It is considered a conflict only if the existing configuration is non-empty and the imported configuration is also non-empty.
       return {
         dataSource: !!(
           existingConfig?.dataSource?.dataSources?.length && config.data.dataSourceConfiguration?.dataSources?.length
@@ -621,8 +621,8 @@ export class ConfigurationImporter {
         )
       }
     } catch (error) {
-      console.error('❌ [ConfigurationImporter] 冲突检测失败:', error)
-      // 检测失败时认为没有冲突，允许导入
+      console.error('❌ [ConfigurationImporter] Conflict detection failed:', error)
+      // When the detection fails, it is assumed that there is no conflict，Allow import
       return {
         dataSource: false,
         component: false,
@@ -632,7 +632,7 @@ export class ConfigurationImporter {
   }
 
   /**
-   * 处理导入配置中的组件 ID 映射
+   * Handling components in imported configurations ID mapping
    */
   private processConfigurationForImport(
     config: ExportedConfiguration,
@@ -648,13 +648,13 @@ export class ConfigurationImporter {
         return obj
       }
 
-      // 处理字符串中的占位符
+      // Handling placeholders in strings
       if (typeof obj === 'string') {
         if (obj === this.CURRENT_COMPONENT_PLACEHOLDER) {
           return targetComponentId
         }
 
-        // 处理变量名中的占位符
+        // Handling placeholders in variable names
         if (obj.includes(this.CURRENT_COMPONENT_PLACEHOLDER)) {
           const restored = obj.replace(new RegExp(this.CURRENT_COMPONENT_PLACEHOLDER, 'g'), targetComponentId)
           return restored
@@ -663,12 +663,12 @@ export class ConfigurationImporter {
         return obj
       }
 
-      // 处理数组
+      // Processing arrays
       if (Array.isArray(obj)) {
         return obj.map(item => processValue(item))
       }
 
-      // 处理对象
+      // Processing object
       if (typeof obj === 'object') {
         const processed: any = {}
         for (const [key, value] of Object.entries(obj)) {
@@ -693,7 +693,7 @@ export class ConfigurationImporter {
   }
 
   /**
-   * 应用配置到目标组件
+   * Apply configuration to target component
    */
   private async applyConfiguration(
     processedConfig: any,
@@ -701,24 +701,24 @@ export class ConfigurationImporter {
     configurationManager: any,
     options: any
   ): Promise<void> {
-    // 检查配置管理器是否有效
+    // Check if the configuration manager is valid
     if (!configurationManager || typeof configurationManager.updateConfiguration !== 'function') {
-      const error = '配置管理器无效或未提供，无法应用配置'
+      const error = 'Configuration manager is invalid or not provided，Unable to apply configuration'
       console.error(`❌ [ConfigurationImporter] ${error}`)
       throw new Error(error)
     }
 
-    // 应用数据源配置
+    // Apply data source configuration
     if (processedConfig.dataSource) {
       configurationManager.updateConfiguration(targetComponentId, 'dataSource', processedConfig.dataSource)
     }
 
-    // 应用组件配置
+    // Application component configuration
     if (processedConfig.component) {
       configurationManager.updateConfiguration(targetComponentId, 'component', processedConfig.component)
     }
 
-    // 应用交互配置
+    // Application interaction configuration
     if (processedConfig.interaction) {
       configurationManager.updateConfiguration(targetComponentId, 'interaction', processedConfig.interaction)
     }
@@ -726,20 +726,20 @@ export class ConfigurationImporter {
 }
 
 /**
- * 单数据源配置导出器类
- * 专门用于导出单个数据源配置，实现跨组件的灵活配置迁移
+ * Single data source configuration exporter class
+ * Designed specifically for exporting a single data source configuration，Enable flexible configuration migration across components
  */
 export class SingleDataSourceExporter {
   private readonly CURRENT_COMPONENT_PLACEHOLDER = '__CURRENT_COMPONENT__'
   private readonly EXPORT_VERSION = '1.0.0'
 
   /**
-   * 导出指定数据源的配置
-   * @param componentId 组件ID
-   * @param sourceId 数据源ID
-   * @param configurationManager 配置管理器实例
-   * @param componentType 组件类型（可选）
-   * @returns 单数据源导出配置
+   * Export the configuration of a specified data source
+   * @param componentId componentsID
+   * @param sourceId data sourceID
+   * @param configurationManager Configuration manager instance
+   * @param componentType Component type（Optional）
+   * @returns Single data source export configuration
    */
   async exportSingleDataSource(
     componentId: string,
@@ -748,36 +748,36 @@ export class SingleDataSourceExporter {
     componentType?: string
   ): Promise<SingleDataSourceExport> {
     if (!configurationManager) {
-      throw new Error('配置管理器未提供')
+      throw new Error('Configuration manager not provided')
     }
 
     try {
-      // 获取组件的完整配置
+      // Get the complete configuration of a component
       const fullConfig = configurationManager.getConfiguration(componentId)
 
-      // 从完整配置中提取数据源配置
+      // Extract data source configuration from full configuration
       const dataSourceConfig = fullConfig?.dataSource
       if (!dataSourceConfig || !dataSourceConfig.dataSources) {
-        throw new Error('未找到数据源配置')
+        throw new Error('Data source configuration not found')
       }
 
-      // 查找指定的数据源
+      // Find the specified data source
       const targetSourceIndex = dataSourceConfig.dataSources.findIndex((source: any) => source.sourceId === sourceId)
       if (targetSourceIndex === -1) {
-        throw new Error(`未找到数据源: ${sourceId}`)
+        throw new Error(`Data source not found: ${sourceId}`)
       }
 
       const targetSource = dataSourceConfig.dataSources[targetSourceIndex]
       const dependencies = new Set<string>()
 
-      // 处理数据源配置中的组件ID占位符
+      // Handle components in data source configurationIDplaceholder
       const processedDataSourceConfig = this.processDataSourceForExport(
         smartDeepClone(targetSource),
         componentId,
         dependencies
       )
 
-      // 获取相关的交互和HTTP绑定配置
+      // Get relevant interactions andHTTPBinding configuration
       const relatedConfig = this.extractRelatedConfigurations(componentId, sourceId, configurationManager, dependencies)
 
       const exportData: SingleDataSourceExport = {
@@ -807,13 +807,13 @@ export class SingleDataSourceExporter {
 
       return exportData
     } catch (error) {
-      console.error(`❌ [SingleDataSourceExporter] 导出失败:`, error)
-      throw new Error(`单数据源导出失败: ${error.message}`)
+      console.error(`❌ [SingleDataSourceExporter] Export failed:`, error)
+      throw new Error(`Single data source export failed: ${error.message}`)
     }
   }
 
   /**
-   * 处理数据源配置中的组件ID映射
+   * Handle components in data source configurationIDmapping
    */
   private processDataSourceForExport(sourceConfig: any, currentComponentId: string, dependencies: Set<string>): any {
     const processValue = (obj: any): any => {
@@ -844,15 +844,15 @@ export class SingleDataSourceExporter {
   }
 
   /**
-   * 处理字符串中的组件ID引用
+   * Handling components in stringsIDQuote
    */
   private processStringValue(value: string, currentComponentId: string, dependencies: Set<string>): string {
-    // 如果字符串包含当前组件ID，替换为占位符
+    // If the string contains the current componentID，Replace with placeholder
     if (value.includes(currentComponentId)) {
       return value.replace(new RegExp(currentComponentId, 'g'), this.CURRENT_COMPONENT_PLACEHOLDER)
     }
 
-    // 检查是否为其他组件ID（简单匹配规则，可根据实际情况调整）
+    // Check if it is another componentID（Simple matching rules，Can be adjusted according to actual situation）
     const componentIdPattern = /^[a-zA-Z][a-zA-Z0-9_-]*_\d+$/
     if (componentIdPattern.test(value) && value !== currentComponentId) {
       dependencies.add(value)
@@ -862,7 +862,7 @@ export class SingleDataSourceExporter {
   }
 
   /**
-   * 提取与指定数据源相关的其他配置
+   * Extract additional configuration related to the specified data source
    */
   private extractRelatedConfigurations(
     componentId: string,
@@ -876,17 +876,17 @@ export class SingleDataSourceExporter {
     }
 
     try {
-      // 获取交互配置
+      // Get interaction configuration
       const interactionConfig = configurationManager.getConfiguration(componentId, 'interaction')
       if (interactionConfig) {
-        // 查找与此数据源相关的交互配置
+        // Find interaction configurations related to this data source
         const relatedInteractions = this.findRelatedInteractions(interactionConfig, sourceId)
         relatedConfig.interactions = relatedInteractions.map(interaction =>
           this.processDataSourceForExport(interaction, componentId, dependencies)
         )
       }
 
-      // 获取HTTP绑定配置（如果存在）
+      // GetHTTPBinding configuration（if exists）
       const componentConfig = configurationManager.getConfiguration(componentId, 'component')
       if (componentConfig?.httpBindings) {
         const relatedHttpBindings = componentConfig.httpBindings.filter((binding: any) => binding.sourceId === sourceId)
@@ -895,15 +895,15 @@ export class SingleDataSourceExporter {
         )
       }
     } catch (error) {
-      console.error(`⚠️ [SingleDataSourceExporter] 提取相关配置失败:`, error)
-      // 相关配置失败不影响主要导出
+      console.error(`⚠️ [SingleDataSourceExporter] Failed to extract related configuration:`, error)
+      // Failure of related configurations does not affect the main export
     }
 
     return relatedConfig
   }
 
   /**
-   * 查找与指定数据源相关的交互配置
+   * Finds interaction configurations related to a specified data source
    */
   private findRelatedInteractions(interactionConfig: any, sourceId: string): any[] {
     const relatedInteractions: any[] = []
@@ -912,17 +912,17 @@ export class SingleDataSourceExporter {
       return relatedInteractions
     }
 
-    // 递归搜索包含sourceId的交互配置
+    // Recursive search containssourceIdinteractive configuration
     const searchInteractions = (obj: any) => {
       if (Array.isArray(obj)) {
         obj.forEach(item => searchInteractions(item))
       } else if (typeof obj === 'object' && obj !== null) {
-        // 检查当前对象是否与sourceId相关
+        // Check if the current object matchessourceIdRelated
         const objStr = JSON.stringify(obj)
         if (objStr.includes(sourceId)) {
           relatedInteractions.push(obj)
         } else {
-          // 继续递归搜索
+          // Continue recursive search
           Object.values(obj).forEach(value => searchInteractions(value))
         }
       }
@@ -933,7 +933,7 @@ export class SingleDataSourceExporter {
   }
 
   /**
-   * 获取组件中的所有数据源列表
+   * Get a list of all data sources in the component
    */
   getAvailableDataSources(
     componentId: string,
@@ -945,7 +945,7 @@ export class SingleDataSourceExporter {
     dataItemCount: number
   }> {
     try {
-      // 获取组件的完整配置并提取数据源配置
+      // Get the complete configuration of the component and extract the data source configuration
       const fullConfig = configurationManager.getConfiguration(componentId)
       const dataSourceConfig = fullConfig?.dataSource
       if (!dataSourceConfig || !dataSourceConfig.dataSources) {
@@ -959,20 +959,20 @@ export class SingleDataSourceExporter {
         dataItemCount: source.dataItems?.length || 0
       }))
     } catch (error) {
-      console.error(`⚠️ [SingleDataSourceExporter] 获取数据源列表失败:`, error)
+      console.error(`⚠️ [SingleDataSourceExporter] Failed to get data source list:`, error)
       return []
     }
   }
 }
 
 /**
- * 单数据源配置导入器类
+ * Single data source configuration importer class
  */
 export class SingleDataSourceImporter {
   private readonly CURRENT_COMPONENT_PLACEHOLDER = '__CURRENT_COMPONENT__'
 
   /**
-   * 生成单数据源导入预览
+   * Generate single data source import preview
    */
   generateImportPreview(
     importData: SingleDataSourceExport,
@@ -980,10 +980,10 @@ export class SingleDataSourceImporter {
     configurationManager: any
   ): SingleDataSourceImportPreview {
     try {
-      // 获取目标组件的数据源槽位信息
+      // Get the data source slot information of the target component
       const availableSlots = this.getAvailableDataSourceSlots(targetComponentId, configurationManager)
 
-      // 检查冲突和依赖
+      // Check for conflicts and dependencies
       const dependencies = importData.mapping.dependencies || []
       const conflicts = this.checkImportConflicts(importData, targetComponentId, configurationManager)
 
@@ -1010,13 +1010,13 @@ export class SingleDataSourceImporter {
         availableSlots
       }
     } catch (error) {
-      console.error(`❌ [SingleDataSourceImporter] 生成导入预览失败:`, error)
-      throw new Error(`生成导入预览失败: ${error.message}`)
+      console.error(`❌ [SingleDataSourceImporter] Failed to generate import preview:`, error)
+      throw new Error(`Failed to generate import preview: ${error.message}`)
     }
   }
 
   /**
-   * 获取可用的数据源槽位
+   * Get available data source slots
    */
   private getAvailableDataSourceSlots(componentId: string, configurationManager: any) {
     const slots: Array<{
@@ -1027,12 +1027,12 @@ export class SingleDataSourceImporter {
     }> = []
 
     try {
-      // 获取组件的完整配置并提取数据源配置
+      // Get the complete configuration of the component and extract the data source configuration
       const fullConfig = configurationManager?.getConfiguration?.(componentId)
       const dataSourceConfig = fullConfig?.dataSource
 
       if (!dataSourceConfig || !dataSourceConfig.dataSources) {
-        // 如果没有数据源配置，提供默认的3个槽位
+        // If there is no data source configuration，provide default3slots
         for (let i = 0; i < 3; i++) {
           slots.push({
             slotId: `dataSource${i + 1}`,
@@ -1041,7 +1041,7 @@ export class SingleDataSourceImporter {
           })
         }
       } else {
-        // 根据现有配置生成槽位信息
+        // Generate slot information based on existing configuration
         dataSourceConfig.dataSources.forEach((source: any, index: number) => {
           slots.push({
             slotId: source.sourceId,
@@ -1058,14 +1058,14 @@ export class SingleDataSourceImporter {
         })
       }
     } catch (error) {
-      console.error(`⚠️ [SingleDataSourceImporter] 获取数据源槽位失败:`, error)
+      console.error(`⚠️ [SingleDataSourceImporter] Failed to obtain data source slot:`, error)
     }
 
     return slots
   }
 
   /**
-   * 检查导入冲突
+   * Check for import conflicts
    */
   private checkImportConflicts(
     importData: SingleDataSourceExport,
@@ -1075,21 +1075,21 @@ export class SingleDataSourceImporter {
     const conflicts: string[] = []
 
     try {
-      // 检查依赖是否满足
+      // Check whether dependencies are met
       const dependencies = importData.mapping.dependencies || []
-      // TODO: 实现依赖检查逻辑
+      // TODO: Implement dependency checking logic
 
-      // 检查组件类型兼容性
-      // TODO: 根据实际需要实现组件类型检查
+      // Check component type compatibility
+      // TODO: Implement component type checking according to actual needs
     } catch (error) {
-      console.error(`⚠️ [SingleDataSourceImporter] 冲突检测失败:`, error)
+      console.error(`⚠️ [SingleDataSourceImporter] Conflict detection failed:`, error)
     }
 
     return conflicts
   }
 
   /**
-   * 执行单数据源导入
+   * Perform a single data source import
    */
   async importSingleDataSource(
     importData: SingleDataSourceExport,
@@ -1101,14 +1101,14 @@ export class SingleDataSourceImporter {
     } = {}
   ): Promise<void> {
     if (!configurationManager || typeof configurationManager.updateConfiguration !== 'function') {
-      throw new Error('配置管理器无效或未提供')
+      throw new Error('Configuration manager is invalid or not provided')
     }
 
     try {
-      // 处理组件ID映射
+      // Processing componentsIDmapping
       const processedConfig = this.processConfigurationForImport(importData, targetComponentId)
 
-      // 获取或创建目标数据源配置
+      // Get or create target data source configuration
       const fullConfig = configurationManager.getConfiguration(targetComponentId)
       const existingConfig = fullConfig?.dataSource || {
         componentId: targetComponentId,
@@ -1117,16 +1117,16 @@ export class SingleDataSourceImporter {
         updatedAt: Date.now()
       }
 
-      // 确保 dataSources 数组存在
+      // make sure dataSources Array exists
       if (!existingConfig.dataSources || !Array.isArray(existingConfig.dataSources)) {
         existingConfig.dataSources = []
       }
 
-      // 找到或创建目标槽位
+      // Find or create target slot
       let targetSlotIndex = existingConfig.dataSources.findIndex((source: any) => source.sourceId === targetSlotId)
 
       if (targetSlotIndex === -1) {
-        // 创建新的数据源槽位
+        // Create a new data source slot
         existingConfig.dataSources.push({
           sourceId: targetSlotId,
           dataItems: [],
@@ -1135,11 +1135,11 @@ export class SingleDataSourceImporter {
         targetSlotIndex = existingConfig.dataSources.length - 1
       }
 
-      // 根据真实导出数据结构，dataItems 已经是标准格式
-      // 从导出数据看，dataItems 已经包含 {item, processing} 结构，直接使用
+      // Export data structure based on reality，dataItems Already a standard format
+      // From the exported data，dataItems Already included {item, processing} structure，Use directly
       const standardDataItems = processedConfig.dataSourceConfig?.dataItems || []
 
-      // 更新目标槽位的配置
+      // Update the configuration of the target slot
       existingConfig.dataSources[targetSlotIndex] = {
         sourceId: targetSlotId,
         dataItems: standardDataItems,
@@ -1151,71 +1151,71 @@ export class SingleDataSourceImporter {
 
       existingConfig.updatedAt = Date.now()
 
-      // 应用数据源配置
+      // Apply data source configuration
       configurationManager.updateConfiguration(targetComponentId, 'dataSource', existingConfig)
 
-      // TODO: 应用相关的交互配置和HTTP绑定
+      // TODO: application-related interaction configuration andHTTPbinding
       if (processedConfig.relatedConfig?.interactions?.length > 0) {
-        // 未来可以实现交互配置导入
+        // Interactive configuration import can be implemented in the future
       }
 
       if (processedConfig.relatedConfig?.httpBindings?.length > 0) {
-        // 未来可以实现HTTP绑定导入
+        // achievable in the futureHTTPbinding import
       }
     } catch (error) {
-      console.error(`❌ [SingleDataSourceImporter] 导入失败:`, error)
-      throw new Error(`单数据源导入失败: ${error.message}`)
+      console.error(`❌ [SingleDataSourceImporter] Import failed:`, error)
+      throw new Error(`Single data source import failed: ${error.message}`)
     }
   }
 
   /**
-   * 智能检测参数是否应该是动态参数
-   * 防御性编程：即使isDynamic为false，但有绑定关系特征时自动修正为true
+   * Intelligent detection of whether a parameter should be a dynamic parameter
+   * defensive programming：even thoughisDynamicforfalse，但有绑定关系特征时自动修正fortrue
    */
   private detectIsDynamicParameter(param: any): boolean {
-    // 检测明显的绑定特征，不依赖于原始isDynamic值
+    // Detect obvious binding features，does not depend on the originalisDynamicvalue
     const hasBindingFeatures =
-      // 特征1：valueMode为component（最强特征）
+      // feature1：valueModeforcomponent（最强feature）
       param.valueMode === 'component' ||
-      // 特征2：selectedTemplate为组件属性绑定（最强特征）
+      // feature2：selectedTemplateBind component properties（最强feature）
       param.selectedTemplate === 'component-property-binding' ||
-      // 特征3：value值看起来像绑定路径（包含.且格式正确）
+      // feature3：valueThe value looks like the binding path（Include.And the format is correct）
       (typeof param.value === 'string' &&
        param.value.includes('.') &&
        param.value.split('.').length >= 3 &&
        param.value.length > 15) ||
-      // 特征4：有variableName且包含组件ID格式
+      // feature4：havevariableNameand contains componentsIDFormat
       (param.variableName && param.variableName.includes('_') && param.variableName.length > 5) ||
-      // 特征5：description包含"绑定"关键词
+      // feature5：descriptionInclude"binding"keywords
       (param.description && (
-        param.description.includes('绑定') ||
-        param.description.includes('属性') ||
+        param.description.includes('binding') ||
+        param.description.includes('property') ||
         param.description.includes('component')
       ))
 
-    // 如果检测到绑定特征，直接返回true，忽略原始isDynamic设置
+    // If binding characteristics are detected，Return directlytrue，ignore originalisDynamicset up
     if (hasBindingFeatures) {
       return true
     }
 
-    // 如果没有绑定特征，保持原始设置或默认为false
+    // If no features are bound，Keep original settings or default tofalse
     return param.isDynamic !== undefined ? param.isDynamic : false
   }
 
   /**
-   * 保护HTTP参数的绑定路径不被意外覆盖
-   * 这是一个防御性机制，确保即使配置管理过程中出现问题，绑定路径也不会被损坏
+   * ProtectHTTPBinding paths for parameters are not accidentally overwritten
+   * This is a defensive mechanism，Ensure that even if problems arise during configuration management，Binding paths are also not corrupted
    */
   private protectParameterBindingPaths(params: any[]): any[] {
     if (!params || !Array.isArray(params)) return params
 
     return params.map(param => {
-      // 只保护已设置绑定关系的参数
+      // Only protect parameters that have set binding relationships
       if (!param.isDynamic && !param.selectedTemplate && !param.valueMode) {
         return param
       }
 
-      // 检测绑定路径是否被损坏
+      // Detect whether the binding path is corrupted
       const isBindingCorrupted = param.value &&
         typeof param.value === 'string' &&
         !param.value.includes('.') &&
@@ -1224,7 +1224,7 @@ export class SingleDataSourceImporter {
         param.variableName.includes('_')
 
       if (isBindingCorrupted) {
-        // 从variableName重建正确的绑定路径
+        // fromvariableNameRebuild the correct binding path
         if (param.variableName.includes('_')) {
           const lastUnderscoreIndex = param.variableName.lastIndexOf('_')
           if (lastUnderscoreIndex > 0) {
@@ -1235,7 +1235,7 @@ export class SingleDataSourceImporter {
             return {
               ...param,
               value: reconstructedPath,
-              isDynamic: true // 确保设置为动态
+              isDynamic: true // Make sure it is set to dynamic
             }
           }
         }
@@ -1246,7 +1246,7 @@ export class SingleDataSourceImporter {
   }
 
   /**
-   * 处理导入配置中的组件ID映射
+   * Handling components in imported configurationsIDmapping
    */
   private processConfigurationForImport(
     importData: SingleDataSourceExport,
@@ -1260,7 +1260,7 @@ export class SingleDataSourceImporter {
       }
 
       if (typeof obj === 'string') {
-        // 将占位符替换为目标组件ID
+        // Replace placeholder with target componentID
         return obj.replace(new RegExp(this.CURRENT_COMPONENT_PLACEHOLDER, 'g'), targetComponentId)
       }
 
@@ -1268,7 +1268,7 @@ export class SingleDataSourceImporter {
         const processedArray = obj.map(item => {
           const processedItem = processValue(item)
 
-          // 检测数组中的HTTP参数并修正isDynamic字段
+          // Check the arrayHTTPParameters and correctionsisDynamicField
           if (processedItem && typeof processedItem === 'object' &&
               ('valueMode' in processedItem || 'selectedTemplate' in processedItem)) {
             const correctedIsDynamic = this.detectIsDynamicParameter(processedItem)
@@ -1281,7 +1281,7 @@ export class SingleDataSourceImporter {
           return processedItem
         })
 
-        // 对数组中的HTTP参数应用绑定路径保护
+        // in the arrayHTTPParameter application binding path protection
         return this.protectParameterBindingPaths(processedArray)
       }
 
@@ -1291,12 +1291,12 @@ export class SingleDataSourceImporter {
           result[key] = processValue(value)
         }
 
-        // 检测HTTP参数对象并修正isDynamic字段
+        // DetectionHTTPParameter object and fixisDynamicField
         if (result && ('valueMode' in result || 'selectedTemplate' in result)) {
           const correctedIsDynamic = this.detectIsDynamicParameter(result)
           result.isDynamic = correctedIsDynamic
 
-          // 对单个HTTP参数对象应用绑定路径保护
+          // to a singleHTTPParameter object applies binding path protection
           const protectedParams = this.protectParameterBindingPaths([result])
           return protectedParams[0]
         }
@@ -1307,10 +1307,10 @@ export class SingleDataSourceImporter {
       return obj
     }
 
-    // 处理数据源配置
+    // Handle data source configuration
     processedData.dataSourceConfig = processValue(processedData.dataSourceConfig)
 
-    // 处理相关配置
+    // Process related configurations
     processedData.relatedConfig.interactions = processValue(processedData.relatedConfig.interactions)
     processedData.relatedConfig.httpBindings = processValue(processedData.relatedConfig.httpBindings)
 
@@ -1319,7 +1319,7 @@ export class SingleDataSourceImporter {
 }
 
 /**
- * 导出单例实例
+ * Export singleton instance
  */
 export const configurationExporter = new ConfigurationExporter()
 export const configurationImporter = new ConfigurationImporter()

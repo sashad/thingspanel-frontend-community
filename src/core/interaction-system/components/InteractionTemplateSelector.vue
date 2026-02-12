@@ -1,6 +1,6 @@
 <template>
   <div class="interaction-template-selector">
-    <!-- 模板分类选择 -->
+    <!-- Template classification selection -->
     <div class="template-categories">
       <n-tabs v-model:value="activeCategory" type="line" size="small">
         <n-tab-pane
@@ -9,7 +9,7 @@
           :name="category.key"
           :tab="category.label"
         >
-          <!-- 模板网格 -->
+          <!-- template grid -->
           <div class="templates-grid">
             <n-card
               v-for="template in getTemplatesByCategory(category.key)"
@@ -31,7 +31,7 @@
               <div class="template-content">
                 <p class="template-description">{{ template.description }}</p>
 
-                <!-- 交互事件预览 -->
+                <!-- Interaction event preview -->
                 <div class="template-events">
                   <n-tag
                     v-for="event in template.config.map(c => c.event)"
@@ -44,7 +44,7 @@
                   </n-tag>
                 </div>
 
-                <!-- 动作数量显示 -->
+                <!-- Action number display -->
                 <div class="template-stats">
                   <n-text depth="3" style="font-size: 12px">
                     {{ getTotalActionsCount(template.config) }} {{ t('interaction.template.actions') }}
@@ -72,7 +72,7 @@
       </n-tabs>
     </div>
 
-    <!-- 自定义模板上传 -->
+    <!-- Custom template upload -->
     <div class="custom-template-section">
       <n-divider dashed>
         <n-text depth="3">{{ t('interaction.template.customTemplate') }}</n-text>
@@ -105,7 +105,7 @@
       </n-space>
     </div>
 
-    <!-- 模板预览对话框 -->
+    <!-- Template preview dialog -->
     <n-modal
       v-model:show="showPreviewDialog"
       :title="t('interaction.template.templatePreview') + ': ' + (previewTemplate?.name || '')"
@@ -123,8 +123,8 @@
 
 <script setup lang="ts">
 /**
- * 交互模板选择器
- * 提供预设的交互模板供用户快速选择
+ * Interactive template selector
+ * Provide preset interaction templates for users to quickly select
  */
 
 import { ref, computed } from 'vue'
@@ -178,13 +178,13 @@ const emit = defineEmits<Emits>()
 const message = useMessage()
 const { t } = useI18n()
 
-// 响应式状态
+// Responsive state
 const activeCategory = ref('basic')
 const customTemplateJson = ref('')
 const showPreviewDialog = ref(false)
 const previewTemplate = ref<InteractionTemplate | null>(null)
 
-// 模板分类
+// Template classification
 const templateCategories = computed(() => [
   { key: 'basic', label: t('interaction.template.basic') },
   { key: 'visual', label: t('interaction.template.visual') },
@@ -193,9 +193,9 @@ const templateCategories = computed(() => [
   { key: 'user', label: t('interaction.template.user') }
 ])
 
-// 预设模板
+// Default template
 const predefinedTemplates = computed((): InteractionTemplate[] => [
-  // 基础交互模板
+  // Basic interaction template
   {
     id: 'click-highlight',
     name: t('interaction.template.predefined.clickHighlight'),
@@ -244,7 +244,7 @@ const predefinedTemplates = computed((): InteractionTemplate[] => [
     ]
   },
 
-  // 视觉效果模板
+  // Visual Effects Template
   {
     id: 'rainbow-border',
     name: t('interaction.template.predefined.rainbowBorder'),
@@ -305,7 +305,7 @@ const predefinedTemplates = computed((): InteractionTemplate[] => [
     ]
   },
 
-  // 动画效果模板
+  // Animation effect template
   {
     id: 'pulse-animation',
     name: t('interaction.template.predefined.pulseAnimation'),
@@ -355,7 +355,7 @@ const predefinedTemplates = computed((): InteractionTemplate[] => [
     ]
   },
 
-  // 复合交互模板
+  // Composite interaction template
   {
     id: 'complete-feedback',
     name: t('interaction.template.predefined.completeFeedback'),
@@ -412,18 +412,18 @@ const predefinedTemplates = computed((): InteractionTemplate[] => [
   }
 ])
 
-// 用户自定义模板（从localStorage加载）
+// User-defined template（fromlocalStorageload）
 const userTemplates = ref<InteractionTemplate[]>([])
 
-// 所有模板
+// All templates
 const allTemplates = computed(() => [...predefinedTemplates.value, ...userTemplates.value])
 
-// 根据分类获取模板
+// Get templates by category
 const getTemplatesByCategory = (category: string) => {
   return allTemplates.value.filter(template => template.category === category)
 }
 
-// 获取事件标签类型
+// Get event tag type
 const getEventTagType = (event: InteractionEventType) => {
   const typeMap = {
     click: 'success',
@@ -435,7 +435,7 @@ const getEventTagType = (event: InteractionEventType) => {
   return typeMap[event] || 'default'
 }
 
-// 获取事件显示名称
+// Get event display name
 const getEventDisplayName = (event: InteractionEventType) => {
   const nameMap = {
     click: t('interaction.events.click'),
@@ -447,26 +447,26 @@ const getEventDisplayName = (event: InteractionEventType) => {
   return nameMap[event] || event
 }
 
-// 获取总动作数量
+// Get the total number of actions
 const getTotalActionsCount = (configs: InteractionConfig[]) => {
   return configs.reduce((total, config) => total + config.responses.length, 0)
 }
 
-// 选择模板
+// Select template
 const selectTemplate = (template: InteractionTemplate) => {
-  // 为每个配置项创建副本并发出选择事件
+  // Create a copy of each configuration item and emit a selection event
   template.config.forEach(config => {
     emit('select', { ...config })
   })
 }
 
-// 预览模板
+// Preview template
 const showTemplatePreview = (template: InteractionTemplate) => {
   previewTemplate.value = template
   showPreviewDialog.value = true
 }
 
-// 处理自定义模板上传
+// Handle custom template uploads
 const handleCustomTemplateUpload = (data: { file: { file?: File } }) => {
   const file = data.file.file
   if (!file) return false
@@ -483,20 +483,20 @@ const handleCustomTemplateUpload = (data: { file: { file?: File } }) => {
   }
   reader.readAsText(file)
 
-  return false // 阻止默认上传行为
+  return false // Block default upload behavior
 }
 
-// 导入自定义模板
+// Import custom template
 const importCustomTemplate = () => {
   try {
     const templateData = JSON.parse(customTemplateJson.value)
 
-    // 验证模板格式
+    // Validate template format
     if (!templateData.name || !templateData.config || !Array.isArray(templateData.config)) {
       throw new Error(t('interaction.messages.invalidTemplateFormat'))
     }
 
-    // 创建新的用户模板
+    // Create new user template
     const newTemplate: InteractionTemplate = {
       id: `user-${Date.now()}`,
       name: templateData.name,
@@ -508,16 +508,16 @@ const importCustomTemplate = () => {
       tags: templateData.tags || []
     }
 
-    // 添加到用户模板列表
+    // Add to user template list
     userTemplates.value.push(newTemplate)
 
-    // 保存到localStorage
+    // save tolocalStorage
     saveUserTemplates()
 
-    // 切换到用户自定义分类
+    // Switch to user-defined categories
     activeCategory.value = 'user'
 
-    // 清空输入
+    // Clear input
     customTemplateJson.value = ''
 
     message.success(t('interaction.messages.templateImported'))
@@ -526,14 +526,14 @@ const importCustomTemplate = () => {
   }
 }
 
-// 保存用户模板到localStorage
+// Save user template tolocalStorage
 const saveUserTemplates = () => {
   try {
     localStorage.setItem('interaction-user-templates', JSON.stringify(userTemplates.value))
   } catch (error) {}
 }
 
-// 加载用户模板从localStorage
+// Load user template fromlocalStorage
 const loadUserTemplates = () => {
   try {
     const saved = localStorage.getItem('interaction-user-templates')
@@ -543,7 +543,7 @@ const loadUserTemplates = () => {
   } catch (error) {}
 }
 
-// 组件挂载时加载用户模板
+// Load user template when component is mounted
 loadUserTemplates()
 </script>
 
@@ -624,7 +624,7 @@ loadUserTemplates()
   border-radius: 8px;
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .templates-grid {
     grid-template-columns: 1fr;
@@ -638,7 +638,7 @@ loadUserTemplates()
   }
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .interaction-template-selector::-webkit-scrollbar {
   width: 6px;
 }
@@ -657,7 +657,7 @@ loadUserTemplates()
   background: var(--text-color-3);
 }
 
-/* 卡片动画 */
+/* card animation */
 .template-card {
   animation: fadeIn 0.3s ease-out;
 }
@@ -673,7 +673,7 @@ loadUserTemplates()
   }
 }
 
-/* 表单样式 */
+/* form style */
 :deep(.n-upload) {
   width: 100%;
 }
@@ -683,7 +683,7 @@ loadUserTemplates()
   font-size: 12px;
 }
 
-/* 标签页样式 */
+/* Tab style */
 :deep(.n-tabs .n-tabs-content) {
   padding-top: 0;
 }

@@ -1,33 +1,33 @@
-# Grid Layout Plus 组件使用指南
+# Grid Layout Plus Component usage guide
 
-基于 [Grid Layout Plus](https://grid-layout-plus.netlify.app/) 的现代化网格布局组件，提供更好的性能和用户体验。
+based on [Grid Layout Plus](https://grid-layout-plus.netlify.app/) A modern grid layout component，Provide better performance and user experience。
 
-## 🎯 为什么选择 Grid Layout Plus？
+## 🎯 Why choose Grid Layout Plus？
 
-相比原有的 DraggableResizableGrid，Grid Layout Plus 具有以下优势：
+Compared to the original DraggableResizableGrid，Grid Layout Plus Has the following advantages：
 
-### ✅ 技术优势
-- **成熟稳定** - 基于经过验证的 grid-layout-plus 库
-- **性能优越** - 更好的拖拽性能和流畅度
-- **响应式设计** - 内置断点支持，自适应不同屏幕
-- **现代化API** - 更直观的配置和事件系统
-- **广泛兼容** - 更好的浏览器兼容性
+### ✅ Technical advantages
+- **Mature and stable** - Based on proven grid-layout-plus Library
+- **Superior performance** - Better drag performance and smoothness
+- **Responsive design** - Built-in breakpoint support，Adapt to different screens
+- **modernizationAPI** - More intuitive configuration and event system
+- **Widely compatible** - Better browser compatibility
 
-### ✅ 功能特性
-- **完整的TypeScript支持** - 类型安全，开发体验好
-- **丰富的配置选项** - 灵活的布局控制
-- **强大的事件系统** - 完整的生命周期回调
-- **主题支持** - 内置明暗主题切换
-- **历史记录** - 撤销重做功能
-- **导入导出** - 布局数据的持久化
+### ✅ Features
+- **completeTypeScriptsupport** - type safety，Good development experience
+- **Rich configuration options** - Flexible layout control
+- **Powerful event system** - Complete life cycle callback
+- **Theme support** - Built-in light and dark theme switching
+- **History** - Undo redo function
+- **Import and export** - Layout data persistence
 
-## 📦 安装
+## 📦 Install
 
-项目已包含 `grid-layout-plus` 依赖，无需额外安装。
+Project already included `grid-layout-plus` rely，No additional installation required。
 
-## 🚀 快速开始
+## 🚀 quick start
 
-### 基础用法
+### Basic usage
 
 ```vue
 <template>
@@ -50,7 +50,7 @@ const layout = ref<GridLayoutPlusItem[]>([
     w: 3,
     h: 2,
     type: 'chart',
-    title: '图表组件'
+    title: 'chart component'
   },
   {
     i: 'item-2',
@@ -59,7 +59,7 @@ const layout = ref<GridLayoutPlusItem[]>([
     w: 2,
     h: 1,
     type: 'text',
-    title: '文本组件'
+    title: 'text component'
   }
 ])
 
@@ -72,21 +72,21 @@ const gridConfig = {
 }
 
 const handleLayoutChange = (newLayout: GridLayoutPlusItem[]) => {
-  console.log('布局变化:', newLayout)
+  console.log('Layout changes:', newLayout)
 }
 </script>
 ```
 
-### 使用 Hook 进行状态管理
+### use Hook Perform status management
 
 ```vue
 <template>
   <div class="grid-container">
     <div class="toolbar">
-      <button @click="addItem('chart')">添加图表</button>
-      <button @click="compactLayout">紧凑布局</button>
-      <button @click="undo" :disabled="!canUndo">撤销</button>
-      <button @click="redo" :disabled="!canRedo">重做</button>
+      <button @click="addItem('chart')">Add chart</button>
+      <button @click="compactLayout">Compact layout</button>
+      <button @click="undo" :disabled="!canUndo">Cancel</button>
+      <button @click="redo" :disabled="!canRedo">Redo</button>
     </div>
     
     <GridLayoutPlus
@@ -96,8 +96,8 @@ const handleLayoutChange = (newLayout: GridLayoutPlusItem[]) => {
     />
     
     <div class="stats">
-      <span>项目数量: {{ layoutStats.totalItems }}</span>
-      <span>利用率: {{ layoutStats.utilization.toFixed(1) }}%</span>
+      <span>Number of items: {{ layoutStats.totalItems }}</span>
+      <span>Utilization: {{ layoutStats.utilization.toFixed(1) }}%</span>
     </div>
   </div>
 </template>
@@ -119,7 +119,7 @@ const {
   enableHistory: true,
   autoSave: true,
   onSave: (layout) => {
-    // 自动保存到后端
+    // Automatically save to backend
     localStorage.setItem('grid-layout', JSON.stringify(layout))
   }
 })
@@ -135,42 +135,42 @@ const compactLayout = () => {
 }
 
 const handleItemEdit = (item) => {
-  // 处理项目编辑
-  console.log('编辑项目:', item)
+  // Working on Project Editing
+  console.log('Edit project:', item)
 }
 </script>
 ```
 
-## 🔧 配置选项
+## 🔧 Configuration options
 
 ### GridLayoutPlusConfig
 
 ```typescript
 interface GridLayoutPlusConfig {
-  // 基础配置
-  colNum: number              // 列数，默认 12
-  rowHeight: number           // 行高，默认 100
-  margin: [number, number]    // 边距 [x, y]，默认 [10, 10]
+  // Basic configuration
+  colNum: number              // Number of columns，default 12
+  rowHeight: number           // row height，default 100
+  margin: [number, number]    // margin [x, y]，default [10, 10]
   
-  // 交互配置
-  isDraggable: boolean        // 是否可拖拽，默认 true
-  isResizable: boolean        // 是否可调整大小，默认 true
-  preventCollision: boolean   // 是否防止碰撞，默认 false
+  // Interactive configuration
+  isDraggable: boolean        // Whether it can be dragged，default true
+  isResizable: boolean        // Is it resizable?，default true
+  preventCollision: boolean   // Whether to prevent collision，default false
   
-  // 布局配置
-  isMirrored: boolean         // 是否镜像，默认 false
-  autoSize: boolean           // 是否自动调整大小，默认 true
-  verticalCompact: boolean    // 是否垂直紧凑，默认 true
-  useCssTransforms: boolean   // 是否使用CSS变换，默认 true
+  // layout configuration
+  isMirrored: boolean         // Whether to mirror，default false
+  autoSize: boolean           // Whether to automatically resize，default true
+  verticalCompact: boolean    // Is it vertically compact?，default true
+  useCssTransforms: boolean   // Whether to useCSStransform，default true
   
-  // 响应式配置
-  responsive: boolean         // 是否响应式，默认 false
-  breakpoints: Record<string, number>  // 断点配置
-  cols: Record<string, number>         // 不同断点的列数
+  // Responsive configuration
+  responsive: boolean         // Is it responsive?，default false
+  breakpoints: Record<string, number>  // Breakpoint configuration
+  cols: Record<string, number>         // Number of columns for different breakpoints
   
-  // 其他配置
-  useStyleCursor: boolean     // 是否使用样式光标，默认 true
-  restoreOnDrag: boolean      // 拖拽时是否恢复，默认 false
+  // Other configurations
+  useStyleCursor: boolean     // Whether to use style cursor，default true
+  restoreOnDrag: boolean      // Whether to restore when dragging，default false
 }
 ```
 
@@ -178,39 +178,39 @@ interface GridLayoutPlusConfig {
 
 ```typescript
 interface GridLayoutPlusItem {
-  // 必需字段
-  i: string                   // 唯一标识符
-  x: number                   // X轴位置
-  y: number                   // Y轴位置
-  w: number                   // 宽度
-  h: number                   // 高度
+  // Required fields
+  i: string                   // unique identifier
+  x: number                   // Xaxis position
+  y: number                   // Yaxis position
+  w: number                   // width
+  h: number                   // high
   
-  // 约束配置
-  minW?: number               // 最小宽度
-  minH?: number               // 最小高度
-  maxW?: number               // 最大宽度
-  maxH?: number               // 最大高度
+  // constraint configuration
+  minW?: number               // minimum width
+  minH?: number               // minimum height
+  maxW?: number               // maximum width
+  maxH?: number               // maximum height
   
-  // 行为配置
-  isDraggable?: boolean       // 是否可拖拽
-  isResizable?: boolean       // 是否可调整大小
-  static?: boolean            // 是否为静态项目
+  // behavior configuration
+  isDraggable?: boolean       // Whether it can be dragged
+  isResizable?: boolean       // Is it resizable?
+  static?: boolean            // Whether it is a static project
   
-  // 业务数据
-  type?: string               // 组件类型
-  title?: string              // 组件标题
-  component?: Component       // 渲染的组件
-  props?: Record<string, any> // 组件属性
-  data?: Record<string, any>  // 组件数据
-  style?: Record<string, string | number>  // 自定义样式
-  className?: string          // 自定义类名
-  metadata?: Record<string, any>           // 项目元数据
+  // business data
+  type?: string               // Component type
+  title?: string              // Component title
+  component?: Component       // Rendered component
+  props?: Record<string, any> // Component properties
+  data?: Record<string, any>  // component data
+  style?: Record<string, string | number>  // Custom style
+  className?: string          // Custom class name
+  metadata?: Record<string, any>           // Project metadata
 }
 ```
 
-## 📡 事件系统
+## 📡 event system
 
-### 布局事件
+### Layout events
 
 ```vue
 <GridLayoutPlus
@@ -223,7 +223,7 @@ interface GridLayoutPlusItem {
 />
 ```
 
-### 项目事件
+### Project events
 
 ```vue
 <GridLayoutPlus
@@ -237,13 +237,13 @@ interface GridLayoutPlusItem {
 />
 ```
 
-## 🎨 自定义样式
+## 🎨 Custom style
 
-### CSS 变量
+### CSS variable
 
 ```css
 .grid-layout-plus-wrapper {
-  /* 主题颜色 */
+  /* theme color */
   --bg-color: #f8f9fa;
   --bg-color-dark: #1a1a1a;
   --border-color: #e1e5e9;
@@ -251,18 +251,18 @@ interface GridLayoutPlusItem {
   --text-color: #495057;
   --text-color-dark: #ffffff;
   
-  /* 项目样式 */
+  /* Item style */
   --item-bg: white;
   --item-border: #e1e5e9;
   --item-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --item-hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   
-  /* 拖拽提示 */
+  /* Drag prompt */
   --drag-hint-color: #007bff;
 }
 ```
 
-### 自定义项目内容
+### Custom project content
 
 ```vue
 <GridLayoutPlus v-model:layout="layout">
@@ -271,28 +271,28 @@ interface GridLayoutPlusItem {
       <div class="item-header">
         <h3>{{ item.title }}</h3>
         <div v-if="!readonly" class="item-actions">
-          <button @click="editItem(item)">编辑</button>
-          <button @click="deleteItem(item)">删除</button>
+          <button @click="editItem(item)">edit</button>
+          <button @click="deleteItem(item)">delete</button>
         </div>
       </div>
       
       <div class="item-content">
-        <!-- 根据 item.type 渲染不同内容 -->
+        <!-- according to item.type Render different content -->
         <component 
           v-if="item.component"
           :is="item.component"
           v-bind="item.props"
         />
-        <div v-else>{{ item.type }} 组件</div>
+        <div v-else>{{ item.type }} components</div>
       </div>
     </div>
   </template>
 </GridLayoutPlus>
 ```
 
-## 🚀 高级用法
+## 🚀 Advanced usage
 
-### 响应式布局
+### Responsive layout
 
 ```typescript
 const gridConfig = {
@@ -314,15 +314,15 @@ const gridConfig = {
 }
 ```
 
-### 防止碰撞
+### Prevent collision
 
 ```typescript
 const gridConfig = {
-  preventCollision: true  // 防止项目重叠
+  preventCollision: true  // Prevent project overlap
 }
 ```
 
-### 项目约束
+### project constraints
 
 ```typescript
 const item: GridLayoutPlusItem = {
@@ -331,15 +331,15 @@ const item: GridLayoutPlusItem = {
   y: 0,
   w: 3,
   h: 2,
-  minW: 2,     // 最小宽度
-  maxW: 6,     // 最大宽度
-  minH: 1,     // 最小高度
-  maxH: 4,     // 最大高度
-  static: false, // 是否静态（不可移动/调整）
+  minW: 2,     // minimum width
+  maxW: 6,     // maximum width
+  minH: 1,     // minimum height
+  maxH: 4,     // maximum height
+  static: false, // Is it static?（Not removable/Adjustment）
 }
 ```
 
-### 拖拽控制
+### Drag control
 
 ```typescript
 const item: GridLayoutPlusItem = {
@@ -348,90 +348,90 @@ const item: GridLayoutPlusItem = {
   y: 0,
   w: 2,
   h: 2,
-  dragIgnoreFrom: '.no-drag',      // 忽略拖拽的选择器
-  dragAllowFrom: '.drag-handle',   // 允许拖拽的选择器
-  resizeIgnoreFrom: '.no-resize',  // 忽略调整大小的选择器
+  dragIgnoreFrom: '.no-drag',      // Ignore dragged selectors
+  dragAllowFrom: '.drag-handle',   // Selector that allows dragging
+  resizeIgnoreFrom: '.no-resize',  // Ignore resized selectors
 }
 ```
 
-## 📱 移动端支持
+## 📱 Mobile support
 
-组件自动支持触摸设备：
+Component automatically supports touch devices：
 
 ```typescript
 const gridConfig = {
-  colNum: 6,        // 移动端使用更少的列数
-  rowHeight: 60,    // 更小的行高
-  margin: [5, 5],   // 更小的边距
+  colNum: 6,        // Mobile uses fewer columns
+  rowHeight: 60,    // Smaller row height
+  margin: [5, 5],   // smaller margins
 }
 ```
 
-## 🔄 迁移指南
+## 🔄 Migration Guide
 
-从 DraggableResizableGrid 迁移到 GridLayoutPlus：
+from DraggableResizableGrid Migrate to GridLayoutPlus：
 
-### 1. 导入更改
+### 1. Import changes
 
 ```typescript
-// 旧版本
+// old version
 import { DraggableResizableGrid } from '@/components/common/grid'
 
-// 新版本
+// new version
 import { GridLayoutPlus } from '@/components/common/grid'
 ```
 
-### 2. 属性映射
+### 2. attribute mapping
 
-| DraggableResizableGrid | GridLayoutPlus | 说明 |
+| DraggableResizableGrid | GridLayoutPlus | illustrate |
 |----------------------|----------------|------|
-| `items` | `layout` | 数据属性名变更 |
-| `config.columns` | `config.colNum` | 列数配置 |
-| `config.rowHeight` | `config.rowHeight` | 行高配置（相同） |
-| `config.gap` | `config.margin` | 间距配置（格式变更） |
-| `config.readonly` | `readonly` | 只读模式提升为顶级属性 |
+| `items` | `layout` | Data attribute name change |
+| `config.columns` | `config.colNum` | Column number configuration |
+| `config.rowHeight` | `config.rowHeight` | Row height configuration（same） |
+| `config.gap` | `config.margin` | spacing configuration（Format changes） |
+| `config.readonly` | `readonly` | Read-only mode promoted to top-level property |
 
-### 3. 事件映射
+### 3. event mapping
 
-| DraggableResizableGrid | GridLayoutPlus | 说明 |
+| DraggableResizableGrid | GridLayoutPlus | illustrate |
 |----------------------|----------------|------|
-| `@layout-change` | `@layout-change` | 相同 |
-| `@item-click` | `@item-edit` | 点击事件重命名 |
-| `@item-add` | `@item-add` | 相同 |
-| `@item-remove` | `@item-delete` | 重命名 |
+| `@layout-change` | `@layout-change` | same |
+| `@item-click` | `@item-edit` | click event rename |
+| `@item-add` | `@item-add` | same |
+| `@item-remove` | `@item-delete` | Rename |
 
-## 📚 示例项目
+## 📚 Sample project
 
-查看完整示例：`src/components/common/grid/examples/GridLayoutPlusExample.vue`
+View full example：`src/components/common/grid/examples/GridLayoutPlusExample.vue`
 
-运行示例：
+Run the example：
 ```bash
-# 在开发环境中访问示例页面
+# Access the sample page in a development environment
 http://localhost:3000/grid-layout-plus-example
 ```
 
-## 🆘 常见问题
+## 🆘 FAQ
 
-### Q: 如何设置项目的最小/最大尺寸？
-A: 在 GridLayoutPlusItem 中设置 `minW`, `maxW`, `minH`, `maxH` 属性。
+### Q: How to set the minimum for a project/Maximum size？
+A: exist GridLayoutPlusItem Medium settings `minW`, `maxW`, `minH`, `maxH` property。
 
-### Q: 如何禁用某个项目的拖拽或调整大小？
-A: 设置项目的 `isDraggable: false` 或 `isResizable: false`。
+### Q: How to disable dragging or resizing of an item？
+A: Set up the project `isDraggable: false` or `isResizable: false`。
 
-### Q: 如何实现项目的自定义拖拽把手？
-A: 使用 `dragAllowFrom` 属性指定拖拽把手的选择器。
+### Q: How to implement custom drag handles for projects？
+A: use `dragAllowFrom` Property specifies the selector for the drag handle。
 
-### Q: 如何处理项目的数据更新？
-A: 监听 `@item-data-update` 事件或使用 Hook 的数据管理方法。
+### Q: How to handle data updates for projects？
+A: monitor `@item-data-update` event or use Hook data management methods。
 
-### Q: 如何保存和恢复布局？
-A: 使用 Hook 的 `exportCurrentLayout()` 和 `importLayout()` 方法。
+### Q: How to save and restore layouts？
+A: use Hook of `exportCurrentLayout()` and `importLayout()` method。
 
-## 🔗 相关链接
+## 🔗 Related links
 
-- [Grid Layout Plus 官方文档](https://grid-layout-plus.netlify.app/)
-- [Vue 3 文档](https://vuejs.org/)
-- [TypeScript 文档](https://www.typescriptlang.org/)
+- [Grid Layout Plus Official documentation](https://grid-layout-plus.netlify.app/)
+- [Vue 3 document](https://vuejs.org/)
+- [TypeScript document](https://www.typescriptlang.org/)
 
 ---
 
-**推荐在新项目中使用 GridLayoutPlus，它提供了更好的性能和用户体验！** 🚀
+**Recommended for use in new projects GridLayoutPlus，It provides better performance and user experience！** 🚀

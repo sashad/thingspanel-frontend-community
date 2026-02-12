@@ -1,12 +1,12 @@
 /**
- * 交互系统类型定义
- * 简化的交互类型系统，专注于核心功能
+ * Interactive system type definition
+ * Simplified interactive type system，Focus on core functionality
  */
 
 import type { Component } from 'vue'
 
 /**
- * 交互事件类型
+ * Interaction event type
  */
 export type InteractionEventType =
   | 'click'
@@ -19,7 +19,7 @@ export type InteractionEventType =
   | 'input'
 
 /**
- * 交互动作类型
+ * Interaction type
  */
 export type InteractionActionType =
   | 'navigate'
@@ -29,19 +29,19 @@ export type InteractionActionType =
   | 'custom'
 
 /**
- * 交互动作配置
+ * Interaction configuration
  */
 export interface InteractionAction {
   type: InteractionActionType
-  target?: string // 目标组件ID或页面路径
-  message?: string // 消息内容
-  data?: Record<string, any> // 更新数据
-  visible?: boolean // 显示/隐藏状态
-  customHandler?: () => void // 自定义处理函数
+  target?: string // target componentIDor page path
+  message?: string // Message content
+  data?: Record<string, any> // Update data
+  visible?: boolean // show/Hidden state
+  customHandler?: () => void // Custom processing function
 }
 
 /**
- * 交互事件配置
+ * Interaction event configuration
  */
 export interface InteractionEvent {
   type: InteractionEventType
@@ -51,15 +51,15 @@ export interface InteractionEvent {
 }
 
 /**
- * 交互配置
+ * Interactive configuration
  */
 export interface InteractionConfig {
   events: Record<string, InteractionEvent>
-  targetComponent?: string // 目标组件类型
+  targetComponent?: string // target component type
 }
 
 /**
- * 交互管理器配置
+ * Interaction Manager configuration
  */
 export interface InteractionManagerConfig {
   enableLogging?: boolean
@@ -69,7 +69,7 @@ export interface InteractionManagerConfig {
 }
 
 /**
- * 交互状态
+ * interaction state
  */
 export interface InteractionState {
   isEnabled: boolean
@@ -82,7 +82,7 @@ export interface InteractionState {
 }
 
 /**
- * 交互上下文
+ * interaction context
  */
 export interface InteractionContext {
   componentId: string
@@ -92,7 +92,7 @@ export interface InteractionContext {
 }
 
 /**
- * 交互处理器函数
+ * Interaction handler function
  */
 export type InteractionHandler = (
   event: Event,
@@ -101,7 +101,7 @@ export type InteractionHandler = (
 ) => void | Promise<void>
 
 /**
- * 交互处理器注册
+ * Interaction handler registration
  */
 export interface InteractionHandlerRegistration {
   type: InteractionActionType
@@ -110,7 +110,7 @@ export interface InteractionHandlerRegistration {
 }
 
 /**
- * 交互系统统计信息
+ * Interactive system statistics
  */
 export interface InteractionStats {
   totalEvents: number

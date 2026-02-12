@@ -6,8 +6,8 @@
 
 <script setup lang="ts">
 /**
- * 仪表盘图表组件
- * 使用 ECharts 实现圆形仪表盘可视化
+ * Dashboard chart component
+ * use ECharts Implement circular dashboard visualization
  */
 
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
@@ -16,14 +16,14 @@ import type { GaugeChartCustomize } from './settingConfig'
 import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
 
-// 组件属性接口
+// Component property interface
 interface Props {
   config: GaugeChartCustomize
   data?: Record<string, unknown>
   componentId?: string
 }
 
-// 组件事件
+// Component events
 interface Emits {
   (e: 'update:config', config: GaugeChartCustomize): void
   (e: 'update:unified-config', config: UnifiedCard2Configuration): void
@@ -35,23 +35,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 使用 Card2 统一配置 hook
-// 🔥 关键修复：data必须传入computed才能响应props.data变化
+// use Card2 Unified configuration hook
+// 🔥 critical fix：dataMust be passed incomputedto respondprops.datachange
 const { unifiedConfig, displayData } = useCard2Props({
   config: props.config,
   data: computed(() => props.data),
   componentId: props.componentId
 })
 
-// ECharts 实例和容器引用
+// ECharts Instance and container references
 const chartRef = ref<HTMLElement>()
 const chartContainerRef = ref<HTMLElement>()
 let chartInstance: echarts.ECharts | null = null
 
-// 计算显示值（数据源优先）
+// Calculate display value（Data source first）
 const displayValue = computed(() => {
-  // 🔥 修复：数据源结构是 { main: { data: { value, unit, ... } } }
-  // 优先使用数据源的值，否则使用配置值
+  // 🔥 repair：The data source structure is { main: { data: { value, unit, ... } } }
+  // Prefer data source values，Otherwise use configuration value
   const dataSourceValue = displayData.value?.main?.data?.value
   return Number(dataSourceValue ?? unifiedConfig.value.component?.value ?? 75)
 })
@@ -68,10 +68,10 @@ const displayMax = computed(() => {
 
 const displayTitle = computed(() => {
   const dataSourceTitle = displayData.value?.main?.data?.metricsName
-  return String(dataSourceTitle ?? unifiedConfig.value.component?.title ?? '数据指标')
+  return String(dataSourceTitle ?? unifiedConfig.value.component?.title ?? 'Data indicators')
 })
 
-// 计算百分比
+// Calculate percentage
 const percentage = computed(() => {
   const range = displayMax.value - displayMin.value
   if (range === 0) return 0
@@ -79,25 +79,25 @@ const percentage = computed(() => {
 })
 
 /**
- * 初始化 ECharts 实例
+ * initialization ECharts Example
  */
 const initChart = () => {
   if (!chartRef.value) return
 
-  // 如果已存在实例，先销毁
+  // If an instance already exists，Destroy first
   if (chartInstance) {
     chartInstance.dispose()
   }
 
-  // 创建新实例
+  // Create new instance
   chartInstance = echarts.init(chartRef.value)
 
-  // 更新图表
+  // Update chart
   updateChart()
 }
 
 /**
- * 更新图表配置
+ * Update chart configuration
  */
 const updateChart = () => {
   if (!chartInstance) return
@@ -189,7 +189,7 @@ const updateChart = () => {
 }
 
 /**
- * 处理窗口大小变化
+ * Handling window size changes
  */
 const handleResize = () => {
   if (chartInstance) {
@@ -197,7 +197,7 @@ const handleResize = () => {
   }
 }
 
-// 监听配置变化
+// Listen for configuration changes
 watch(
   () => unifiedConfig.value.component,
   () => {
@@ -208,7 +208,7 @@ watch(
   { deep: true }
 )
 
-// 监听数据变化
+// Monitor data changes
 watch(
   () => props.data,
   () => {
@@ -219,7 +219,7 @@ watch(
   { deep: true }
 )
 
-// 监听显示值变化
+// Monitor display value changes
 watch(
   [displayValue, displayMin, displayMax, displayTitle],
   () => {
@@ -229,16 +229,16 @@ watch(
   }
 )
 
-// 组件挂载
+// Component mounting
 onMounted(() => {
   nextTick(() => {
     initChart()
   })
 
-  // 监听窗口大小变化
+  // Listen for window size changes
   window.addEventListener('resize', handleResize)
 
-  // 使用 ResizeObserver 监听容器大小变化
+  // use ResizeObserver Monitor container size changes
   if (chartContainerRef.value) {
     const resizeObserver = new ResizeObserver(() => {
       handleResize()
@@ -247,7 +247,7 @@ onMounted(() => {
   }
 })
 
-// 组件卸载
+// Component uninstallation
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 

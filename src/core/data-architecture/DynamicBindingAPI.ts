@@ -1,28 +1,28 @@
 /**
- * 动态绑定API - 完全可配置的属性绑定系统
- * 提供运行时动态配置绑定规则的完整API
+ * dynamic bindingAPI - Fully configurable property binding system
+ * Provides complete runtime dynamic configuration of binding rulesAPI
  */
 
 import { dataSourceBindingConfig, type BindingRule, type TriggerRule, type AutoBindConfig } from './DataSourceBindingConfig'
 
 /**
- * 🚀 动态绑定管理器 - 消除所有硬编码
- * 这个API证明系统完全没有硬编码，任何属性都可以动态配置
+ * 🚀 Dynamic binding manager - Eliminate all hard coding
+ * thisAPIProve that the system is not hardcoded at all，Any attribute can be configured dynamically
  */
 export class DynamicBindingAPI {
 
   /**
-   * 🔥 完全清空默认规则，从零开始自定义
-   * 证明系统没有任何硬编码依赖
+   * 🔥 Completely clear default rules，Customize from scratch
+   * Prove that the system does not have any hard-coded dependencies
    */
   static clearAllDefaultRules(): void {
     dataSourceBindingConfig.clearAllRules()
-    console.log('🧹 [DynamicBindingAPI] 已清空所有默认规则，现在系统完全空白')
+    console.log('🧹 [DynamicBindingAPI] All default rules cleared，The system is now completely blank')
   }
 
   /**
-   * 🚀 添加完全自定义的绑定规则
-   * 支持任意属性路径，不限于deviceId等预设字段
+   * 🚀 Add fully custom binding rules
+   * Supports arbitrary attribute paths，Not limited todeviceIdWait for default fields
    */
   static addCustomBinding(config: {
     propertyPath: string
@@ -36,13 +36,13 @@ export class DynamicBindingAPI {
       paramName: config.paramName,
       transform: config.transform,
       required: config.required || false,
-      description: config.description || `自定义绑定: ${config.propertyPath} → ${config.paramName}`
+      description: config.description || `Custom binding: ${config.propertyPath} → ${config.paramName}`
     })
   }
 
   /**
-   * 🚀 添加完全自定义的触发规则
-   * 支持任意属性路径的变更触发
+   * 🚀 Add fully custom trigger rules
+   * Supports change triggering of any attribute path
    */
   static addCustomTrigger(config: {
     propertyPath: string
@@ -54,29 +54,29 @@ export class DynamicBindingAPI {
       propertyPath: config.propertyPath,
       enabled: config.enabled !== false,
       debounceMs: config.debounceMs || 100,
-      description: config.description || `自定义触发: ${config.propertyPath}`
+      description: config.description || `Custom trigger: ${config.propertyPath}`
     })
   }
 
   /**
-   * 🔥 移除任意绑定规则
-   * 包括默认的deviceId等规则都可以被移除
+   * 🔥 Remove any binding rules
+   * including defaultdeviceIdrules can be removed
    */
   static removeBinding(propertyPath: string): boolean {
     return dataSourceBindingConfig.removeBindingRule(propertyPath)
   }
 
   /**
-   * 🔥 移除任意触发规则
-   * 包括默认的deviceId等触发都可以被移除
+   * 🔥 Remove any trigger rules
+   * including defaultdeviceIdCan be removed when triggered
    */
   static removeTrigger(propertyPath: string): boolean {
     return dataSourceBindingConfig.removeTriggerRule(propertyPath)
   }
 
   /**
-   * 🚀 批量配置自定义组件的绑定规则
-   * 演示如何为特殊组件配置完全不同的绑定规则
+   * 🚀 Configure binding rules for custom components in batches
+   * Demonstrates how to configure completely different binding rules for special components
    */
   static configureCustomComponent(componentType: string, config: {
     bindings: Array<{
@@ -92,7 +92,7 @@ export class DynamicBindingAPI {
     }>
     autoBind?: AutoBindConfig
   }): void {
-    // 设置组件特定配置
+    // Set component specific configuration
     dataSourceBindingConfig.setComponentConfig(componentType, {
       componentType,
       additionalBindings: config.bindings.map(b => ({
@@ -100,18 +100,18 @@ export class DynamicBindingAPI {
         paramName: b.paramName,
         transform: b.transform,
         required: b.required || false,
-        description: `${componentType}组件专用绑定: ${b.propertyPath}`
+        description: `${componentType}Component-specific binding: ${b.propertyPath}`
       })),
       additionalTriggers: config.triggers.map(t => ({
         propertyPath: t.propertyPath,
         enabled: t.enabled !== false,
         debounceMs: t.debounceMs || 100,
-        description: `${componentType}组件专用触发: ${t.propertyPath}`
+        description: `${componentType}Component-specific triggering: ${t.propertyPath}`
       })),
       autoBindEnabled: config.autoBind?.enabled || false
     })
 
-    console.log(`⚙️ [DynamicBindingAPI] 已配置自定义组件 ${componentType}:`, {
+    console.log(`⚙️ [DynamicBindingAPI] Custom component configured ${componentType}:`, {
       bindingCount: config.bindings.length,
       triggerCount: config.triggers.length,
       autoBindEnabled: config.autoBind?.enabled
@@ -119,21 +119,21 @@ export class DynamicBindingAPI {
   }
 
   /**
-   * 🔥 获取当前所有绑定规则 - 用于调试和验证
+   * 🔥 Get all current binding rules - for debugging and verification
    */
   static getCurrentBindingRules(componentType?: string): BindingRule[] {
     return dataSourceBindingConfig.getAllBindingRules(componentType)
   }
 
   /**
-   * 🔥 获取当前所有触发规则 - 用于调试和验证
+   * 🔥 Get all current triggering rules - for debugging and verification
    */
   static getCurrentTriggerRules(componentType?: string): TriggerRule[] {
     return dataSourceBindingConfig.getAllTriggerRules(componentType)
   }
 
   /**
-   * 🚀 预设配置模板 - 常见场景的快速配置
+   * 🚀 Default configuration template - Quick configuration for common scenarios
    */
   static applyTemplate(template: 'iot-device' | 'data-analytics' | 'user-interface' | 'custom'): void {
     switch (template) {
@@ -153,55 +153,55 @@ export class DynamicBindingAPI {
   }
 
   /**
-   * IoT设备模板 - 设备相关的绑定规则
+   * IoTDevice template - Device-related binding rules
    */
   private static applyIoTDeviceTemplate(): void {
     this.clearAllDefaultRules()
 
-    // 设备基础属性
+    // Basic device properties
     this.addCustomBinding({
       propertyPath: 'base.deviceId',
       paramName: 'device_id',
       required: true,
-      description: 'IoT设备ID'
+      description: 'IoTequipmentID'
     })
 
     this.addCustomBinding({
       propertyPath: 'base.deviceType',
       paramName: 'device_type',
-      description: 'IoT设备类型'
+      description: 'IoTDevice type'
     })
 
     this.addCustomBinding({
       propertyPath: 'component.sensorIds',
       paramName: 'sensors',
       transform: (ids: string[]) => ids.join(','),
-      description: 'IoT传感器列表'
+      description: 'IoTSensor list'
     })
 
-    // 对应的触发规则
+    // Corresponding trigger rules
     this.addCustomTrigger({
       propertyPath: 'base.deviceId',
       debounceMs: 50,
-      description: 'IoT设备切换触发'
+      description: 'IoTDevice switching trigger'
     })
 
     this.addCustomTrigger({
       propertyPath: 'component.sensorIds',
       debounceMs: 200,
-      description: 'IoT传感器变更触发'
+      description: 'IoTSensor change trigger'
     })
 
-    console.log('📡 [DynamicBindingAPI] 已应用IoT设备模板')
+    console.log('📡 [DynamicBindingAPI] AppliedIoTDevice template')
   }
 
   /**
-   * 数据分析模板 - 分析相关的绑定规则
+   * Data analysis template - Analyze relevant binding rules
    */
   private static applyDataAnalyticsTemplate(): void {
     this.clearAllDefaultRules()
 
-    // 数据查询属性
+    // Data query properties
     this.addCustomBinding({
       propertyPath: 'component.timeRange',
       paramName: 'time_range',
@@ -209,82 +209,82 @@ export class DynamicBindingAPI {
         start: range.start.toISOString(),
         end: range.end.toISOString()
       }),
-      description: '数据分析时间范围'
+      description: 'Data analysis time frame'
     })
 
     this.addCustomBinding({
       propertyPath: 'component.aggregationType',
       paramName: 'aggregation',
-      description: '数据聚合类型'
+      description: 'Data aggregation type'
     })
 
     this.addCustomBinding({
       propertyPath: 'component.groupBy',
       paramName: 'group_by',
       transform: (fields: string[]) => fields.join(','),
-      description: '数据分组字段'
+      description: 'Data grouping field'
     })
 
-    // 对应的触发规则
+    // Corresponding trigger rules
     this.addCustomTrigger({
       propertyPath: 'component.timeRange',
       debounceMs: 500,
-      description: '时间范围变更触发'
+      description: 'Time range change trigger'
     })
 
     this.addCustomTrigger({
       propertyPath: 'component.aggregationType',
       debounceMs: 100,
-      description: '聚合类型变更触发'
+      description: 'Aggregation type change trigger'
     })
 
-    console.log('📊 [DynamicBindingAPI] 已应用数据分析模板')
+    console.log('📊 [DynamicBindingAPI] Data analysis template applied')
   }
 
   /**
-   * UI界面模板 - 界面相关的绑定规则
+   * UIInterface template - Interface-related binding rules
    */
   private static applyUITemplate(): void {
     this.clearAllDefaultRules()
 
-    // UI状态属性
+    // UIstatus attribute
     this.addCustomBinding({
       propertyPath: 'component.selectedTab',
       paramName: 'active_tab',
-      description: 'UI选中标签页'
+      description: 'UISelect tab'
     })
 
     this.addCustomBinding({
       propertyPath: 'component.filterText',
       paramName: 'search_query',
-      description: 'UI搜索查询'
+      description: 'UIsearch query'
     })
 
     this.addCustomBinding({
       propertyPath: 'component.pageSize',
       paramName: 'limit',
       transform: (size: number) => Math.max(1, Math.min(100, size)),
-      description: 'UI分页大小'
+      description: 'UIpaging size'
     })
 
-    // 对应的触发规则
+    // Corresponding trigger rules
     this.addCustomTrigger({
       propertyPath: 'component.selectedTab',
       debounceMs: 50,
-      description: 'UI标签页切换触发'
+      description: 'UITab switching trigger'
     })
 
     this.addCustomTrigger({
       propertyPath: 'component.filterText',
       debounceMs: 300,
-      description: 'UI搜索输入触发'
+      description: 'UISearch input triggers'
     })
 
-    console.log('🎨 [DynamicBindingAPI] 已应用UI界面模板')
+    console.log('🎨 [DynamicBindingAPI] AppliedUIInterface template')
   }
 
   /**
-   * 🔥 运行时动态检测系统状态
+   * 🔥 Dynamically detect system status at runtime
    */
   static getSystemStatus(): {
     totalBindingRules: number
@@ -298,7 +298,7 @@ export class DynamicBindingAPI {
     const debugInfo = dataSourceBindingConfig.getDebugInfo()
 
     const hasDeviceIdRule = allBindings.some(rule => rule.propertyPath === 'base.deviceId')
-    const hasDefaultRules = hasDeviceIdRule // 如果还有deviceId规则，说明有默认规则
+    const hasDefaultRules = hasDeviceIdRule // if there is stilldeviceIdrule，说明有默认rule
 
     return {
       totalBindingRules: allBindings.length,
@@ -311,12 +311,12 @@ export class DynamicBindingAPI {
 }
 
 /**
- * 🚀 使用示例和测试用例
+ * 🚀 Usage examples and test cases
  */
 export class DynamicBindingExamples {
 
   /**
-   * 示例1: 完全自定义的电商组件
+   * Example1: Fully customized e-commerce components
    */
   static configureECommerceComponent(): void {
     DynamicBindingAPI.configureCustomComponent('ecommerce-product-list', {
@@ -361,18 +361,18 @@ export class DynamicBindingExamples {
   }
 
   /**
-   * 示例2: 完全移除deviceId相关的所有绑定
+   * Example2: Completely removedeviceIdAll bindings related to
    */
   static removeAllDeviceBindings(): void {
-    // 证明可以完全移除系统默认的deviceId绑定
+    // Proves that the system default can be completely removeddeviceIdbinding
     DynamicBindingAPI.removeBinding('base.deviceId')
     DynamicBindingAPI.removeTrigger('base.deviceId')
 
-    console.log('🗑️ [DynamicBindingAPI] 已移除所有deviceId相关绑定，系统不再依赖deviceId')
+    console.log('🗑️ [DynamicBindingAPI] All removeddeviceIdRelated bindings，The system no longer relies ondeviceId')
   }
 
   /**
-   * 示例3: 自定义金融数据组件
+   * Example3: Custom financial data component
    */
   static configureFinancialComponent(): void {
     DynamicBindingAPI.addCustomBinding({
@@ -380,7 +380,7 @@ export class DynamicBindingExamples {
       paramName: 'symbol',
       required: true,
       transform: (symbol: string) => symbol.toUpperCase(),
-      description: '股票代码绑定'
+      description: 'Stock code binding'
     })
 
     DynamicBindingAPI.addCustomBinding({
@@ -390,47 +390,47 @@ export class DynamicBindingExamples {
         const mapping = { '1m': '1min', '5m': '5min', '1h': '60min', '1d': 'daily' }
         return mapping[tf] || tf
       },
-      description: '时间周期转换'
+      description: 'time period conversion'
     })
 
     DynamicBindingAPI.addCustomTrigger({
       propertyPath: 'component.stockSymbol',
       debounceMs: 200,
-      description: '股票切换触发'
+      description: 'Stock switch trigger'
     })
   }
 
   /**
-   * 测试系统的完全动态性
+   * Test the system's full dynamics
    */
   static testSystemFlexibility(): void {
-    console.log('🧪 [DynamicBindingAPI] 开始测试系统动态性...')
+    console.log('🧪 [DynamicBindingAPI] Start testing system dynamics...')
 
-    // 1. 清空所有规则
+    // 1. Clear all rules
     DynamicBindingAPI.clearAllDefaultRules()
     let status = DynamicBindingAPI.getSystemStatus()
     console.log('📊 清空后状态:', status)
 
-    // 2. 添加完全自定义的规则
+    // 2. Add fully custom rules
     DynamicBindingAPI.addCustomBinding({
       propertyPath: 'custom.myField',
       paramName: 'my_param',
-      description: '完全自定义的字段'
+      description: 'Fully customizable fields'
     })
 
     DynamicBindingAPI.addCustomTrigger({
       propertyPath: 'custom.myField',
-      description: '完全自定义的触发'
+      description: 'Fully customizable triggers'
     })
 
     status = DynamicBindingAPI.getSystemStatus()
     console.log('📊 添加自定义规则后状态:', status)
 
-    // 3. 验证系统运行
+    // 3. Verify system operation
     const bindings = DynamicBindingAPI.getCurrentBindingRules()
     const triggers = DynamicBindingAPI.getCurrentTriggerRules()
 
-    console.log('✅ [DynamicBindingAPI] 测试完成 - 系统完全动态化:', {
+    console.log('✅ [DynamicBindingAPI] Test completed - The system is fully dynamic:', {
       customBindings: bindings.length,
       customTriggers: triggers.length,
       isFullyCustomized: status.isFullyCustomized,
@@ -439,7 +439,7 @@ export class DynamicBindingExamples {
   }
 }
 
-// 全局暴露API，供调试和配置使用
+// global exposureAPI，For debugging and configuration use
 if (typeof globalThis !== 'undefined') {
   (globalThis as any).__dynamicBindingAPI = DynamicBindingAPI
   (globalThis as any).__dynamicBindingExamples = DynamicBindingExamples

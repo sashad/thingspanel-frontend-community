@@ -12,8 +12,8 @@
 
 <script setup lang="ts">
 /**
- * 基础右键菜单组件
- * 为所有渲染器提供统一的右键菜单功能
+ * Basic right-click menu component
+ * Provide unified right-click menu functionality for all renderers
  */
 
 import { computed, h } from 'vue'
@@ -51,7 +51,7 @@ const menuOptions = computed(() => {
   }
 
   const lockOption = {
-    label: isLocked ? '解锁' : '锁定',
+    label: isLocked ? 'Unlock' : 'locking',
     key: isLocked ? 'unlock' : 'lock',
     icon: () => h(NIcon, null, { default: () => h(isLocked ? LockOpenOutline : LockClosedOutline) }),
     disabled: !isSingleSelection
@@ -59,7 +59,7 @@ const menuOptions = computed(() => {
 
   return [
     {
-      label: '属性',
+      label: 'property',
       key: 'settings',
       icon: () => h(NIcon, null, { default: () => h(SettingsOutline) }),
       disabled: !isSingleSelection
@@ -70,13 +70,13 @@ const menuOptions = computed(() => {
       key: 'd1'
     },
     {
-      label: '复制',
+      label: 'copy',
       key: 'copy',
       icon: () => h(NIcon, null, { default: () => h(CopyOutline) }),
       disabled: !hasSelection
     },
     {
-      label: '删除',
+      label: 'delete',
       key: 'delete',
       icon: () => h(NIcon, null, { default: () => h(TrashOutline) }),
       disabled: !hasSelection
@@ -94,7 +94,7 @@ const handleClickOutside = () => {
 </script>
 
 <style scoped>
-/* 基础右键菜单样式 */
+/* Basic right-click menu style */
 .context-menu-disabled {
   position: fixed;
   top: 0;

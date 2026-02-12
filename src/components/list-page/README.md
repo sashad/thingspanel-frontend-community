@@ -1,41 +1,41 @@
-# ListPage 组件使用文档
+# ListPage Component usage documentation
 
-## 概述
+## Overview
 
-`ListPage` 是一个高度可定制的列表页面布局组件，旨在统一项目中列表页面的UI和交互体验，同时提供足够的灵活性来满足不同场景的需求。
+`ListPage` Is a highly customizable list page layout component，Designed to unify list pages in projectsUIand interactive experience，At the same time, it provides enough flexibility to meet the needs of different scenarios.。
 
-## 特性
+## characteristic
 
-- 🔍 **智能搜索区域**：根据插槽内容自动显示/隐藏搜索区域
-- 🎛️ **灵活的头部操作**：支持自定义左侧和右侧操作区域
-- 👁️ **多视图切换**：支持卡片、列表、地图等多种视图模式
-- 🔄 **内置刷新功能**：提供统一的刷新交互
-- 📱 **响应式设计**：适配不同屏幕尺寸
-- 🎨 **高度可定制**：通过插槽系统实现灵活的内容定制
+- 🔍 **Smart search area**：Automatically displayed based on slot content/Hide search area
+- 🎛️ **Flexible head operation**：Supports customizing the left and right operating areas
+- 👁️ **Multiple view switching**：Support cards、list、Multiple view modes such as maps
+- 🔄 **Built-in refresh function**：Provide unified refresh interaction
+- 📱 **Responsive design**：Adapt to different screen sizes
+- 🎨 **Highly customizable**：Flexible content customization via slot system
 
-## 基础用法
+## Basic usage
 
 ```vue
 <template>
   <list-page>
-    <!-- 搜索表单 -->
+    <!-- search form -->
     <template #search-form-content>
       <n-form inline>
-        <n-form-item label="名称">
-          <n-input v-model:value="searchForm.name" placeholder="请输入名称" />
+        <n-form-item label="name">
+          <n-input v-model:value="searchForm.name" placeholder="Please enter name" />
         </n-form-item>
-        <n-form-item label="状态">
+        <n-form-item label="state">
           <n-select v-model:value="searchForm.status" :options="statusOptions" />
         </n-form-item>
       </n-form>
     </template>
 
-    <!-- 列表视图 -->
+    <!-- list view -->
     <template #list-view>
       <n-data-table :columns="columns" :data="data" />
     </template>
 
-    <!-- 分页 -->
+    <!-- Pagination -->
     <template #footer>
       <n-pagination v-model:page="pagination.page" :page-count="pagination.pageCount" />
     </template>
@@ -47,76 +47,76 @@
 
 ### Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
+| attribute name | type | default value | illustrate |
 |--------|------|--------|------|
-| `addButtonText` | `string \| (() => string)` | `''` | 新建按钮文本，支持函数形式 |
-| `addButtonI18nKey` | `string` | `'card.addButton'` | 新建按钮国际化key |
-| `initialView` | `string` | `''` | 初始视图类型 |
-| `availableViews` | `ViewItem[]` | `[card, list, map]` | 可用的视图类型配置 |
-| `showQueryButton` | `boolean` | `true` | 是否显示查询按钮 |
-| `showResetButton` | `boolean` | `true` | 是否显示重置按钮 |
+| `addButtonText` | `string \| (() => string)` | `''` | New button text，Support functional form |
+| `addButtonI18nKey` | `string` | `'card.addButton'` | New button internationalizationkey |
+| `initialView` | `string` | `''` | Initial view type |
+| `availableViews` | `ViewItem[]` | `[card, list, map]` | Available view type configurations |
+| `showQueryButton` | `boolean` | `true` | Whether to display the query button |
+| `showResetButton` | `boolean` | `true` | Whether to display the reset button |
 
-### ViewItem 接口
+### ViewItem interface
 
 ```typescript
 interface ViewItem {
-  key: string;        // 视图标识
-  icon: any;          // 视图图标组件
-  label?: string;     // 视图标签（国际化key）
+  key: string;        // View ID
+  icon: any;          // View icon component
+  label?: string;     // view label（internationalizationkey）
 }
 ```
 
 ### Events
 
-| 事件名 | 参数 | 说明 |
+| event name | parameter | illustrate |
 |--------|------|------|
-| `query` | `filterData: Record<string, any>` | 查询事件 |
-| `reset` | - | 重置事件 |
-| `add-new` | - | 新建事件 |
-| `view-change` | `{ viewType: string }` | 视图切换事件 |
-| `refresh` | - | 刷新事件 |
+| `query` | `filterData: Record<string, any>` | Query events |
+| `reset` | - | reset event |
+| `add-new` | - | New event |
+| `view-change` | `{ viewType: string }` | View switching event |
+| `refresh` | - | refresh event |
 
-### 插槽
+### slot
 
-#### 搜索区域插槽
+#### Search area slot
 
-| 插槽名 | 说明 |
+| Slot name | illustrate |
 |--------|------|
-| `search-form-content` | 搜索表单内容 |
+| `search-form-content` | Search form content |
 
-#### 头部操作插槽
+#### Head operating slot
 
-| 插槽名 | 说明 |
+| Slot name | illustrate |
 |--------|------|
-| `header-left` | 完全自定义左侧头部内容 |
-| `add-button` | 自定义新建按钮（在默认左侧布局内） |
-| `header-right` | 完全自定义右侧头部内容 |
+| `header-left` | Fully customize left header content |
+| `add-button` | Customize new button（Within the default left layout） |
+| `header-right` | Fully customize the right header content |
 
-#### 视图内容插槽
+#### View content slot
 
-| 插槽名 | 说明 |
+| Slot name | illustrate |
 |--------|------|
-| `card-view` | 卡片视图内容 |
-| `list-view` | 列表视图内容 |
-| `map-view` | 地图视图内容 |
+| `card-view` | card view content |
+| `list-view` | list view content |
+| `map-view` | Map view content |
 
-#### 其他插槽
+#### Other slots
 
-| 插槽名 | 说明 |
+| Slot name | illustrate |
 |--------|------|
-| `footer` | 底部内容（通常用于分页） |
+| `footer` | bottom content（Usually used for pagination） |
 
-## 使用场景
+## Usage scenarios
 
-### 1. 基础列表页面
+### 1. Basic list page
 
 ```vue
 <template>
   <list-page @query="handleQuery" @reset="handleReset" @add-new="handleAddNew">
     <template #search-form-content>
       <n-form ref="searchFormRef" inline :model="searchForm">
-        <n-form-item label="名称" path="name">
-          <n-input v-model:value="searchForm.name" placeholder="请输入名称" />
+        <n-form-item label="name" path="name">
+          <n-input v-model:value="searchForm.name" placeholder="Please enter name" />
         </n-form-item>
       </n-form>
     </template>
@@ -136,7 +136,7 @@ interface ViewItem {
 </template>
 ```
 
-### 2. 多视图切换
+### 2. Multiple view switching
 
 ```vue
 <template>
@@ -145,78 +145,78 @@ interface ViewItem {
     @view-change="handleViewChange"
   >
     <template #search-form-content>
-      <!-- 搜索表单 -->
+      <!-- search form -->
     </template>
 
-    <!-- 卡片视图 -->
+    <!-- card view -->
     <template #card-view>
       <div class="card-grid">
         <div v-for="item in data" :key="item.id" class="card-item">
-          <!-- 卡片内容 -->
+          <!-- Card content -->
         </div>
       </div>
     </template>
 
-    <!-- 列表视图 -->
+    <!-- list view -->
     <template #list-view>
       <n-data-table :columns="columns" :data="data" />
     </template>
 
-    <!-- 地图视图 -->
+    <!-- map view -->
     <template #map-view>
       <div class="map-container">
-        <!-- 地图组件 -->
+        <!-- map component -->
       </div>
     </template>
   </list-page>
 </template>
 ```
 
-### 3. 自定义头部操作
+### 3. Custom head operation
 
 ```vue
 <template>
   <list-page>
-    <!-- 完全自定义左侧 -->
+    <!-- Fully customize the left side -->
     <template #header-left>
       <n-space>
         <n-button type="primary" @click="handleBatchImport">
           <template #icon><n-icon><upload-icon /></n-icon></template>
-          批量导入
+          Batch import
         </n-button>
         <n-button type="success" @click="handleAddNew">
           <template #icon><n-icon><plus-icon /></n-icon></template>
-          新建项目
+          New project
         </n-button>
       </n-space>
     </template>
 
-    <!-- 自定义右侧 -->
+    <!-- Customize the right side -->
     <template #header-right>
       <n-space>
         <n-button @click="handleExport">
           <template #icon><n-icon><download-icon /></n-icon></template>
-          导出
+          Export
         </n-button>
         <n-button @click="handleSettings">
           <template #icon><n-icon><settings-icon /></n-icon></template>
-          设置
+          set up
         </n-button>
         <n-button @click="handleRefresh">
           <template #icon><n-icon><refresh-icon /></n-icon></template>
-          刷新
+          refresh
         </n-button>
       </n-space>
     </template>
 
     <template #list-view>
-      <!-- 列表内容 -->
+      <!-- List content -->
     </template>
   </list-page>
 </template>
 ```
 
-### 4. 简洁模式（无搜索区域）
+### 4. Simple mode（No search area）
 
 ```vue
 <template>
@@ -224,7 +224,7 @@ interface ViewItem {
     :show-query-button="false"
     :show-reset-button="false"
   >
-    <!-- 不提供 search-form-content 插槽，搜索区域将被隐藏 -->
+    <!-- Not available search-form-content slot，The search area will be hidden -->
 
     <template #list-view>
       <n-data-table :columns="columns" :data="data" />
@@ -233,7 +233,7 @@ interface ViewItem {
 </template>
 ```
 
-### 5. 只自定义新建按钮
+### 5. Only customize the new button
 
 ```vue
 <template>
@@ -242,20 +242,20 @@ interface ViewItem {
       <n-dropdown :options="addOptions" @select="handleAddSelect">
         <n-button type="primary">
           <template #icon><n-icon><plus-icon /></n-icon></template>
-          新建
+          New
           <template #suffix><n-icon><chevron-down-icon /></n-icon></template>
         </n-button>
       </n-dropdown>
     </template>
 
     <template #list-view>
-      <!-- 列表内容 -->
+      <!-- List content -->
     </template>
   </list-page>
 </template>
 ```
 
-## 事件处理示例
+## Event handling example
 
 ```vue
 <script setup>
@@ -269,13 +269,13 @@ const searchForm = ref({
 const data = ref([]);
 const loading = ref(false);
 
-// 查询事件
+// Query events
 const handleQuery = (filterData) => {
-  console.log('查询参数:', searchForm.value);
+  console.log('query parameters:', searchForm.value);
   loadData();
 };
 
-// 重置事件
+// reset event
 const handleReset = () => {
   searchForm.value = {
     name: '',
@@ -284,19 +284,19 @@ const handleReset = () => {
   loadData();
 };
 
-// 新建事件
+// New event
 const handleAddNew = () => {
-  // 跳转到新建页面或打开新建弹窗
-  console.log('新建操作');
+  // Jump to the new page or open the new pop-up window
+  console.log('New operation');
 };
 
-// 视图切换事件
+// View switching event
 const handleViewChange = ({ viewType }) => {
-  console.log('切换到视图:', viewType);
-  // 可以根据视图类型调整数据加载方式
+  console.log('switch to view:', viewType);
+  // Data loading method can be adjusted based on view type
 };
 
-// 刷新事件
+// refresh event
 const handleRefresh = () => {
   loadData();
 };
@@ -304,7 +304,7 @@ const handleRefresh = () => {
 const loadData = async () => {
   loading.value = true;
   try {
-    // 加载数据逻辑
+    // Load data logic
     // const result = await api.getData(searchForm.value);
     // data.value = result.data;
   } finally {
@@ -314,73 +314,73 @@ const loadData = async () => {
 </script>
 ```
 
-## 样式定制
+## Style customization
 
-组件提供了以下CSS类名供样式定制：
+The component provides the followingCSSClass name for style customization：
 
 ```scss
 .advanced-list-layout {
-  // 主容器
+  // main container
 
   .search {
-    // 搜索区域
+    // search area
 
     .search-form-content {
-      // 搜索表单内容区域
+      // Search form content area
     }
 
     .search-button {
-      // 搜索按钮区域
+      // search button area
     }
   }
 
   .list-content {
-    // 内容区域
+    // content area
 
     .list-content-header {
-      // 头部区域
+      // head area
 
       .list-content-header-left {
-        // 左侧操作区域
+        // Left operating area
       }
 
       .list-content-header-right {
-        // 右侧操作区域
+        // Right operating area
       }
     }
 
     .list-content-body {
-      // 主体内容区域
+      // main content area
 
       .view-wrapper {
-        // 视图包装器
+        // View wrapper
       }
     }
   }
 }
 
 .list-content-footer {
-  // 底部区域
+  // bottom area
 }
 ```
 
-## 注意事项
+## Things to note
 
-1. **搜索区域显示逻辑**：只有当存在 `search-form-content` 插槽或者 `showQueryButton`/`showResetButton` 为 true 时，搜索区域才会显示。
+1. **Search area display logic**：only if there is `search-form-content` slot or `showQueryButton`/`showResetButton` for true hour，The search area will be displayed。
 
-2. **视图切换**：视图切换器只有在存在多个视图对应的插槽时才会显示。
+2. **View switching**：View switching器只有在存在多个视图对应的插槽时才会显示。
 
-3. **事件处理**：查询和重置事件需要父组件自行处理表单数据的收集和清空。
+3. **event handling**：Query and reset events require the parent component to handle the collection and clearing of form data by itself。
 
-4. **插槽优先级**：`header-left` 插槽会完全替换默认的新建按钮，如果只想自定义新建按钮，请使用 `add-button` 插槽。
+4. **Slot priority**：`header-left` The slot completely replaces the default New button，If you just want to customize the new button，Please use `add-button` slot。
 
-5. **国际化**：组件内置了国际化支持，确保项目中已正确配置国际化。
+5. **internationalization**：组件内置了internationalization支持，确保项目中已正确配置internationalization。
 
-## 更新日志
+## Change log
 
 ### v1.1.0
-- ✨ 新增搜索区域智能显示功能
-- ✨ 新增头部操作区域插槽化
-- ✨ 新增 `add-button` 插槽支持
-- 🐛 修复视图切换时的样式问题
-- 📝 完善使用文档和示例
+- ✨ Added search area smart display function
+- ✨ Added slot-based head operation area
+- ✨ New `add-button` Slot support
+- 🐛 Fix style issue when switching views
+- 📝 Improve usage documentation and examples

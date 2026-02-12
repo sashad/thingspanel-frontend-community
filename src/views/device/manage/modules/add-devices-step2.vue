@@ -9,32 +9,32 @@ import { $t } from '@/locales'
 const formRef = ref<FormInst | null>(null)
 
 const formRules = ref<FormRules>({})
-// 定义支持的表单元素类型
+// Define supported form element types
 type FormElementType = 'input' | 'table' | 'select'
 
-// 定义选项接口，适用于 select 类型的表单元素
+// Define options interface，Applicable to select Type of form element
 interface Option {
   label: string
   value: number | string
 }
 
-// 定义验证规则接口
+// Define validation rule interface
 interface Validate {
-  message?: string // 验证失败时显示的错误消息
-  required?: boolean // 指定字段是否必填
-  rules?: string // 用于验证字段值的正则表达式规则
-  type?: 'number' | 'string' | 'array' | 'boolean' | 'object' // 验证的类型
+  message?: string // Error message displayed when verification fails
+  required?: boolean // Specifies whether the field is required
+  rules?: string // Regular expression rules for validating field values
+  type?: 'number' | 'string' | 'array' | 'boolean' | 'object' // Type of verification
 }
 
-// 定义表单元素接口
+// Define form element interface
 interface FormElement {
-  type: FormElementType // 表单元素的类型
-  dataKey: string // 用于唯一标识表单元素的键
-  label: string // 显示为表单元素标签的文本
-  options?: Option[] // 下拉选择的枚举选项，仅 select 类型时有效
-  placeholder?: string // 提示文本，仅 input 类型时有效
-  validate?: Validate // 包含表单验证规则的对象
-  array?: FormElement[] // 仅 table 类型时有效，定义表格列的配置
+  type: FormElementType // Type of form element
+  dataKey: string // The key used to uniquely identify the form element
+  label: string // The text that appears as the form element label
+  options?: Option[] // Enumeration options for drop-down selection，only select Valid when type
+  placeholder?: string // Prompt text，only input Valid when type
+  validate?: Validate // Object containing form validation rules
+  array?: FormElement[] // only table Valid when type，Define the configuration of table columns
 }
 
 const props = defineProps<{

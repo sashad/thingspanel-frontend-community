@@ -1,12 +1,12 @@
 /**
- * Grid 响应式工具函数
- * 专门处理断点管理、布局转换等响应式功能
+ * Grid Responsive utility functions
+ * Specially handles breakpoint management、Responsive features such as layout transitions
  */
 
 import type { GridLayoutPlusItem, ResponsiveLayout, LayoutOperationResult } from '../gridLayoutPlusTypes'
 
 /**
- * 创建响应式布局
+ * Create a responsive layout
  */
 export function createResponsiveLayout(
   baseLayout: GridLayoutPlusItem[],
@@ -15,9 +15,9 @@ export function createResponsiveLayout(
 ): ResponsiveLayout {
   try {
     const responsiveLayout: ResponsiveLayout = {}
-    const sortedBreakpoints = Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // 从大到小排序
+    const sortedBreakpoints = Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // Sort from large to small
 
-    // 为每个断点生成布局
+    // Generate layout for each breakpoint
     for (const [breakpoint] of sortedBreakpoints) {
       const targetCols = cols[breakpoint] || 12
       const baseCols = cols.lg || 12
@@ -33,7 +33,7 @@ export function createResponsiveLayout(
 }
 
 /**
- * 为特定断点转换布局
+ * Convert layout for specific breakpoints
  */
 export function transformLayoutForBreakpoint(
   sourceLayout: GridLayoutPlusItem[],
@@ -49,19 +49,19 @@ export function transformLayoutForBreakpoint(
     const ratio = targetCols / sourceCols
 
     return sourceLayout.map(item => {
-      // 计算新的位置和尺寸
+      // Calculate new position and size
       const newX = Math.floor(item.x * ratio)
       const newW = Math.max(1, Math.floor(item.w * ratio))
 
-      // 确保项目不会超出边界
+      // Make sure the project doesn't go out of bounds
       const adjustedX = Math.min(newX, targetCols - newW)
 
       return {
         ...item,
         x: Math.max(0, adjustedX),
         w: newW,
-        // Y坐标和高度保持不变，让布局算法自动调整
-        // 但可以根据断点特性进行调整
+        // YCoordinates and height remain the same，Let the layout algorithm adjust automatically
+        // But it can be adjusted according to the breakpoint characteristics
         h: getResponsiveHeight(item, breakpoint)
       }
     })
@@ -72,15 +72,15 @@ export function transformLayoutForBreakpoint(
 }
 
 /**
- * 根据断点获取响应式高度
+ * Get responsive height based on breakpoint
  */
 function getResponsiveHeight(item: GridLayoutPlusItem, breakpoint: string): number {
   try {
-    // 根据断点调整高度
+    // Adjust height based on breakpoints
     switch (breakpoint) {
       case 'xs':
       case 'xxs':
-        // 小屏幕下可能需要更高的项目来容纳内容
+        // Smaller screens may require taller items to accommodate content
         return Math.max(item.h, 2)
 
       case 'sm':
@@ -96,7 +96,7 @@ function getResponsiveHeight(item: GridLayoutPlusItem, breakpoint: string): numb
 }
 
 /**
- * 合并响应式布局
+ * Incorporate responsive layout
  */
 export function mergeResponsiveLayouts(layout1: ResponsiveLayout, layout2: ResponsiveLayout): ResponsiveLayout {
   try {
@@ -114,7 +114,7 @@ export function mergeResponsiveLayouts(layout1: ResponsiveLayout, layout2: Respo
 }
 
 /**
- * 验证响应式布局
+ * Validate responsive layout
  */
 export function validateResponsiveLayout(
   responsiveLayout: ResponsiveLayout,
@@ -123,32 +123,32 @@ export function validateResponsiveLayout(
 ): LayoutOperationResult<boolean> {
   try {
     for (const [breakpoint, layout] of Object.entries(responsiveLayout)) {
-      // 检查断点是否存在
+      // Check if breakpoint exists
       if (!(breakpoint in breakpoints)) {
         return {
           success: false,
           error: new Error(`Unknown breakpoint: ${breakpoint}`),
-          message: `未知的断点: ${breakpoint}`
+          message: `unknown breakpoint: ${breakpoint}`
         }
       }
 
-      // 检查列数配置
+      // Check column configuration
       const breakpointCols = cols[breakpoint]
       if (!breakpointCols) {
         return {
           success: false,
           error: new Error(`Missing column config for breakpoint: ${breakpoint}`),
-          message: `断点 ${breakpoint} 缺少列配置`
+          message: `breakpoint ${breakpoint} Missing column configuration`
         }
       }
 
-      // 验证布局中的每个项目
+      // Validate each item in the layout
       for (const item of layout) {
         if (item.x + item.w > breakpointCols) {
           return {
             success: false,
             error: new Error(`Item ${item.i} exceeds column limit in breakpoint ${breakpoint}`),
-            message: `项目 ${item.i} 在断点 ${breakpoint} 中超出列数限制`
+            message: `project ${item.i} at breakpoint ${breakpoint} Column limit exceeded in`
           }
         }
       }
@@ -159,13 +159,13 @@ export function validateResponsiveLayout(
     return {
       success: false,
       error: error as Error,
-      message: '响应式布局验证失败'
+      message: 'Responsive layout validation failed'
     }
   }
 }
 
 /**
- * 获取断点信息
+ * Get breakpoint information
  */
 export function getBreakpointInfo(
   currentWidth: number,
@@ -177,12 +177,12 @@ export function getBreakpointInfo(
   width: number
 } {
   try {
-    const sortedBreakpoints = Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // 从大到小排序
+    const sortedBreakpoints = Object.entries(breakpoints).sort(([, a], [, b]) => b - a) // Sort from large to small
 
-    let current = sortedBreakpoints[sortedBreakpoints.length - 1][0] // 默认最小的断点
+    let current = sortedBreakpoints[sortedBreakpoints.length - 1][0] // Default minimum breakpoint
     let currentIndex = sortedBreakpoints.length - 1
 
-    // 找到当前断点
+    // Find current breakpoint
     for (let i = 0; i < sortedBreakpoints.length; i++) {
       const [breakpoint, minWidth] = sortedBreakpoints[i]
       if (currentWidth >= minWidth) {
@@ -208,7 +208,7 @@ export function getBreakpointInfo(
 }
 
 /**
- * 计算断点过渡
+ * Calculate breakpoint transition
  */
 export function calculateBreakpointTransition(
   fromBreakpoint: string,
@@ -228,7 +228,7 @@ export function calculateBreakpointTransition(
 
     const direction = toWidth > fromWidth ? 'up' : 'down'
     const ratio = toCols / fromCols
-    const significant = Math.abs(ratio - 1) > 0.2 // 超过20%的列数变化被认为是显著的
+    const significant = Math.abs(ratio - 1) > 0.2 // Exceed20%Changes in the number of columns are considered significant
 
     return { direction, ratio, significant }
   } catch (error) {
@@ -238,7 +238,7 @@ export function calculateBreakpointTransition(
 }
 
 /**
- * 自适应调整项目尺寸
+ * Adaptively adjust project size
  */
 export function adaptItemSizeForBreakpoint(
   item: GridLayoutPlusItem,
@@ -249,33 +249,33 @@ export function adaptItemSizeForBreakpoint(
   try {
     const adapted = { ...item }
 
-    // 根据断点调整项目属性
+    // Adjust project properties based on breakpoints
     switch (breakpoint) {
       case 'xxs':
       case 'xs':
-        // 极小屏幕：项目占满宽度，增加高度
+        // extremely small screen：Item fills the width，increase height
         adapted.x = 0
         adapted.w = cols
         adapted.h = Math.max(adapted.h, 3)
         break
 
       case 'sm':
-        // 小屏幕：最大占用一半宽度
+        // small screen：Maximum occupies half the width
         adapted.w = Math.min(adapted.w, Math.floor(cols / 2))
         adapted.h = Math.max(adapted.h, 2)
         break
 
       case 'md':
-        // 中等屏幕：限制最大宽度
+        // medium screen：Limit maximum width
         adapted.w = Math.min(adapted.w, Math.floor(cols * 0.75))
         break
 
       default:
-        // 大屏幕保持原样
+        // The big screen remains the same
         break
     }
 
-    // 确保项目不超出边界
+    // Ensure that projects do not exceed boundaries
     adapted.w = Math.max(1, adapted.w)
     adapted.x = Math.min(adapted.x, cols - adapted.w)
 
@@ -287,7 +287,7 @@ export function adaptItemSizeForBreakpoint(
 }
 
 /**
- * 响应式媒体查询工具
+ * Responsive media query tool
  */
 export class ResponsiveMediaQuery {
   private breakpoints: Record<string, number>
@@ -300,7 +300,7 @@ export class ResponsiveMediaQuery {
   }
 
   /**
-   * 初始化媒体查询
+   * Initialize media queries
    */
   private initMediaQueries(): void {
     if (typeof window === 'undefined') return
@@ -309,7 +309,7 @@ export class ResponsiveMediaQuery {
       const mediaQuery = window.matchMedia(`(min-width: ${minWidth}px)`)
       this.mediaQueries.set(breakpoint, mediaQuery)
 
-      // 监听变化
+      // Listen for changes
       mediaQuery.addListener(e => {
         const callbacks = this.callbacks.get(breakpoint)
         if (callbacks) {
@@ -320,7 +320,7 @@ export class ResponsiveMediaQuery {
   }
 
   /**
-   * 监听断点变化
+   * Monitor breakpoint changes
    */
   onBreakpoint(breakpoint: string, callback: (matches: boolean) => void): () => void {
     if (!this.callbacks.has(breakpoint)) {
@@ -330,20 +330,20 @@ export class ResponsiveMediaQuery {
     const callbacks = this.callbacks.get(breakpoint)!
     callbacks.add(callback)
 
-    // 立即调用一次
+    // Call once immediately
     const mediaQuery = this.mediaQueries.get(breakpoint)
     if (mediaQuery) {
       callback(mediaQuery.matches)
     }
 
-    // 返回取消监听的函数
+    // Returns the function to cancel listening
     return () => {
       callbacks.delete(callback)
     }
   }
 
   /**
-   * 检查当前是否匹配断点
+   * Check if current breakpoint is matched
    */
   matches(breakpoint: string): boolean {
     const mediaQuery = this.mediaQueries.get(breakpoint)
@@ -351,7 +351,7 @@ export class ResponsiveMediaQuery {
   }
 
   /**
-   * 获取当前匹配的断点
+   * Get the currently matching breakpoint
    */
   getCurrentBreakpoint(): string {
     const sortedBreakpoints = Object.entries(this.breakpoints).sort(([, a], [, b]) => b - a)
@@ -366,7 +366,7 @@ export class ResponsiveMediaQuery {
   }
 
   /**
-   * 销毁监听器
+   * Destroy listener
    */
   destroy(): void {
     this.callbacks.clear()

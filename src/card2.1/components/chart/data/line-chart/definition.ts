@@ -1,29 +1,29 @@
 /**
- * 折线图组件定义
+ * Line chart component definition
  */
 import type { ComponentDefinition } from '@/card2.1/core2'
 import type { LineChartCustomize } from './settingConfig'
 
 export const lineChartDefinition: ComponentDefinition = {
   id: 'line-chart',
-  name: '折线图',
-  description: 'ECharts折线图，用于展示数据随时间变化的趋势',
+  name: 'Line chart',
+  description: 'EChartsLine chart，Used to show trends in data over time',
   category: 'chart',
   subCategory: 'data',
   version: '1.0.0',
   author: 'ThingsPanel',
 
-  // 组件配置接口
+  // Component configuration interface
   component: {} as LineChartCustomize,
 
-  // 默认配置
+  // Default configuration
   defaultConfig: {
-    title: '数据趋势',
+    title: 'Data trends',
     showLegend: true,
     smooth: true,
     showArea: false,
-    xAxisLabel: '时间',
-    yAxisLabel: '数值',
+    xAxisLabel: 'time',
+    yAxisLabel: 'numerical value',
     showGrid: true,
     lineColor: '#5470c6',
     areaColor: 'rgba(84, 112, 198, 0.3)',
@@ -32,12 +32,12 @@ export const lineChartDefinition: ComponentDefinition = {
     animationDuration: 1000
   },
 
-  // 数据源定义 - 支持时间序列数据
+  // Data source definition - Support time series data
   dataSources: [
     {
       key: 'main',
-      name: '数据源',
-      description: '折线图的时间序列数据',
+      name: 'data source',
+      description: 'Time series data for line chart',
       supportedTypes: ['static', 'api', 'websocket'],
       required: false,
       example: {
@@ -48,17 +48,17 @@ export const lineChartDefinition: ComponentDefinition = {
     }
   ],
 
-  // 交互能力
+  // Interactive capabilities
   interactionCapabilities: {
     canTrigger: false,
     canReceive: false,
     exposedProperties: []
   },
 
-  // 组件标签
-  tags: ['图表', '折线图', 'ECharts', '趋势'],
+  // component label
+  tags: ['chart', 'Line chart', 'ECharts', 'trend'],
 
-  // 预览配置
+  // Preview configuration
   preview: {
     width: 400,
     height: 300

@@ -2,13 +2,13 @@ import { computed, onScopeDispose, ref } from 'vue'
 import { useBoolean } from '@sa/hooks'
 
 /**
- * 倒计时
+ * Countdown
  *
- * @param second - 倒计时的时间(s)
+ * @param second - Countdown time(s)
  */
 export default function useCountDown(second: number) {
   if (second <= 0 && second % 1 !== 0) {
-    throw new Error('倒计时的时间应该为一个正整数！')
+    throw new Error('The countdown time should be a positive integer！')
   }
   const { bool: isComplete, setTrue, setFalse } = useBoolean(false)
 
@@ -18,9 +18,9 @@ export default function useCountDown(second: number) {
   let intervalId: any
 
   /**
-   * 开始计时
+   * Start timing
    *
-   * @param updateSecond - 更改初时传入的倒计时时间
+   * @param updateSecond - Change the initially passed countdown time
    */
   function start(updateSecond: number = second) {
     if (!counts.value) {
@@ -36,7 +36,7 @@ export default function useCountDown(second: number) {
     }
   }
 
-  /** 停止计时 */
+  /** Stop timing */
   function stop() {
     intervalId = clearInterval(intervalId)
     counts.value = 0

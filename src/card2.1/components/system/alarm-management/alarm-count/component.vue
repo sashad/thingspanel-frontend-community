@@ -19,8 +19,8 @@
 
 <script lang="ts" setup>
 /**
- * @file 告警统计卡片 (Card 2.1)
- * @description 使用 GenericCard 重构，展示系统当前的告警总数。
+ * @file Alarm statistics card (Card 2.1)
+ * @description use GenericCard Refactor，Display the current total number of alarms in the system。
  */
 import { ref } from "vue";
 import GenericCard from "@/card2.1/components/common/generic-card/component.vue";
@@ -29,41 +29,41 @@ import { $t } from '@/locales';
 import { getAlarmCount } from '@/service/api';
 import { createLogger } from '@/utils/logger';
 
-// 定义组件名称
+// Define component name
 defineOptions({ name: 'AlarmCountCardV2' });
 
-// 日志记录器
+// Logger
 const logger = createLogger('AlarmCountCardV2');
 
-// 卡片响应式数据，与原版保持1:1一致
+// Card responsive data，Keep with the original1:1consistent
 const cardData = ref({
   title: $t('card.alarmCount'),
   value: 0,
-  unit: $t('card.alarmUnit'), // 使用国际化，与原版一致
-  colors: ['#f97316', '#ef4444'], // 与原版保持一致的颜色配置
+  unit: $t('card.alarmUnit'), // Use internationalization，Consistent with the original
+  colors: ['#f97316', '#ef4444'], // Color scheme consistent with the original
 });
 
 /**
  * @function getData
- * @description 从 API 获取告警统计数据并更新卡片。
+ * @description from API Get alarm statistics and update cards。
  */
 const getData = async () => {
   try {
     const response: { data: any } = await getAlarmCount();
-    // 验证响应数据的有效性
+    // Verify the validity of response data
     if (response && response.data && typeof response.data.alarm_device_total === 'number') {
       cardData.value.value = response.data.alarm_device_total;
     } else {
-      logger.error('告警统计数据缺失、非数字或响应结构不符合预期。', response);
-      cardData.value.value = 0; // 数据无效时重置为0
+      logger.error('Alarm statistics are missing、Non-numeric or response structure not expected。', response);
+      cardData.value.value = 0; // Reset to when data is invalid0
     }
   } catch (error) {
-    logger.error('获取告警统计数据时出错:', error);
-    cardData.value.value = 0; // 发生错误时重置为0
+    logger.error('An error occurred while obtaining alarm statistics:', error);
+    cardData.value.value = 0; // Reset to0
   }
 };
 
-// 初始化时获取数据
+// Get data during initialization
 getData();
 </script>
 

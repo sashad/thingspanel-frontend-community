@@ -1,6 +1,6 @@
 /**
- * 多层级执行器链主协调类
- * 整合4层执行器，提供完整的数据处理管道
+ * Multi-level executor chain main coordination class
+ * Integrate4layer executor，Provides a complete data processing pipeline
  */
 
 import { DataItemFetcher, DataItem, IDataItemFetcher } from '@/core/data-architecture/executors/DataItemFetcher'
@@ -9,7 +9,7 @@ import { DataSourceMerger, MergeStrategy, IDataSourceMerger } from '@/core/data-
 import { MultiSourceIntegrator, ComponentData, DataSourceResult, IMultiSourceIntegrator } from '@/core/data-architecture/executors/MultiSourceIntegrator'
 
 /**
- * 数据源配置结构
+ * Data source configuration structure
  */
 export interface DataSourceConfiguration {
   componentId: string
@@ -26,19 +26,19 @@ export interface DataSourceConfiguration {
 }
 
 /**
- * 执行状态跟踪 (用于调试监控)
+ * Execution status tracking (for debugging monitoring)
  */
 export interface ExecutionState {
   componentId: string
   dataSourceId: string
   stages: {
-    /** 第一层: 原始数据获取结果 */
+    /** first floor: Raw data acquisition results */
     rawData: Map<string, { data: any; timestamp: number; success: boolean }>
-    /** 第二层: 数据处理结果 */
+    /** second floor: Data processing results */
     processedData: Map<string, { data: any; timestamp: number; success: boolean }>
-    /** 第三层: 数据源合并结果 */
+    /** third floor: Data source merge results */
     mergedData: { data: any; timestamp: number; success: boolean } | null
-    /** 第四层: 最终组件数据 */
+    /** fourth floor: final component data */
     finalData: { data: any; timestamp: number; success: boolean } | null
   }
   debugMode: boolean
@@ -46,38 +46,38 @@ export interface ExecutionState {
 }
 
 /**
- * 执行结果
+ * Execution result
  */
 export interface ExecutionResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 组件数据 */
+  /** component data */
   componentData?: ComponentData
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 执行时间（毫秒） */
+  /** Execution time（millisecond） */
   executionTime: number
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
-  /** 调试状态 */
+  /** debug status */
   executionState?: ExecutionState
 }
 
 /**
- * 多层级执行器链接口
+ * Multi-level actuator link interface
  */
 export interface IMultiLayerExecutorChain {
   /**
-   * 执行完整的数据处理管道
-   * @param config 数据源配置
-   * @param debugMode 是否开启调试模式
-   * @returns 执行结果
+   * Execute complete data processing pipeline
+   * @param config Data source configuration
+   * @param debugMode Whether to enable debugging mode
+   * @returns Execution result
    */
   executeDataProcessingChain(config: DataSourceConfiguration, debugMode?: boolean): Promise<ExecutionResult>
 }
 
 /**
- * 多层级执行器链实现类
+ * Multi-level executor chain implementation class
  */
 export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
   private dataItemFetcher: IDataItemFetcher
@@ -93,7 +93,7 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
   }
 
   /**
-   * 执行完整的数据处理管道
+   * Execute complete data processing pipeline
    */
   async executeDataProcessingChain(
     config: DataSourceConfiguration,
@@ -101,32 +101,32 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
   ): Promise<ExecutionResult> {
     const startTime = Date.now()
 
-    // 🔥 设置DataItemFetcher的组件上下文
+    // 🔥 set upDataItemFetchercomponent context
     this.dataItemFetcher.setCurrentComponentId(config.componentId)
 
-    // 🔥 移除循环打印日志，避免200+组件场景下的性能问题
+    // 🔥 Remove circular print log，avoid200+Performance issues in component scenarios
 
     try {
       const dataSourceResults: DataSourceResult[] = []
       let executionState: ExecutionState | undefined
 
-      // 初始化调试状态
+      // Initialize debugging state
       if (debugMode) {
         executionState = this.initializeExecutionState(config.componentId)
       }
 
-      // 处理每个数据源
+      // Process each data source
       for (const dataSourceConfig of config.dataSources) {
-        // 🔥 移除循环打印日志
+        // 🔥 Remove circular print log
 
-        // 🔥 关键调试：如果dataItems不存在或为空，立即报告
+        // 🔥 critical debugging：ifdataItemsDoes not exist or is empty，Report immediately
         if (!dataSourceConfig.dataItems || dataSourceConfig.dataItems.length === 0) {
-          console.error(`🚨 [MultiLayerExecutorChain] 数据源配置异常 - dataItems为空！`, {
-            数据源ID: dataSourceConfig.sourceId,
-            dataItems类型: typeof dataSourceConfig.dataItems,
-            dataItems值: dataSourceConfig.dataItems,
-            这意味着: 'DataItemFetcher.fetchData方法不会被调用',
-            数据源完整配置: JSON.stringify(dataSourceConfig, null, 2)
+          console.error(`🚨 [MultiLayerExecutorChain] Data source configuration exception - dataItemsis empty！`, {
+            dataSourceID: dataSourceConfig.sourceId,
+            dataItemsType: typeof dataSourceConfig.dataItems,
+            dataItemsValue: dataSourceConfig.dataItems,
+            thisMeans: 'DataItemFetcher.fetchDatamethod will not be called',
+            completeDataSourceConfiguration: JSON.stringify(dataSourceConfig, null, 2)
           })
         }
 
@@ -135,16 +135,16 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
           const sourceResult = await this.processDataSource(dataSourceConfig, executionState, config.componentId)
 
 
-          // 🔥 移除循环打印日志
+          // 🔥 Remove circular print log
 
           dataSourceResults.push(sourceResult)
         } catch (error) {
-          console.error(`❌ [MultiLayerExecutorChain] processDataSource调用失败:`, {
-            数据源ID: dataSourceConfig.sourceId,
-            错误类型: typeof error,
-            错误消息: error instanceof Error ? error.message : error,
-            错误堆栈: error instanceof Error ? error.stack : undefined,
-            原始错误对象: error
+          console.error(`❌ [MultiLayerExecutorChain] processDataSourcecall failed:`, {
+            dataSourceID: dataSourceConfig.sourceId,
+            rrrorType: typeof error,
+            errorMessage: error instanceof Error ? error.message : error,
+            errorStack: error instanceof Error ? error.stack : undefined,
+            originalErrorObject: error
           })
 
           dataSourceResults.push({
@@ -152,19 +152,19 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
             type: 'unknown',
             data: {},
             success: false,
-            error: error instanceof Error ? error.message : '未知错误'
+            error: error instanceof Error ? error.message : 'unknown error'
           })
         }
       }
 
-      // 🔥 移除循环打印日志
+      // 🔥 Remove circular print log
 
-      // 第四层：多源整合
+      // fourth floor：Multi-source integration
       const componentData = await this.multiSourceIntegrator.integrateDataSources(dataSourceResults, config.componentId)
 
-      // 🔥 移除循环打印日志
+      // 🔥 Remove circular print log
 
-      // 更新调试状态
+      // Update debugging status
       if (executionState) {
         executionState.stages.finalData = {
           data: componentData,
@@ -176,14 +176,14 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
 
       const executionTime = Date.now() - startTime
 
-      // 🔥 修复：执行成功就是成功，无论数据是否为空
+      // 🔥 repair：Successful execution is success，Regardless of whether the data is empty
       return {
-        success: true, // 只要没有异常就是成功
+        success: true, // As long as there are no exceptions, it is a success
         componentData,
         executionTime,
         timestamp: Date.now(),
         executionState,
-        // 添加辅助信息
+        // Add supporting information
         isEmpty: Object.keys(componentData).length === 0
       }
     } catch (error) {
@@ -191,7 +191,7 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : '执行器链执行失败',
+        error: error instanceof Error ? error.message : 'Execution of executor chain failed',
         executionTime,
         timestamp: Date.now()
       }
@@ -199,7 +199,7 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
   }
 
   /**
-   * 处理单个数据源
+   * Work with a single data source
    */
   private async processDataSource(
     dataSourceConfig: {
@@ -210,25 +210,25 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
     executionState?: ExecutionState,
     componentId?: string
   ): Promise<DataSourceResult> {
-    // 🔥 最简单的确认日志
+    // 🔥 The simplest confirmation log
 
-    // 🔥 关键调试：记录processDataSource的入口参数
+    // 🔥 critical debugging：RecordprocessDataSourceEntry parameters of
 
 
     try {
       const processedItems: any[] = []
 
-      // 🔥 关键调试：检查dataItems数组
+      // 🔥 critical debugging：examinedataItemsarray
 
       if (dataSourceConfig.dataItems.length === 0) {
-        console.warn(`⚠️ [MultiLayerExecutorChain] dataItems数组为空，无法执行任何数据获取！`, {
-          数据源ID: dataSourceConfig.sourceId,
-          这意味着: '不会调用DataItemFetcher.fetchData方法'
+        console.warn(`⚠️ [MultiLayerExecutorChain] dataItemsArray is empty，Unable to perform any data acquisition！`, {
+          dataSourceID: dataSourceConfig.sourceId,
+          thisMeans: 'will not be calledDataItemFetcher.fetchDatamethod'
         })
       }
 
 
-      // 处理每个数据项
+      // Process each data item
       for (let i = 0; i < dataSourceConfig.dataItems.length; i++) {
 
         const { item, processing } = dataSourceConfig.dataItems[i]
@@ -236,12 +236,12 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
 
 
         try {
-          // 🔍 调试：检查传递给fetchData的item对象
+          // 🔍 debug：Check passed tofetchDataofitemobject
 
-          // 🔥 特别检查HTTP类型的配置
+          // 🔥 special inspectionHTTPType configuration
           if (item.type === 'http' && item.config) {
 
-            // 🚨 检查HTTP参数中是否有损坏的绑定路径
+            // 🚨 examineHTTPIs there a broken binding path in the parameter?
             const allParams = [
               ...(item.config.params || []),
               ...(item.config.parameters || []),
@@ -253,14 +253,14 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
                 const isSuspiciousPath = !param.value.includes('.') && param.value.length < 10 && param.variableName
 
                 if (isSuspiciousPath) {
-                  console.error(`🚨 [MultiLayerExecutorChain] 在传递给fetchData前发现损坏的绑定路径!`, {
-                    组件ID: componentId || 'unknown',
-                    数据源ID: dataSourceConfig.sourceId,
-                    参数索引: paramIndex,
-                    参数key: param.key,
-                    损坏的value: param.value,
+                  console.error(`🚨 [MultiLayerExecutorChain] passing tofetchDataCorrupted binding path found before!`, {
+                    componentsID: componentId || 'unknown',
+                    dataSourceID: dataSourceConfig.sourceId,
+                    parameterIndex: paramIndex,
+                    parameterKey: param.key,
+                    damagedValue: param.value,
                     variableName: param.variableName,
-                    完整参数对象: JSON.stringify(param, null, 2)
+                    completeParameterObject: JSON.stringify(param, null, 2)
                   })
                 } else {
                 }
@@ -268,12 +268,12 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
             })
           }
 
-          // 🔥 第一层：数据项获取 - 即将调用DataItemFetcher.fetchData
+          // 🔥 first floor：Data item acquisition - About to be calledDataItemFetcher.fetchData
 
           const rawData = await this.dataItemFetcher.fetchData(item)
 
 
-          // 更新调试状态
+          // Update debugging status
           if (executionState) {
             executionState.stages.rawData.set(itemId, {
               data: rawData,
@@ -282,10 +282,10 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
             })
           }
 
-          // 第二层：数据项处理
+          // second floor：Data item processing
           const processedData = await this.dataItemProcessor.processData(rawData, processing)
 
-          // 更新调试状态
+          // Update debugging status
           if (executionState) {
             executionState.stages.processedData.set(itemId, {
               data: processedData,
@@ -296,25 +296,25 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
 
           processedItems.push(processedData)
         } catch (error) {
-          console.error(`🚨 [MultiLayerExecutorChain] 数据项处理失败 - 这是关键异常！`, {
+          console.error(`🚨 [MultiLayerExecutorChain] Data item processing failed - This is the critical exception！`, {
             itemId: itemId,
-            item类型: item.type,
-            数据项索引: i,
-            错误类型: typeof error,
-            错误消息: error instanceof Error ? error.message : error,
-            错误堆栈: error instanceof Error ? error.stack : undefined,
-            原始错误对象: error,
-            item配置: item.config,
-            这就是为什么没有HTTP请求的原因: '异常被静默处理了'
+            itemType: item.type,
+            DataItemIndex: i,
+            errorType: typeof error,
+            errorMessage: error instanceof Error ? error.message : error,
+            errorStack: error instanceof Error ? error.stack : undefined,
+            originalErrorObject: error,
+            itemConfiguration: item.config,
+            thatIsWhyThereIsNotHTTPReasonForRequest: 'Exceptions are handled silently'
           })
-          processedItems.push({}) // 失败时添加空对象
+          processedItems.push({}) // Add empty object on failure
         }
       }
 
-      // 第三层：数据源合并
+      // third floor：Data source merge
       const mergedData = await this.dataSourceMerger.mergeDataItems(processedItems, dataSourceConfig.mergeStrategy)
 
-      // 更新调试状态
+      // Update debugging status
       if (executionState) {
         executionState.stages.mergedData = {
           data: mergedData,
@@ -335,13 +335,13 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
         type: 'unknown',
         data: {},
         success: false,
-        error: error instanceof Error ? error.message : '数据源处理失败'
+        error: error instanceof Error ? error.message : 'Data source processing failed'
       }
     }
   }
 
   /**
-   * 初始化执行状态
+   * Initialize execution status
    */
   private initializeExecutionState(componentId: string): ExecutionState {
     return {
@@ -359,19 +359,19 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
   }
 
   /**
-   * 验证数据源配置
+   * Verify data source configuration
    */
   validateConfiguration(config: DataSourceConfiguration): boolean {
     if (!config.componentId || !config.dataSources) {
       return false
     }
 
-    // 允许数据项数组为空，这样可以返回 null 数据
+    // 允许data项数组为空，This will return null data
     return config.dataSources.every(ds => ds.sourceId && Array.isArray(ds.dataItems) && ds.mergeStrategy)
   }
 
   /**
-   * 获取执行器链统计信息
+   * Get executor chain statistics
    */
   getChainStatistics(): {
     version: string
@@ -384,12 +384,12 @@ export class MultiLayerExecutorChain implements IMultiLayerExecutorChain {
       supportedDataTypes: ['json', 'http', 'websocket', 'script'],
       supportedMergeStrategies: ['object', 'array', 'script'],
       features: [
-        'JSONPath数据过滤',
-        '自定义脚本处理',
-        '多种合并策略',
-        '调试监控机制',
-        'Visual Editor兼容',
-        'Card2.1兼容'
+        'JSONPathData filtering',
+        'Custom script processing',
+        'Multiple merge strategies',
+        'Debugging monitoring mechanism',
+        'Visual Editorcompatible',
+        'Card2.1compatible'
       ]
     }
   }

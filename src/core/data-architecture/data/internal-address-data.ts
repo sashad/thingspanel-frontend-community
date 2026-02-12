@@ -1,145 +1,145 @@
 /**
- * 内部地址数据生成器
- * 基于实际API接口维护的内部地址选项数据
+ * Internal address data generator
+ * Based on realityAPIInternal address options data maintained by the interface
  */
 
 import type { InternalAddressOptions, InternalApiItem } from '@/core/data-architecture/types/internal-api'
 
 /**
- * 遥测数据模块API接口
+ * telemetry data moduleAPIinterface
  */
 const telemetryApis: InternalApiItem[] = [
   {
-    label: '设备遥测当前值查询',
+    label: 'Device telemetry current value query',
     value: '/telemetry/datas/current/{id}',
     url: '/telemetry/datas/current/{id}',
     method: 'GET',
-    description: '设备当前值查询，获取设备每个key的最新一条数据',
+    description: 'Equipment current value query，Get each devicekeyThe latest data of',
     hasPathParams: true,
     pathParamNames: ['id'],
     commonParams: [
-      { name: 'id', type: 'string', required: true, description: '设备ID（路径参数）', example: '5fd9b168-9e2a-d91c-a7c3-9c1f4d4b5137' }
+      { name: 'id', type: 'string', required: true, description: 'equipmentID（path parameters）', example: '5fd9b168-9e2a-d91c-a7c3-9c1f4d4b5137' }
     ],
     module: 'telemetry',
     functionName: 'telemetryDataCurrent'
   },
   {
-    label: '根据key查询指标当前值',
+    label: 'according tokeyQuery the current value of the indicator',
     value: '/telemetry/datas/current/keys',
     url: '/telemetry/datas/current/keys',
     method: 'GET',
-    description: '设备当前值查询，获取设备每个key的最新一条数据',
+    description: 'Equipment current value query，Get each devicekeyThe latest data of',
     hasPathParams: false,
     commonParams: [
       {
         name: 'device_id',
         type: 'string',
         required: true,
-        description: '设备ID',
+        description: 'equipmentID',
         example: '5fd9b168-9e2a-d91c-a7c3-9c1f4d4b5137'
       },
-      { name: 'keys', type: 'object', required: true, description: '指标key数组', example: ['temperature', 'humidity'] }
+      { name: 'keys', type: 'object', required: true, description: 'indexkeyarray', example: ['temperature', 'humidity'] }
     ],
     module: 'telemetry',
     functionName: 'telemetryDataCurrentKeys'
   },
   {
-    label: '指标历史数值查询',
+    label: 'Indicator historical value query',
     value: '/telemetry/datas/history/pagination',
     url: '/telemetry/datas/history/pagination',
     method: 'GET',
-    description: '设备历史数值查询，时间最多限一个月。不送分页支持全部返回，该接口不反回消息总数，只能上一页下一页操作',
+    description: 'Equipment historical value query，Time limit is one month at most。Support all returns without pagination，This interface does not return the total number of messages，Can only operate on the previous page and next page',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_id', type: 'string', required: true, description: '设备ID', example: '5fd9b168-9e2a-d91c-a7c3-9c1f4d4b5137' },
-      { name: 'key', type: 'string', required: true, description: '指标key', example: 'temperature' },
-      { name: 'start_time', type: 'number', required: true, description: '起始时间（毫秒时间戳）', example: 1742780418369 },
-      { name: 'end_time', type: 'number', required: true, description: '结束时间（毫秒时间戳）', example: 1711656000000 },
-      { name: 'page', type: 'string', required: false, description: '页码', example: '1' },
-      { name: 'page_size', type: 'string', required: false, description: '每页数量', example: '100' },
-      { name: 'export_excel', type: 'string', required: false, description: '导出到excel标志(true/false)', example: 'false' }
+      { name: 'device_id', type: 'string', required: true, description: 'equipmentID', example: '5fd9b168-9e2a-d91c-a7c3-9c1f4d4b5137' },
+      { name: 'key', type: 'string', required: true, description: 'indexkey', example: 'temperature' },
+      { name: 'start_time', type: 'number', required: true, description: 'start time（millisecond timestamp）', example: 1742780418369 },
+      { name: 'end_time', type: 'number', required: true, description: 'end time（millisecond timestamp）', example: 1711656000000 },
+      { name: 'page', type: 'string', required: false, description: 'page number', example: '1' },
+      { name: 'page_size', type: 'string', required: false, description: 'Quantity per page', example: '100' },
+      { name: 'export_excel', type: 'string', required: false, description: 'Export toexcellogo(true/false)', example: 'false' }
     ],
     module: 'telemetry',
     functionName: 'telemetryDataHistoryPagination'
   },
   {
-    label: '遥测聚合数据查询',
+    label: 'Telemetry aggregated data query',
     value: '/telemetry/datas/statistic',
     url: '/telemetry/datas/statistic',
     method: 'GET',
-    description: '查询遥测数据的聚合统计信息，支持多种时间范围和聚合方式',
+    description: 'Query aggregate statistics for telemetry data，Supports multiple time ranges and aggregation methods',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_id', type: 'string', required: true, description: '设备ID', example: 'f3625aae-1283-1afc-259e-f43a58ba7070' },
-      { name: 'key', type: 'string', required: true, description: '指标key', example: 'temperature' },
+      { name: 'device_id', type: 'string', required: true, description: 'equipmentID', example: 'f3625aae-1283-1afc-259e-f43a58ba7070' },
+      { name: 'key', type: 'string', required: true, description: 'indexkey', example: 'temperature' },
       {
         name: 'time_range',
         type: 'string',
         required: true,
-        description: '时间范围 (TODO: 后续用表单实现选择器)',
+        description: 'time range (TODO: Later use the form to implement the selector)',
         example: 'last_1h'
-        // 可选值: custom, last_5m, last_15m, last_30m, last_1h, last_3h, last_6h, last_12h, last_24h, last_3d, last_7d, last_15d, last_30d, last_60d, last_90d, last_6m, last_1y
+        // Optional value: custom, last_5m, last_15m, last_30m, last_1h, last_3h, last_6h, last_12h, last_24h, last_3d, last_7d, last_15d, last_30d, last_60d, last_90d, last_6m, last_1y
       },
       {
         name: 'aggregate_window',
         type: 'string',
         required: true,
-        description: '聚合间隔 (TODO: 后续用表单实现与time_range的联动逻辑)',
+        description: 'aggregation interval (TODO: Later, use the form to implement thetime_rangelinkage logic)',
         example: 'no_aggregate'
-        // 可选值: no_aggregate, 30s, 1m, 2m, 5m, 10m, 30m, 1h, 3h, 6h, 1d, 7d, 1mo
+        // Optional value: no_aggregate, 30s, 1m, 2m, 5m, 10m, 30m, 1h, 3h, 6h, 1d, 7d, 1mo
       },
       {
         name: 'aggregate_function',
         type: 'string',
         required: false,
-        description: '聚合方法 (TODO: 当aggregate_window不为no_aggregate时必填)',
+        description: 'aggregation method (TODO: whenaggregate_windowNot forno_aggregateRequired when)',
         example: 'avg'
-        // 可选值: avg(平均数), max(最大值), min(最小值), sum(求和), diff(最大最小的差值)
+        // Optional value: avg(average), max(maximum value), min(minimum value), sum(Sum), diff(The difference between the maximum and minimum)
       },
       {
         name: 'start_time',
         type: 'number',
         required: false,
-        description: '开始时间（毫秒时间戳，time_range为custom时必填）',
+        description: 'start time（millisecond timestamp，time_rangeforcustomRequired when）',
         example: 1711864177268
       },
       {
         name: 'end_time',
         type: 'number',
         required: false,
-        description: '结束时间（毫秒时间戳，time_range为custom时必填）',
+        description: 'end time（millisecond timestamp，time_rangeforcustomRequired when）',
         example: 1711864177268
       },
-      { name: 'is_export', type: 'boolean', required: false, description: '是否导出', example: false }
+      { name: 'is_export', type: 'boolean', required: false, description: 'Whether to export', example: false }
     ],
     module: 'telemetry',
     functionName: 'telemetryDataStatistic'
   },
   {
-    label: '批量查询多个设备的遥测统计数据',
+    label: 'Batch query telemetry statistics for multiple devices',
     value: '/telemetry/datas/statistic/batch',
     url: '/telemetry/datas/statistic/batch',
     method: 'GET',
-    description: '批量查询多个设备的遥测统计数据，只有diff支持数字型字符串',
+    description: 'Batch query telemetry statistics for multiple devices，onlydiffSupports numeric strings',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_ids', type: 'object', required: true, description: '设备ID数组', example: ['device-001', 'device-002'] },
-      { name: 'keys', type: 'object', required: true, description: '遥测key数组', example: ['temperature', 'humidity'] },
+      { name: 'device_ids', type: 'object', required: true, description: 'equipmentIDarray', example: ['device-001', 'device-002'] },
+      { name: 'keys', type: 'object', required: true, description: 'telemetrykeyarray', example: ['temperature', 'humidity'] },
       {
         name: 'time_type',
         type: 'string',
         required: true,
-        description: '时间类型 (hour/day/week/month/year)',
+        description: 'time type (hour/day/week/month/year)',
         example: 'hour'
       },
       {
         name: 'aggregate_method',
         type: 'string',
         required: true,
-        description: '聚合方式 (avg/sum/max/min/count/diff-聚合区间内最新和最旧数据的差)',
+        description: 'Aggregation method (avg/sum/max/min/count/diff-The difference between the latest and oldest data in the aggregation interval)',
         example: 'avg'
       },
-      { name: 'limit', type: 'number', required: false, description: '数据数量限制（1-1000）', example: 100 }
+      { name: 'limit', type: 'number', required: false, description: 'Data quantity limit（1-1000）', example: 100 }
     ],
     module: 'telemetry',
     functionName: 'telemetryDataStatisticBatch'
@@ -147,92 +147,92 @@ const telemetryApis: InternalApiItem[] = [
 ]
 
 /**
- * 设备数据模块API接口
+ * device data moduleAPIinterface
  */
 const deviceApis: InternalApiItem[] = [
   {
-    label: '设备简单信息查询（带遥测数据）',
+    label: 'Simple information query of equipment（With telemetry data）',
     value: '/device/map/telemetry/{id}',
     url: '/device/map/telemetry/{id}',
     method: 'GET',
-    description: '地图上遥测接口，返回设备基本信息和遥测数据，如label不返回则显示key',
+    description: 'Telemetry interface on the map，Return basic device information and telemetry data，likelabelDisplay if not returnedkey',
     hasPathParams: true,
     pathParamNames: ['id'],
     commonParams: [
-      { name: 'id', type: 'string', required: true, description: '设备ID（路径参数）', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' }
+      { name: 'id', type: 'string', required: true, description: 'equipmentID（path parameters）', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' }
     ],
     module: 'device',
     functionName: 'deviceMapTelemetry'
   },
   {
-    label: '设备单指标图表数据查询',
+    label: 'Equipment single indicator chart data query',
     value: '/device/metrics/chart',
     url: '/device/metrics/chart',
     method: 'GET',
-    description: '查询设备最新数据和历史数据',
+    description: 'Query the latest and historical data of the device',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_id', type: 'string', required: true, description: '设备ID', example: 'af13ac2c-3a9e-5ab9-cd31-0cf01f984b3c' },
+      { name: 'device_id', type: 'string', required: true, description: 'equipmentID', example: 'af13ac2c-3a9e-5ab9-cd31-0cf01f984b3c' },
       {
         name: 'data_type',
         type: 'string',
         required: true,
-        description: '设备数据类型 (TODO: 后续用表单实现选择器)',
+        description: 'Device data type (TODO: Later use the form to implement the selector)',
         example: 'telemetry'
-        // 可选值: telemetry(遥测), attribute(属性), command(命令), event(事件)
+        // Optional value: telemetry(telemetry), attribute(property), command(Order), event(event)
       },
       {
         name: 'data_mode',
         type: 'string',
         required: true,
-        description: '数据模式 (TODO: 后续用表单实现选择器)',
+        description: 'data schema (TODO: Later use the form to implement the selector)',
         example: 'latest'
-        // 可选值: latest(最新值), history(历史数据-需要data_type是telemetry并且key的值是数字)
+        // Optional value: latest(latest value), history(historical data-needdata_typeyestelemetryandkeyThe value is a number)
       },
       {
         name: 'key',
         type: 'string',
         required: true,
-        description: '数据标识符（根据data_type不同代表不同含义：遥测指标名称、属性键名、命令标识符或事件标识符）',
+        description: 'data identifier（according todata_typeDifferent means different meanings：Telemetry metric name、attribute key name、command identifier or event identifier）',
         example: 'temperature'
       },
       {
         name: 'time_range',
         type: 'string',
         required: false,
-        description: '时间范围，默认last_5m (TODO: 后续用表单实现选择器)',
+        description: 'time range，defaultlast_5m (TODO: Later use the form to implement the selector)',
         example: 'last_5m'
-        // 可选值: last_5m, last_15m, last_30m, last_1h, last_3h, last_6h, last_12h, last_24h, last_3d, last_7d, last_15d, last_30d, last_60d, last_90d, last_6m, last_1y
+        // Optional value: last_5m, last_15m, last_30m, last_1h, last_3h, last_6h, last_12h, last_24h, last_3d, last_7d, last_15d, last_30d, last_60d, last_90d, last_6m, last_1y
       },
       {
         name: 'aggregate_window',
         type: 'string',
         required: false,
-        description: '聚合间隔，默认no_aggregate (TODO: 后续用表单实现与time_range的联动逻辑)',
+        description: 'aggregation interval，defaultno_aggregate (TODO: Later, use the form to implement thetime_rangelinkage logic)',
         example: 'no_aggregate'
-        // 可选值: no_aggregate, 30s, 1m, 2m, 5m, 10m, 30m, 1h, 3h, 6h, 1d, 7d, 1mo
+        // Optional value: no_aggregate, 30s, 1m, 2m, 5m, 10m, 30m, 1h, 3h, 6h, 1d, 7d, 1mo
       },
       {
         name: 'aggregate_function',
         type: 'string',
         required: false,
-        description: '聚合方法，默认avg (TODO: 当aggregate_window不为no_aggregate时使用)',
+        description: 'aggregation method，defaultavg (TODO: whenaggregate_windowNot forno_aggregateused when)',
         example: 'avg'
-        // 可选值: avg(平均数), max(最大值), min(最小值), sum(求和), diff(最大最小的差值)
+        // Optional value: avg(average), max(maximum value), min(minimum value), sum(Sum), diff(The difference between the maximum and minimum)
       }
     ],
     module: 'device',
     functionName: 'deviceMetricsChart'
   },
   {
-    label: '【租户/用户】设备汇总',
+    label: '【tenant/user】Equipment summary',
     value: '/board/tenant/device/info',
     url: '/board/tenant/device/info',
     method: 'GET',
-    description: '租户下设备总数、在线数和激活数统计',
+    description: 'Total number of devices under the tenant、Online and activation statistics',
     hasPathParams: false,
     commonParams: [
-      // 此接口无需查询参数，仅需token认证
+      // This interface does not require query parameters，Just needtokenCertification
     ],
     module: 'device',
     functionName: 'boardTenantDeviceInfo'
@@ -240,30 +240,30 @@ const deviceApis: InternalApiItem[] = [
 ]
 
 /**
- * 属性数据模块API接口
+ * attribute data moduleAPIinterface
  */
 const attributeApis: InternalApiItem[] = [
   {
-    label: '根据KEY查询属性信息',
+    label: 'according toKEYQuery attribute information',
     value: '/attribute/datas/key',
     url: '/attribute/datas/key',
     method: 'GET',
-    description: '根据指定的key查询属性信息',
+    description: 'According to the specifiedkeyQuery attribute information',
     hasPathParams: false,
     commonParams: [],
     module: 'attribute',
     functionName: 'attributeDataByKey'
   },
   {
-    label: '设备属性列表查询',
+    label: 'Device attribute list query',
     value: '/attribute/datas/{id}',
     url: '/attribute/datas/{id}',
     method: 'GET',
-    description: '查询指定设备的属性列表',
+    description: 'Query the attribute list of the specified device',
     hasPathParams: true,
     pathParamNames: ['id'],
     commonParams: [
-      { name: 'id', type: 'string', required: true, description: '设备ID（路径参数）', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' }
+      { name: 'id', type: 'string', required: true, description: 'equipmentID（path parameters）', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' }
     ],
     module: 'attribute',
     functionName: 'attributeDataList'
@@ -271,21 +271,21 @@ const attributeApis: InternalApiItem[] = [
 ]
 
 /**
- * 事件数据模块API接口
+ * event data moduleAPIinterface
  */
 const eventApis: InternalApiItem[] = [
   {
-    label: '事件数据分页查询',
+    label: 'Event data paging query',
     value: '/event/datas',
     url: '/event/datas',
     method: 'GET',
-    description: '事件数据查询（分页）',
+    description: 'Event data query（Pagination）',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_id', type: 'string', required: true, description: '设备ID', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' },
-      { name: 'page', type: 'number', required: true, description: '页码', example: 1 },
-      { name: 'page_size', type: 'number', required: true, description: '每页数量', example: 10 },
-      { name: 'identify', type: 'string', required: false, description: '事件标识符', example: 'event_001' }
+      { name: 'device_id', type: 'string', required: true, description: 'equipmentID', example: 'ca33926c-5ee5-3e9f-147e-94e188fde65b' },
+      { name: 'page', type: 'number', required: true, description: 'page number', example: 1 },
+      { name: 'page_size', type: 'number', required: true, description: 'Quantity per page', example: 10 },
+      { name: 'identify', type: 'string', required: false, description: 'event identifier', example: 'event_001' }
     ],
     module: 'event',
     functionName: 'eventDataPagination'
@@ -293,49 +293,49 @@ const eventApis: InternalApiItem[] = [
 ]
 
 /**
- * 告警数据模块API接口
+ * Alarm data moduleAPIinterface
  */
 const alarmApis: InternalApiItem[] = [
   {
-    label: '【租户】当前告警状态的设备数量',
+    label: '【tenant】Number of devices in current alarm status',
     value: '/alarm/device/counts',
     url: '/alarm/device/counts',
     method: 'GET',
-    description: '查询租户下当前告警状态的设备数量统计',
+    description: 'Query statistics on the number of devices with current alarm status under the tenant',
     hasPathParams: false,
     commonParams: [
-      // 此接口无需查询参数，仅需token认证
+      // This interface does not require query parameters，Just needtokenCertification
     ],
     module: 'alarm',
     functionName: 'alarmDeviceCounts'
   },
   {
-    label: '获取设备告警状态',
+    label: 'Get device alarm status',
     value: '/alarm/info/history/device',
     url: '/alarm/info/history/device',
     method: 'GET',
-    description: '获取指定设备的告警状态',
+    description: 'Get the alarm status of the specified device',
     hasPathParams: false,
     commonParams: [
-      { name: 'device_id', type: 'string', required: true, description: '设备ID', example: '41b44d60-305f-f559-1d8d-61c040b63b1e' }
+      { name: 'device_id', type: 'string', required: true, description: 'equipmentID', example: '41b44d60-305f-f559-1d8d-61c040b63b1e' }
     ],
     module: 'alarm',
     functionName: 'alarmInfoHistoryDevice'
   },
   {
-    label: '获取告警历史列表',
+    label: 'Get the alarm history list',
     value: '/alarm/info/history',
     url: '/alarm/info/history',
     method: 'GET',
-    description: '获取告警历史记录列表（分页）',
+    description: 'Get the alarm history list（Pagination）',
     hasPathParams: false,
     commonParams: [
-      { name: 'page', type: 'number', required: true, description: '页码', example: 1 },
-      { name: 'page_size', type: 'number', required: true, description: '每页数量', example: 10 },
-      { name: 'device_id', type: 'string', required: false, description: '设备ID（筛选条件）', example: '41b44d60-305f-f559-1d8d-61c040b63b1e' },
-      { name: 'alarm_status', type: 'string', required: false, description: '告警状态（筛选条件）', example: '' },
-      { name: 'start_time', type: 'string', required: false, description: '开始时间（筛选条件）', example: '' },
-      { name: 'end_time', type: 'string', required: false, description: '结束时间（筛选条件）', example: '' }
+      { name: 'page', type: 'number', required: true, description: 'page number', example: 1 },
+      { name: 'page_size', type: 'number', required: true, description: 'Quantity per page', example: 10 },
+      { name: 'device_id', type: 'string', required: false, description: 'equipmentID（Filter criteria）', example: '41b44d60-305f-f559-1d8d-61c040b63b1e' },
+      { name: 'alarm_status', type: 'string', required: false, description: 'Alarm status（Filter criteria）', example: '' },
+      { name: 'start_time', type: 'string', required: false, description: 'start time（Filter criteria）', example: '' },
+      { name: 'end_time', type: 'string', required: false, description: 'end time（Filter criteria）', example: '' }
     ],
     module: 'alarm',
     functionName: 'alarmInfoHistory'
@@ -343,44 +343,44 @@ const alarmApis: InternalApiItem[] = [
 ]
 
 /**
- * 内部地址选项数据
- * 按模块分组的API接口列表
+ * Internal address option data
+ * grouped by moduleAPIinterface list
  */
 export const internalAddressOptions: InternalAddressOptions = [
   {
     type: 'group',
-    label: '遥测数据',
+    label: 'telemetry data',
     key: 'telemetry',
     children: telemetryApis
   },
   {
     type: 'group',
-    label: '设备数据',
+    label: 'Device data',
     key: 'device',
     children: deviceApis
   },
   {
     type: 'group',
-    label: '属性数据',
+    label: 'attribute data',
     key: 'attribute',
     children: attributeApis
   },
   {
     type: 'group',
-    label: '事件数据',
+    label: 'event data',
     key: 'event',
     children: eventApis
   },
   {
     type: 'group',
-    label: '告警数据',
+    label: 'Alarm data',
     key: 'alarm',
     children: alarmApis
   }
 ]
 
 /**
- * 根据模块获取API列表
+ * Get based on moduleAPIlist
  */
 export function getApisByModule(module: string): InternalApiItem[] {
   const moduleGroup = internalAddressOptions.find(group => group.key === module)
@@ -388,7 +388,7 @@ export function getApisByModule(module: string): InternalApiItem[] {
 }
 
 /**
- * 根据API值获取API详情
+ * according toAPIvalue getAPIDetails
  */
 export function getApiByValue(value: string): InternalApiItem | undefined {
   for (const group of internalAddressOptions) {
@@ -399,7 +399,7 @@ export function getApiByValue(value: string): InternalApiItem | undefined {
 }
 
 /**
- * 获取所有API接口的扁平列表
+ * Get allAPIflat list of interfaces
  */
 export function getAllApis(): InternalApiItem[] {
   return internalAddressOptions.reduce((acc, group) => {
@@ -408,7 +408,7 @@ export function getAllApis(): InternalApiItem[] {
 }
 
 /**
- * 搜索API接口
+ * searchAPIinterface
  */
 export function searchApis(keyword: string): InternalApiItem[] {
   const allApis = getAllApis()

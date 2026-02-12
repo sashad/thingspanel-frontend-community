@@ -46,7 +46,7 @@ const insertCard = (card: ICardData) => {
             return item?.data?.cardId === cur?.data?.cardId
           })
         ) {
-          acc.push(cur as ICardView) // 如果acc中没有当前cur的cardId，则添加cur到acc中
+          acc.push(cur as ICardView) // ifaccmiddle没有当前curofcardId，then addcurarriveaccmiddle
         }
         return acc
       }, [])
@@ -125,43 +125,43 @@ onMounted(fetchBroad)
   @apply border border-transparent;
 }
 .smartphone {
-  width: 480px; /* 设置手机外框的宽度 */
-  height: 960px; /* 设置手机外框的高度 */
-  border: 16px solid black; /* 设置边框模拟手机边框 */
-  border-radius: 32px; /* 设置边框圆角模拟手机的圆角 */
-  display: flex; /* 使用flex布局 */
-  justify-content: center; /* 水平居中 */
-  align-items: start; /* 垂直居中 */
-  background: #f3f3f3; /* 设置背景颜色 */
-  box-shadow: 0 0 10px #999; /* 添加阴影效果 */
+  width: 480px; /* Set the width of the mobile phone frame */
+  height: 960px; /* Set the height of the phone frame */
+  border: 16px solid black; /* Set borders to simulate mobile phone borders */
+  border-radius: 32px; /* Set the border rounded corners to simulate the rounded corners of a mobile phone */
+  display: flex; /* useflexlayout */
+  justify-content: center; /* Center horizontally */
+  align-items: start; /* Center vertically */
+  background: #f3f3f3; /* Set background color */
+  box-shadow: 0 0 10px #999; /* Add shadow effect */
 }
 
 .screen {
-  width: 90%; /* 设置屏幕宽度为手机宽度的90% */
-  height: 90%; /* 设置屏幕高度为手机高度的90% */
-  background: white; /* 设置屏幕背景颜色为白色 */
-  border-radius: 24px; /* 设置屏幕边框圆角 */
-  display: flex; /* 使用flex布局 */
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
-  color: black; /* 设置文本颜色 */
-  font-family: Arial, sans-serif; /* 设置字体 */
+  width: 90%; /* Set the screen width to the phone width90% */
+  height: 90%; /* Set the screen height to the height of the phone90% */
+  background: white; /* Set screen background color to white */
+  border-radius: 24px; /* Set screen border rounded corners */
+  display: flex; /* useflexlayout */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  color: black; /* Set text color */
+  font-family: Arial, sans-serif; /* Set font */
 }
 
-/* 定制滚动条的整体样式 */
+/* Customize the overall style of the scroll bar */
 .screena::-webkit-scrollbar {
-  width: 4px; /* 滚动条宽度 */
+  width: 4px; /* scroll bar width */
 }
 
-/* 定制滚动条滑块（thumb）的样式 */
+/* Custom scroll bar slider（thumb）style */
 .screena::-webkit-scrollbar-thumb {
-  background: #888; /* 滚动条滑块颜色 */
-  border-radius: 4px; /* 滚动条滑块圆角 */
+  background: #888; /* Scroll bar slider color */
+  border-radius: 4px; /* Scroll bar slider rounded corners */
 }
 
-/* 定制滚动条轨道（track）的样式 */
+/* Custom scroll bar track（track）style */
 .screena::-webkit-scrollbar-track {
-  background: #f0f0f0; /* 滚动条轨道颜色 */
-  border-radius: 4px; /* 滚动条轨道圆角 */
+  background: #f0f0f0; /* Scroll bar track color */
+  border-radius: 4px; /* Scroll bar track rounded corners */
 }
 </style>

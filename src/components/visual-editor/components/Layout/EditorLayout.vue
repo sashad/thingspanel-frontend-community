@@ -1,6 +1,6 @@
 <template>
   <div class="editor-layout h-full w-full flex flex-col" :style="themeColors">
-    <!-- 工具栏区域 - 仅当编辑模式且有插槽内容时显示 -->
+    <!-- toolbar area - Only shown when in edit mode and has slot content -->
     <div
       v-if="showToolbar"
       class="toolbar-area flex-shrink-0 h-12 px-4 flex items-center justify-between transition-all duration-300"
@@ -9,9 +9,9 @@
       <slot name="toolbar" :mode="props.mode" :isEditMode="isEditMode" />
     </div>
 
-    <!-- 主内容区域 -->
+    <!-- main content area -->
     <div class="main-content flex-1 flex overflow-hidden" style="background-color: var(--panel-bg)">
-      <!-- 左侧区域 - 仅当编辑模式、有插槽内容且未收起时显示 -->
+      <!-- left area - Only in edit mode、Displayed when there is slot content and is not collapsed -->
       <div
         v-if="showLeft"
         class="left-area flex-shrink-0 overflow-auto transition-all duration-300"
@@ -24,12 +24,12 @@
         <slot name="left" :mode="props.mode" :isEditMode="isEditMode" />
       </div>
 
-      <!-- 中央编辑区域 - 始终显示 -->
+      <!-- central editing area - always show -->
       <div class="main-area flex-1 overflow-auto transition-all duration-300" style="background-color: var(--panel-bg)">
         <slot name="main" :mode="props.mode" :isEditMode="isEditMode" />
       </div>
 
-      <!-- 右侧区域 - 仅当编辑模式、有插槽内容且未收起时显示 -->
+      <!-- right area - Only in edit mode、Displayed when there is slot content and is not collapsed -->
       <div
         v-if="showRight"
         class="right-area flex-shrink-0 overflow-auto transition-all duration-300"
@@ -74,7 +74,7 @@ const slots = useSlots()
 const themeStore = useThemeStore()
 const isEditMode = computed(() => props.mode === 'edit')
 
-// 主题颜色计算属性
+// Theme color computed property
 const themeColors = computed(() => {
   const isDark = themeStore.darkMode
   return {
@@ -86,18 +86,18 @@ const themeColors = computed(() => {
   }
 })
 
-// 插槽存在性检查
+// Slot existence check
 const hasToolbar = computed(() => !!slots.toolbar)
 const hasLeft = computed(() => !!slots.left)
 const hasRight = computed(() => !!slots.right)
 
-// 显示条件 - 工具栏在任何模式下都显示（如果有插槽内容）
+// display conditions - Toolbar appears in any mode（If there is slot content）
 const showToolbar = computed(() => hasToolbar.value)
-// 左右面板在编辑模式下显示，预览模式下可以通过工具栏按钮切换显示
+// The left and right panels are shown in edit mode，In preview mode, the display can be switched through the toolbar button
 const showLeft = computed(() => hasLeft.value && !props.leftCollapsed)
 const showRight = computed(() => hasRight.value && !props.rightCollapsed)
 
-// API方法
+// APImethod
 const toggleLeft = () => {
   emit('update:leftCollapsed', !props.leftCollapsed)
 }
@@ -106,7 +106,7 @@ const toggleRight = () => {
   emit('update:rightCollapsed', !props.rightCollapsed)
 }
 
-// 暴露方法给父组件
+// Expose methods to parent component
 defineExpose({
   toggleLeft,
   toggleRight,
@@ -119,24 +119,24 @@ defineExpose({
 
 <style scoped>
 .editor-layout {
-  /* 确保布局占满全部空间 */
+  /* Make sure the layout takes up all the space */
   min-height: 0;
 }
 
 .main-content {
-  /* 确保主内容区域能够正确处理 overflow */
+  /* Make sure the main content area is handled correctly overflow */
   min-height: 0;
 }
 
 .left-area,
 .right-area,
 .main-area {
-  /* 防止子元素溢出 */
+  /* Prevent child elements from overflowing */
   min-width: 0;
   min-height: 0;
 }
 
-/* 自定义滚动条样式 */
+/* Custom scroll bar style */
 .left-area::-webkit-scrollbar,
 .right-area::-webkit-scrollbar,
 .main-area::-webkit-scrollbar {

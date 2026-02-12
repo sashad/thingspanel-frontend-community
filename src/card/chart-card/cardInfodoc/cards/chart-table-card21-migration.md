@@ -1,58 +1,58 @@
-# Chart Table 组件 Card 2.1 迁移配置文档
+# Chart Table components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-**组件ID**: `chart-table`  
-**组件类型**: `chart`  
-**组件名称**: 数据表格  
-**功能描述**: 基于 Naive UI 的数据表格组件，支持多数据源、分页、时间范围选择、数据聚合等功能
+**componentsID**: `chart-table`  
+**Component type**: `chart`  
+**Component name**: data table  
+**Function description**: based on Naive UI data table component，Support multiple data sources、Pagination、Time range selection、Data aggregation and other functions
 
-## 当前实现分析
+## Current implementation analysis
 
-### 1. 组件结构
+### 1. Component structure
 ```
 table/
-├── index.ts              # 组件定义配置
-├── component.vue         # 主组件入口
-├── card-config.vue       # 配置表单
-├── poster.png           # 组件预览图
+├── index.ts              # Component definition configuration
+├── component.vue         # Main component entry
+├── card-config.vue       # Configuration form
+├── poster.png           # Component preview
 └── modules/
-    └── table.vue        # 核心表格实现
+    └── table.vue        # Core table implementation
 ```
 
-### 2. 核心特性
-- **多数据源支持**: 最多支持 20 个数据源
-- **时间范围**: 支持时间范围选择和数据聚合
-- **分页功能**: 支持分页显示，可配置每页条数
-- **数据合并**: 按时间维度合并多个数据源
-- **实时更新**: 支持设备遥测数据实时更新
-- **时间格式化**: 自动格式化时间戳显示
+### 2. Core features
+- **Multiple data sources support**: Most supported 20 data sources
+- **time range**: 支持time range选择和数据聚合
+- **Paging function**: Support paging display，Configurable number of items per page
+- **Data merge**: Merge multiple data sources by time dimension
+- **real time updates**: 支持设备遥测数据real time updates
+- **time formatting**: Automatically format timestamp display
 
-### 3. 技术实现
-- **表格组件**: Naive UI NDataTable
-- **数据处理**: 时间维度数据合并、分页处理
-- **时间处理**: moment.js 时间格式化
-- **响应式**: 动态列生成、数据监听
+### 3. Technical implementation
+- **Table component**: Naive UI NDataTable
+- **Data processing**: Time dimension data merging、Pagination
+- **time processing**: moment.js time formatting
+- **Responsive**: Dynamic column generation、Data monitoring
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 1. 组件定义 (ComponentDefinition)
+### 1. Component definition (ComponentDefinition)
 
 ```typescript
 import { ComponentDefinition } from '@/card2.1/types'
 
 export const chartTableDefinition: ComponentDefinition = {
-  // 基础信息
+  // Basic information
   id: 'chart-table',
   name: 'chart.table',
   type: 'chart',
   category: 'data-display',
   
-  // 组件配置
+  // Component configuration
   component: () => import('./component.vue'),
   configComponent: () => import('./config.vue'),
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 8, height: 5 },
     minSize: { width: 3, height: 3 },
@@ -60,7 +60,7 @@ export const chartTableDefinition: ComponentDefinition = {
     resizable: true
   },
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     multiple: true,
@@ -74,11 +74,11 @@ export const chartTableDefinition: ComponentDefinition = {
     }
   },
   
-  // 配置模式
+  // configuration mode
   configSchema: {
     type: 'object',
     properties: {
-      // 表格配置
+      // Table configuration
       table: {
         type: 'object',
         properties: {
@@ -93,7 +93,7 @@ export const chartTableDefinition: ComponentDefinition = {
         }
       },
       
-      // 分页配置
+      // Paging configuration
       pagination: {
         type: 'object',
         properties: {
@@ -113,7 +113,7 @@ export const chartTableDefinition: ComponentDefinition = {
         }
       },
       
-      // 列配置
+      // column configuration
       columns: {
         type: 'array',
         items: {
@@ -145,7 +145,7 @@ export const chartTableDefinition: ComponentDefinition = {
         }
       },
       
-      // 数据配置
+      // Data configuration
       data: {
         type: 'object',
         properties: {
@@ -187,47 +187,47 @@ export const chartTableDefinition: ComponentDefinition = {
 }
 ```
 
-### 2. 数据源映射
+### 2. Data source mapping
 
 ```typescript
-// 原始数据源结构 -> Card 2.1 数据源结构
+// Original data source structure -> Card 2.1 Data source structure
 const dataSourceMapping = {
-  // 设备数据源
+  // Device data source
   deviceSource: {
     type: 'device',
     config: {
-      deviceId: 'string',      // 设备ID
-      metricKey: 'string',     // 指标键名
-      metricName: 'string',    // 指标显示名称
-      unit: 'string',          // 单位
-      aggregateFunction: 'string' // 聚合函数
+      deviceId: 'string',      // equipmentID
+      metricKey: 'string',     // Indicator key name
+      metricName: 'string',    // Indicator display name
+      unit: 'string',          // unit
+      aggregateFunction: 'string' // aggregate function
     }
   },
   
-  // 时间范围配置
+  // Time range configuration
   timeRange: {
-    enabled: 'boolean',        // 是否启用时间范围
-    range: 'string',          // 时间范围 (如: 'last_1h', 'last_1d')
-    custom: {                 // 自定义时间范围
-      start: 'number',        // 开始时间戳
-      end: 'number'           // 结束时间戳
+    enabled: 'boolean',        // Whether to enable time range
+    range: 'string',          // time range (like: 'last_1h', 'last_1d')
+    custom: {                 // Custom time range
+      start: 'number',        // start timestamp
+      end: 'number'           // end timestamp
     }
   },
   
-  // 聚合配置
+  // Aggregation configuration
   aggregate: {
-    enabled: 'boolean',       // 是否启用聚合
-    window: 'string',         // 聚合窗口
-    function: 'string'        // 聚合函数
+    enabled: 'boolean',       // Whether to enable aggregation
+    window: 'string',         // aggregation window
+    function: 'string'        // aggregate function
   }
 }
 ```
 
-### 3. 实现要点
+### 3. Implementation points
 
-#### 数据处理流程
+#### Data processing flow
 ```typescript
-// 1. 数据获取
+// 1. data acquisition
 const fetchTableData = async (dataSources: DataSourceConfig[]) => {
   const promises = dataSources.map(source => {
     const params = {
@@ -250,7 +250,7 @@ const fetchTableData = async (dataSources: DataSourceConfig[]) => {
   return results.flat()
 }
 
-// 2. 数据合并处理
+// 2. Data merging processing
 const mergeDataByTime = (data: any[]) => {
   const timeMap = new Map()
   
@@ -261,15 +261,15 @@ const mergeDataByTime = (data: any[]) => {
     timeMap.get(timestamp)[key] = value
   })
   
-  // 按时间排序
+  // Sort by time
   return Array.from(timeMap.values()).sort((a, b) => b.time - a.time)
 }
 
-// 3. 动态列生成
+// 3. Dynamic column generation
 const generateColumns = (dataSources: DataSourceConfig[], config: TableConfig) => {
   const columns = [
     {
-      title: '时间',
+      title: 'time',
       key: 'time',
       render: (row: any) => {
         return moment(row.time).format(config.columns?.timeFormat || 'YYYY-MM-DD HH:mm:ss')
@@ -286,7 +286,7 @@ const generateColumns = (dataSources: DataSourceConfig[], config: TableConfig) =
         const value = row[source.metricKey]
         if (value === undefined || value === null) return ''
         
-        // 数值格式化
+        // Numeric formatting
         if (typeof value === 'number') {
           return value.toFixed(config.columns?.precision || 2) + (source.unit || '')
         }
@@ -300,9 +300,9 @@ const generateColumns = (dataSources: DataSourceConfig[], config: TableConfig) =
 }
 ```
 
-#### 分页处理
+#### Pagination
 ```typescript
-// 分页配置
+// Paging configuration
 const paginationConfig = reactive({
   page: 1,
   pageSize: config.pagination?.pageSize || 10,
@@ -311,147 +311,147 @@ const paginationConfig = reactive({
   pageSizes: config.pagination?.pageSizes || [10, 15, 20, 50]
 })
 
-// 分页数据计算
+// Paging data calculation
 const paginatedData = computed(() => {
   const startIndex = (paginationConfig.page - 1) * paginationConfig.pageSize
   const endIndex = startIndex + paginationConfig.pageSize
   return allTableData.value.slice(startIndex, endIndex)
 })
 
-// 分页事件处理
+// Pagination event handling
 const handlePageChange = (page: number) => {
   paginationConfig.page = page
 }
 
 const handlePageSizeChange = (pageSize: number) => {
   paginationConfig.pageSize = pageSize
-  paginationConfig.page = 1 // 重置到第一页
+  paginationConfig.page = 1 // Reset to first page
 }
 ```
 
-#### 数据更新机制
+#### Data update mechanism
 ```typescript
-// 监听配置变化
+// Listen for configuration changes
 watch(
   () => props.card,
   async () => {
-    // 重新生成列配置
+    // Regenerate column configuration
     columns.value = generateColumns(
       props.card.dataSource.deviceSource,
       props.card.config
     )
     
-    // 重新获取数据
+    // Retrieve data
     await fetchTableData()
   },
   { deep: true }
 )
 
-// 实时数据更新
+// Real-time data updates
 const updateData = (deviceId: string, metricKey: string, data: any) => {
-  // 更新对应设备的数据
+  // Update the data of the corresponding device
   const existingIndex = allTableData.value.findIndex(
     item => item.time === data.timestamp
   )
   
   if (existingIndex >= 0) {
-    // 更新现有数据
+    // Update existing data
     allTableData.value[existingIndex][metricKey] = data.value
   } else {
-    // 添加新数据
+    // Add new data
     const newRow = { time: data.timestamp, [metricKey]: data.value }
     allTableData.value.unshift(newRow)
     
-    // 保持数据量限制
+    // Keep data volume limits
     if (allTableData.value.length > 1000) {
       allTableData.value = allTableData.value.slice(0, 1000)
     }
   }
   
-  // 更新分页信息
+  // Update pagination information
   paginationConfig.itemCount = allTableData.value.length
 }
 ```
 
-## 迁移检查清单
+## Migration checklist
 
-### 功能迁移
-- [ ] 多数据源支持 (最多20个)
-- [ ] 时间范围选择功能
-- [ ] 数据聚合功能
-- [ ] 分页显示功能
-- [ ] 数据排序功能
-- [ ] 实时数据更新
-- [ ] 时间格式化显示
+### Function migration
+- [ ] Multiple data sources support (most20indivual)
+- [ ] Time range selection function
+- [ ] Data aggregation function
+- [ ] Paging display function
+- [ ] Data sorting function
+- [ ] Real-time data updates
+- [ ] Time formatted display
 
-### 配置迁移
-- [ ] 表格样式配置
-- [ ] 分页参数配置
-- [ ] 列显示配置
-- [ ] 数据格式化配置
-- [ ] 排序配置
-- [ ] 过滤配置
+### Configuration migration
+- [ ] Table style configuration
+- [ ] Paging parameter configuration
+- [ ] Column display configuration
+- [ ] Data format configuration
+- [ ] Sorting configuration
+- [ ] Filter configuration
 
-### 性能优化
-- [ ] 大数据量分页处理
-- [ ] 虚拟滚动支持
-- [ ] 数据缓存机制
-- [ ] 内存泄漏防护
+### Performance optimization
+- [ ] Large data volume paging processing
+- [ ] Virtual scrolling support
+- [ ] Data caching mechanism
+- [ ] Memory leak prevention
 
-## 迁移步骤
+## Migration steps
 
-### 1. 创建组件定义
+### 1. Create component definition
 ```bash
-# 创建组件目录
+# Create component directory
 mkdir -p src/card2.1/components/chart/table
 
-# 创建必要文件
+# Create necessary files
 touch src/card2.1/components/chart/table/definition.ts
 touch src/card2.1/components/chart/table/component.vue
 touch src/card2.1/components/chart/table/config.vue
 ```
 
-### 2. 实现核心组件
-- 迁移 `component.vue` 主组件逻辑
-- 迁移 `table.vue` 表格实现
-- 适配 Card 2.1 数据源接口
-- 实现配置表单组件
+### 2. Implement core components
+- migrate `component.vue` main component logic
+- migrate `table.vue` Table implementation
+- adaptation Card 2.1 Data source interface
+- Implement configuration form components
 
-### 3. 配置验证
-- 测试多数据源配置
-- 验证分页功能
-- 测试数据聚合功能
-- 检查排序和过滤效果
+### 3. Configuration verification
+- Test multiple data source configurations
+- Verify paging functionality
+- Test data aggregation functionality
+- Check sorting and filtering effects
 
-### 4. 性能测试
-- 大数据量渲染测试
-- 分页性能测试
-- 内存使用情况监控
+### 4. Performance testing
+- Large data volume rendering test
+- Paging performance test
+- Memory usage monitoring
 
-## 数据处理流程
+## Data processing flow
 
-### 1. 数据获取流程
+### 1. Data acquisition process
 ```
-用户配置 → 数据源验证 → API调用 → 数据预处理 → 表格渲染
-```
-
-### 2. 数据合并流程
-```
-多源数据 → 时间维度分组 → 数据合并 → 排序处理 → 分页显示
+User configuration → Data source validation → APIcall → Data preprocessing → Table rendering
 ```
 
-### 3. 实时更新流程
+### 2. Data merging process
 ```
-WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 表格重绘
+multi-source data → Time dimension grouping → Data merge → sort processing → Paginated display
 ```
 
-## 配置示例
+### 3. Real-time update process
+```
+WebSocketconnect → Data reception → Data validation → incremental update → Table redraw
+```
 
-### 基础配置
+## Configuration example
+
+### Basic configuration
 ```json
 {
   "table": {
-    "title": "设备数据表",
+    "title": "Equipment data sheet",
     "showBorder": true,
     "striped": true,
     "size": "medium"
@@ -466,18 +466,18 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 表格重
     {
       "deviceId": "device_001",
       "metricKey": "temperature",
-      "metricName": "温度",
+      "metricName": "temperature",
       "unit": "°C"
     }
   ]
 }
 ```
 
-### 高级配置
+### Advanced configuration
 ```json
 {
   "table": {
-    "title": "多设备监控数据",
+    "title": "Multiple device monitoring data",
     "showBorder": true,
     "striped": false,
     "size": "small"
@@ -491,7 +491,7 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 表格重
   "columns": [
     {
       "key": "time",
-      "title": "时间",
+      "title": "time",
       "width": 200,
       "align": "center",
       "sortable": true,
@@ -502,7 +502,7 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 表格重
     },
     {
       "key": "temperature",
-      "title": "温度",
+      "title": "temperature",
       "width": 120,
       "align": "right",
       "sortable": true,
@@ -530,27 +530,27 @@ WebSocket连接 → 数据接收 → 数据验证 → 增量更新 → 表格重
 }
 ```
 
-## 使用场景
+## Usage scenarios
 
-### 1. 设备监控数据展示
-- 多设备实时数据对比
-- 历史数据趋势分析
-- 异常数据快速定位
+### 1. Equipment monitoring data display
+- Real-time data comparison of multiple devices
+- Historical data trend analysis
+- Quickly locate abnormal data
 
-### 2. 数据报表生成
-- 定时数据汇总报表
-- 多维度数据分析
-- 数据导出功能
+### 2. Data report generation
+- Regular data summary report
+- Multidimensional data analysis
+- Data export function
 
-### 3. 运维监控面板
-- 系统指标监控
-- 性能数据展示
-- 告警数据列表
+### 3. Operation and maintenance monitoring panel
+- System indicator monitoring
+- Performance data display
+- Alarm data list
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture.md)
-- [数据源配置指南](../data-source-guide.md)
-- [组件开发规范](../component-development.md)
-- [Naive UI 表格组件文档](https://www.naiveui.com/zh-CN/os-theme/components/data-table)
-- [分页组件集成指南](../pagination-integration.md)
+- [Card 2.1 Architecture documentation](../architecture.md)
+- [Data source configuration guide](../data-source-guide.md)
+- [Component Development Specifications](../component-development.md)
+- [Naive UI Table component documentation](https://www.naiveui.com/zh-CN/os-theme/components/data-table)
+- [Pagination component integration guide](../pagination-integration.md)

@@ -1,21 +1,21 @@
 <!--
-  Grid Layout Plus 使用示例
-  展示如何使用新的 Grid Layout Plus 组件
+  Grid Layout Plus Usage example
+  Show how to use the new Grid Layout Plus components
 -->
 <template>
   <div class="grid-layout-plus-example">
     <div class="example-header">
-      <h2>Grid Layout Plus 示例</h2>
+      <h2>Grid Layout Plus Example</h2>
       <div class="example-controls">
         <n-space>
-          <n-button @click="addRandomItem">添加项目</n-button>
-          <n-button @click="compactLayout">紧凑布局</n-button>
-          <n-button type="error" @click="clearAll">清空</n-button>
+          <n-button @click="addRandomItem">Add item</n-button>
+          <n-button @click="compactLayout">Compact layout</n-button>
+          <n-button type="error" @click="clearAll">Clear</n-button>
           <n-button @click="toggleReadonly">
-            {{ readonly ? '启用编辑' : '只读模式' }}
+            {{ readonly ? 'Enable editing' : 'read-only mode' }}
           </n-button>
           <n-button @click="toggleGrid">
-            {{ showGrid ? '隐藏网格' : '显示网格' }}
+            {{ showGrid ? 'Hide grid' : 'show grid' }}
           </n-button>
         </n-space>
       </div>
@@ -24,10 +24,10 @@
     <div class="example-stats">
       <n-card size="small">
         <n-space>
-          <n-statistic label="项目数量" :value="layoutStats.totalItems" />
-          <n-statistic label="总行数" :value="layoutStats.totalRows" />
-          <n-statistic label="利用率" :value="layoutStats.utilization" suffix="%" />
-          <n-statistic label="已选择" :value="selectedItems.length" />
+          <n-statistic label="Number of items" :value="layoutStats.totalItems" />
+          <n-statistic label="Total number of rows" :value="layoutStats.totalRows" />
+          <n-statistic label="Utilization" :value="layoutStats.utilization" suffix="%" />
+          <n-statistic label="Selected" :value="selectedItems.length" />
         </n-space>
       </n-card>
     </div>
@@ -58,16 +58,16 @@
             <div class="item-main-content">
               <div class="item-title">{{ item.title || item.type }}</div>
               <div class="item-info">
-                <div>位置: {{ item.x }}, {{ item.y }}</div>
-                <div>大小: {{ item.w }} × {{ item.h }}</div>
+                <div>Location: {{ item.x }}, {{ item.y }}</div>
+                <div>size: {{ item.w }} × {{ item.h }}</div>
               </div>
 
-              <!-- 根据类型渲染不同内容 -->
+              <!-- Render different content based on type -->
               <div class="item-body">
-                <div v-if="item.type === 'chart'" class="chart-placeholder">📊 图表组件</div>
-                <div v-else-if="item.type === 'text'" class="text-placeholder">📝 文本组件</div>
-                <div v-else-if="item.type === 'image'" class="image-placeholder">🖼️ 图片组件</div>
-                <div v-else class="default-placeholder">📦 {{ item.type || '默认组件' }}</div>
+                <div v-if="item.type === 'chart'" class="chart-placeholder">📊 chart component</div>
+                <div v-else-if="item.type === 'text'" class="text-placeholder">📝 text component</div>
+                <div v-else-if="item.type === 'image'" class="image-placeholder">🖼️ Picture component</div>
+                <div v-else class="default-placeholder">📦 {{ item.type || 'Default component' }}</div>
               </div>
             </div>
           </div>
@@ -76,23 +76,23 @@
     </div>
 
     <div class="example-actions">
-      <n-card title="操作面板" size="small">
+      <n-card title="Operation panel" size="small">
         <n-space vertical>
           <n-space>
-            <n-button :disabled="!canUndo" @click="undo">撤销</n-button>
-            <n-button :disabled="!canRedo" @click="redo">重做</n-button>
+            <n-button :disabled="!canUndo" @click="undo">Cancel</n-button>
+            <n-button :disabled="!canRedo" @click="redo">Redo</n-button>
           </n-space>
 
           <n-space>
-            <n-button @click="selectAll">全选</n-button>
-            <n-button @click="clearSelection">清除选择</n-button>
-            <n-button :disabled="!hasSelectedItems" type="error" @click="deleteSelected">删除选中</n-button>
+            <n-button @click="selectAll">Select all</n-button>
+            <n-button @click="clearSelection">Clear selection</n-button>
+            <n-button :disabled="!hasSelectedItems" type="error" @click="deleteSelected">Remove selected</n-button>
           </n-space>
 
           <n-space>
-            <n-button @click="exportLayout">导出布局</n-button>
+            <n-button @click="exportLayout">Export layout</n-button>
             <n-upload :show-file-list="false" accept=".json" @before-upload="importLayout">
-              <n-button>导入布局</n-button>
+              <n-button>Import layout</n-button>
             </n-upload>
           </n-space>
         </n-space>
@@ -114,7 +114,7 @@ import {
 
 const message = useMessage()
 
-// 初始布局数据
+// Initial layout data
 const initialLayout: GridLayoutPlusItem[] = [
   {
     i: 'item-1',
@@ -123,7 +123,7 @@ const initialLayout: GridLayoutPlusItem[] = [
     w: 3,
     h: 2,
     type: 'chart',
-    title: '销售图表'
+    title: 'sales chart'
   },
   {
     i: 'item-2',
@@ -132,7 +132,7 @@ const initialLayout: GridLayoutPlusItem[] = [
     w: 2,
     h: 1,
     type: 'text',
-    title: '文本模块'
+    title: 'text module'
   },
   {
     i: 'item-3',
@@ -141,11 +141,11 @@ const initialLayout: GridLayoutPlusItem[] = [
     w: 4,
     h: 2,
     type: 'image',
-    title: '图片展示'
+    title: 'Picture display'
   }
 ]
 
-// 网格配置
+// Grid configuration
 const gridConfig: Partial<GridLayoutPlusConfig> = {
   colNum: 12,
   rowHeight: 80,
@@ -156,7 +156,7 @@ const gridConfig: Partial<GridLayoutPlusConfig> = {
   preventCollision: false
 }
 
-// 使用Grid Layout Plus Hook
+// useGrid Layout Plus Hook
 const {
   layout,
   selectedItems,
@@ -183,14 +183,14 @@ const {
   onSave: layout => {}
 })
 
-// 组件状态
+// Component status
 const readonly = ref(false)
 const showGrid = ref(true)
 
-// 项目类型列表
+// List of project types
 const itemTypes = ['chart', 'text', 'image', 'table', 'button']
 
-// 方法
+// method
 const addRandomItem = () => {
   const randomType = itemTypes[Math.floor(Math.random() * itemTypes.length)]
   const result = addItem(randomType, {
@@ -200,7 +200,7 @@ const addRandomItem = () => {
   })
 
   if (result.success) {
-    message.success('项目添加成功')
+    message.success('Project added successfully')
   } else {
     message.error(result.message)
   }
@@ -208,13 +208,13 @@ const addRandomItem = () => {
 
 const compactLayout = () => {
   compactCurrentLayout()
-  message.success('布局已紧凑')
+  message.success('The layout has been compacted')
 }
 
 const clearAll = () => {
   const result = clearLayout()
   if (result.success) {
-    message.success('布局已清空')
+    message.success('The layout has been cleared')
   }
 }
 
@@ -228,7 +228,7 @@ const toggleGrid = () => {
 
 const selectAll = () => {
   selectAllItems()
-  message.info(`已选择 ${selectedItems.value.length} 个项目`)
+  message.info(`Selected ${selectedItems.value.length} items`)
 }
 
 const deleteSelected = () => {
@@ -247,7 +247,7 @@ const exportLayout = () => {
   a.download = `grid-layout-${Date.now()}.json`
   a.click()
   URL.revokeObjectURL(url)
-  message.success('布局已导出')
+  message.success('Layout exported')
 }
 
 const importLayout = (options: any) => {
@@ -260,32 +260,32 @@ const importLayout = (options: any) => {
       const result = importLayoutFromHook(layoutData)
 
       if (result.success) {
-        message.success('布局导入成功')
+        message.success('Layout imported successfully')
       } else {
         message.error(result.message)
       }
     } catch (error) {
-      message.error('布局导入失败')
+      message.error('Layout import failed')
     }
   }
 
   reader.readAsText(file)
-  return false // 阻止默认上传
+  return false // Block default upload
 }
 
-// 事件处理
+// event handling
 const handleLayoutChange = (newLayout: GridLayoutPlusItem[]) => {}
 
 const handleItemAdd = (item: GridLayoutPlusItem) => {
-  message.success(`添加了项目: ${item.title || item.i}`)
+  message.success(`Item added: ${item.title || item.i}`)
 }
 
 const handleItemDelete = (itemId: string) => {
-  message.warning(`删除了项目: ${itemId}`)
+  message.warning(`Project deleted: ${itemId}`)
 }
 
 const handleItemEdit = (item: GridLayoutPlusItem) => {
-  message.info(`编辑项目: ${item.title || item.i}`)
+  message.info(`Edit project: ${item.title || item.i}`)
 }
 
 const handleItemMove = (itemId: string, x: number, y: number) => {}
@@ -293,7 +293,7 @@ const handleItemMove = (itemId: string, x: number, y: number) => {}
 const handleItemResize = (itemId: string, w: number, h: number) => {}
 
 const handleBreakpointChange = (breakpoint: string) => {
-  message.info(`断点切换到: ${breakpoint}`)
+  message.info(`Breakpoint switches to: ${breakpoint}`)
 }
 </script>
 
@@ -333,7 +333,7 @@ const handleBreakpointChange = (breakpoint: string) => {
   max-width: 300px;
 }
 
-/* 自定义项目内容样式 */
+/* Customize project content styles */
 .custom-item-content {
   height: 100%;
   display: flex;
@@ -412,7 +412,7 @@ const handleBreakpointChange = (breakpoint: string) => {
   background: rgba(245, 158, 11, 0.05);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 768px) {
   .example-header {
     flex-direction: column;

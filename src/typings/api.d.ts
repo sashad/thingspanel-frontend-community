@@ -5,7 +5,7 @@
  */
 declare namespace Api {
   namespace BaseApi {
-    /** 后端返回的路由数据类型 */
+    /** Route data type returned by the backend */
     interface Data {
       name: string
       code: number
@@ -59,11 +59,11 @@ declare namespace Api {
    */
   namespace Auth {
     /**
-     * 用户角色类型(前端静态路由用角色类型进行路由权限的控制)
+     * User role type(Front-end static routing uses role types to control routing permissions)
      *
-     * - SYS_ADMIN: 系统管理员(该权限具有所有路由数据)
-     * - TENANT_ADMIN: 租户管理员
-     * - TENANT_USER: 用户
+     * - SYS_ADMIN: system administrator(This permission has all routing data)
+     * - TENANT_ADMIN: Tenant Administrator
+     * - TENANT_USER: user
      */
     type RoleType = 'SYS_ADMIN' | 'TENANT_ADMIN' | 'TENANT_USER'
 
@@ -73,14 +73,14 @@ declare namespace Api {
       expires_in: number
     }
 
-    /** 用户信息 */
+    /** User information */
     interface UserInfo {
-      /** 用户id */
+      /** userid */
       id?: string
       userId?: string
-      /** 用户名 */
+      /** username */
       userName: string
-      /** 用户角色类型 */
+      /** User role type */
       roles?: string[]
       authority: string
 
@@ -97,34 +97,34 @@ declare namespace Api {
 
     interface MenuRoute extends ElegantConstRoute {
       id: string
-      /** 父节点ID */
+      /** parent nodeID */
       parent_id: string
-      /** 标题 */
+      /** title */
       title: string
-      /** 国际化 */
+      /** internationalization */
       multilingual: App.I18n.I18nKey
-      /** 图标 */
+      /** icon */
       param2: string
-      /** 组件名称 */
+      /** Component name */
       element_code: string
-      /** 组件路径 */
+      /** component path */
       param1: string
-      /** 是否隐藏 0 1 */
+      /** Whether to hide 0 1 */
       param3: string
-      /** 排序 */
+      /** sort */
       orders: number
-      /** 类型 */
+      /** type */
       // element_type: 1 | 2 | 3 | 4 | 5;
       element_type: 1 | 3
-      /** 访问标识 */
+      /** Access ID */
       authority: any
-      /** 描述 */
+      /** describe */
       description: string
-      /** 描述 */
+      /** describe */
       remark: string
-      /** 组件地址 */
+      /** Component address */
       route_path: string
-      /** 子节点 */
+      /** child node */
       children: MenuRoute[]
     }
 
@@ -299,26 +299,26 @@ declare namespace Api {
       remark?: null
     }
   }
-  /** 系统设置-路由管理 */
+  /** System settings-Route management */
   namespace ApiApplyManagement {
     interface Service {
       /** id */
       id: string
-      /** 服务名称 */
+      /** Service name */
       name: string | null
-      /** 设备类型 */
+      /** Device type */
       device_type: string | number
-      /** 协议类型 */
+      /** protocol type */
       protocol_type: string
-      /** 介绍 */
+      /** introduce */
       description: string | null
-      /** HTTP服务地址 */
+      /** HTTPService address */
       http_address: string | null
-      /** 接入地址 */
+      /** Access address */
       access_address: string | null
-      /** 插件订阅主题前缀 */
+      /** Plugin subscription topic prefix */
       sub_topic_prefix: string | null
-      /** 链接参数 */
+      /** link parameters */
       additional_info: string
       ts: string
       language_code: string
@@ -329,39 +329,39 @@ declare namespace Api {
       total: number
     }
   }
-  /** 常规设置 */
+  /** General settings */
   namespace GeneralSetting {
-    /** 主题设置 */
+    /** Theme settings */
     interface ThemeSetting {
       /** id */
       id: string
-      /** 系统标题 */
+      /** system title */
       system_name: string | null
-      /** 首页和后台 logo */
+      /** Home page and backend logo */
       logo_background: string | undefined
-      /** 加载页面 logo */
+      /** Load page logo */
       logo_loading: string | undefined
-      /** 站标 logo */
+      /** Site logo logo */
       logo_cache: string | undefined
-      /** 背景图片 */
+      /** background image */
       home_background: string | undefined
     }
 
-    /** 数据清理设置 */
+    /** Data cleaning settings */
     interface DataClearSetting {
       /** id */
       id: string
-      /** 清理类型 */
+      /** Cleanup type */
       data_type: string
-      /** 是否启用 */
+      /** Whether to enable */
       enabled: string
-      /** 保留天数 */
+      /** retention days */
       retention_days: number
-      /** 上次清理时间 */
+      /** Last clean time */
       last_cleanup_time: string | null
-      /** 上次清理数据时间节点 */
+      /** Last data cleaning time node */
       last_cleanup_data_time: string | null
-      /** 备注 */
+      /** Remark */
       remark: string | null
     }
 
@@ -390,60 +390,60 @@ declare namespace Api {
   }
   namespace UserManagement {
     interface User {
-      /** 用户id */
+      /** userid */
       id: string
-      /** 用户邮箱 */
+      /** User email */
       email: string | null
-      /** 用户名 */
+      /** username */
       name: string | null
       description: string | null
-      /** 用户手机号码 */
+      /** User mobile phone number */
       phone_number: string
       /**
-       * 用户状态
+       * User status
        *
-       * - N: 正常
-       * - F: 冻结
+       * - N: normal
+       * - F: freeze
        */
       status: 'F' | 'N' | null
       /**
-       * 用户性别
+       * User gender
        *
-       * - 0: 女
-       * - 1: 男
+       * - 0: female
+       * - 1: male
        */
       gender: '0' | '1' | null
 
-      /** 备注 */
+      /** Remark */
       remark: string | null
-      /** 创建时间 */
+      /** creation time */
       created_at: string | null
-      /** 更新時間 */
+      /** Update time */
       updated_at: string | null
-      /** 上次访问时间 */
+      /** last access time */
       lastVisitTime: string | null
     }
     interface UserKey {
-      /** 用户id */
+      /** userid */
       id: string
-      /** 用户名 */
+      /** username */
       name: string | null
       /** key */
       api_key: string | null
       /**
-       * 用户状态
+       * User status
        *
-       * - N: 正常
-       * - F: 冻结
+       * - N: normal
+       * - F: freeze
        */
       status: 0 | 1 | null
-      /** 创建时间 */
+      /** creation time */
       created_at: string | null
-      /** 更新時間 */
+      /** Update time */
       updated_at: string | null
-      /** 是否明文显示 */
+      /** Whether to display in clear text */
       show: boolean | false
-      /** 租户id */
+      /** tenantid */
       tenant_id: string | null
     }
 
@@ -456,18 +456,18 @@ declare namespace Api {
       total: number
     }
   }
-  /** 规则引擎 */
+  /** rules engine */
   namespace RuleEngine {
     interface Rule {
       /** id */
       id: string
-      /** 规则名 */
+      /** Rule name */
       name: string | null
       /**
-       * 规则状态
+       * Rule status
        *
-       * - 1: 已启动
-       * - 2: 已暂停
+       * - 1: Started
+       * - 2: Suspended
        */
       status: '1' | '2' | null
     }
@@ -476,27 +476,27 @@ declare namespace Api {
     interface Data {
       /** id */
       id: string
-      /** 规则名 */
+      /** Rule name */
       name: string | null
       /** app_key */
       appKey: string | null
-      /** 签名方式 */
+      /** Signature method */
       signMode: string | null
-      /** IP白名单 */
+      /** IPwhitelist */
       ip: string | null
-      /** 接口支持标志 */
+      /** Interface support flag */
       flag: string | null
-      /** 推送数据间隔 */
+      /** Push data interval */
       dataInterval: string | null
-      /** 描述 */
+      /** describe */
       desc: string | null
-      /** 创建时间 */
+      /** creation time */
       createTime: string | null
       /**
-       * 规则状态
+       * Rule status
        *
-       * - 1: 已启动
-       * - 2: 已停止
+       * - 1: Started
+       * - 2: Stopped
        */
       status: '1' | '2' | null
     }
@@ -505,27 +505,27 @@ declare namespace Api {
     interface Service {
       /** id */
       id: string
-      /** 服务名称 */
+      /** Service name */
       name: string | null
-      /** 服务类别 */
+      /** Service Category */
       serviceType: string | null
-      /** 介绍 */
+      /** introduce */
       desc: string | null
-      /** 作者 */
+      /** author */
       author: string | null
-      /** 版本 */
+      /** Version */
       version: string | null
       /**
-       * 规则状态
+       * Rule status
        *
-       * - 1: 已启动
-       * - 2: 已停止
+       * - 1: Started
+       * - 2: Stopped
        */
       status: '1' | '2' | null
     }
   }
 
-  /** 设备管理 */
+  /** Device management */
   namespace device {
     interface addDeviceModel {
       additional_info: string
@@ -546,7 +546,7 @@ declare namespace Api {
     }
   }
 
-  /** 告警 */
+  /** Alarm */
   namespace Alarm {
     interface NotificationGroupParams {
       name?: string
@@ -598,7 +598,7 @@ declare namespace Api {
       send_time_stop?: string
     }
   }
-  /** 灌溉计划 */
+  /** irrigation plan */
   namespace Irrigation {
     interface AddTimeIrrigation {
       name: string | null
@@ -622,21 +622,21 @@ declare namespace Api {
    * backend api module: "device"
    */
   namespace Device {
-    // 定义设备选择器项的类型
+    // Define the type of device selector item
     interface DeviceSelectItem {
       device_id: string
       device_name: string
       device_type: string
     }
 
-    // 定义设备选择器请求参数的类型
+    // Defines the type of device selector request parameter
     interface DeviceSelectorParams {
-      page?: string // 注意文档类型为 string
-      page_size?: string // 注意文档类型为 string
+      page?: string // Note that the document type is string
+      page_size?: string // Note that the document type is string
       has_device_config?: boolean
-      search?: string // 搜索关键词
+      search?: string // Search keywords
     }
 
-    // ... (这里可以添加其他与 device 相关的类型)
+    // ... (Here you can add other device Related types)
   }
 }

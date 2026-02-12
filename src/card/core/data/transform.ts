@@ -1,19 +1,19 @@
 /**
- * 数据转换器
- * 实现统一数据节点协议的转换逻辑
+ * data converter
+ * Implement the conversion logic of the unified data node protocol
  */
 
 import type { IDataNode, IDataTransform } from '../types/index'
 
 /**
- * 数据转换器实现类
+ * Data converter implementation class
  */
 export class DataTransform implements IDataTransform {
   /**
-   * 将原始数据转换为统一数据节点
-   * @param rawData 原始数据
-   * @param sourceType 数据源类型
-   * @returns 统一数据节点
+   * Convert raw data into unified data nodes
+   * @param rawData raw data
+   * @param sourceType Data source type
+   * @returns unified data node
    */
   transform(rawData: any, sourceType: string): IDataNode {
     const timestamp = Date.now()
@@ -32,58 +32,58 @@ export class DataTransform implements IDataTransform {
           return this.transformGenericData(rawData, timestamp, sourceType)
       }
     } catch (error) {
-      console.error(`[DataTransform] 数据转换失败 (${sourceType}):`, error)
+      console.error(`[DataTransform] Data conversion failed (${sourceType}):`, error)
       return this.createErrorNode(error as Error, timestamp)
     }
   }
 
   /**
-   * 批量转换数据
-   * @param dataList 原始数据列表
-   * @param sourceType 数据源类型
-   * @returns 统一数据节点数组
+   * Convert data in batches
+   * @param dataList Raw data list
+   * @param sourceType Data source type
+   * @returns Unified data node array
    */
   transformBatch(dataList: any[], sourceType: string): IDataNode[] {
     return dataList.map(data => this.transform(data, sourceType))
   }
 
   /**
-   * 验证数据节点
-   * @param node 数据节点
-   * @returns 是否有效
+   * Verify data node
+   * @param node data node
+   * @returns Is it valid?
    */
   validate(node: IDataNode): boolean {
     try {
-      // 检查必需字段
+      // Check required fields
       if (!node.id || !node.type || node.timestamp === undefined) {
         return false
       }
 
-      // 检查时间戳有效性
+      // Check timestamp validity
       if (typeof node.timestamp !== 'number' || node.timestamp <= 0) {
         return false
       }
 
-      // 检查元数据
+      // Check metadata
       if (!node.metadata || typeof node.metadata !== 'object') {
         return false
       }
 
       return true
     } catch (error) {
-      console.error('[DataTransform] 数据节点验证失败:', error)
+      console.error('[DataTransform] Data node verification failed:', error)
       return false
     }
   }
 
   /**
-   * 转换设备数据
-   * @param rawData 原始设备数据
-   * @param timestamp 时间戳
-   * @returns 数据节点
+   * Convert device data
+   * @param rawData raw device data
+   * @param timestamp Timestamp
+   * @returns data node
    */
   private transformDeviceData(rawData: any, timestamp: number): IDataNode {
-    // 处理设备遥测数据
+    // Process device telemetry data
     if (rawData.telemetry) {
       return {
         id: `device_${rawData.device_id || rawData.deviceId}_${timestamp}`,
@@ -101,7 +101,7 @@ export class DataTransform implements IDataTransform {
       }
     }
 
-    // 处理设备属性数据
+    // Process device attribute data
     if (rawData.attributes) {
       return {
         id: `device_attr_${rawData.device_id || rawData.deviceId}_${timestamp}`,
@@ -118,7 +118,7 @@ export class DataTransform implements IDataTransform {
       }
     }
 
-    // 处理通用设备数据
+    // Handle common device data
     return {
       id: `device_${rawData.device_id || rawData.id}_${timestamp}`,
       type: 'device',
@@ -135,10 +135,10 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 转换系统数据
-   * @param rawData 原始系统数据
-   * @param timestamp 时间戳
-   * @returns 数据节点
+   * Convert system data
+   * @param rawData raw system data
+   * @param timestamp Timestamp
+   * @returns data node
    */
   private transformSystemData(rawData: any, timestamp: number): IDataNode {
     return {
@@ -158,10 +158,10 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 转换API数据
-   * @param rawData 原始API数据
-   * @param timestamp 时间戳
-   * @returns 数据节点
+   * ConvertAPIdata
+   * @param rawData originalAPIdata
+   * @param timestamp Timestamp
+   * @returns data node
    */
   private transformApiData(rawData: any, timestamp: number): IDataNode {
     return {
@@ -181,10 +181,10 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 转换模拟数据
-   * @param rawData 原始模拟数据
-   * @param timestamp 时间戳
-   * @returns 数据节点
+   * Convert simulated data
+   * @param rawData Raw simulation data
+   * @param timestamp Timestamp
+   * @returns data node
    */
   private transformMockData(rawData: any, timestamp: number): IDataNode {
     return {
@@ -201,11 +201,11 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 转换通用数据
-   * @param rawData 原始数据
-   * @param timestamp 时间戳
-   * @param sourceType 数据源类型
-   * @returns 数据节点
+   * Convert common data
+   * @param rawData raw data
+   * @param timestamp Timestamp
+   * @param sourceType Data source type
+   * @returns data node
    */
   private transformGenericData(rawData: any, timestamp: number, sourceType: string): IDataNode {
     return {
@@ -222,10 +222,10 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 创建错误节点
-   * @param error 错误对象
-   * @param timestamp 时间戳
-   * @returns 错误数据节点
+   * Create error node
+   * @param error error object
+   * @param timestamp Timestamp
+   * @returns Bad data node
    */
   private createErrorNode(error: Error, timestamp: number): IDataNode {
     return {
@@ -246,9 +246,9 @@ export class DataTransform implements IDataTransform {
   }
 
   /**
-   * 推断数据类型
-   * @param value 数据值
-   * @returns 数据类型
+   * Infer data type
+   * @param value data value
+   * @returns data type
    */
   private inferDataType(value: any): string {
     if (value === null) return 'null'
@@ -267,15 +267,15 @@ export class DataTransform implements IDataTransform {
 }
 
 /**
- * 数据聚合器
- * 实现数据的聚合和统计功能
+ * data aggregator
+ * Implement data aggregation and statistical functions
  */
 export class DataAggregator {
   /**
-   * 聚合数据节点
-   * @param nodes 数据节点数组
-   * @param aggregationType 聚合类型
-   * @returns 聚合结果
+   * aggregate data node
+   * @param nodes data node array
+   * @param aggregationType Aggregation type
+   * @returns Aggregation results
    */
   aggregate(nodes: IDataNode[], aggregationType: 'sum' | 'avg' | 'max' | 'min' | 'count'): number {
     if (nodes.length === 0) return 0
@@ -303,11 +303,11 @@ export class DataAggregator {
   }
 
   /**
-   * 按时间窗口聚合
-   * @param nodes 数据节点数组
-   * @param windowMs 时间窗口（毫秒）
-   * @param aggregationType 聚合类型
-   * @returns 时间窗口聚合结果
+   * Aggregate by time window
+   * @param nodes data node array
+   * @param windowMs time window（millisecond）
+   * @param aggregationType Aggregation type
+   * @returns Time window aggregation results
    */
   aggregateByTimeWindow(
     nodes: IDataNode[],
@@ -316,7 +316,7 @@ export class DataAggregator {
   ): Array<{ timestamp: number; value: number; count: number }> {
     if (nodes.length === 0) return []
 
-    // 按时间窗口分组
+    // Group by time window
     const windows = new Map<number, IDataNode[]>()
 
     nodes.forEach(node => {
@@ -327,7 +327,7 @@ export class DataAggregator {
       windows.get(windowStart)!.push(node)
     })
 
-    // 对每个窗口进行聚合
+    // Aggregate per window
     return Array.from(windows.entries())
       .map(([timestamp, windowNodes]) => ({
         timestamp,
@@ -338,9 +338,9 @@ export class DataAggregator {
   }
 
   /**
-   * 提取数值
-   * @param value 原始值
-   * @returns 数值或null
+   * Extract value
+   * @param value original value
+   * @returns numerical value ornull
    */
   private extractNumericValue(value: any): number | null {
     if (typeof value === 'number') return value
@@ -353,9 +353,9 @@ export class DataAggregator {
   }
 }
 
-// 创建全局实例
+// Create a global instance
 export const dataTransform = new DataTransform()
 export const dataAggregator = new DataAggregator()
 
-// 导出类型
+// Export type
 export type { IDataTransform }

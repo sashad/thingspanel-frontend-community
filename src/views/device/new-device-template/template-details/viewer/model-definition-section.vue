@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 模型定义展示区块
- * 展示遥测、属性、事件、命令数据（只读模式）
+ * Model definition display block
+ * show telemetry、property、event、command data（read-only mode）
  */
 
 import { inject, ref, onMounted, computed, h } from 'vue'
@@ -20,7 +20,7 @@ import type { TelemetryData, AttributeData, EventData, CommandData } from '../ty
 
 const templateData = inject<Ref<any>>('templateData')!
 
-// 各类数据列表
+// Various data lists
 const telemetryList = ref<TelemetryData[]>([])
 const attributesList = ref<AttributeData[]>([])
 const eventsList = ref<EventData[]>([])
@@ -28,7 +28,7 @@ const commandsList = ref<CommandData[]>([])
 const customControlList = ref<any[]>([])
 const customCommandsList = ref<any[]>([])
 
-// 加载状态
+// Loading status
 const loading = ref({
   telemetry: false,
   attributes: false,
@@ -39,7 +39,7 @@ const loading = ref({
 })
 
 /**
- * 获取遥测数据列表
+ * Get a list of telemetry data
  */
 const loadTelemetryData = async () => {
   if (!templateData.value?.id) return
@@ -62,7 +62,7 @@ const loadTelemetryData = async () => {
 }
 
 /**
- * 获取属性数据列表
+ * Get attribute data list
  */
 const loadAttributesData = async () => {
   if (!templateData.value?.id) return
@@ -85,7 +85,7 @@ const loadAttributesData = async () => {
 }
 
 /**
- * 获取事件数据列表
+ * Get event data list
  */
 const loadEventsData = async () => {
   if (!templateData.value?.id) return
@@ -108,7 +108,7 @@ const loadEventsData = async () => {
 }
 
 /**
- * 获取命令数据列表
+ * Get command data list
  */
 const loadCommandsData = async () => {
   if (!templateData.value?.id) return
@@ -131,7 +131,7 @@ const loadCommandsData = async () => {
 }
 
 /**
- * 遥测/属性表格列定义
+ * telemetry/Property table column definition
  */
 const telemetryColumns = [
   {
@@ -166,7 +166,7 @@ const telemetryColumns = [
 ]
 
 /**
- * 事件表格列定义
+ * Event table column definitions
  */
 const eventsColumns = [
   {
@@ -184,7 +184,7 @@ const eventsColumns = [
 ]
 
 /**
- * 命令表格列定义
+ * Command table column definition
  */
 const commandsColumns = [
   {
@@ -202,7 +202,7 @@ const commandsColumns = [
 ]
 
 /**
- * 自定义控制表格列定义
+ * Custom control table column definition
  */
 const customControlColumns = [
   {
@@ -232,7 +232,7 @@ const customControlColumns = [
 ]
 
 /**
- * 自定义命令表格列定义
+ * Custom command table column definition
  */
 const customCommandsColumns = [
   {
@@ -266,7 +266,7 @@ const customCommandsColumns = [
 ]
 
 /**
- * 获取自定义控制列表
+ * Get custom control list
  */
 const loadCustomControlData = async () => {
   if (!templateData.value?.id) return
@@ -289,7 +289,7 @@ const loadCustomControlData = async () => {
 }
 
 /**
- * 获取自定义命令列表
+ * Get a list of custom commands
  */
 const loadCustomCommandsData = async () => {
   if (!templateData.value?.id) return
@@ -312,7 +312,7 @@ const loadCustomCommandsData = async () => {
 }
 
 onMounted(() => {
-  // 等待templateData加载完成后再加载数据
+  // waittemplateDataLoad data after loading is complete
   if (templateData.value?.id) {
     loadTelemetryData()
     loadAttributesData()
@@ -328,11 +328,11 @@ onMounted(() => {
   <div class="model-definition-section">
     <NCard :bordered="false">
       <NTabs type="line">
-        <!-- 遥测数据 -->
+        <!-- telemetry data -->
         <NTabPane name="telemetry" :tab="$t('device_template.telemetry')">
           <NSpin :show="loading.telemetry || loading.customControl">
             <div class="tab-content">
-              <!-- 标准遥测数据 -->
+              <!-- Standard telemetry data -->
               <div v-if="telemetryList.length > 0" class="mb-6">
                 <h3 class="text-base font-semibold mb-3">{{ $t('device_template.telemetry') }}</h3>
                 <NDataTable
@@ -343,7 +343,7 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- 自定义控制 -->
+              <!-- Custom controls -->
               <div v-if="customControlList.length > 0" class="mb-6">
                 <h3 class="text-base font-semibold mb-3">{{ $t('generate.customControl') }}</h3>
                 <NDataTable
@@ -354,7 +354,7 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- 空状态 -->
+              <!-- Empty state -->
               <NEmpty
                 v-if="telemetryList.length === 0 && customControlList.length === 0"
                 :description="$t('device_template.noAttributesDefined')"
@@ -363,7 +363,7 @@ onMounted(() => {
           </NSpin>
         </NTabPane>
 
-        <!-- 属性数据 -->
+        <!-- attribute data -->
         <NTabPane name="attributes" :tab="$t('device_template.attributes')">
           <NSpin :show="loading.attributes">
             <div class="tab-content">
@@ -379,7 +379,7 @@ onMounted(() => {
           </NSpin>
         </NTabPane>
 
-        <!-- 事件定义 -->
+        <!-- event definition -->
         <NTabPane name="events" :tab="$t('device_template.events')">
           <NSpin :show="loading.events">
             <div class="tab-content">
@@ -395,11 +395,11 @@ onMounted(() => {
           </NSpin>
         </NTabPane>
 
-        <!-- 命令定义 -->
+        <!-- Command definition -->
         <NTabPane name="commands" :tab="$t('device_template.commands')">
           <NSpin :show="loading.commands || loading.customCommands">
             <div class="tab-content">
-              <!-- 标准命令 -->
+              <!-- standard commands -->
               <div v-if="commandsList.length > 0" class="mb-6">
                 <h3 class="text-base font-semibold mb-3">{{ $t('device_template.commands') }}</h3>
                 <NDataTable
@@ -410,7 +410,7 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- 自定义命令 -->
+              <!-- Custom command -->
               <div v-if="customCommandsList.length > 0" class="mb-6">
                 <h3 class="text-base font-semibold mb-3">{{ $t('generate.customCommand') }}</h3>
                 <NDataTable
@@ -421,7 +421,7 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- 空状态 -->
+              <!-- Empty state -->
               <NEmpty
                 v-if="commandsList.length === 0 && customCommandsList.length === 0"
                 :description="$t('device_template.noCommandsDefined')"

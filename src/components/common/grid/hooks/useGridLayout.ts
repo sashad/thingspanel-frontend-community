@@ -1,5 +1,5 @@
 /**
- * 网格布局Hook - 管理栅格布局逻辑
+ * grid layoutHook - Manage grid layout logic
  */
 
 import { computed, reactive, ref, watch, type Ref } from 'vue'
@@ -28,24 +28,24 @@ import {
 } from '../utils'
 
 /**
- * 网格布局Hook
- * @param items 网格项响应式引用
- * @param config 网格配置
- * @param containerElement 容器元素引用
- * @returns 布局相关的计算函数和响应式数据
+ * grid layoutHook
+ * @param items Grid item responsive quotes
+ * @param config Grid configuration
+ * @param containerElement Container element reference
+ * @returns Layout-related calculation functions and responsive data
  */
 export function useGridLayout(
   items: Ref<GridItem[]>,
   config: Partial<GridConfig> = {},
   containerElement?: Ref<HTMLElement | undefined>
 ): UseGridLayoutReturn {
-  // 合并默认配置，监听配置变化
+  // Merge default configuration，Listen for configuration changes
   const gridConfig = reactive<GridConfig>({
     ...DEFAULT_GRID_CONFIG,
     ...config
   })
 
-  // 监听外部配置变化
+  // Monitor external configuration changes
   watch(
     () => config,
     newConfig => {
@@ -54,10 +54,10 @@ export function useGridLayout(
     { deep: true, immediate: true }
   )
 
-  // 容器宽度
+  // Container width
   const containerWidth = ref(1200)
 
-  // 监听容器尺寸变化
+  // Monitor container size changes
   if (containerElement) {
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
@@ -80,18 +80,18 @@ export function useGridLayout(
     )
   }
 
-  // 计算列宽
+  // Calculate column width
   const colWidth = computed(() => calculateColWidth(gridConfig, containerWidth.value))
 
-  // 计算总行数
+  // Calculate the total number of rows
   const totalRows = computed(() => calculateTotalRows(items.value, gridConfig.minRows))
 
-  // 计算容器高度
+  // Calculate container height
   const containerHeight = computed(() =>
     Math.max(calculateContainerHeight(totalRows.value, gridConfig.rowHeight, gridConfig.gap), gridConfig.minHeight || 0)
   )
 
-  // 网格样式计算
+  // Grid style calculation
   const gridCalculation = computed<GridCalculation>(() => {
     const gridTemplateColumns = `repeat(${gridConfig.columns}, ${colWidth.value}px)`
     const gridTemplateRows = `repeat(${totalRows.value}, ${gridConfig.rowHeight}px)`
@@ -107,7 +107,7 @@ export function useGridLayout(
       position: 'relative'
     }
 
-    // 添加网格背景
+    // Add grid background
     if (gridConfig.showGrid) {
       Object.assign(gridStyle, generateGridBackgroundStyle(gridConfig, containerWidth.value))
     }
@@ -125,34 +125,34 @@ export function useGridLayout(
     }
   })
 
-  // 栅格坐标转像素
+  // Raster coordinates to pixels
   const gridToPixelFunc = (gridPos: number, isCol: boolean = true): number => {
     const cellSize = isCol ? colWidth.value : gridConfig.rowHeight
     return gridToPixel(gridPos, cellSize, gridConfig.gap)
   }
 
-  // 像素转栅格坐标
+  // Pixel to raster coordinate
   const pixelToGridFunc = (pixel: number, isCol: boolean = true): number => {
     const cellSize = isCol ? colWidth.value : gridConfig.rowHeight
     return pixelToGrid(pixel, cellSize, gridConfig.gap)
   }
 
-  // 获取网格区域CSS
+  // Get grid areaCSS
   const getGridAreaFunc = (item: GridItem): string => {
     return getGridArea(item)
   }
 
-  // 验证位置有效性
+  // Verify location validity
   const validatePositionFunc = (position: GridPosition, size: GridSize): boolean => {
     return validateGridPosition(position, size, gridConfig)
   }
 
-  // 计算项目像素位置
+  // Calculate item pixel position
   const getItemPixelPositionFunc = (item: GridItem): PixelPosition => {
     return getItemPixelPosition(item, gridConfig, containerWidth.value)
   }
 
-  // 计算项目像素尺寸
+  // Calculate project pixel dimensions
   const getItemPixelSizeFunc = (item: GridItem): PixelSize => {
     return getItemPixelSize(item, gridConfig, containerWidth.value)
   }
@@ -170,7 +170,7 @@ export function useGridLayout(
 }
 
 /**
- * 创建只读的响应式对象
+ * Create a read-only reactive object
  */
 function readonly<T>(obj: T): Readonly<T> {
   return obj as Readonly<T>

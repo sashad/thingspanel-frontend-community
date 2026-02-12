@@ -1,20 +1,20 @@
 /**
- * Grid Hooks 导出 - V2 模块化版本
- * 包含原有Hook和新的模块化Hook系统
+ * Grid Hooks Export - V2 Modular version
+ * Contains originalHookand new modularHooksystem
  */
 
-// ==================== 原有Hook导出 ====================
+// ==================== originalHookExport ====================
 export { useGridLayout } from './useGridLayout'
-export { useGridLayoutPlus } from './useGridLayoutPlus' // 保持向后兼容
+export { useGridLayoutPlus } from './useGridLayoutPlus' // Stay backwards compatible
 
-// ==================== 新模块化Hook导出 ====================
+// ==================== New modularityHookExport ====================
 export { useGridCore } from './useGridCore'
 export { useGridHistory } from './useGridHistory'
 export { useGridPerformance } from './useGridPerformance'
 export { useGridResponsive } from './useGridResponsive'
 export { useGridLayoutPlusV2 } from './useGridLayoutPlusV2'
 
-// ==================== 类型导出 ====================
+// ==================== Type export ====================
 export type { UseGridLayoutReturn } from '../types'
 export type { UseGridCoreOptions } from './useGridCore'
 export type { UseGridHistoryOptions } from './useGridHistory'
@@ -22,11 +22,11 @@ export type { UseGridPerformanceOptions, PerformanceMetrics } from './useGridPer
 export type { UseGridResponsiveOptions } from './useGridResponsive'
 export type { UseGridLayoutPlusV2Options } from './useGridLayoutPlusV2'
 
-// ==================== Hook版本信息 ====================
+// ==================== HookVersion information ====================
 export const GRID_HOOKS_VERSION = '2.0.0'
 export const GRID_HOOKS_INFO = {
   version: GRID_HOOKS_VERSION,
-  description: '模块化网格Hook系统',
+  description: 'modular gridHooksystem',
   hooks: {
     legacy: ['useGridLayout', 'useGridLayoutPlus'],
     v2: ['useGridCore', 'useGridHistory', 'useGridPerformance', 'useGridResponsive'],
@@ -37,11 +37,11 @@ export const GRID_HOOKS_INFO = {
     to: 'useGridLayoutPlusV2',
     breaking_changes: false,
     benefits: [
-      '模块化架构提升可维护性',
-      '独立的性能监控系统',
-      '完整的历史记录管理',
-      '响应式布局支持',
-      '更好的错误处理和类型安全'
+      'Modular architecture improves maintainability',
+      'Independent performance monitoring system',
+      'Complete history management',
+      'Responsive layout support',
+      'Better error handling and type safety'
     ]
   }
 }

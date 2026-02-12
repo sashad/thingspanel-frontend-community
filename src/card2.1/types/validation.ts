@@ -1,6 +1,6 @@
 /**
- * Card2.1 类型验证系统
- * 提供运行时类型验证功能，确保类型定义的正确性
+ * Card2.1 type verification system
+ * Provides runtime type verification capabilities，Ensure the correctness of type definitions
  */
 
 import type {
@@ -13,28 +13,28 @@ import type {
   DataValidationRule
 } from './index'
 
-// ============ 验证结果类型 ============
+// ============ Validation result type ============
 
 /**
- * 验证结果接口
+ * Verification result interface
  */
 export interface ValidationResult {
-  /** 验证是否通过 */
+  /** Verification passed */
   valid: boolean
-  /** 错误信息列表 */
+  /** Error message list */
   errors: string[]
-  /** 警告信息列表 */
+  /** Warning message list */
   warnings: string[]
-  /** 验证的对象类型 */
+  /** Verified object type */
   objectType: string
 }
 
-// ============ 基础类型验证 ============
+// ============ Basic type validation ============
 
 /**
- * 验证数据字段类型
- * @param type 待验证的类型
- * @returns 是否为有效的数据字段类型
+ * Validate data field type
+ * @param type Type to be verified
+ * @returns Is it a valid data field type?
  */
 export function isValidDataFieldType(type: any): type is DataFieldType {
   const validTypes: DataFieldType[] = ['value', 'object', 'array', 'string', 'number', 'boolean', 'date']
@@ -42,9 +42,9 @@ export function isValidDataFieldType(type: any): type is DataFieldType {
 }
 
 /**
- * 验证数据验证规则
- * @param rule 待验证的规则
- * @returns 验证结果
+ * Validate data validation rules
+ * @param rule Rules to be verified
+ * @returns Verification results
  */
 export function validateDataValidationRule(rule: any): ValidationResult {
   const result: ValidationResult = {
@@ -55,56 +55,56 @@ export function validateDataValidationRule(rule: any): ValidationResult {
   }
 
   if (rule && typeof rule === 'object') {
-    // 检查必要的字段
+    // Check necessary fields
     const { min, max, pattern, enum: enumValues, customValidator } = rule
 
-    // 验证min/max
+    // verifymin/max
     if (min !== undefined && typeof min !== 'number') {
-      result.errors.push('min 字段必须是数字类型')
+      result.errors.push('min Field must be of numeric type')
     }
     if (max !== undefined && typeof max !== 'number') {
-      result.errors.push('max 字段必须是数字类型')
+      result.errors.push('max Field must be of numeric type')
     }
     if (min !== undefined && max !== undefined && min > max) {
-      result.errors.push('min 值不能大于 max 值')
+      result.errors.push('min value不能大于 max value')
     }
 
-    // 验证pattern
+    // verifypattern
     if (pattern !== undefined) {
       if (typeof pattern !== 'string') {
-        result.errors.push('pattern 字段必须是字符串类型')
+        result.errors.push('pattern Field must be of type string')
       } else {
         try {
           new RegExp(pattern)
         } catch (e) {
-          result.errors.push('pattern 必须是有效的正则表达式')
+          result.errors.push('pattern Must be a valid regular expression')
         }
       }
     }
 
-    // 验证enum
+    // verifyenum
     if (enumValues !== undefined && !Array.isArray(enumValues)) {
-      result.errors.push('enum 字段必须是数组类型')
+      result.errors.push('enum Field must be of array type')
     }
 
-    // 验证customValidator
+    // verifycustomValidator
     if (customValidator !== undefined && typeof customValidator !== 'string') {
-      result.errors.push('customValidator 字段必须是字符串类型')
+      result.errors.push('customValidator Field must be of type string')
     }
   } else if (rule !== undefined) {
-    result.errors.push('验证规则必须是对象类型')
+    result.errors.push('Validation rules must be of object type')
   }
 
   result.valid = result.errors.length === 0
   return result
 }
 
-// ============ 组件类型验证 ============
+// ============ Component type validation ============
 
 /**
- * 验证数据源需求
- * @param requirement 数据源需求对象
- * @returns 验证结果
+ * Verify data source requirements
+ * @param requirement Data source requirement object
+ * @returns Verification results
  */
 export function validateDataSourceRequirement(requirement: any): ValidationResult {
   const result: ValidationResult = {
@@ -115,58 +115,58 @@ export function validateDataSourceRequirement(requirement: any): ValidationResul
   }
 
   if (!requirement || typeof requirement !== 'object') {
-    result.errors.push('数据源需求必须是对象类型')
+    result.errors.push('Data source requirements must be of object type')
     result.valid = false
     return result
   }
 
   const { key, name, description, supportedTypes, fieldMappings, example } = requirement
 
-  // 验证必填字段
+  // Validate required fields
   if (!key || typeof key !== 'string') {
-    result.errors.push('key 字段是必填的且必须是字符串类型')
+    result.errors.push('key Field is required and must be of type string')
   }
   if (!name || typeof name !== 'string') {
-    result.errors.push('name 字段是必填的且必须是字符串类型')
+    result.errors.push('name Field is required and must be of type string')
   }
   if (!description || typeof description !== 'string') {
-    result.errors.push('description 字段是必填的且必须是字符串类型')
+    result.errors.push('description Field is required and must be of type string')
   }
 
-  // 验证supportedTypes
+  // verifysupportedTypes
   if (!Array.isArray(supportedTypes)) {
-    result.errors.push('supportedTypes 必须是数组类型')
+    result.errors.push('supportedTypes Must be an array type')
   } else {
     const validTypes = ['static', 'api', 'websocket', 'mqtt', 'database', 'script']
     const invalidTypes = supportedTypes.filter(type => !validTypes.includes(type))
     if (invalidTypes.length > 0) {
-      result.errors.push(`无效的数据源类型: ${invalidTypes.join(', ')}`)
+      result.errors.push(`Invalid data source type: ${invalidTypes.join(', ')}`)
     }
   }
 
-  // 验证fieldMappings
+  // verifyfieldMappings
   if (fieldMappings !== undefined) {
     if (typeof fieldMappings !== 'object' || Array.isArray(fieldMappings)) {
-      result.errors.push('fieldMappings 必须是对象类型')
+      result.errors.push('fieldMappings Must be of object type')
     } else {
       Object.entries(fieldMappings).forEach(([key, mapping]: [string, any]) => {
         if (!mapping || typeof mapping !== 'object') {
-          result.errors.push(`fieldMapping[${key}] 必须是对象类型`)
+          result.errors.push(`fieldMapping[${key}] Must be of object type`)
           return
         }
 
         const { targetField, type, required, defaultValue, validation } = mapping
 
         if (!targetField || typeof targetField !== 'string') {
-          result.errors.push(`fieldMapping[${key}].targetField 是必填的且必须是字符串`)
+          result.errors.push(`fieldMapping[${key}].targetField is required and must be a string`)
         }
 
         if (!isValidDataFieldType(type)) {
-          result.errors.push(`fieldMapping[${key}].type 必须是有效的数据字段类型`)
+          result.errors.push(`fieldMapping[${key}].type Must be a valid data field type`)
         }
 
         if (typeof required !== 'boolean') {
-          result.errors.push(`fieldMapping[${key}].required 必须是布尔类型`)
+          result.errors.push(`fieldMapping[${key}].required Must be of type boolean`)
         }
 
         if (validation !== undefined) {
@@ -179,9 +179,9 @@ export function validateDataSourceRequirement(requirement: any): ValidationResul
     }
   }
 
-  // 验证example
+  // verifyexample
   if (example !== undefined && (typeof example !== 'object' || Array.isArray(example))) {
-    result.warnings.push('example 字段应该是对象类型，用于提供示例数据')
+    result.warnings.push('example Field should be of object type，used to provide sample data')
   }
 
   result.valid = result.errors.length === 0
@@ -189,9 +189,9 @@ export function validateDataSourceRequirement(requirement: any): ValidationResul
 }
 
 /**
- * 验证静态参数需求
- * @param requirement 静态参数需求对象
- * @returns 验证结果
+ * Verify static parameter requirements
+ * @param requirement Static parameter requirement object
+ * @returns Verification results
  */
 export function validateStaticParamRequirement(requirement: any): ValidationResult {
   const result: ValidationResult = {
@@ -202,25 +202,25 @@ export function validateStaticParamRequirement(requirement: any): ValidationResu
   }
 
   if (!requirement || typeof requirement !== 'object') {
-    result.errors.push('静态参数需求必须是对象类型')
+    result.errors.push('Static parameter requirements must be of object type')
     result.valid = false
     return result
   }
 
   const { key, name, type, description } = requirement
 
-  // 验证必填字段
+  // Validate required fields
   if (!key || typeof key !== 'string') {
-    result.errors.push('key 字段是必填的且必须是字符串类型')
+    result.errors.push('key Field is required and must be of type string')
   }
   if (!name || typeof name !== 'string') {
-    result.errors.push('name 字段是必填的且必须是字符串类型')
+    result.errors.push('name Field is required and must be of type string')
   }
   if (!type || !['string', 'number', 'boolean', 'object', 'array'].includes(type)) {
-    result.errors.push('type 字段必须是有效的参数类型')
+    result.errors.push('type Field must be a valid parameter type')
   }
   if (!description || typeof description !== 'string') {
-    result.errors.push('description 字段是必填的且必须是字符串类型')
+    result.errors.push('description Field is required and must be of type string')
   }
 
   result.valid = result.errors.length === 0
@@ -228,9 +228,9 @@ export function validateStaticParamRequirement(requirement: any): ValidationResu
 }
 
 /**
- * 验证设置项配置
- * @param setting 设置项对象
- * @returns 验证结果
+ * Verify settings configuration
+ * @param setting settings object
+ * @returns Verification results
  */
 export function validateSetting(setting: any): ValidationResult {
   const result: ValidationResult = {
@@ -241,34 +241,34 @@ export function validateSetting(setting: any): ValidationResult {
   }
 
   if (!setting || typeof setting !== 'object') {
-    result.errors.push('设置项必须是对象类型')
+    result.errors.push('The setting item must be of object type')
     result.valid = false
     return result
   }
 
   const { type, label, field } = setting
 
-  // 验证必填字段
+  // Validate required fields
   if (!type || typeof type !== 'string') {
-    result.errors.push('type 字段是必填的且必须是字符串类型')
+    result.errors.push('type Field is required and must be of type string')
   }
   if (!label || typeof label !== 'string') {
-    result.errors.push('label 字段是必填的且必须是字符串类型')
+    result.errors.push('label Field is required and must be of type string')
   }
   if (!field || typeof field !== 'string') {
-    result.errors.push('field 字段是必填的且必须是字符串类型')
+    result.errors.push('field Field is required and must be of type string')
   }
 
-  // 验证选项字段
+  // Validation option fields
   if (setting.options !== undefined) {
     if (!Array.isArray(setting.options)) {
-      result.errors.push('options 字段必须是数组类型')
+      result.errors.push('options Field must be of array type')
     } else {
       setting.options.forEach((option: any, index: number) => {
         if (!option || typeof option !== 'object') {
-          result.errors.push(`options[${index}] 必须是对象类型`)
+          result.errors.push(`options[${index}] Must be of object type`)
         } else if (!option.label || !option.hasOwnProperty('value')) {
-          result.errors.push(`options[${index}] 必须包含 label 和 value 字段`)
+          result.errors.push(`options[${index}] must contain label and value Field`)
         }
       })
     }
@@ -279,9 +279,9 @@ export function validateSetting(setting: any): ValidationResult {
 }
 
 /**
- * 验证组件定义
- * @param definition 组件定义对象
- * @returns 验证结果
+ * Verify component definition
+ * @param definition component definition object
+ * @returns Verification results
  */
 export function validateComponentDefinition(definition: any): ValidationResult {
   const result: ValidationResult = {
@@ -292,36 +292,36 @@ export function validateComponentDefinition(definition: any): ValidationResult {
   }
 
   if (!definition || typeof definition !== 'object') {
-    result.errors.push('组件定义必须是对象类型')
+    result.errors.push('Component definition must be of object type')
     result.valid = false
     return result
   }
 
   const { type, name, description, component, dataSources, staticParams } = definition
 
-  // 验证必填字段
+  // Validate required fields
   if (!type || typeof type !== 'string') {
-    result.errors.push('type 字段是必填的且必须是字符串类型')
+    result.errors.push('type Field is required and must be of type string')
   } else if (!/^[a-z0-9-]+$/.test(type)) {
-    result.warnings.push('type 字段建议使用 kebab-case 命名规范')
+    result.warnings.push('type Fields are recommended to use kebab-case Naming convention')
   }
 
   if (!name || typeof name !== 'string') {
-    result.errors.push('name 字段是必填的且必须是字符串类型')
+    result.errors.push('name Field is required and must be of type string')
   }
 
   if (!description || typeof description !== 'string') {
-    result.errors.push('description 字段是必填的且必须是字符串类型')
+    result.errors.push('description Field is required and must be of type string')
   }
 
   if (!component) {
-    result.errors.push('component 字段是必填的，必须是Vue组件')
+    result.errors.push('component Field is required，must beVuecomponents')
   }
 
-  // 验证数据源需求
+  // Verify data source requirements
   if (dataSources !== undefined) {
     if (!Array.isArray(dataSources)) {
-      result.errors.push('dataSources 字段必须是数组类型')
+      result.errors.push('dataSources Field must be of array type')
     } else {
       dataSources.forEach((dataSource: any, index: number) => {
         const validationResult = validateDataSourceRequirement(dataSource)
@@ -335,10 +335,10 @@ export function validateComponentDefinition(definition: any): ValidationResult {
     }
   }
 
-  // 验证静态参数需求
+  // Verify static parameter requirements
   if (staticParams !== undefined) {
     if (!Array.isArray(staticParams)) {
-      result.errors.push('staticParams 字段必须是数组类型')
+      result.errors.push('staticParams Field must be of array type')
     } else {
       staticParams.forEach((staticParam: any, index: number) => {
         const validationResult = validateStaticParamRequirement(staticParam)
@@ -356,12 +356,12 @@ export function validateComponentDefinition(definition: any): ValidationResult {
   return result
 }
 
-// ============ 批量验证函数 ============
+// ============ Batch verification function ============
 
 /**
- * 批量验证组件定义列表
- * @param definitions 组件定义列表
- * @returns 汇总的验证结果
+ * Bulk verification component definition list
+ * @param definitions component definition list
+ * @returns Aggregated verification results
  */
 export function validateComponentDefinitions(definitions: any[]): ValidationResult {
   const result: ValidationResult = {
@@ -372,7 +372,7 @@ export function validateComponentDefinitions(definitions: any[]): ValidationResu
   }
 
   if (!Array.isArray(definitions)) {
-    result.errors.push('组件定义列表必须是数组类型')
+    result.errors.push('The component definition list must be of array type')
     result.valid = false
     return result
   }
@@ -381,18 +381,18 @@ export function validateComponentDefinitions(definitions: any[]): ValidationResu
   definitions.forEach((definition, index) => {
     const validationResult = validateComponentDefinition(definition)
 
-    // 收集错误和警告
+    // Collect errors and warnings
     if (!validationResult.valid) {
-      result.errors.push(`定义[${index}]: ${validationResult.errors.join(', ')}`)
+      result.errors.push(`definition[${index}]: ${validationResult.errors.join(', ')}`)
     }
     if (validationResult.warnings.length > 0) {
-      result.warnings.push(`定义[${index}]: ${validationResult.warnings.join(', ')}`)
+      result.warnings.push(`definition[${index}]: ${validationResult.warnings.join(', ')}`)
     }
 
-    // 检查类型重复
+    // Check for type duplication
     if (definition && definition.type) {
       if (typeSet.has(definition.type)) {
-        result.errors.push(`重复的组件类型: ${definition.type}`)
+        result.errors.push(`Duplicate component type: ${definition.type}`)
       } else {
         typeSet.add(definition.type)
       }
@@ -403,12 +403,12 @@ export function validateComponentDefinitions(definitions: any[]): ValidationResu
   return result
 }
 
-// ============ 类型安全工具 ============
+// ============ Type safety tools ============
 
 /**
- * 类型断言：检查对象是否为有效的组件定义
- * @param obj 待检查的对象
- * @returns 类型守护
+ * type assertion：Check if the object is a valid component definition
+ * @param obj Object to be checked
+ * @returns type guard
  */
 export function isValidComponentDefinition(obj: any): obj is ComponentDefinition {
   const result = validateComponentDefinition(obj)
@@ -416,9 +416,9 @@ export function isValidComponentDefinition(obj: any): obj is ComponentDefinition
 }
 
 /**
- * 类型断言：检查对象是否为有效的数据源需求
- * @param obj 待检查的对象
- * @returns 类型守护
+ * type assertion：Check whether the object is a valid data source requirement
+ * @param obj Object to be checked
+ * @returns type guard
  */
 export function isValidDataSourceRequirement(obj: any): obj is DataSourceRequirement {
   const result = validateDataSourceRequirement(obj)
@@ -426,9 +426,9 @@ export function isValidDataSourceRequirement(obj: any): obj is DataSourceRequire
 }
 
 /**
- * 类型断言：检查对象是否为有效的设置项
- * @param obj 待检查的对象
- * @returns 类型守护
+ * type assertion：Check whether the object is a valid setting item
+ * @param obj Object to be checked
+ * @returns type guard
  */
 export function isValidSetting(obj: any): obj is Setting {
   const result = validateSetting(obj)
@@ -436,8 +436,8 @@ export function isValidSetting(obj: any): obj is Setting {
 }
 
 /**
- * 开发模式下的验证警告
- * 在开发环境中输出验证警告信息
+ * Validation warning in development mode
+ * Output verification warning messages in the development environment
  */
 export function devModeValidationWarning(result: ValidationResult, objectName: string = 'object'): void {
   if (!import.meta.env.DEV) return

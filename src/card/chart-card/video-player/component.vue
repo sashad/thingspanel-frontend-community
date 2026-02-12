@@ -7,7 +7,7 @@ import 'video.js/dist/video-js.css'
 import { createLogger } from '@/utils/logger'
 const logger = createLogger('Player')
 interface ICardData {
-  dataSource: any // 定义数据源接口
+  dataSource: any // Define data source interface
 }
 
 interface DataDetail {
@@ -63,16 +63,16 @@ let player: VideoJsPlayer
 const videoUrl = ref('')
 const createPlayer = async () => {
   const options = {
-    autoplay: true, // 设置自动播放
-    muted: true, // 设置了它为true，才可实现自动播放,同时视频也被静音 （Chrome66及以上版本，禁止音视频的自动播放）
-    preload: 'auto', // 预加载
-    controls: false // 显示播放的控件
+    autoplay: true, // Set up autoplay
+    muted: true, // set it totrue，to achieve automatic playback,The video is also muted （Chrome66and above，Disable automatic playback of audio and video）
+    preload: 'auto', // preload
+    controls: false // Show playback controls
   }
 
   player = videojs(m3u8_video.value, options, () => {
-    videojs.log('播放器已经准备好了!')
+    videojs.log('The player is ready!')
     player.on('error', () => {
-      videojs.log('播放器解析出错!', player.error())
+      videojs.log('Player parsing error!', player.error())
     })
   })
 }

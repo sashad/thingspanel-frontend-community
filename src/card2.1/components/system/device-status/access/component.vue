@@ -35,12 +35,12 @@ const logger = createLogger('Access');
 const count = ref(0);
 
 /**
- * 获取设备总数数据
- * 根据用户权限调用不同的API接口
+ * Get total device data
+ * Call different functions based on user permissionsAPIinterface
  */
 async function fetchDeviceTotal() {
   try {
-    // 根据用户权限选择不同的API接口，与原版保持1:1一致
+    // Choose different ones based on user permissionsAPIinterface，Keep with the original1:1consistent
     const response = authStore?.$state.userInfo.authority === 'TENANT_ADMIN'
       ? await sumData()
       : await totalNumber();
@@ -51,7 +51,7 @@ async function fetchDeviceTotal() {
       logger.error('Data does not contain the required properties or they are not numbers.');
     }
   } catch (error) {
-    // 处理请求数据时的错误
+    // Error while processing request data
     logger.error('Error fetching data:', error);
   }
 }

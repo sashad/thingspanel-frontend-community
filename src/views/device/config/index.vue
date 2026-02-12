@@ -12,19 +12,19 @@ import ItemCard from '@/components/dev-card-item/index.vue'
 const router = useRouter()
 const { routerPushByKey } = useRouterPush()
 
-// 查询参数
+// query parameters
 const queryData = ref({
   page: 1,
   page_size: 10,
   name: ''
 })
 
-// 数据
+// data
 const deviceConfigList = ref([] as any[])
 const dataTotal = ref(0)
 const loading = ref(false)
 
-// 获取数据
+// Get data
 const getData = async () => {
   loading.value = true
   try {
@@ -38,37 +38,37 @@ const getData = async () => {
   }
 }
 
-// 搜索处理
+// Search processing
 const handleQuery = async () => {
   queryData.value.page = 1
   await getData()
 }
 
-// 重置搜索
+// Reset search
 const handleReset = async () => {
   queryData.value.page = 1
   queryData.value.name = ''
   await getData()
 }
 
-// 新建配置
+// New configuration
 const handleAddNew = () => {
   routerPushByKey('device_config-edit')
 }
 
-// 页面跳转
+// Page jump
 const goToDetail = (id: string) => {
   router.push({ path: '/device/config-detail', query: { id } })
 }
 
-// 设备类型映射
+// Device type mapping
 const deviceTypeMap = {
   '1': $t('generate.direct-connected-device'),
   '2': $t('generate.gateway'),
   '3': $t('generate.gateway-sub-device')
 }
 
-// 表格列定义
+// table column definition
 const columns = computed(() => [
   {
     title: $t('device_template.templateName'),
@@ -127,42 +127,42 @@ const columns = computed(() => [
   }
 ])
 
-// 编辑处理
+// Edit processing
 const handleEdit = (id: string) => {
   routerPushByKey('device_config-edit', { query: { id } })
 }
 
-// 分页处理
+// Pagination
 const handlePageChange = (page: number) => {
   queryData.value.page = page
   getData()
 }
 
-// 分页大小处理
+// Page size handling
 const handlePageSizeChange = (pageSize: number) => {
   queryData.value.page_size = pageSize
   queryData.value.page = 1
   getData()
 }
 
-// 排序处理
+// sort processing
 const handleSorterChange = (sorter: any) => {
-  // 根据需要实现排序逻辑
+  // Implement sorting logic as needed
   if (process.env.NODE_ENV === 'development') {
   }
 }
 
-// 刷新数据
+// Refresh data
 const handleRefresh = () => {
   getData()
 }
 
-// 组件挂载时获取数据
+// Get data when component is mounted
 onMounted(() => {
   getData()
 })
 
-// 打开时自动刷新页面
+// Automatically refresh the page when opening
 onActivated(() => {
   getData()
 })
@@ -172,17 +172,17 @@ import { getDemoServerUrl } from '@/utils/common/tool'
 
 const demoUrl = getDemoServerUrl()
 
-// 注释：已移除defaultConfigSvg导入和svgToDataUrl函数，现在使用SvgIcon组件处理SVG图标
+// Comment：RemoveddefaultConfigSvgimport andsvgToDataUrlfunction，Use nowSvgIconComponent handlingSVGicon
 
-// 设备类型图标映射 - 使用本地SVG图标名称
+// Device type icon mapping - Use localSVGIcon name
 const deviceTypeIcons = {
-  1: 'direct', // 直连设备
-  2: 'gateway', // 网关设备  
-  3: 'subdevice', // 子设备
-  default: 'defaultdevice' // 默认设备图标
+  1: 'direct', // direct connect device
+  2: 'gateway', // gateway device  
+  3: 'subdevice', // subdevice
+  default: 'defaultdevice' // Default device icon
 }
 
-// 获取设备图标名称的函数
+// Function to get the device icon name
 const getDeviceIconName = (deviceType: string): string => {
   return deviceTypeIcons[deviceType] || deviceTypeIcons.default
 }
@@ -193,7 +193,7 @@ const getConfigImageUrl = (imageUrl?: string) => {
   return `${demoUrl.replace('api/v1', '')}${imageUrl}`
 }
 
-// 注释：已移除getConfigImageUrl函数，现在直接在模板中判断是否有image_url
+// Comment：RemovedgetConfigImageUrlfunction，Now check directly in the template whether there isimage_url
 
 const availableViews = [
   { key: 'card', icon: CardIcon, label: 'common.viewCard' },
@@ -218,7 +218,7 @@ const availableViews = [
         <n-button type="primary" @click="handleAddNew">{{ $t('generate.createDeviceConfig') }}</n-button>
       </div>
     </template>
-    <!-- 搜索表单内容 -->
+    <!-- Search form content -->
     <template #search-form-content>
       <div class="flex gap-4">
         <NInput
@@ -240,7 +240,7 @@ const availableViews = [
       </div>
     </template>
 
-    <!-- 卡片视图 -->
+    <!-- card view -->
     <template #card-view>
       <n-spin :show="loading">
         <div v-if="deviceConfigList.length === 0 && !loading" class="empty-state">
@@ -260,7 +260,7 @@ const availableViews = [
                 <SvgIcon :local-icon="getDeviceIconName(item.device_type)" class="image-icon" />
               </template>
 
-              <!-- 底部图标 - 左下角显示配置图片 -->
+              <!-- bottom icon - The configuration picture is displayed in the lower left corner -->
               <template #footer-icon>
                 <div class="footer-icon-container">
                   <img
@@ -273,14 +273,14 @@ const availableViews = [
                 </div>
               </template>
 
-              <!-- 卡片内容区域可以显示更多信息 -->
+              <!-- Card content area can display more information -->
             </ItemCard>
           </n-gi>
         </n-grid>
       </n-spin>
     </template>
 
-    <!-- 表格视图 -->
+    <!-- table view -->
     <template #list-view>
       <NDataTable
         :columns="columns"
@@ -295,7 +295,7 @@ const availableViews = [
       />
     </template>
 
-    <!-- 底部分页 -->
+    <!-- bottom pagination -->
     <template #footer>
       <NPagination
         v-model:page="queryData.page"
@@ -352,7 +352,7 @@ const availableViews = [
   color: #333;
 }
 
-// 设备类型图标样式
+// Device type icon style
 .image-icon {
   width: 24px;
   height: 24px;
@@ -360,7 +360,7 @@ const availableViews = [
   vertical-align: middle;
 }
 
-// 底部图标容器 - 固定40x40正方形
+// bottom icon container - fixed40x40square
 .footer-icon-container {
   width: 40px;
   height: 40px;
@@ -380,7 +380,7 @@ const availableViews = [
   object-position: center;
 }
 
-// 响应式设计
+// Responsive design
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;

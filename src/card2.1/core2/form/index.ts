@@ -1,9 +1,9 @@
 /**
- * 表单系统导出
+ * Form system export
  */
 
 export * from './form-generator'
 export * from './config-manager'
 
-// 默认导出表单生成器实例
+// Default export form builder instance
 export { formGenerator } from './form-generator'

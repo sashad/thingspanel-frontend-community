@@ -1,15 +1,15 @@
 /**
- * Visual Editor - 对外API入口
- * 新统一架构入口
+ * Visual Editor - foreignAPIEntrance
+ * New unified architecture portal
  */
 
-// 主组件导出
+// Main component export
 export { default as PanelEditor } from '@/components/visual-editor/PanelEditor.vue'
 
-// 新架构Hook导出 - 替代旧的useEditor和createEditor
+// new architectureHookExport - replace olduseEditorandcreateEditor
 export { useVisualEditor } from '@/store/modules/visual-editor'
 
-// 类型导出
+// Type export
 export type {
   EditorConfig,
   RendererType,
@@ -17,7 +17,7 @@ export type {
   DashboardConfig,
   GraphData,
   WidgetType,
-  // Card 2.0 相关类型
+  // Card 2.0 Related types
   IComponentDefinition,
   IComponentInstance,
   IComponentMeta

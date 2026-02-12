@@ -1,16 +1,16 @@
 <template>
   <n-space vertical :size="16">
-    <n-card title="基础配置" size="small">
+    <n-card title="Basic configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="图表标题">
+        <n-form-item label="Chart title">
           <n-input
             v-model:value="localConfig.title"
-            placeholder="数据分布"
+            placeholder="Data distribution"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="显示图例">
+        <n-form-item label="Show legend">
           <n-switch
             v-model:value="localConfig.showLegend"
             @update:value="handleConfigChange"
@@ -19,16 +19,16 @@
       </n-space>
     </n-card>
 
-    <n-card title="饼图配置" size="small">
+    <n-card title="Pie chart configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="环形图模式">
+        <n-form-item label="donut chart pattern">
           <n-switch
             v-model:value="localConfig.isDonut"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item label="外半径">
+        <n-form-item label="outer radius">
           <n-input
             v-model:value="localConfig.radius"
             placeholder="70%"
@@ -36,7 +36,7 @@
           />
         </n-form-item>
 
-        <n-form-item v-if="localConfig.isDonut" label="内半径">
+        <n-form-item v-if="localConfig.isDonut" label="inner radius">
           <n-input
             v-model:value="localConfig.innerRadius"
             placeholder="40%"
@@ -46,30 +46,30 @@
       </n-space>
     </n-card>
 
-    <n-card title="标签配置" size="small">
+    <n-card title="Label configuration" size="small">
       <n-space vertical :size="12">
-        <n-form-item label="显示标签">
+        <n-form-item label="show label">
           <n-switch
             v-model:value="localConfig.showLabel"
             @update:value="handleConfigChange"
           />
         </n-form-item>
 
-        <n-form-item v-if="localConfig.showLabel" label="标签位置">
+        <n-form-item v-if="localConfig.showLabel" label="label position">
           <n-radio-group
             v-model:value="localConfig.labelPosition"
             @update:value="handleConfigChange"
           >
-            <n-radio value="outside">外部</n-radio>
-            <n-radio value="inside">内部</n-radio>
-            <n-radio value="center">中心</n-radio>
+            <n-radio value="outside">external</n-radio>
+            <n-radio value="inside">internal</n-radio>
+            <n-radio value="center">center</n-radio>
           </n-radio-group>
         </n-form-item>
       </n-space>
     </n-card>
 
-    <n-card title="动画配置" size="small">
-      <n-form-item label="动画时长 (ms)">
+    <n-card title="Animation configuration" size="small">
+      <n-form-item label="Animation duration (ms)">
         <n-input-number
           v-model:value="localConfig.animationDuration"
           :min="0"

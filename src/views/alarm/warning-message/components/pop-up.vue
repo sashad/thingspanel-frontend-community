@@ -76,7 +76,7 @@ const loadMoreNotificationGroupData = async () => {
     }
     const res = await getNotificationGroupList(params)
     let list = res?.data?.list || []
-    // list = list.filter(item => item.status === 'OPEN'); // 只展示生效的通知组
+    // list = list.filter(item => item.status === 'OPEN'); // Only display effective notification groups
     const total = res?.data?.total || 0
     state.generalOptions = [...state.generalOptions, ...list]
 
@@ -161,7 +161,7 @@ const alarmLevel = ref([
     value: 'L'
   }
 ])
-/** 触发时间下拉 */
+/** Trigger time drop-down */
 // const alarmKeepTime = ref([
 //   {
 //     label: $t('common.minute1'),
@@ -204,7 +204,7 @@ const alarmLevel = ref([
 //     value: '10'
 //   }
 // ]);
-/** 关闭弹框 */
+/** Close popup */
 const closeModal = () => {
   modalVisible.value = false
   emit('newEdit')
@@ -214,10 +214,10 @@ const formData = ref({
   id: '',
   name: '',
   alarm_level: '',
-  alarm_repeat_time: '', // 触发重复次数
-  alarm_keep_time: '', // 触发持续时间
-  notification_group_id: '', // 通知组ID
-  enabled: 'Y', // 是否启用，Y-启用N-停止
+  alarm_repeat_time: '', // Trigger repeat count
+  alarm_keep_time: '', // Trigger duration
+  notification_group_id: '', // notification groupID
+  enabled: 'Y', // 是否enable，Y-enableN-stop
   description: ''
 })
 const rules = {
@@ -242,7 +242,7 @@ const rules = {
     message: $t('common.enterTriggeringDuration')
   }
 }
-/** 新增 */
+/** New */
 const add = async () => {
   const data = {
     name: formData.value.name,
@@ -263,7 +263,7 @@ const add = async () => {
   }
 }
 
-/** @param e 编辑 */
+/** @param e edit */
 async function editInfoText() {
   const datas = {
     id: formData.value.id,

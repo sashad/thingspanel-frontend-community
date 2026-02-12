@@ -1,26 +1,26 @@
 <script setup lang="ts">
 /**
- * 数据源合并策略编辑器 - 简化版
- * 用于配置数据源内多个数据项的合并方式
+ * Data Source Merge Strategy Editor - Simplified version
+ * Used to configure the merging method of multiple data items in the data source
  */
 
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// 合并策略类型定义
+// Merge strategy type definition
 interface MergeStrategy {
   type: 'select' | 'array' | 'object' | 'script'
   script?: string
-  selectedIndex?: number // 当type为'select'时，用户选择的数据项索引
+  selectedIndex?: number // whentypefor'select'hour，User-selected data item index
 }
 
-// Props 接口定义
+// Props Interface definition
 interface Props {
-  /** 数据源ID */
+  /** data sourceID */
   dataSourceId: string
-  /** 当前合并策略 */
+  /** Current merge strategy */
   modelValue?: MergeStrategy
-  /** 数据项数量 */
+  /** Number of data items */
   dataItemCount?: number
 }
 
@@ -33,72 +33,72 @@ const emit = defineEmits<{
   'update:modelValue': [value: MergeStrategy]
 }>()
 
-// 国际化
+// internationalization
 const { t } = useI18n()
 
-// 响应式数据
+// Responsive data
 const currentStrategy = ref<MergeStrategy>({ ...props.modelValue })
-// 🔥 全新方案：基于内容哈希的去重机制
+// 🔥 Brand new solution：Deduplication mechanism based on content hashing
 const lastEmittedHash = ref('')
 const isUpdatingFromProps = ref(false)
 
-// 预制合并策略选项
+// Pre-made merge strategy options
 const mergeStrategyOptions = [
   {
     value: 'select',
-    label: '选择其中一个',
-    description: '用户选择特定的数据项',
+    label: 'Choose one',
+    description: 'User selects specific data item',
     icon: '🎯'
   },
   {
     value: 'object',
-    label: '对象合并',
+    label: 'Object merge',
     description: 'Object.assign({}, item1, item2, ...)',
     icon: '🔗'
   },
   {
     value: 'array',
-    label: '数组组成',
+    label: 'Array composition',
     description: '[item1, item2, item3]',
     icon: '📋'
   },
   {
     value: 'script',
-    label: '自定义脚本',
-    description: '完全自定义的合并逻辑',
+    label: 'custom script',
+    description: 'Fully customizable merge logic',
     icon: '⚙️'
   }
 ]
 
-// 计算属性
+// Computed properties
 const previewText = computed(() => {
   const count = props.dataItemCount
 
   switch (currentStrategy.value.type) {
     case 'select':
       if (count <= 1) {
-        return '返回唯一数据项'
+        return 'Return unique data items'
       } else {
         const selectedIndex = currentStrategy.value.selectedIndex ?? 0
-        return `选择第${selectedIndex + 1}项(共${count}项)`
+        return `Select the${selectedIndex + 1}item(common${count}item)`
       }
     case 'object':
-      return count <= 1 ? '单项对象输出' : `对象合并(${count}项)`
+      return count <= 1 ? 'Single object output' : `Object merge(${count}item)`
     case 'array':
-      return count <= 1 ? '单项数组输出' : `数组组成(${count}项)`
+      return count <= 1 ? 'Single item array output' : `Array composition(${count}item)`
     case 'script':
-      return count <= 1 ? '脚本处理单项' : `脚本处理(${count}项)`
+      return count <= 1 ? 'Script processing单item' : `Script processing(${count}item)`
     default:
       return ''
   }
 })
 
-// 🔥 全新方案：基于内容哈希的智能去重
+// 🔥 Brand new solution：Intelligent deduplication based on content hashing
 watch(
   currentStrategy,
   newValue => {
     if (!isUpdatingFromProps.value) {
-      // 计算内容哈希，避免相同内容的重复emit
+      // Compute content hash，Avoid duplication of the same contentemit
       const contentHash = JSON.stringify(newValue)
       if (contentHash !== lastEmittedHash.value) {
         lastEmittedHash.value = contentHash
@@ -110,7 +110,7 @@ watch(
   { deep: true }
 )
 
-// 🔥 全新方案：智能props同步，基于内容哈希判断
+// 🔥 Brand new solution：intelligentpropssynchronous，Judgment based on content hash
 watch(
   () => props.modelValue,
   newValue => {
@@ -121,9 +121,9 @@ watch(
       if (newContentHash !== currentContentHash) {
         isUpdatingFromProps.value = true
         currentStrategy.value = { ...newValue }
-        lastEmittedHash.value = newContentHash // 更新哈希，防止回环
+        lastEmittedHash.value = newContentHash // Update hash，Prevent loops
 
-        // 在下一个tick清除标志
+        // in the nexttickclear flag
         nextTick(() => {
           isUpdatingFromProps.value = false
         })
@@ -136,17 +136,17 @@ watch(
   { deep: true }
 )
 
-// 选择合并策略
+// Choose a merge strategy
 const selectMergeStrategy = (strategyType: string) => {
   currentStrategy.value.type = strategyType as any
 
   if (strategyType === 'script') {
     currentStrategy.value.script =
-      currentStrategy.value.script || '// items 为数据项数组，返回合并后的数据\nreturn items[0] || {}'
+      currentStrategy.value.script || '// items is an array of data items，Return the merged data\nreturn items[0] || {}'
   }
 
   if (strategyType === 'select') {
-    // 默认选择第1项（索引0）
+    // The default selection is1item（index0）
     currentStrategy.value.selectedIndex = currentStrategy.value.selectedIndex ?? 0
   }
 }
@@ -154,18 +154,18 @@ const selectMergeStrategy = (strategyType: string) => {
 
 <template>
   <div class="data-source-merge-strategy-editor-simple">
-    <!-- 紧凑的标题行 -->
+    <!-- compact title line -->
     <div class="strategy-header">
       <n-space align="center" justify="space-between" size="small">
-        <n-text strong style="font-size: 13px">{{ dataSourceId }} - 合并策略</n-text>
+        <n-text strong style="font-size: 13px">{{ dataSourceId }} - merge strategy</n-text>
         <n-space align="center" size="small">
-          <n-tag type="info" size="tiny">{{ dataItemCount }}项</n-tag>
+          <n-tag type="info" size="tiny">{{ dataItemCount }}item</n-tag>
           <n-text depth="3" style="font-size: 11px">{{ previewText }}</n-text>
         </n-space>
       </n-space>
     </div>
 
-    <!-- 合并策略选择 -->
+    <!-- Merge strategy selection -->
     <n-space align="center" justify="space-between" style="margin-top: 8px">
       <n-select
         :value="currentStrategy.type"
@@ -180,7 +180,7 @@ const selectMergeStrategy = (strategyType: string) => {
         @update:value="selectMergeStrategy"
       />
 
-      <!-- 选择数据项(当策略为select且有多项时) -->
+      <!-- Select data item(When the strategy isselectand when there are multiple) -->
       <n-select
         v-if="currentStrategy.type === 'select' && dataItemCount > 1"
         :value="currentStrategy.selectedIndex ?? 0"
@@ -188,7 +188,7 @@ const selectMergeStrategy = (strategyType: string) => {
         style="width: 100px"
         :options="
           Array.from({ length: dataItemCount }, (_, i) => ({
-            label: `第${i + 1}项`,
+            label: `No.${i + 1}item`,
             value: i
           }))
         "
@@ -200,12 +200,12 @@ const selectMergeStrategy = (strategyType: string) => {
       />
     </n-space>
 
-    <!-- 脚本编辑区域 -->
+    <!-- Script editing area -->
     <div v-if="currentStrategy.type === 'script'" style="margin-top: 8px">
       <n-input
         v-model:value="currentStrategy.script"
         type="textarea"
-        placeholder="// items数组，返回合并结果&#10;return items[0] || {}"
+        placeholder="// itemsarray，Return merged results&#10;return items[0] || {}"
         :rows="4"
         size="small"
         style="font-family: 'Consolas', monospace; font-size: 11px"

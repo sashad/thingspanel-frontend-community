@@ -8,12 +8,12 @@ import { createLogger } from '@/utils/logger'
 import { $t } from '@/locales'
 
 const logger = createLogger('Chart')
-// 定义组件props
+// Define componentsprops
 const props = defineProps<{
   card: ICardData
 }>()
 
-// 初始化变量
+// initialize variables
 const pagination = reactive({
   page: 1,
   pageSize: 10,
@@ -36,10 +36,10 @@ const handlePageChange = (page: number) => {
 
 const handlePageSizeChange = (pageSize: number) => {
   pagination.pageSize = pageSize
-  pagination.page = 1 // 重置到第一页
+  pagination.page = 1 // Reset to first page
 }
 
-// 动态生成表格列
+// Dynamically generate table columns
 const columns = ref<any[]>([
   {
     title: $t('common.time'),
@@ -65,7 +65,7 @@ const columns = ref<any[]>([
     }) ?? [])
 ])
 
-// 数据处理函数：合并相同时间的数据
+// Data processing functions：Merge data from the same time
 const processData = data => {
   const timeMap = new Map()
   data.forEach(({ x, y, key }) => {
@@ -75,11 +75,11 @@ const processData = data => {
     timeMap.get(x)[key] = y
   })
 
-  // 将 Map 转换为数组并按时间降序排列
+  // Will Map Convert to array and sort by time descending
   return Array.from(timeMap.values()).sort((a, b) => b.time - a.time)
 }
 
-// 数据获取函数
+// Data acquisition function
 const fetchData = async () => {
   const deviceSources = (props.card?.dataSource?.deviceSource ?? []).filter(deviceSource => {
     return deviceSource.deviceId && deviceSource.metricsId
@@ -141,7 +141,7 @@ watch(
   { deep: true }
 )
 
-// 初始加载数据
+// Initial load data
 onMounted(fetchData)
 </script>
 

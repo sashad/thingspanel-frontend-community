@@ -1,6 +1,6 @@
 /**
- * Card 2.1 自动注册系统
- * 简化的组件自动注册和分类系统
+ * Card 2.1 Automatic registration system
+ * Simplified automatic component registration and classification system
  */
 
 import type { ComponentDefinition, ComponentTree } from '../types'
@@ -9,7 +9,7 @@ import { getCategoryFromComponentId } from './category-definition'
 import { checkComponentPermission } from '../utils/permission'
 
 /**
- * 自动注册系统类
+ * Automatic registration system class
  */
 export class AutoRegistry {
   private registry: ComponentRegistry
@@ -20,7 +20,7 @@ export class AutoRegistry {
   }
 
   /**
-   * 从文件路径提取组件ID
+   * Extract components from file pathID
    */
   private extractComponentIdFromPath(path: string): string | null {
     const match = path.match(/\/([^/]+)\/index\.ts$/)
@@ -28,7 +28,7 @@ export class AutoRegistry {
   }
 
   /**
-   * 验证组件定义是否有效
+   * Verify that the component definition is valid
    */
   private isValidComponentDefinition(definition: any): definition is ComponentDefinition {
     const isComponentValid = definition.component &&
@@ -43,28 +43,28 @@ export class AutoRegistry {
   }
 
   /**
-   * 检查组件是否应该注册
+   * Check if the component should be registered
    */
   private shouldRegisterComponent(definition: ComponentDefinition): boolean {
-    // 检查注册设置，默认为true（注册）
-    return definition.isRegistered !== false // 只有明确设置为false才不注册
+    // 检查register设置，Default istrue（register）
+    return definition.isRegistered !== false // Only explicitly set tofalseDon't register
   }
 
   /**
-   * 自动生成分类树
+   * Automatically generate classification trees
    */
   private autoGenerateCategories(definition: ComponentDefinition) {
     const mainName = definition.mainCategory || 'categories.chart'
     const subName = definition.subCategory
 
-    // 顶层分类
+    // Top level categories
     let mainCat = this.categoryTree.find(cat => cat.id === mainName)
     if (!mainCat) {
       mainCat = { id: mainName, name: mainName, children: [] }
       this.categoryTree.push(mainCat)
     }
 
-    // 子分类
+    // subcategory
     if (subName) {
       let subCat = mainCat.children.find((cat: any) => cat.id === subName)
       if (!subCat) {
@@ -75,30 +75,30 @@ export class AutoRegistry {
   }
 
   /**
-   * 自动扫描并注册组件
+   * Automatically scan and register components
    */
   async autoRegister(componentModules: Record<string, any>) {
     const registeredComponents: ComponentDefinition[] = []
 
     for (const [componentPath, module] of Object.entries(componentModules)) {
       try {
-        // 获取默认导出（组件定义）
+        // Get default export（Component definition）
         const definition = module.default || module
 
         if (this.isValidComponentDefinition(definition)) {
-          // 从路径提取组件ID
+          // Extract components from pathID
           const componentId = this.extractComponentIdFromPath(componentPath)
 
           if (!componentId) {
-            console.warn(`⚠️ [AutoRegistry] 无法从路径提取组件ID: ${componentPath}`)
+            console.warn(`⚠️ [AutoRegistry] Unable to extract component from pathID: ${componentPath}`)
             continue
           }
 
-          // 根据组件ID获取分类信息
+          // According to componentsIDGet classified information
           const categoryInfo = getCategoryFromComponentId(componentId)
 
 
-          // 增强组件定义
+          // Enhance component definition
           const enhancedDefinition = {
             ...definition,
             mainCategory: categoryInfo.mainCategory,
@@ -106,21 +106,21 @@ export class AutoRegistry {
             category: `${categoryInfo.mainCategory}/${categoryInfo.subCategory}`,
           }
 
-          // 生成分类信息
+          // Generate classification information
           this.autoGenerateCategories(enhancedDefinition)
 
-          // 检查权限
+          // Check permissions
           const hasPermission = checkComponentPermission(enhancedDefinition)
 
           if (hasPermission && this.shouldRegisterComponent(enhancedDefinition)) {
-            // 注册组件
+            // Register component
             this.registry.register(enhancedDefinition)
             registeredComponents.push(enhancedDefinition)
           }
         }
       } catch (error) {
-        console.error(`❌ [AutoRegistry] 组件注册失败: ${componentPath}`, error)
-        // 忽略组件注册过程中的错误，继续处理其他组件
+        console.error(`❌ [AutoRegistry] Component registration failed: ${componentPath}`, error)
+        // Ignore errors during component registration，Continue working on other components
       }
     }
 
@@ -128,7 +128,7 @@ export class AutoRegistry {
   }
 
   /**
-   * 获取组件树形结构
+   * Get component tree structure
    */
   getComponentTree(): ComponentTree {
     const components = this.registry.getAll()
@@ -141,14 +141,14 @@ export class AutoRegistry {
   }
 
   /**
-   * 获取所有组件
+   * Get all components
    */
   getAllComponents(): ComponentDefinition[] {
     return this.registry.getAll()
   }
 
   /**
-   * 按分类获取组件
+   * Get components by category
    */
   getComponentsByCategory(mainCategory?: string, subCategory?: string): ComponentDefinition[] {
     const components = this.registry.getAll()
@@ -167,20 +167,20 @@ export class AutoRegistry {
   }
 
   /**
-   * 获取所有分类
+   * Get all categories
    */
   getCategories(): any[] {
     return this.categoryTree
   }
 
   /**
-   * 重新应用权限过滤（当用户权限发生变化时调用）
+   * Reapply permission filtering（Called when user permissions change）
    */
   reapplyPermissionFilter(): void {
-    // 清空注册表
+    // Clear registry
     this.registry.clear()
 
-    // 重新注册有权限的组件
+    // Re-register components with permissions
     const allComponents = this.getAllComponents()
     for (const component of allComponents) {
       if (checkComponentPermission(component)) {
@@ -191,6 +191,6 @@ export class AutoRegistry {
 }
 
 /**
- * 默认导出
+ * Default export
  */
 export default AutoRegistry

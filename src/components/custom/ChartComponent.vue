@@ -15,7 +15,7 @@ watch(
   newOptions => {
     if (newOptions) {
       updateOptions(currentOptions => {
-        // 这里进行深拷贝以确保图表配置完全更新
+        // A deep copy is made here to ensure the chart configuration is fully updated
         return { ...currentOptions, ...newOptions }
       })
     }
@@ -31,6 +31,6 @@ watch(
 <style scoped>
 .chart-container {
   width: 100%;
-  height: 100%; /* 根据需求调整 */
+  height: 100%; /* Adjust according to needs */
 }
 </style>

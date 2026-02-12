@@ -1,13 +1,13 @@
 /**
- * 配置模块统一导出
+ * Unified export of configuration modules
  * Configuration Module Unified Exports
  */
 
-// 导出安全配置
+// Export security configuration
 export * from './security'
 
 /**
- * 配置模块信息
+ * Configure module information
  * Configuration Module Information
  */
 export const configInfo = {

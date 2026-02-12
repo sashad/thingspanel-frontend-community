@@ -1,15 +1,15 @@
 /**
- * 配置转换适配器
- * 将现有的复杂配置格式转换为SimpleDataBridge需要的简化格式
+ * Configure conversion adapter
+ * Convert existing complex configuration formats toSimpleDataBridgeSimplified format required
  */
 
 import type { ComponentDataRequirement, SimpleDataSourceConfig } from '@/core/data-architecture/SimpleDataBridge'
 
 /**
- * 将复杂的数据源配置转换为简化格式
- * @param componentId 组件ID
- * @param config 原始配置对象
- * @returns 简化的组件数据需求
+ * Convert complex data source configurations into simplified formats
+ * @param componentId componentsID
+ * @param config original configuration object
+ * @returns Simplified component data requirements
  */
 export function convertToSimpleDataRequirement(componentId: string, config: any): ComponentDataRequirement | null {
   if (!config) {
@@ -18,7 +18,7 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
 
   const dataSources: SimpleDataSourceConfig[] = []
 
-  // 处理 dataSourceBindings 格式 (来自 ConfigurationPanel)
+  // deal with dataSourceBindings Format (from ConfigurationPanel)
   if (config.dataSourceBindings) {
     if (process.env.NODE_ENV === 'development') {
     }
@@ -26,7 +26,7 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
     Object.entries(config.dataSourceBindings).forEach(([key, binding]: [string, any]) => {
       if (binding && binding.rawData) {
         try {
-          // 解析rawData
+          // parserawData
           const parsedData = JSON.parse(binding.rawData)
 
           dataSources.push({
@@ -40,13 +40,13 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
           if (process.env.NODE_ENV === 'development') {
           }
         } catch (error) {
-          console.error(`❌ [ConfigAdapter] 解析rawData失败: ${key}`, error)
+          console.error(`❌ [ConfigAdapter] parserawDatafail: ${key}`, error)
         }
       }
     })
   }
 
-  // 处理直接的 config.dataSourceBindings 格式
+  // handle direct config.dataSourceBindings Format
   if (config.config?.dataSourceBindings) {
     if (process.env.NODE_ENV === 'development') {
     }
@@ -67,13 +67,13 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
           if (process.env.NODE_ENV === 'development') {
           }
         } catch (error) {
-          console.error(`❌ [ConfigAdapter] 解析嵌套rawData失败: ${key}`, error)
+          console.error(`❌ [ConfigAdapter] Parse nestingrawDatafail: ${key}`, error)
         }
       }
     })
   }
 
-  // 处理简单对象格式
+  // Handling simple object formats
   if (
     typeof config === 'object' &&
     !Array.isArray(config) &&
@@ -94,7 +94,7 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
   }
 
   if (dataSources.length === 0) {
-    console.error(`⚠️ [ConfigAdapter] 没有找到有效的数据源配置: ${componentId}`)
+    console.error(`⚠️ [ConfigAdapter] No valid data source configuration found: ${componentId}`)
     return null
   }
 
@@ -109,21 +109,21 @@ export function convertToSimpleDataRequirement(componentId: string, config: any)
 }
 
 /**
- * 检查配置是否需要转换
- * @param config 配置对象
- * @returns 是否需要转换
+ * Check whether the configuration needs to be converted
+ * @param config Configuration object
+ * @returns Do you need to convert
  */
 export function shouldConvertConfig(config: any): boolean {
   if (!config || typeof config !== 'object') {
     return false
   }
 
-  // 有dataSourceBindings的需要转换
+  // havedataSourceBindingsneed to convert
   if (config.dataSourceBindings || config.config?.dataSourceBindings) {
     return true
   }
 
-  // 简单对象也可以转换
+  // Simple objects can also be converted
   if (!Array.isArray(config) && !config.type && !config.enabled && !config.metadata) {
     return true
   }
@@ -132,18 +132,18 @@ export function shouldConvertConfig(config: any): boolean {
 }
 
 /**
- * 从配置中提取组件类型
- * @param config 配置对象
- * @returns 组件类型
+ * Extract component type from configuration
+ * @param config Configuration object
+ * @returns Component type
  */
 export function extractComponentType(config: any): string {
   return config?.metadata?.componentType || 'unknown'
 }
 
 /**
- * 批量转换多个组件配置
- * @param configs 配置映射 {componentId: config}
- * @returns 转换结果映射
+ * Convert multiple component configurations in batches
+ * @param configs Configuration mapping {componentId: config}
+ * @returns Conversion result mapping
  */
 export function batchConvertConfigs(configs: Record<string, any>): Record<string, ComponentDataRequirement> {
   const results: Record<string, ComponentDataRequirement> = {}

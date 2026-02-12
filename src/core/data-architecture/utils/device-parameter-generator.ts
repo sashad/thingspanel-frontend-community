@@ -1,6 +1,6 @@
 /**
- * 设备参数生成器
- * 根据不同的选择模式生成对应的参数组
+ * Device parameter generator
+ * Generate corresponding parameter groups according to different selection modes
  */
 
 import type {
@@ -15,7 +15,7 @@ import type {
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 
 /**
- * 生成唯一的参数组ID
+ * Generate unique parameter groupID
  */
 export function generateGroupId(sourceType: DeviceParameterSourceType): string {
   const timestamp = Date.now()
@@ -24,31 +24,31 @@ export function generateGroupId(sourceType: DeviceParameterSourceType): string {
 }
 
 /**
- * 生成唯一的参数ID
+ * Generate unique parametersID
  */
 export function generateParameterId(): string {
   return `param_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
 /**
- * 根据设备ID选择器生成参数
+ * According to deviceIDSelector generation parameters
  */
 export function generateDeviceIdParameters(device: DeviceInfo): DeviceSelectionResult {
   const groupId = generateGroupId('device-id')
   const now = Date.now()
 
-  // 生成设备ID参数
+  // Generate deviceIDparameter
   const parameters = [
     {
       key: 'deviceId',
       value: device.deviceId,
       dataType: 'string' as const,
-      description: `设备ID - ${device.deviceName}`,
+      description: `equipmentID - ${device.deviceName}`,
       role: 'primary' as ParameterRole
     }
   ]
 
-  // 创建参数组信息
+  // Create parameter group information
   const groupInfo: DeviceParameterGroup = {
     groupId,
     sourceType: 'device-id',
@@ -77,31 +77,31 @@ export function generateDeviceIdParameters(device: DeviceInfo): DeviceSelectionR
 }
 
 /**
- * 根据设备指标选择器生成参数
+ * Generate parameters based on device metric selector
  */
 export function generateDeviceMetricParameters(device: DeviceInfo, metric: DeviceMetric): DeviceSelectionResult {
   const groupId = generateGroupId('device-metric')
   const now = Date.now()
 
-  // 生成设备ID + 指标参数
+  // Generate deviceID + Indicator parameters
   const parameters = [
     {
       key: 'deviceId',
       value: device.deviceId,
       dataType: 'string' as const,
-      description: `设备ID - ${device.deviceName}`,
+      description: `equipmentID - ${device.deviceName}`,
       role: 'primary' as ParameterRole
     },
     {
       key: 'metric',
       value: metric.metricKey,
       dataType: metric.metricType,
-      description: `指标 - ${metric.metricLabel}${metric.unit ? ` (${metric.unit})` : ''}`,
+      description: `index - ${metric.metricLabel}${metric.unit ? ` (${metric.unit})` : ''}`,
       role: 'secondary' as ParameterRole
     }
   ]
 
-  // 创建参数组信息
+  // Create parameter group information
   const groupInfo: DeviceParameterGroup = {
     groupId,
     sourceType: 'device-metric',
@@ -136,7 +136,7 @@ export function generateDeviceMetricParameters(device: DeviceInfo, metric: Devic
 }
 
 /**
- * 将生成的参数转换为EnhancedParameter格式
+ * Convert the generated parameters toEnhancedParameterFormat
  */
 export function convertToEnhancedParameters(result: DeviceSelectionResult): EnhancedParameter[] {
   return result.parameters.map(param => ({
@@ -150,14 +150,14 @@ export function convertToEnhancedParameters(result: DeviceSelectionResult): Enha
     description: param.description,
     _id: generateParameterId(),
 
-    // 设备参数组信息
+    // Device parameter group information
     deviceContext: {
       sourceType: 'device-selection',
       selectionConfig: result.selectionConfig,
       timestamp: result.groupInfo.createdAt
     },
 
-    // 参数组归属信息
+    // Parameter group ownership information
     parameterGroup: {
       groupId: result.groupInfo.groupId,
       role: param.role,
@@ -167,34 +167,34 @@ export function convertToEnhancedParameters(result: DeviceSelectionResult): Enha
 }
 
 /**
- * 参数组管理器类
+ * Parameter group manager class
  */
 export class DeviceParameterGroupManager {
   private groups: Map<string, DeviceParameterGroup> = new Map()
 
   /**
-   * 添加参数组
+   * Add parameter group
    */
   addGroup(group: DeviceParameterGroup): void {
     this.groups.set(group.groupId, group)
   }
 
   /**
-   * 获取参数组
+   * Get parameter group
    */
   getGroup(groupId: string): DeviceParameterGroup | undefined {
     return this.groups.get(groupId)
   }
 
   /**
-   * 移除参数组
+   * Remove parameter group
    */
   removeGroup(groupId: string): boolean {
     return this.groups.delete(groupId)
   }
 
   /**
-   * 根据参数key查找所属的参数组
+   * According to parameterskeyFind the parameter group it belongs to
    */
   findGroupByParameterKey(paramKey: string): DeviceParameterGroup | undefined {
     for (const group of this.groups.values()) {
@@ -206,7 +206,7 @@ export class DeviceParameterGroupManager {
   }
 
   /**
-   * 获取参数组的所有相关参数
+   * Get all relevant parameters of the parameter group
    */
   getGroupParameters(groupId: string, allParams: EnhancedParameter[]): EnhancedParameter[] {
     const group = this.getGroup(groupId)
@@ -216,7 +216,7 @@ export class DeviceParameterGroupManager {
   }
 
   /**
-   * 更新参数组
+   * Update parameter group
    */
   updateGroup(groupId: string, updates: Partial<DeviceParameterGroup>): boolean {
     const group = this.groups.get(groupId)
@@ -227,19 +227,19 @@ export class DeviceParameterGroupManager {
   }
 
   /**
-   * 获取所有参数组
+   * Get all parameter groups
    */
   getAllGroups(): DeviceParameterGroup[] {
     return Array.from(this.groups.values())
   }
 
   /**
-   * 清空所有参数组
+   * Clear all parameter groups
    */
   clear(): void {
     this.groups.clear()
   }
 }
 
-// 全局参数组管理器实例
+// Global parameter group manager instance
 export const globalParameterGroupManager = new DeviceParameterGroupManager()

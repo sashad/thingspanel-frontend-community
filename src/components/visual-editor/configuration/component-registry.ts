@@ -1,19 +1,19 @@
 /**
- * 组件配置显示逻辑 - 最终精准版本
- * 只有test目录下的3个测试组件才显示配置面板
+ * Component configuration display logic - final accurate version
+ * onlytestunder the directory3The configuration panel is displayed only after testing the component
  */
 
 import type { Component } from 'vue'
 
-// 导入各层级配置组件 - 使用动态导入避免循环依赖
+// Import configuration components at each level - Use dynamic imports to avoid circular dependencies
 import { defineAsyncComponent } from 'vue'
 
-// 导入配置管理器用于检查组件数据源需求
+// Import Configuration Manager to check component data source requirements
 import { configurationIntegrationBridge as configurationManager } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
-// 🔥 已迁移：使用核心数据架构的组件数据需求
+// 🔥 Migrated：Component data requirements using Core Data architecture
 import type { ComponentDataRequirement } from '@/core/data-architecture/types/simple-types'
 
-// 动态导入组件避免循环依赖问题
+// Dynamically import components to avoid circular dependency issues
 const BaseConfigForm = defineAsyncComponent(() => import('@/components/visual-editor/renderers/base/BaseConfigForm.vue'))
 const ComponentConfigForm = defineAsyncComponent(() => import('@/components/visual-editor/renderers/base/ComponentConfigForm.vue'))
 const InteractionConfigWrapper = defineAsyncComponent(
@@ -33,38 +33,40 @@ export interface ConfigLayerDefinition {
 }
 
 /**
- * 精确控制组件配置显示逻辑
- * 只有4个有settingConfig.ts的组件才显示配置面板
+ * Precise control over component configuration display logic
+ * only4Everyone hassettingConfig.tsThe configuration panel is displayed only for the component
  */
 const shouldShowComponentConfig = (componentId: string, widget?: any): boolean => {
   try {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 检查Card2.1组件是否有configComponent
+    // examineCard2.1Does the component haveconfigComponent
     if (widget?.metadata?.card2Definition) {
       const hasConfigComponent = !!widget.metadata.card2Definition.configComponent
-      
+      
+
       return hasConfigComponent
     }
 
-    // 对于传统组件，暂时返回false（可以根据需要扩展）
+    // For traditional components，Return temporarilyfalse（Can be expanded as needed）
     if (process.env.NODE_ENV === 'development') {
     }
     return false
   } catch (error) {
-    console.error(`❌ [ComponentRegistry] 配置检查出错`, { componentId, error })
+    console.error(`❌ [ComponentRegistry] Configuration check error`, { componentId, error })
     return false
   }
 }
 
 /**
- * 🎯 交互配置显示检查函数
- * 只有声明了交互能力的组件才显示交互配置
+ * 🎯 Interactive configuration display check function
+ * Only components that declare interactive capabilities display interaction configurations
  */
 const shouldShowInteractionConfig = (componentId: string, widget?: any): boolean => {
-  try {
-    // 检查Card2.1组件的交互能力声明
+  try {
+
+    // examineCard2.1Component’s interactivity declaration
     if (widget?.metadata?.card2Definition) {
       const card2Definition = widget.metadata.card2Definition
       const hasInteractionCapabilities = !!(
@@ -72,20 +74,22 @@ const shouldShowInteractionConfig = (componentId: string, widget?: any): boolean
         (card2Definition.interactionCapabilities.supportedEvents?.length > 0 ||
          card2Definition.interactionCapabilities.availableActions?.length > 0)
       )
-
+
+
       return hasInteractionCapabilities
     }
 
-    // 对于传统组件，暂时返回false    return false
+    // For traditional components，Return temporarilyfalse
+    return false
   } catch (error) {
-    console.error(`❌ [ComponentRegistry] 交互配置检查出错`, { componentId, error })
+    console.error(`❌ [ComponentRegistry] Error in interactive configuration check`, { componentId, error })
     return false
   }
 }
 
 /**
- * 最终精准的数据源配置显示检查函数
- * 🔥 修复：优先检查Card2.1组件定义，避免被硬编码列表过滤
+ * The final accurate data source configuration shows the check function
+ * 🔥 repair：Priority checkCard2.1Component definition，Avoid being filtered by hard-coded lists
  */
 const shouldShowDataSourceConfig = (componentId: string, widget?: any): boolean => {
   try {
@@ -93,7 +97,7 @@ const shouldShowDataSourceConfig = (componentId: string, widget?: any): boolean 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 🔥 第一优先级：检查Card2.1组件的数据源定义
+    // 🔥 first priority：examineCard2.1Component data source definition
     if (widget?.metadata?.card2Definition) {
       const card2Definition = widget.metadata.card2Definition
       const hasDataNeeds = !!(
@@ -101,44 +105,48 @@ const shouldShowDataSourceConfig = (componentId: string, widget?: any): boolean 
         card2Definition.dataRequirements?.primaryData ||
         card2Definition.dataSources?.length > 0
       )
-
+
+
       if (hasDataNeeds) {
-        return true // Card2.1组件有数据源定义，立即显示
+        return true // Card2.1The component has a data source definition，Show now
       }
     }
 
-    // 第二优先级：传统组件的硬编码判断
+    // second priority：Hard-coded judgments on traditional components
     if (widget?.type) {
-      // 明确需要数据源的传统组件
+      // Traditional components that explicitly require data sources
       const dataSourceComponents = [
-        'dual-data-display', // 需要2个数据源
-        'triple-data-display' // 需要3个数据源
+        'dual-data-display', // need2data sources
+        'triple-data-display' // need3data sources
       ]
 
-      if (dataSourceComponents.includes(widget.type)) {        return true
+      if (dataSourceComponents.includes(widget.type)) {
+        return true
       }
 
-      // 明确不需要数据源的组件
+      // Explicitly specify components that do not require a data source
       const noDataSourceComponents = [
-        'simple-display', // 静态展示组件
-        'access-num', // 统计组件
-        'alarm-info', // 统计组件
-        'alarm-count' // 统计组件
+        'simple-display', // Static display component
+        'access-num', // Statistics component
+        'alarm-info', // Statistics component
+        'alarm-count' // Statistics component
       ]
 
-      if (noDataSourceComponents.includes(widget.type)) {        return false
+      if (noDataSourceComponents.includes(widget.type)) {
+        return false
       }
     }
 
-    // 默认不显示数据源配置    return false
+    // Data source configuration is not displayed by default
+    return false
   } catch (error) {
-    console.error(`❌ [ComponentRegistry] 数据源配置检查出错`, { componentId, error })
+    console.error(`❌ [ComponentRegistry] Data source configuration check error`, { componentId, error })
     return false
   }
 }
 
 /**
- * 配置层级注册表
+ * Configure hierarchical registry
  */
 export const configLayerRegistry: Record<string, ConfigLayerDefinition> = {
   base: {
@@ -147,7 +155,7 @@ export const configLayerRegistry: Record<string, ConfigLayerDefinition> = {
     component: BaseConfigForm,
     visible: true,
     order: 1,
-    description: '节点基础属性配置（标题、样式、布局等）'
+    description: 'Node basic attribute configuration（title、style、Layout etc.）'
   },
   component: {
     name: 'component',
@@ -155,7 +163,7 @@ export const configLayerRegistry: Record<string, ConfigLayerDefinition> = {
     component: ComponentConfigForm,
     visible: true,
     order: 2,
-    description: '组件特有配置（只有test组件显示）'
+    description: 'Component specific configuration（onlytestComponent display）'
   },
   dataSource: {
     name: 'dataSource',
@@ -163,7 +171,7 @@ export const configLayerRegistry: Record<string, ConfigLayerDefinition> = {
     component: SimpleConfigurationEditor,
     visible: true,
     order: 3,
-    description: '数据源配置（只有多数据源test组件显示）'
+    description: 'Data source configuration（Only multiple data sourcestestComponent display）'
   },
   interaction: {
     name: 'interaction',
@@ -171,12 +179,12 @@ export const configLayerRegistry: Record<string, ConfigLayerDefinition> = {
     component: InteractionConfigWrapper,
     visible: true,
     order: 4,
-    description: '组件交互配置（卡片式简洁界面，点击、悬停等交互效果）'
+    description: 'Component interaction configuration（Card-style simple interface，Click、Hover and other interactive effects）'
   }
 }
 
 /**
- * 最终精准的配置层级获取函数
+ * The final accurate configuration level acquisition function
  */
 export const getVisibleConfigLayers = (componentId?: string, widget?: any): ConfigLayerDefinition[] => {
   let layers = Object.values(configLayerRegistry).filter(layer => layer.visible)
@@ -199,7 +207,8 @@ export const getVisibleConfigLayers = (componentId?: string, widget?: any): Conf
         return shouldShow
       }
       if (layer.name === 'interaction') {
-        const shouldShow = shouldShowInteractionConfig(componentId, widget)        return shouldShow
+        const shouldShow = shouldShowInteractionConfig(componentId, widget)
+        return shouldShow
       }
       return true
     })
@@ -216,34 +225,34 @@ export const getConfigLayer = (layerName: string): ConfigLayerDefinition | undef
 }
 
 /**
- * 🔥 手动刷新组件定义
- * 当配置面板打开时调用此函数确保组件定义是最新的
+ * 🔥 Manually refresh component definitions
+ * This function is called when the configuration panel is opened to ensure that the component definition is up to date
  */
 export const refreshComponentDefinitions = async (widget?: any): Promise<boolean> => {
   try {
     if (!widget?.metadata?.card2Definition?.configComponent && widget?.type) {
       
-      // 尝试从全局获取组件定义
+      // Try to get component definition from global
       const getComponentDefinition = async (type: string) => {
         try {
-          // 动态导入以避免循环依赖
+          // Dynamic imports to avoid circular dependencies
           const { getComponentDefinition: getDef } = await import('@/card2.1/components/index')
           return await getDef(type)
         } catch (error) {
-          console.error(`❌ [refreshComponentDefinitions] 导入组件定义函数失败:`, error)
+          console.error(`❌ [refreshComponentDefinitions] Failed to import component definition function:`, error)
           return undefined
         }
       }
       
       const definition = await getComponentDefinition(widget.type)
       if (definition?.configComponent) {
-        // 更新widget的metadata（这需要与PanelEditorV2集成）
+        // renewwidgetofmetadata（This requiresPanelEditorV2integrated）
         return true
       }
     }
     return false
   } catch (error) {
-    console.error('❌ [refreshComponentDefinitions] 刷新失败:', error)
+    console.error('❌ [refreshComponentDefinitions] Refresh failed:', error)
     return false
   }
 }

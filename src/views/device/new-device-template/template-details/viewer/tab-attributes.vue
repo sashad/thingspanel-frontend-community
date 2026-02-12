@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 属性Tab内容
- * 从 src/views/device/template/components/step/model-definition.vue 复制属性部分逻辑
+ * propertyTabcontent
+ * from src/views/device/template/components/step/model-definition.vue Copy attribute part logic
  */
 
 import { ref, onMounted, reactive, watch } from 'vue'
@@ -20,18 +20,18 @@ const loading = ref(false)
 const attributesList = ref<any[]>([])
 const total = ref(0)
 
-// 分页参数
+// Paging parameters
 const queryParams = reactive({
   page: 1,
   page_size: 5,
   device_template_id: ''
 })
 
-// 编辑弹窗
+// Edit pop-up window
 const showEditModal = ref(false)
 const editingItem = ref<any>({})
 
-// 表格列配置
+// Table column configuration
 const columns: any = [
   ...attribute.value,
   {
@@ -62,10 +62,10 @@ const columns: any = [
 ]
 
 /**
- * 加载属性数据
+ * Load attribute data
  */
 const loadData = async () => {
-  // 🔥 严格验证：必须有有效的模板ID
+  // 🔥 Strict verification：Must have a valid templateID
   if (!templateData.value?.id || templateData.value.id === '') {
     return
   }
@@ -79,11 +79,11 @@ const loadData = async () => {
       attributesList.value = res.data.list || []
       total.value = Math.ceil(res.data.total / queryParams.page_size)
 
-      // 处理读写标志显示
+      // Handling read and write flag display
       attributesList.value.forEach((item: any) => {
-        if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+        if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
           item.read_write_flag = $t('device_template.table_header.readOnly')
-        } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+        } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
           item.read_write_flag = $t('device_template.table_header.readAndWrite')
         }
       })
@@ -96,7 +96,7 @@ const loadData = async () => {
 }
 
 /**
- * 新增属性
+ * Add new attributes
  */
 const handleAdd = () => {
   editingItem.value = {}
@@ -104,7 +104,7 @@ const handleAdd = () => {
 }
 
 /**
- * 编辑属性
+ * Edit properties
  */
 const handleEdit = (row: any) => {
   editingItem.value = { ...row }
@@ -112,7 +112,7 @@ const handleEdit = (row: any) => {
 }
 
 /**
- * 删除属性
+ * Delete attribute
  */
 const handleDelete = async (id: string) => {
   await delAttributes(id)
@@ -121,7 +121,7 @@ const handleDelete = async (id: string) => {
 }
 
 /**
- * 编辑成功回调
+ * Edit success callback
  */
 const handleEditSuccess = () => {
   showEditModal.value = false
@@ -130,7 +130,7 @@ const handleEditSuccess = () => {
 }
 
 /**
- * 取消编辑
+ * Cancel edit
  */
 const handleEditCancel = () => {
   showEditModal.value = false
@@ -138,7 +138,7 @@ const handleEditCancel = () => {
 }
 
 /**
- * 分页变化
+ * Pagination changes
  */
 const handlePageChange = (page: number) => {
   queryParams.page = page
@@ -146,8 +146,8 @@ const handlePageChange = (page: number) => {
 }
 
 /**
- * 🔥 监听 templateData 变化
- * 当父组件加载完模板数据后，自动加载属性数据
+ * 🔥 monitor templateData change
+ * After the parent component loads the template data，Automatically load attribute data
  */
 watch(
   () => templateData.value?.id,
@@ -160,7 +160,7 @@ watch(
 )
 
 onMounted(() => {
-  // 数据加载由 watch 处理
+  // Data is loaded by watch deal with
 })
 </script>
 
@@ -179,7 +179,7 @@ onMounted(() => {
       <NPagination :page-count="total" :page-size="queryParams.page_size" @update:page="handlePageChange" />
     </div>
 
-    <!-- 编辑弹窗 -->
+    <!-- Edit pop-up window -->
     <NModal
       v-model:show="showEditModal"
       :title="editingItem.id ? $t('common.edit') : $t('common.add')"

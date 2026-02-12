@@ -1,39 +1,39 @@
 /**
- * 面板编辑器配置管理组合式函数
- * 负责配置解析、验证、迁移和默认配置生成
+ * Panel editor configuration management combined functions
+ * Responsible for configuration analysis、verify、Migration and default configuration generation
  */
 
 import type { RendererType } from '@/components/visual-editor/types'
 
 /**
- * 配置管理相关函数集合
+ * Configuration management related function collection
  */
 export function usePanelConfigManager() {
   /**
-   * 解析配置字符串
-   * 支持新旧格式兼容性处理
+   * Parse configuration string
+   * Supports compatibility processing of old and new formats
    */
   const parseConfig = (configString: string) => {
     try {
       const config = JSON.parse(configString)
 
-      // 检查是否为新格式
+      // Check if it is the new format
       if (typeof config === 'object' && config.visualEditor) {
-        // 验证配置格式
+        // Verify configuration format
         const validatedConfig = validateConfig(config)
         return validatedConfig
       }
 
-      // 🔥 修复：兼容直接格式 {widgets: [...], config: {...}}
+      // 🔥 repair：Direct format compatible {widgets: [...], config: {...}}
       if (config.widgets !== undefined || config.config !== undefined) {
-        // 直接格式，直接返回
+        // direct format，Return directly
         return {
           legacyComponents: [],
-          visualEditor: config // 直接使用，不包装
+          visualEditor: config // Use directly，No packaging
         }
       }
 
-      // 🔥 兼容更老的数组格式
+      // 🔥 Compatible with older array formats
       if (Array.isArray(config)) {
         return {
           legacyComponents: [],
@@ -44,7 +44,7 @@ export function usePanelConfigManager() {
         }
       }
 
-      // 未知格式，使用默认配置
+      // unknown format，Use default configuration
       return {
         legacyComponents: [],
         visualEditor: getDefaultConfig()
@@ -58,22 +58,22 @@ export function usePanelConfigManager() {
   }
 
   /**
-   * 验证配置格式
-   * 确保配置项完整性并补充缺失项
+   * Verify configuration format
+   * Ensure the completeness of configuration items and fill in missing items
    */
   const validateConfig = (config: any) => {
     const defaultConfig = getDefaultConfig()
 
-    // 确保 visualEditor 存在
+    // make sure visualEditor exist
     if (!config.visualEditor) {
       config.visualEditor = defaultConfig
       return config
     }
 
-    // 验证并补充缺失的配置项
+    // Verify and add missing configuration items
     const visualEditor = config.visualEditor
 
-    // 确保基本配置项存在
+    // Make sure basic configuration items exist
     if (!visualEditor.nodes) visualEditor.nodes = defaultConfig.nodes
     if (!visualEditor.canvasConfig) visualEditor.canvasConfig = defaultConfig.canvasConfig
     if (!visualEditor.gridConfig) visualEditor.gridConfig = defaultConfig.gridConfig
@@ -83,30 +83,30 @@ export function usePanelConfigManager() {
     if (!visualEditor.showLeftDrawer) visualEditor.showLeftDrawer = defaultConfig.showLeftDrawer
     if (!visualEditor.showRightDrawer) visualEditor.showRightDrawer = defaultConfig.showRightDrawer
 
-    // 确保 legacyComponents 存在
+    // make sure legacyComponents exist
     if (!config.legacyComponents) {
       config.legacyComponents = []
     }
 
-    // 执行配置迁移
+    // Perform configuration migration
     const migratedConfig = migrateConfig(config)
 
     return migratedConfig
   }
 
   /**
-   * 配置迁移函数
-   * 处理不同版本间的配置格式升级
+   * Configure migration function
+   * Handle configuration format upgrades between different versions
    */
   const migrateConfig = (config: any) => {
     const visualEditor = config.visualEditor
 
-    // 检查版本并执行迁移
+    // Check version and perform migration
     const version = visualEditor.metadata?.version || '0.0.0'
 
-    // 从 v0.x 迁移到 v1.0
+    // from v0.x Migrate to v1.0
     if (version.startsWith('0.')) {
-      // 添加缺失的配置项
+      // Add missing configuration items
       if (!visualEditor.currentRenderer) {
         visualEditor.currentRenderer = 'gridstack'
       }
@@ -120,7 +120,7 @@ export function usePanelConfigManager() {
         visualEditor.showRightDrawer = false
       }
 
-      // 更新版本信息
+      // Update version information
       if (!visualEditor.metadata) {
         visualEditor.metadata = {}
       }
@@ -132,8 +132,8 @@ export function usePanelConfigManager() {
   }
 
   /**
-   * 获取默认配置
-   * 生成编辑器的默认配置对象
+   * Get default configuration
+   * Generate the default configuration object of the editor
    */
   const getDefaultConfig = () => {
     const config = {
@@ -147,26 +147,26 @@ export function usePanelConfigManager() {
       gridConfig: {
         colNum: 24,
         rowHeight: 80,
-        // 默认无间距：从 [10, 10] 调整为 [0, 0]
+        // Default no spacing：from [10, 10] Adjust to [0, 0]
         margin: [0, 0],
         isDraggable: true,
         isResizable: true,
         staticGrid: false
       },
       viewport: {},
-      // 默认渲染器类型和编辑器状态
+      // Default renderer type and editor state
       currentRenderer: 'gridstack' as RendererType,
       showWidgetTitles: true,
       showLeftDrawer: false,
       showRightDrawer: false,
-      // 新增：默认编辑状态
+      // New：Default editing state
       isEditing: false,
       selectedNodeId: '',
       isDragging: false,
       draggedComponent: null
     }
 
-    // 🔥 调试：分析配置对象的可克隆性
+    // 🔥 debug：Analyze the clonability of configuration objects
     const cloneabilityIssues = analyzeCloneability(config)
     if (cloneabilityIssues.length > 0) {
     }
@@ -175,8 +175,8 @@ export function usePanelConfigManager() {
   }
 
   /**
-   * 🔥 调试：分析structuredClone失败的具体原因
-   * 检查对象的可克隆性，识别不能被结构化克隆的属性
+   * 🔥 debug：analyzestructuredCloneSpecific reasons for failure
+   * Check the clonability of an object，Identify attributes that cannot be structurally cloned
    */
   const analyzeCloneability = (obj: any, path = 'root'): string[] => {
     const issues: string[] = []
@@ -194,18 +194,18 @@ export function usePanelConfigManager() {
     }
 
     if (typeof obj === 'object') {
-      // 检查是否是Vue响应式对象
+      // Check if it isVueReactive objects
       if (obj.__v_isReactive || obj.__v_isReadonly || obj.__v_isRef) {
         issues.push(`${path}: Vue reactive object`)
         return issues
       }
 
-      // 检查原型链
+      // Check the prototype chain
       if (obj.constructor !== Object && obj.constructor !== Array) {
         issues.push(`${path}: Custom class instance (${obj.constructor.name})`)
       }
 
-      // 递归检查属性
+      // Check properties recursively
       for (const [key, value] of Object.entries(obj)) {
         issues.push(...analyzeCloneability(value, `${path}.${key}`))
       }
@@ -215,7 +215,7 @@ export function usePanelConfigManager() {
   }
 
   return {
-    // 配置解析和验证
+    // Configuration parsing and verification
     parseConfig,
     validateConfig,
     migrateConfig,

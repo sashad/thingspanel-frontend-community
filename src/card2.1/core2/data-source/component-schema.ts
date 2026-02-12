@@ -1,78 +1,78 @@
 /**
- * 组件数据模式管理器
- * 管理组件的数据字段定义、验证规则和默认值
- * 用于数据绑定系统中的数据校验和转换
+ * Component Data Schema Manager
+ * Data field definitions for management components、Validation rules and default values
+ * Used for data checksum conversion in data binding systems
  */
 
 import type { ComponentDefinition, DataFieldType, DataValidationRule } from '../types'
 import { ComponentRegistry } from '../registry/component-registry'
 
 /**
- * 组件字段定义接口
+ * Component field definition interface
  */
 export interface ComponentFieldSchema {
-  /** 字段名称 */
+  /** Field name */
   name: string
-  /** 字段类型 */
+  /** Field type */
   type: DataFieldType
-  /** 字段描述 */
+  /** Field description */
   description?: string
-  /** 是否必需 */
+  /** Is it necessary */
   required?: boolean
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
-  /** 验证规则 */
+  /** Validation rules */
   validation?: DataValidationRule
-  /** 字段别名（用于数据绑定时的映射） */
+  /** Field alias（Mapping for data binding） */
   alias?: string[]
 }
 
 /**
- * 组件数据模式接口
+ * Component Data Schema Interface
  */
 export interface ComponentSchema {
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 字段定义映射 */
+  /** Field definition mapping */
   fields: Record<string, ComponentFieldSchema>
-  /** 模式版本 */
+  /** Schema version */
   version?: string
-  /** 创建时间 */
+  /** creation time */
   createdAt?: Date
-  /** 更新时间 */
+  /** Update time */
   updatedAt?: Date
 }
 
 /**
- * 数据验证结果接口
+ * Data verification result interface
  */
 export interface ValidationResult {
-  /** 是否有效 */
+  /** Is it valid? */
   valid: boolean
-  /** 验证错误信息 */
+  /** Validation error message */
   errors: Array<{
     field: string
     message: string
     value?: any
   }>
-  /** 处理后的数据 */
+  /** processed data */
   processedData?: Record<string, any>
 }
 
 /**
- * 组件数据模式管理器类
+ * Component Data Schema Manager Class
  */
 export class ComponentSchemaManager {
-  /** 组件模式缓存 */
+  /** Component mode caching */
   private schemas = new Map<string, ComponentSchema>()
 
-  /** 默认字段定义（基础通用字段） */
+  /** Default field definition（Basic common fields） */
   private readonly defaultFields: Record<string, ComponentFieldSchema> = {
-    // 数字指示器常用字段
+    // Numeric indicator common fields
     value: {
       name: 'value',
       type: 'string',
-      description: '主要数值',
+      description: 'Main values',
       required: false,
       defaultValue: '0',
       alias: ['val', 'number', 'data']
@@ -80,7 +80,7 @@ export class ComponentSchemaManager {
     unit: {
       name: 'unit',
       type: 'string',
-      description: '数值单位',
+      description: 'numerical unit',
       required: false,
       defaultValue: '',
       alias: ['units', 'measure']
@@ -88,16 +88,16 @@ export class ComponentSchemaManager {
     metricsName: {
       name: 'metricsName',
       type: 'string',
-      description: '指标名称',
+      description: 'Indicator name',
       required: false,
-      defaultValue: '指标',
+      defaultValue: 'index',
       alias: ['metricName', 'name', 'title']
     },
-    // 通用组件字段
+    // Common component fields
     title: {
       name: 'title',
       type: 'string',
-      description: '标题',
+      description: 'title',
       required: false,
       defaultValue: '',
       alias: ['name', 'label']
@@ -105,7 +105,7 @@ export class ComponentSchemaManager {
     description: {
       name: 'description',
       type: 'string',
-      description: '描述',
+      description: 'describe',
       required: false,
       defaultValue: '',
       alias: ['desc', 'detail']
@@ -113,16 +113,16 @@ export class ComponentSchemaManager {
     amount: {
       name: 'amount',
       type: 'string',
-      description: '数量或金额',
+      description: 'quantity or amount',
       required: false,
       defaultValue: '0',
       alias: ['count', 'quantity']
     },
-    // 状态和控制字段
+    // Status and control fields
     status: {
       name: 'status',
       type: 'string',
-      description: '状态',
+      description: 'state',
       required: false,
       defaultValue: 'normal',
       alias: ['state', 'condition']
@@ -130,7 +130,7 @@ export class ComponentSchemaManager {
     color: {
       name: 'color',
       type: 'string',
-      description: '颜色',
+      description: 'color',
       required: false,
       defaultValue: '#1890ff',
       alias: ['backgroundColor', 'bgColor']
@@ -138,7 +138,7 @@ export class ComponentSchemaManager {
     iconName: {
       name: 'iconName',
       type: 'string',
-      description: '图标名称',
+      description: 'Icon name',
       required: false,
       defaultValue: 'default',
       alias: ['icon', 'iconType']
@@ -146,13 +146,13 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 注册或更新组件数据模式
-   * @param componentType 组件类型
-   * @param schema 组件模式定义
+   * Register or update component data schema
+   * @param componentType Component type
+   * @param schema Component pattern definition
    */
   registerSchema(componentType: string, schema: ComponentSchema): void {
 
-    // 合并默认字段和自定义字段
+    // Merge default fields and custom fields
     const mergedFields = {
       ...this.defaultFields,
       ...schema.fields
@@ -170,17 +170,17 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 从组件定义自动生成数据模式
-   * @param definition 组件定义
+   * Automatically generate data schema from component definition
+   * @param definition Component definition
    */
   generateSchemaFromDefinition(definition: ComponentDefinition): ComponentSchema {
     const fields: Record<string, ComponentFieldSchema> = { ...this.defaultFields }
 
-    // 如果组件定义中有数据源需求，添加对应的字段
+    // If there is a data source requirement in the component definition，Add corresponding fields
     if (definition.dataSources && Array.isArray(definition.dataSources)) {
       definition.dataSources.forEach(dataSource => {
         if (dataSource.example) {
-          // 从示例数据中推断字段类型
+          // Infer field types from sample data
           Object.keys(dataSource.example).forEach(key => {
             if (!fields[key]) {
               const value = dataSource.example![key]
@@ -189,7 +189,7 @@ export class ComponentSchemaManager {
               fields[key] = {
                 name: key,
                 type,
-                description: `来自数据源 ${dataSource.name} 的字段`,
+                description: `from data source ${dataSource.name} fields`,
                 required: false,
                 defaultValue: this.getDefaultValueForType(type)
               }
@@ -207,28 +207,28 @@ export class ComponentSchemaManager {
       updatedAt: new Date()
     }
 
-    // 自动注册生成的模式
+    // Automatically register generated schema
     this.registerSchema(definition.type, schema)
 
     return schema
   }
 
   /**
-   * 获取组件数据模式
-   * @param componentType 组件类型
-   * @returns 组件模式或 undefined
+   * Get component data schema
+   * @param componentType Component type
+   * @returns component pattern or undefined
    */
   getSchema(componentType: string): ComponentSchema | undefined {
     let schema = this.schemas.get(componentType)
 
-    // 如果没有找到模式，尝试从组件注册表生成
+    // if pattern not found，Try to generate from component registry
     if (!schema) {
       const definition = ComponentRegistry.get(componentType)
       if (definition) {
         schema = this.generateSchemaFromDefinition(definition)
       } else {
-        console.warn(`⚠️ [ComponentSchemaManager] 未找到组件定义: ${componentType}`)
-        // 返回基础默认模式
+        console.warn(`⚠️ [ComponentSchemaManager] Component definition not found: ${componentType}`)
+        // Return to basic default mode
         schema = {
           componentType,
           fields: { ...this.defaultFields },
@@ -244,46 +244,46 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 验证组件数据
-   * @param componentType 组件类型
-   * @param data 要验证的数据
-   * @returns 验证结果
+   * Validate component data
+   * @param componentType Component type
+   * @param data Data to verify
+   * @returns Verification results
    */
   validateComponentData(componentType: string, data: Record<string, any>): ValidationResult {
     const schema = this.getSchema(componentType)
     if (!schema) {
       return {
         valid: false,
-        errors: [{ field: 'schema', message: `未找到组件 ${componentType} 的数据模式` }]
+        errors: [{ field: 'schema', message: `Component not found ${componentType} data pattern` }]
       }
     }
 
     const errors: Array<{ field: string; message: string; value?: any }> = []
     const processedData: Record<string, any> = {}
 
-    // 验证每个字段
+    // Validate each field
     for (const [fieldName, fieldSchema] of Object.entries(schema.fields)) {
       const value = data[fieldName]
 
-      // 检查必需字段
+      // Check required fields
       if (fieldSchema.required && (value === undefined || value === null)) {
         errors.push({
           field: fieldName,
-          message: `字段 ${fieldName} 是必需的`,
+          message: `Field ${fieldName} is required`,
           value
         })
         continue
       }
 
-      // 使用默认值或提供的值
+      // Use default or provided value
       let finalValue = value !== undefined ? value : fieldSchema.defaultValue
 
-      // 类型转换和验证
+      // Type conversion and validation
       if (finalValue !== undefined) {
         try {
           finalValue = this.convertValueToType(finalValue, fieldSchema.type)
 
-          // 应用验证规则
+          // Apply validation rules
           if (fieldSchema.validation) {
             const validationError = this.validateField(fieldName, finalValue, fieldSchema.validation)
             if (validationError) {
@@ -296,7 +296,7 @@ export class ComponentSchemaManager {
         } catch (error) {
           errors.push({
             field: fieldName,
-            message: `字段 ${fieldName} 类型转换失败: ${error}`,
+            message: `Field ${fieldName} Type conversion failed: ${error}`,
             value: finalValue
           })
         }
@@ -311,35 +311,35 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 获取所有已注册的组件模式
-   * @returns 组件模式数组
+   * Get all registered component modes
+   * @returns component pattern array
    */
   getAllSchemas(): ComponentSchema[] {
     return Array.from(this.schemas.values())
   }
 
   /**
-   * 清除指定组件的模式
-   * @param componentType 组件类型
+   * Clear the mode of the specified component
+   * @param componentType Component type
    */
   clearSchema(componentType: string): void {
     this.schemas.delete(componentType)
   }
 
   /**
-   * 清除所有组件模式
+   * Clear all component modes
    */
   clearAllSchemas(): void {
     const count = this.schemas.size
     this.schemas.clear()
   }
 
-  // ==================== 私有方法 ====================
+  // ==================== private method ====================
 
   /**
-   * 推断字段类型
-   * @param value 字段值
-   * @returns 推断的字段类型
+   * Infer field type
+   * @param value field value
+   * @returns Inferred field type
    */
   private inferFieldType(value: any): DataFieldType {
     if (typeof value === 'string') return 'string'
@@ -348,13 +348,13 @@ export class ComponentSchemaManager {
     if (Array.isArray(value)) return 'array'
     if (value instanceof Date) return 'date'
     if (typeof value === 'object' && value !== null) return 'object'
-    return 'value' // 默认类型
+    return 'value' // Default type
   }
 
   /**
-   * 获取类型的默认值
-   * @param type 字段类型
-   * @returns 默认值
+   * Get the default value of a type
+   * @param type Field type
+   * @returns default value
    */
   private getDefaultValueForType(type: DataFieldType): any {
     switch (type) {
@@ -370,10 +370,10 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 将值转换为指定类型
-   * @param value 原始值
-   * @param type 目标类型
-   * @returns 转换后的值
+   * Convert a value to a specified type
+   * @param value original value
+   * @param type target type
+   * @returns converted value
    */
   private convertValueToType(value: any, type: DataFieldType): any {
     if (value === null || value === undefined) {
@@ -385,7 +385,7 @@ export class ComponentSchemaManager {
         return String(value)
       case 'number':
         const num = Number(value)
-        if (isNaN(num)) throw new Error(`无法转换为数字: ${value}`)
+        if (isNaN(num)) throw new Error(`Cannot convert to number: ${value}`)
         return num
       case 'boolean':
         if (typeof value === 'boolean') return value
@@ -412,7 +412,7 @@ export class ComponentSchemaManager {
       case 'date':
         if (value instanceof Date) return value
         const date = new Date(value)
-        if (isNaN(date.getTime())) throw new Error(`无法转换为日期: ${value}`)
+        if (isNaN(date.getTime())) throw new Error(`Cannot convert to date: ${value}`)
         return date
       case 'value':
       default:
@@ -421,58 +421,58 @@ export class ComponentSchemaManager {
   }
 
   /**
-   * 验证字段值
-   * @param fieldName 字段名称
-   * @param value 字段值
-   * @param validation 验证规则
-   * @returns 验证错误或 null
+   * Validate field value
+   * @param fieldName Field name
+   * @param value field value
+   * @param validation Validation rules
+   * @returns Validation error or null
    */
   private validateField(
     fieldName: string,
     value: any,
     validation: DataValidationRule
   ): { field: string; message: string; value?: any } | null {
-    // 最小值/长度检查
+    // minimum value/length check
     if (validation.min !== undefined) {
       const length = typeof value === 'string' || Array.isArray(value) ? value.length : value
       if (length < validation.min) {
         return {
           field: fieldName,
-          message: `字段 ${fieldName} 的值小于最小要求 ${validation.min}`,
+          message: `Field ${fieldName} The value is less than the minimum requirement ${validation.min}`,
           value
         }
       }
     }
 
-    // 最大值/长度检查
+    // maximum value/length check
     if (validation.max !== undefined) {
       const length = typeof value === 'string' || Array.isArray(value) ? value.length : value
       if (length > validation.max) {
         return {
           field: fieldName,
-          message: `字段 ${fieldName} 的值超过最大限制 ${validation.max}`,
+          message: `Field ${fieldName} The value exceeds the maximum limit ${validation.max}`,
           value
         }
       }
     }
 
-    // 正则表达式检查
+    // Regular expression check
     if (validation.pattern && typeof value === 'string') {
       const regex = new RegExp(validation.pattern)
       if (!regex.test(value)) {
         return {
           field: fieldName,
-          message: `字段 ${fieldName} 的值不符合格式要求`,
+          message: `Field ${fieldName} The value does not meet the format requirements`,
           value
         }
       }
     }
 
-    // 枚举值检查
+    // Enumeration value checking
     if (validation.enum && !validation.enum.includes(value)) {
       return {
         field: fieldName,
-        message: `字段 ${fieldName} 的值不在允许的选项中: ${validation.enum.join(', ')}`,
+        message: `Field ${fieldName} The value for is not among the allowed options: ${validation.enum.join(', ')}`,
         value
       }
     }
@@ -482,17 +482,17 @@ export class ComponentSchemaManager {
 }
 
 /**
- * 默认组件数据模式管理器实例
+ * Default component data schema manager instance
  */
 export const componentSchemaManager = new ComponentSchemaManager()
 
 /**
- * 创建自定义组件数据模式管理器
- * @returns 新的组件数据模式管理器实例
+ * Create a custom component data schema manager
+ * @returns New component data schema manager instance
  */
 export function createComponentSchemaManager(): ComponentSchemaManager {
   return new ComponentSchemaManager()
 }
 
-// 默认导出
+// Default export
 export default componentSchemaManager

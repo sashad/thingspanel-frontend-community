@@ -2,27 +2,27 @@ import type { NavigationGuardNext, RouteLocationNormalized, Router } from 'vue-r
 import { useAppStore } from '@/store/modules/app'
 
 /**
- * 创建移动端布局守卫
- * 在移动设备上自动将使用 base 布局的路由切换为 mobile 布局
+ * Create mobile layout guards
+ * on mobile devices will automatically use base The layout's routing is switched to mobile layout
  */
 export function createMobileLayoutGuard(router: Router) {
   router.beforeEach((to, from, next) => {
     const appStore = useAppStore()
 
-    // 如果是移动设备且当前路由使用的是 base 布局
+    // If it is a mobile device and the current routing uses base layout
     if (appStore.isMobile && shouldUseMobileLayout(to)) {
-      // 修改路由配置为移动端布局
+      // Modify routing configuration to mobile layout
       const mobileRoute = { ...to }
 
-      // 将路由组件从 base 布局改为 mobile 布局
+      // Change the routing component from base The layout is changed to mobile layout
       const routeMatch = router.getRoutes().find(route => route.name === to.name)
       if (routeMatch && routeMatch.matched?.[0]) {
         const matched = routeMatch.matched[0]
-        // 检查是否使用 base 布局组件
+        // Check if using base layout component
         if (isBaseLayoutComponent(matched.components?.default)) {
-          // 这里我们通过路由守卫动态修改组件
-          // 由于 Vue Router 的限制，我们在路由层面使用不同的处理方式
-          // 实际上我们会在组件内部根据 isMobile 状态来渲染不同的布局
+          // Here we dynamically modify components through routing guards
+          // because Vue Router restrictions，We use different processing methods at the routing level
+          // In fact, we will use the isMobile state to render different layouts
         }
       }
     }
@@ -32,23 +32,23 @@ export function createMobileLayoutGuard(router: Router) {
 }
 
 /**
- * 判断是否应该使用移动端布局
+ * Determine whether mobile layout should be used
  */
 function shouldUseMobileLayout(route: RouteLocationNormalized): boolean {
-  // 排除不需要移动端布局的路由
+  // Exclude routes that do not require mobile layout
   const excludeRoutes = ['login', '403', '404', '500']
 
-  // 如果是常量路由（如登录页、错误页）则不使用移动端布局
+  // If it is a constant route（Such as login page、error page）Do not use mobile layout
   if (route.meta?.constant) {
     return false
   }
 
-  // 如果路由名称在排除列表中
+  // If the route name is in the exclude list
   if (excludeRoutes.includes(route.name as string)) {
     return false
   }
 
-  // 检查路由是否明确指定了不使用移动端布局
+  // Check if the route explicitly specifies not to use mobile layout
   if (route.meta?.disableMobileLayout) {
     return false
   }
@@ -57,13 +57,13 @@ function shouldUseMobileLayout(route: RouteLocationNormalized): boolean {
 }
 
 /**
- * 检查组件是否是 base 布局组件
+ * Check if the component is base layout component
  */
 function isBaseLayoutComponent(component: any): boolean {
-  // 这里可以通过组件名或其他标识来判断
+  // This can be determined by the component name or other identifiers.
   if (!component) return false
 
-  // 检查组件名称或选项
+  // Check component name or options
   const componentName = component.name || component.__name || component.displayName
   return (
     componentName === 'BaseLayout' || (component.__asyncResolved && component.__asyncResolved.name === 'BaseLayout')

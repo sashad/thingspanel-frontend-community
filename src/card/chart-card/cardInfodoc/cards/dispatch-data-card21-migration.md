@@ -1,56 +1,56 @@
-# Dispatch Data 组件 Card 2.1 迁移配置文档
+# Dispatch Data components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-**组件ID**: `chart-dispatch`  
-**组件类型**: `chart`  
-**组件名称**: 数据分发器  
-**功能描述**: 用于向设备发送数据的控制组件，支持属性、遥测和命令三种数据类型的发送
+**componentsID**: `chart-dispatch`  
+**Component type**: `chart`  
+**Component name**: data distributor  
+**Function description**: Control component for sending data to the device，Support properties、Sending of three data types, telemetry and commands
 
-## 当前实现分析
+## Current implementation analysis
 
-### 1. 组件结构
+### 1. Component structure
 ```
 dispatch-data/
-├── index.ts              # 组件定义配置
-├── component.vue         # 主组件实现
-├── card-config.vue       # 配置表单
-└── poster.png           # 组件预览图
+├── index.ts              # Component definition configuration
+├── component.vue         # Main component implementation
+├── card-config.vue       # Configuration form
+└── poster.png           # Component preview
 ```
 
-### 2. 核心特性
-- **数据发送**: 支持向设备发送属性、遥测和命令数据
-- **单设备支持**: 支持 1 个设备数据源
-- **自定义按钮**: 可配置按钮图标、颜色和文本
-- **响应式设计**: 根据容器大小自动调整字体和图标大小
-- **错误处理**: 包含发送成功/失败的消息提示
-- **多数据类型**: 支持 attributes、telemetry、command 三种数据类型
+### 2. Core features
+- **Data sending**: Support sending properties to the device、Telemetry and command data
+- **单设备support**: support 1 device data sources
+- **Custom button**: Configurable button icon、color and text
+- **Responsive design**: Automatically adjust font and icon sizes based on container size
+- **Error handling**: Contains sent successfully/Failure message prompt
+- **Multiple data types**: support attributes、telemetry、command Three data types
 
-### 3. 技术实现
-- **图标库**: @vicons/ionicons5
-- **API调用**: attributeDataPub、telemetryDataPub、commandDataPub
-- **响应式**: ResizeObserver API 监听容器变化
-- **消息提示**: 集成 naive-ui 消息组件
+### 3. Technical implementation
+- **Icon library**: @vicons/ionicons5
+- **APIcall**: attributeDataPub、telemetryDataPub、commandDataPub
+- **Responsive**: ResizeObserver API Listen for container changes
+- **Message prompt**: integrated naive-ui Message component
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 1. 组件定义 (ComponentDefinition)
+### 1. Component definition (ComponentDefinition)
 
 ```typescript
 import { ComponentDefinition } from '@/card2.1/types'
 
 export const dispatchDataDefinition: ComponentDefinition = {
-  // 基础信息
+  // Basic information
   id: 'chart-dispatch',
   name: 'card.dataSent',
   type: 'chart',
   category: 'data',
   
-  // 组件配置
+  // Component configuration
   component: () => import('./component.vue'),
   configComponent: () => import('./config.vue'),
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 3, height: 2 },
     minSize: { width: 2, height: 1 },
@@ -58,7 +58,7 @@ export const dispatchDataDefinition: ComponentDefinition = {
     resizable: true
   },
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     multiple: false,
@@ -69,15 +69,15 @@ export const dispatchDataDefinition: ComponentDefinition = {
       timeRange: false,
       aggregate: false,
       realtime: false,
-      writable: true  // 支持数据写入
+      writable: true  // Support data writing
     }
   },
   
-  // 配置模式
+  // configuration mode
   configSchema: {
     type: 'object',
     properties: {
-      // 数据配置
+      // Data configuration
       data: {
         type: 'object',
         properties: {
@@ -85,37 +85,37 @@ export const dispatchDataDefinition: ComponentDefinition = {
             type: 'string',
             enum: ['attributes', 'telemetry', 'command'],
             default: 'command',
-            title: '数据类型'
+            title: 'data type'
           },
           valueToSend: {
             type: 'string',
             default: '1',
-            title: '发送值',
-            description: '点击按钮时发送的数据值'
+            title: 'Send value',
+            description: 'The data value sent when the button is clicked'
           },
           targetKey: {
             type: 'string',
-            title: '目标键名',
-            description: '数据发送的目标键名'
+            title: 'Target key name',
+            description: 'The target key name for data sending'
           }
         },
         required: ['dataType', 'valueToSend']
       },
       
-      // 按钮样式配置
+      // Button style configuration
       button: {
         type: 'object',
         properties: {
           text: {
             type: 'string',
-            default: '发送数据',
-            title: '按钮文本'
+            default: 'Send data',
+            title: 'button text'
           },
           color: {
             type: 'string',
             format: 'color',
             default: '#ff4d4f',
-            title: '按钮颜色'
+            title: 'button color'
           },
           iconName: {
             type: 'string',
@@ -125,65 +125,65 @@ export const dispatchDataDefinition: ComponentDefinition = {
               'Refresh', 'Download', 'Upload', 'Save'
             ],
             default: 'Play',
-            title: '按钮图标'
+            title: 'button icon'
           },
           iconColor: {
             type: 'string',
             format: 'color',
             default: '#ffffff',
-            title: '图标颜色'
+            title: 'icon color'
           }
         }
       },
       
-      // 显示配置
+      // show configuration
       display: {
         type: 'object',
         properties: {
           showDeviceName: {
             type: 'boolean',
             default: true,
-            title: '显示设备名称'
+            title: 'Show device name'
           },
           showButtonText: {
             type: 'boolean',
             default: true,
-            title: '显示按钮文本'
+            title: 'Show button text'
           },
           customDeviceName: {
             type: 'string',
-            title: '自定义设备名称',
-            description: '留空则使用数据源中的设备名称'
+            title: 'Custom device name',
+            description: 'Leave blank to use the device name from the data source'
           }
         }
       },
       
-      // 行为配置
+      // behavior configuration
       behavior: {
         type: 'object',
         properties: {
           confirmBeforeSend: {
             type: 'boolean',
             default: false,
-            title: '发送前确认'
+            title: 'Confirm before sending'
           },
           cooldownTime: {
             type: 'number',
             minimum: 0,
             maximum: 60,
             default: 0,
-            title: '冷却时间(秒)',
-            description: '防止频繁点击的冷却时间'
+            title: 'Cooling time(Second)',
+            description: 'Cooldown time to prevent frequent clicks'
           },
           showSuccessMessage: {
             type: 'boolean',
             default: true,
-            title: '显示成功消息'
+            title: 'Show success message'
           },
           showErrorMessage: {
             type: 'boolean',
             default: true,
-            title: '显示错误消息'
+            title: 'Show error message'
           }
         }
       }
@@ -192,29 +192,29 @@ export const dispatchDataDefinition: ComponentDefinition = {
 }
 ```
 
-### 2. 数据源映射
+### 2. Data source mapping
 
 ```typescript
-// 原始数据源结构 -> Card 2.1 数据源结构
+// Original data source structure -> Card 2.1 Data source structure
 const dataSourceMapping = {
-  // 设备数据源
+  // Device data source
   deviceSource: {
     type: 'device',
     config: {
-      deviceId: 'string',      // 设备ID
-      deviceName: 'string',    // 设备名称
-      targetKey: 'string',     // 目标数据键名
-      dataType: 'string'       // 数据类型: 'attributes' | 'telemetry' | 'command'
+      deviceId: 'string',      // equipmentID
+      deviceName: 'string',    // Device name
+      targetKey: 'string',     // Target data key name
+      dataType: 'string'       // data type: 'attributes' | 'telemetry' | 'command'
     }
   }
 }
 ```
 
-### 3. 实现要点
+### 3. Implementation points
 
-#### 数据发送逻辑
+#### Data sending logic
 ```typescript
-// 数据发送函数
+// Data sending function
 const sendData = async (config: DataConfig, deviceId: string) => {
   const { dataType, valueToSend, targetKey } = config
   
@@ -246,52 +246,52 @@ const sendData = async (config: DataConfig, deviceId: string) => {
   }
 }
 
-// 按钮点击处理
+// Button click processing
 const handleButtonClick = async () => {
   if (!deviceId.value) {
-    showError('设备ID不能为空')
+    showError('equipmentIDcannot be empty')
     return
   }
   
-  // 冷却时间检查
+  // Cooldown check
   if (isInCooldown.value) {
-    showWarning(`请等待 ${remainingCooldown.value} 秒后再试`)
+    showWarning(`please wait ${remainingCooldown.value} Try again in seconds`)
     return
   }
   
-  // 发送前确认
+  // Confirm before sending
   if (props.card.config.behavior.confirmBeforeSend) {
-    const confirmed = await showConfirmDialog('确认发送数据？')
+    const confirmed = await showConfirmDialog('Confirm sending data？')
     if (!confirmed) return
   }
   
-  // 设置冷却状态
+  // Set cooling status
   setButtonCooldown()
   
-  // 发送数据
+  // Send data
   const result = await sendData(props.card.config.data, deviceId.value)
   
-  // 显示结果消息
+  // Show result message
   if (result.success) {
     if (props.card.config.behavior.showSuccessMessage) {
-      showSuccess('数据发送成功')
+      showSuccess('Data sent successfully')
     }
   } else {
     if (props.card.config.behavior.showErrorMessage) {
-      showError('数据发送失败')
+      showError('Data sending failed')
     }
   }
 }
 ```
 
-#### 冷却时间管理
+#### Cooling time management
 ```typescript
-// 冷却时间状态
+// Cooldown status
 const isInCooldown = ref(false)
 const remainingCooldown = ref(0)
 let cooldownTimer: NodeJS.Timeout | null = null
 
-// 设置按钮冷却
+// Set button cooling
 const setButtonCooldown = () => {
   const cooldownTime = props.card.config.behavior.cooldownTime || 0
   if (cooldownTime <= 0) return
@@ -307,7 +307,7 @@ const setButtonCooldown = () => {
   }, 1000)
 }
 
-// 清除冷却状态
+// Clear cool down status
 const clearCooldown = () => {
   isInCooldown.value = false
   remainingCooldown.value = 0
@@ -318,9 +318,9 @@ const clearCooldown = () => {
 }
 ```
 
-#### 响应式布局
+#### Responsive layout
 ```typescript
-// 响应式尺寸计算
+// Responsive size calculation
 const calculateSizes = (containerWidth: number, containerHeight: number) => {
   const minDimension = Math.min(containerWidth, containerHeight)
   
@@ -334,7 +334,7 @@ const calculateSizes = (containerWidth: number, containerHeight: number) => {
   }
 }
 
-// ResizeObserver 监听
+// ResizeObserver monitor
 const setupResizeObserver = () => {
   if (!containerRef.value) return
   
@@ -353,12 +353,12 @@ const setupResizeObserver = () => {
 }
 ```
 
-#### 图标系统集成
+#### Icon system integration
 ```typescript
-// 图标配置
+// Icon configuration
 import * as ionicons5 from '@vicons/ionicons5'
 
-// 可用图标列表
+// List of available icons
 const availableIcons = {
   Play: ionicons5.Play,
   Send: ionicons5.Send,
@@ -374,71 +374,71 @@ const availableIcons = {
   Save: ionicons5.Save
 }
 
-// 动态图标组件
+// Dynamic icon component
 const IconComponent = computed(() => {
   const iconName = props.card.config.button.iconName || 'Play'
   return availableIcons[iconName] || availableIcons.Play
 })
 ```
 
-## 迁移检查清单
+## Migration checklist
 
-### 功能迁移
-- [ ] 数据发送功能（属性、遥测、命令）
-- [ ] 按钮点击处理
-- [ ] 设备名称显示
-- [ ] 响应式布局调整
-- [ ] 错误处理和消息提示
-- [ ] 冷却时间控制
+### Function migration
+- [ ] Data sending function（property、telemetry、Order）
+- [ ] Button click processing
+- [ ] Device name display
+- [ ] Responsive layout adjustments
+- [ ] Error handling and message prompts
+- [ ] Cooling time control
 
-### 配置迁移
-- [ ] 按钮样式配置（颜色、图标、文本）
-- [ ] 数据类型配置
-- [ ] 发送值配置
-- [ ] 显示选项配置
-- [ ] 行为控制配置
+### Configuration migration
+- [ ] Button style configuration（color、icon、text）
+- [ ] Data type configuration
+- [ ] Send value configuration
+- [ ] Show option configuration
+- [ ] Behavior control configuration
 
-### 安全性检查
-- [ ] 输入验证
-- [ ] 权限检查
-- [ ] 频率限制
-- [ ] 错误处理
+### Security check
+- [ ] Input validation
+- [ ] Permission check
+- [ ] frequency limit
+- [ ] Error handling
 
-## 迁移步骤
+## Migration steps
 
-### 1. 创建组件定义
+### 1. Create component definition
 ```bash
-# 创建组件目录
+# Create component directory
 mkdir -p src/card2.1/components/data/dispatch-data
 
-# 创建必要文件
+# Create necessary files
 touch src/card2.1/components/data/dispatch-data/definition.ts
 touch src/card2.1/components/data/dispatch-data/component.vue
 touch src/card2.1/components/data/dispatch-data/config.vue
 ```
 
-### 2. 实现核心组件
-- 迁移 `component.vue` 主组件逻辑
-- 适配 Card 2.1 数据源接口
-- 实现冷却时间和确认机制
-- 实现配置表单组件
+### 2. Implement core components
+- migrate `component.vue` main component logic
+- adaptation Card 2.1 Data source interface
+- Implement cooling time and confirmation mechanism
+- Implement configuration form components
 
-### 3. 配置验证
-- 测试数据发送功能
-- 验证按钮样式配置
-- 测试响应式布局
-- 检查错误处理机制
+### 3. Configuration verification
+- Test data sending function
+- Validate button style configuration
+- Test responsive layout
+- Check error handling mechanism
 
-### 4. 安全测试
-- 验证输入数据安全性
-- 测试频率限制功能
-- 检查权限控制
+### 4. Security testing
+- Verify input data security
+- Test frequency limiting function
+- Check access control
 
-## 数据发送流程
+## Data sending process
 
-### 1. 数据准备
+### 1. Data preparation
 ```typescript
-// 构建发送数据
+// Build sending data
 const buildPayload = (config: DataConfig, deviceId: string) => {
   return {
     device_id: deviceId,
@@ -449,9 +449,9 @@ const buildPayload = (config: DataConfig, deviceId: string) => {
 }
 ```
 
-### 2. API 调用
+### 2. API call
 ```typescript
-// 根据数据类型选择API
+// Select based on data typeAPI
 const selectAPI = (dataType: string) => {
   const apiMap = {
     attributes: attributeDataPub,
@@ -463,31 +463,31 @@ const selectAPI = (dataType: string) => {
 }
 ```
 
-### 3. 结果处理
+### 3. Result processing
 ```typescript
-// 处理发送结果
+// Process sending results
 const handleSendResult = (result: any, config: BehaviorConfig) => {
   if (result.success) {
     if (config.showSuccessMessage) {
-      showSuccessNotification('数据发送成功')
+      showSuccessNotification('Data sent successfully')
     }
     
-    // 触发成功事件
+    // Trigger success event
     emit('dataSent', { success: true, data: result.data })
   } else {
     if (config.showErrorMessage) {
-      showErrorNotification('数据发送失败: ' + result.error)
+      showErrorNotification('Data sending failed: ' + result.error)
     }
     
-    // 触发失败事件
+    // trigger failure event
     emit('dataSent', { success: false, error: result.error })
   }
 }
 ```
 
-## 配置示例
+## Configuration example
 
-### 基础配置
+### Basic configuration
 ```json
 {
   "data": {
@@ -496,7 +496,7 @@ const handleSendResult = (result: any, config: BehaviorConfig) => {
     "targetKey": "switch"
   },
   "button": {
-    "text": "开启设备",
+    "text": "Turn on the device",
     "color": "#52c41a",
     "iconName": "Power",
     "iconColor": "#ffffff"
@@ -514,7 +514,7 @@ const handleSendResult = (result: any, config: BehaviorConfig) => {
 }
 ```
 
-### 高级配置
+### Advanced configuration
 ```json
 {
   "data": {
@@ -523,7 +523,7 @@ const handleSendResult = (result: any, config: BehaviorConfig) => {
     "targetKey": "temperature_setpoint"
   },
   "button": {
-    "text": "设置温度",
+    "text": "Set temperature",
     "color": "#1890ff",
     "iconName": "Settings",
     "iconColor": "#ffffff"
@@ -531,7 +531,7 @@ const handleSendResult = (result: any, config: BehaviorConfig) => {
   "display": {
     "showDeviceName": true,
     "showButtonText": true,
-    "customDeviceName": "空调控制器"
+    "customDeviceName": "air conditioning controller"
   },
   "behavior": {
     "confirmBeforeSend": true,
@@ -542,27 +542,27 @@ const handleSendResult = (result: any, config: BehaviorConfig) => {
 }
 ```
 
-## 使用场景
+## Usage scenarios
 
-### 1. 设备控制
-- 开关控制
-- 模式切换
-- 参数设置
+### 1. Device control
+- switch control
+- Mode switching
+- Parameter settings
 
-### 2. 数据注入
-- 测试数据发送
-- 校准数据写入
-- 配置参数更新
+### 2. data injection
+- Test data sending
+- Calibration data writing
+- Configuration parameter update
 
-### 3. 远程操作
-- 远程重启
-- 远程配置
-- 远程诊断
+### 3. remote operation
+- Remote restart
+- remote configuration
+- remote diagnosis
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture.md)
-- [数据源配置指南](../data-source-guide.md)
-- [组件开发规范](../component-development.md)
-- [设备控制API文档](../device-control-api.md)
-- [安全性指南](../security-guide.md)
+- [Card 2.1 Architecture documentation](../architecture.md)
+- [Data source configuration guide](../data-source-guide.md)
+- [Component Development Specifications](../component-development.md)
+- [Device controlAPIdocument](../device-control-api.md)
+- [Security Guide](../security-guide.md)

@@ -1,18 +1,18 @@
 /**
- * SimpleDataBridge 使用示例
- * 展示如何使用简化的数据桥接器替代复杂的ComponentExecutorManager
+ * SimpleDataBridge Usage example
+ * Show how to use a simplified data bridge instead of a complexComponentExecutorManager
  */
 
 import { simpleDataBridge, convertToSimpleDataRequirement } from '@/core/data-architecture/interfaces'
 
 /**
- * 示例1：基本使用
+ * Example1：Basic usage
  */
 export function basicUsageExample() {
-  // 1. 注册数据更新回调
+  // 1. Register data update callback
   const cleanup = simpleDataBridge.onDataUpdate((componentId, data) => {})
 
-  // 2. 执行组件数据获取
+  // 2. Execution component data acquisition
   simpleDataBridge
     .executeComponent({
       componentId: 'test-component-1',
@@ -21,7 +21,7 @@ export function basicUsageExample() {
           id: 'dataSource1',
           type: 'static',
           config: {
-            data: { value: 123, label: '测试数据' }
+            data: { value: 123, label: 'test data' }
           }
         },
         {
@@ -40,10 +40,10 @@ export function basicUsageExample() {
       }
     })
     .catch(error => {
-      console.error('❌ 执行失败:', error)
+      console.error('❌ Execution failed:', error)
     })
 
-  // 3. 清理资源
+  // 3. Clean up resources
   setTimeout(() => {
     cleanup()
     if (process.env.NODE_ENV === 'development') {
@@ -52,10 +52,10 @@ export function basicUsageExample() {
 }
 
 /**
- * 示例2：配置转换
+ * Example2：Configuration transformation
  */
 export function configConversionExample() {
-  // 模拟来自ConfigurationPanel的复杂配置
+  // The simulation comes fromConfigurationPanelcomplex configuration
   const complexConfig = {
     type: 'data-source-bindings',
     enabled: true,
@@ -64,7 +64,7 @@ export function configConversionExample() {
         rawData: '{"temperature": 25.5, "humidity": 60}'
       },
       dataSource2: {
-        rawData: '[{"id": 1, "name": "设备A"}, {"id": 2, "name": "设备B"}]'
+        rawData: '[{"id": 1, "name": "equipmentA"}, {"id": 2, "name": "equipmentB"}]'
       }
     },
     metadata: {
@@ -73,14 +73,14 @@ export function configConversionExample() {
     }
   }
 
-  // 转换为SimpleDataBridge格式
+  // Convert toSimpleDataBridgeFormat
   const requirement = convertToSimpleDataRequirement('test-component-2', complexConfig)
 
   if (requirement) {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 使用转换后的配置执行数据获取
+    // Perform data acquisition using the transformed configuration
     simpleDataBridge.executeComponent(requirement).then(result => {
     })
   } else {
@@ -90,18 +90,18 @@ export function configConversionExample() {
 }
 
 /**
- * 示例3：对比SimpleDataBridge vs ComponentExecutorManager
+ * Example3：contrastSimpleDataBridge vs ComponentExecutorManager
  */
 export function comparisonExample() {
-  // 统计信息对比
+  // Statistics comparison
   const stats = simpleDataBridge.getStats()
 }
 
 /**
- * 示例4：实际替换ComponentExecutorManager的步骤
+ * Example4：actual replacementComponentExecutorManagersteps
  */
 export function migrationExample() {
-  // 模拟迁移过程
+  // Simulate the migration process
   const legacyConfig = {
     config: {
       dataSourceBindings: {
@@ -112,7 +112,7 @@ export function migrationExample() {
     metadata: { componentType: 'sensor-display' }
   }
 
-  // 转换并执行
+  // Convert and execute
   const requirement = convertToSimpleDataRequirement('migrated-component', legacyConfig)
   if (requirement) {
     simpleDataBridge.executeComponent(requirement).then(result => {})

@@ -14,7 +14,7 @@ const token = localStg.get('token') || ''
 
 const chartLoading = ref(true)
 
-// CardRender相关
+// CardRenderRelated
 const layout = ref<ICardView[]>([])
 const showDefaultCards = ref(true)
 const showAppChart = ref(false)

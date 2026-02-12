@@ -1,42 +1,42 @@
 /**
- * 组件注册表实现
- * 提供组件的注册、查找和管理功能
+ * Component registry implementation
+ * Provides component registration、Find and manage features
  */
 
 import type { IComponentRegistry, IComponentDefinition, RendererType } from '../types/component'
 import type { IComponentMeta } from '../types/index'
 
 /**
- * 组件注册表实现类
+ * Component registry implementation class
  */
 export class ComponentRegistry implements IComponentRegistry {
-  /** 组件定义存储 */
+  /** Component definition storage */
   private definitions = new Map<string, IComponentDefinition>()
-  /** 类型索引 */
+  /** type index */
   private typeIndex = new Map<string, Set<string>>()
-  /** 渲染器索引 */
+  /** renderer index */
   private rendererIndex = new Map<RendererType, Set<string>>()
 
   /**
-   * 注册组件
-   * @param definition 组件定义
+   * Register component
+   * @param definition Component definition
    */
   register(definition: IComponentDefinition): void {
     const { meta } = definition
 
-    // 验证组件定义
+    // Verify component definition
     this.validateDefinition(definition)
 
-    // 存储组件定义
+    // Storage component definition
     this.definitions.set(meta.id, definition)
 
-    // 更新类型索引
+    // Update type index
     if (!this.typeIndex.has(meta.type)) {
       this.typeIndex.set(meta.type, new Set())
     }
     this.typeIndex.get(meta.type)!.add(meta.id)
 
-    // 更新渲染器索引
+    // Update renderer index
     meta.supportedRenderers.forEach(rendererType => {
       if (!this.rendererIndex.has(rendererType)) {
         this.rendererIndex.set(rendererType, new Set())
@@ -49,22 +49,22 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 注销组件
-   * @param componentId 组件ID
+   * Unregister component
+   * @param componentId componentsID
    */
   unregister(componentId: string): void {
     const definition = this.definitions.get(componentId)
     if (!definition) {
-      console.error(`[ComponentRegistry] 组件 ${componentId} 不存在，无法注销`)
+      console.error(`[ComponentRegistry] components ${componentId} does not exist，Unable to log out`)
       return
     }
 
     const { meta } = definition
 
-    // 从主存储中移除
+    // Remove from main storage
     this.definitions.delete(componentId)
 
-    // 从类型索引中移除
+    // Remove from type index
     const typeSet = this.typeIndex.get(meta.type)
     if (typeSet) {
       typeSet.delete(componentId)
@@ -73,7 +73,7 @@ export class ComponentRegistry implements IComponentRegistry {
       }
     }
 
-    // 从渲染器索引中移除
+    // Remove from renderer index
     meta.supportedRenderers.forEach(rendererType => {
       const rendererSet = this.rendererIndex.get(rendererType)
       if (rendererSet) {
@@ -89,26 +89,26 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 获取组件定义
-   * @param componentId 组件ID
-   * @returns 组件定义或null
+   * Get component definition
+   * @param componentId componentsID
+   * @returns component definition ornull
    */
   getDefinition(componentId: string): IComponentDefinition | null {
     return this.definitions.get(componentId) || null
   }
 
   /**
-   * 获取所有组件定义
-   * @returns 所有组件定义数组
+   * Get all component definitions
+   * @returns Array of all component definitions
    */
   getAllDefinitions(): IComponentDefinition[] {
     return Array.from(this.definitions.values())
   }
 
   /**
-   * 按类型获取组件
-   * @param type 组件类型
-   * @returns 该类型的所有组件定义
+   * Get components by type
+   * @param type Component type
+   * @returns All component definitions of this type
    */
   getByType(type: string): IComponentDefinition[] {
     const componentIds = this.typeIndex.get(type)
@@ -122,9 +122,9 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 按渲染器获取组件
-   * @param rendererType 渲染器类型
-   * @returns 支持该渲染器的所有组件定义
+   * Get components by renderer
+   * @param rendererType Renderer type
+   * @returns All component definitions supported by this renderer
    */
   getByRenderer(rendererType: RendererType): IComponentDefinition[] {
     const componentIds = this.rendererIndex.get(rendererType)
@@ -138,16 +138,16 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 检查组件是否存在
-   * @param componentId 组件ID
-   * @returns 是否存在
+   * Check if the component exists
+   * @param componentId componentsID
+   * @returns exists
    */
   has(componentId: string): boolean {
     return this.definitions.has(componentId)
   }
 
   /**
-   * 清空注册表
+   * Clear registry
    */
   clear(): void {
     this.definitions.clear()
@@ -158,8 +158,8 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 获取注册表统计信息
-   * @returns 统计信息
+   * Get registry statistics
+   * @returns Statistics
    */
   getStats() {
     return {
@@ -172,29 +172,29 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 搜索组件
-   * @param query 搜索条件
-   * @returns 匹配的组件定义
+   * Search component
+   * @param query Search criteria
+   * @returns matching component definition
    */
   search(query: { name?: string; type?: string; renderer?: RendererType; keyword?: string }): IComponentDefinition[] {
     let results = this.getAllDefinitions()
 
-    // 按名称过滤
+    // Filter by name
     if (query.name) {
       results = results.filter(def => def.meta.name.toLowerCase().includes(query.name!.toLowerCase()))
     }
 
-    // 按类型过滤
+    // Filter by type
     if (query.type) {
       results = results.filter(def => def.meta.type === query.type)
     }
 
-    // 按渲染器过滤
+    // Filter by renderer
     if (query.renderer) {
       results = results.filter(def => def.meta.supportedRenderers.includes(query.renderer!))
     }
 
-    // 按关键词过滤
+    // Filter by keyword
     if (query.keyword) {
       const keyword = query.keyword.toLowerCase()
       results = results.filter(
@@ -209,43 +209,43 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 验证组件定义
-   * @param definition 组件定义
+   * Verify component definition
+   * @param definition Component definition
    */
   private validateDefinition(definition: IComponentDefinition): void {
     const { meta, logic, views } = definition
 
-    // 验证元数据
+    // Verify metadata
     if (!meta.id || !meta.name || !meta.type) {
-      throw new Error('组件元数据不完整：缺少id、name或type')
+      throw new Error('Component metadata is incomplete：Lackid、nameortype')
     }
 
-    // 验证ID唯一性
+    // verifyIDuniqueness
     if (this.definitions.has(meta.id)) {
-      throw new Error(`组件ID ${meta.id} 已存在`)
+      throw new Error(`componentsID ${meta.id} Already exists`)
     }
 
-    // 验证逻辑Hook
+    // Validation logicHook
     if (typeof logic !== 'function') {
-      throw new Error('组件逻辑Hook必须是函数')
+      throw new Error('Component logicHookMust be a function')
     }
 
-    // 验证视图映射
+    // Verify view mapping
     if (!views || Object.keys(views).length === 0) {
-      throw new Error('组件必须至少提供一个视图实现')
+      throw new Error('The component must provide at least one view implementation')
     }
 
-    // 验证支持的渲染器与视图映射一致
+    // Verify that supported renderers are consistent with the view mapping
     meta.supportedRenderers.forEach(renderer => {
       if (!views[renderer]) {
-        throw new Error(`组件声明支持渲染器 ${renderer}，但未提供对应的视图实现`)
+        throw new Error(`Component declaration supports renderer ${renderer}，But no corresponding view implementation is provided`)
       }
     })
   }
 }
 
-// 创建全局注册表实例
+// Create a global registry instance
 export const componentRegistry = new ComponentRegistry()
 
-// 导出注册表类型
+// Export registry type
 export type { IComponentRegistry }

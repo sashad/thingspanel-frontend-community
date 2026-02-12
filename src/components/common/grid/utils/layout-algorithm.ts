@@ -1,12 +1,12 @@
 /**
- * Grid 布局算法工具函数
- * 专门处理布局计算、位置查找、碰撞检测等算法
+ * Grid Layout algorithm tool function
+ * Specialized in handling layout calculations、location lookup、Collision detection and other algorithms
  */
 
 import type { GridLayoutPlusItem, LayoutOperationResult } from '../gridLayoutPlusTypes'
 
 /**
- * 查找可用位置
+ * Find available locations
  */
 export function findAvailablePosition(
   layout: GridLayoutPlusItem[],
@@ -16,12 +16,12 @@ export function findAvailablePosition(
   startY: number = 0
 ): { x: number; y: number } {
   try {
-    // 简单的位置查找算法
+    // Simple location finding algorithm
     for (let y = startY; y < startY + 100; y++) {
       for (let x = 0; x <= cols - w; x++) {
         const proposed = { x, y, w, h }
 
-        // 检查是否与现有项目冲突
+        // Check for conflicts with existing projects
         const hasCollision = layout.some(item => {
           return !(
             proposed.x + proposed.w <= item.x ||
@@ -37,7 +37,7 @@ export function findAvailablePosition(
       }
     }
 
-    // 如果找不到位置，返回底部
+    // If the location cannot be found，Return to bottom
     const maxY = Math.max(0, ...layout.map(item => item.y + item.h))
     return { x: 0, y: maxY }
   } catch (error) {
@@ -47,7 +47,7 @@ export function findAvailablePosition(
 }
 
 /**
- * 优化查找可用位置（更高效的算法）
+ * Optimize finding available locations（more efficient algorithm）
  */
 export function findOptimalPosition(
   layout: GridLayoutPlusItem[],
@@ -60,35 +60,35 @@ export function findOptimalPosition(
   try {
     const candidates: Array<{ x: number; y: number; score: number }> = []
 
-    // 如果有首选位置，先检查
+    // If there is a preferred location，Check first
     if (preferredX !== undefined && preferredY !== undefined) {
       const candidate = { x: preferredX, y: preferredY, score: 0 }
       if (isPositionAvailable(layout, preferredX, preferredY, w, h, cols)) {
-        candidate.score = 100 // 最高分
+        candidate.score = 100 // highest score
         candidates.push(candidate)
       }
     }
 
-    // 搜索最优位置
+    // Search for the best location
     const maxY = Math.max(10, ...layout.map(item => item.y + item.h))
 
     for (let y = 0; y < maxY + 5; y++) {
       for (let x = 0; x <= cols - w; x++) {
         if (isPositionAvailable(layout, x, y, w, h, cols)) {
-          // 计算位置得分（越靠上左越好）
+          // Calculate position score（The further up and to the left, the better）
           const score = calculatePositionScore(x, y, w, h, layout, cols)
           candidates.push({ x, y, score })
         }
       }
     }
 
-    // 如果没有找到任何可用位置，返回底部位置
+    // If no available locations are found，Return to bottom position
     if (candidates.length === 0) {
       const bottomY = Math.max(0, ...layout.map(item => item.y + item.h))
       return { x: 0, y: bottomY, score: 0 }
     }
 
-    // 返回得分最高的位置
+    // Return the position with the highest score
     return candidates.reduce((best, current) => (current.score > best.score ? current : best))
   } catch (error) {
     console.error('Failed to find optimal position:', error)
@@ -97,7 +97,7 @@ export function findOptimalPosition(
 }
 
 /**
- * 检查位置是否可用
+ * Check if location is available
  */
 export function isPositionAvailable(
   layout: GridLayoutPlusItem[],
@@ -109,12 +109,12 @@ export function isPositionAvailable(
   excludeId?: string
 ): boolean {
   try {
-    // 检查边界
+    // Check boundaries
     if (x < 0 || y < 0 || x + w > cols) {
       return false
     }
 
-    // 检查碰撞
+    // Check for collisions
     const proposed = { x, y, w, h }
     return !layout.some(item => {
       if (excludeId && item.i === excludeId) return false
@@ -133,7 +133,7 @@ export function isPositionAvailable(
 }
 
 /**
- * 计算位置得分
+ * Calculate position score
  */
 function calculatePositionScore(
   x: number,
@@ -146,26 +146,26 @@ function calculatePositionScore(
   try {
     let score = 1000
 
-    // Y位置惩罚（越高得分越低）
+    // Yposition penalty（The higher the score, the lower the score）
     score -= y * 10
 
-    // X位置轻微惩罚（偏左更好）
+    // XSlight penalty for position（Left is better）
     score -= x * 2
 
-    // 边缘位置加分
-    if (x === 0) score += 5 // 左边缘
-    if (x + w === cols) score += 3 // 右边缘
+    // Bonus points for edge positions
+    if (x === 0) score += 5 // left edge
+    if (x + w === cols) score += 3 // right edge
 
-    // 与现有项目的邻接关系加分
+    // Bonus points for adjacencies to existing projects
     for (const item of layout) {
-      // 垂直邻接
+      // vertical adjacency
       if ((item.y + item.h === y || y + h === item.y) && !(x + w <= item.x || x >= item.x + item.w)) {
-        score += 20 // 垂直相邻
+        score += 20 // vertically adjacent
       }
 
-      // 水平邻接
+      // horizontal adjacency
       if ((item.x + item.w === x || x + w === item.x) && !(y + h <= item.y || y >= item.y + item.h)) {
-        score += 15 // 水平相邻
+        score += 15 // horizontally adjacent
       }
     }
 
@@ -177,7 +177,7 @@ function calculatePositionScore(
 }
 
 /**
- * 紧凑布局算法
+ * compact layout algorithm
  */
 export function compactLayout(
   layout: GridLayoutPlusItem[],
@@ -187,25 +187,25 @@ export function compactLayout(
   if (!verticalCompact || layout.length === 0) return layout
 
   try {
-    // 按Y坐标排序，确保我们从上到下处理项目
+    // according toYCoordinate sorting，Make sure we approach projects from top to bottom
     const sortedLayout = [...layout].sort((a, b) => {
       if (a.y === b.y) return a.x - b.x
       return a.y - b.y
     })
 
-    // 用于存放已处理和放置好的项目
+    // Used to store processed and placed items
     const compacted: GridLayoutPlusItem[] = []
 
     for (const item of sortedLayout) {
-      // 从顶部开始为当前项目寻找新的Y坐标
+      // Start at the top to find new ones for the current projectYcoordinate
       let newY = 0
 
-      // 持续增加Y坐标，直到找到一个不与 `compacted` 中任何项目碰撞的位置
+      // Continue to increaseYcoordinate，until you find one that doesn't match `compacted` The position where any item collides in
       while (!isPositionAvailable(compacted, item.x, newY, item.w, item.h, cols)) {
         newY++
       }
 
-      // 将项目放置在找到的第一个可用位置
+      // Place the item in the first available location found
       compacted.push({
         ...item,
         y: newY
@@ -220,7 +220,7 @@ export function compactLayout(
 }
 
 /**
- * 排序布局项目
+ * Sort layout items
  */
 export function sortLayout(
   layout: GridLayoutPlusItem[],
@@ -240,7 +240,7 @@ export function sortLayout(
         return sorted.sort((a, b) => {
           const aSize = a.w * a.h
           const bSize = b.w * b.h
-          return bSize - aSize // 大的在前
+          return bSize - aSize // Big one first
         })
 
       case 'id':
@@ -256,7 +256,7 @@ export function sortLayout(
 }
 
 /**
- * 计算布局边界
+ * Calculate layout bounds
  */
 export function getLayoutBounds(layout: GridLayoutPlusItem[]): {
   minX: number
@@ -291,7 +291,7 @@ export function getLayoutBounds(layout: GridLayoutPlusItem[]): {
 }
 
 /**
- * 计算两个项目的重叠面积
+ * Calculate the overlapping area of ​​two items
  */
 export function getOverlapArea(item1: GridLayoutPlusItem, item2: GridLayoutPlusItem): number {
   try {
@@ -301,7 +301,7 @@ export function getOverlapArea(item1: GridLayoutPlusItem, item2: GridLayoutPlusI
     const bottom = Math.min(item1.y + item1.h, item2.y + item2.h)
 
     if (left >= right || top >= bottom) {
-      return 0 // 没有重叠
+      return 0 // no overlap
     }
 
     return (right - left) * (bottom - top)
@@ -312,13 +312,13 @@ export function getOverlapArea(item1: GridLayoutPlusItem, item2: GridLayoutPlusI
 }
 
 /**
- * 移动项目到新位置并处理碰撞
- * @param layout - 当前布局
- * @param movingItem - 正在移动的项
- * @param newX - 移动项的新x坐标
- * @param newY - 移动项的新y坐标
- * @param cols - 网格的列数
- * @returns 经过碰撞处理和紧凑化后的新布局
+ * Move items to new locations and handle collisions
+ * @param layout - current layout
+ * @param movingItem - Item being moved
+ * @param newX - New for mobile itemsxcoordinate
+ * @param newY - New for mobile itemsycoordinate
+ * @param cols - The number of columns in the grid
+ * @returns New layout after collision handling and compaction
  */
 export function moveItemWithCollisionHandling(
   layout: GridLayoutPlusItem[],
@@ -327,18 +327,18 @@ export function moveItemWithCollisionHandling(
   newY: number,
   cols: number
 ): GridLayoutPlusItem[] {
-  // 步骤1: 布局净化与规范化
-  // 深拷贝布局以进行修改，并规范化所有项的坐标。
-  // 解决新添加项（坐标为 'auto' 或 undefined）无法参与碰撞检测的核心问题。
+  // step1: Layout purification and standardization
+  // Deep copy layout for modification，and normalize the coordinates of all items。
+  // Address new additions（The coordinates are 'auto' or undefined）The core problem of being unable to participate in collision detection。
   const workingLayout = cloneLayout(layout).map(item => {
-    // 检查x和y坐标是否为无效值（非数字、NaN、'auto'等）。
+    // examinexandyWhether the coordinates are invalid values（Not a number、NaN、'auto'wait）。
     const isInvalidX = typeof item.x !== 'number' || isNaN(item.x);
     const isInvalidY = typeof item.y !== 'number' || isNaN(item.y);
 
-    // 为无效坐标提供一个临时的、可预测的初始位置。
-    // 如果y坐标无效，则假定其在顶部（y=0）。
-    // 如果x坐标无效，则假定其在最左侧（x=0）。
-    // 这使得项的逻辑位置与其初始视觉位置（通常在左上角）相匹配。
+    // Provides a temporary for invalid coordinates、Predictable starting position。
+    // ifyInvalid coordinates，then assume it is at the top（y=0）。
+    // ifxInvalid coordinates，then assume it is on the far left（x=0）。
+    // This aligns the item's logical position with its initial visual position（Usually in the upper left corner）match。
     return {
       ...item,
       x: isInvalidX ? 0 : item.x,
@@ -346,25 +346,25 @@ export function moveItemWithCollisionHandling(
     };
   });
 
-  // 步骤2: 更新移动项的位置
-  // 在净化后的工作布局中找到正在移动的项。
+  // step2: Update the position of a moved item
+  // Find moving items in sanitized work layout。
   const movingItemInLayout = workingLayout.find(item => item.i === movingItem.i);
-  // 如果找不到（理论上不应发生），则返回原始布局以保证安全。
+  // if not found（Theoretically it shouldn't happen），then return to the original layout to ensure safety。
   if (!movingItemInLayout) {
     return layout;
   }
 
-  // 将移动项的位置更新为拖拽操作提供的新坐标。
+  // Updates the position of the moved item to the new coordinates provided by the drag operation。
   movingItemInLayout.x = newX;
   movingItemInLayout.y = newY;
 
-  // 步骤3: 连锁碰撞处理 (BFS)
-  // 使用广度优先搜索（BFS）来处理由移动项引起的连锁碰撞。
+  // step3: Chain collision handling (BFS)
+  // Use breadth first search（BFS）to handle chain collisions caused by moving items。
   const queue: GridLayoutPlusItem[] = [movingItemInLayout];
-  // `movedItems` 用于跟踪在此次操作中已经移动过的项，防止在同一次连锁反应中被重复处理，避免无限循环。
+  // `movedItems` Used to track items that have been moved during this operation，Prevent repeated processing in the same chain reaction，Avoid infinite loops。
   const movedItems = new Set<string>([movingItemInLayout.i]);
 
-  // 设置最大迭代次数，作为防止无限循环的安全阀。
+  // Set the maximum number of iterations，Acts as a safety valve against infinite loops。
   let iterations = 0;
   const maxIterations = workingLayout.length * workingLayout.length;
 
@@ -372,31 +372,31 @@ export function moveItemWithCollisionHandling(
     iterations++;
     if (iterations > maxIterations) {
       console.error('moveItemWithCollisionHandling: Max iterations reached, aborting.');
-      return layout; // 检测到可能的无限循环，返回原始布局以避免应用冻结。
+      return layout; // Possible infinite loop detected，Return to original layout to avoid app freezing。
     }
 
     const currentItem = queue.shift()!;
 
-    // 遍历布局中的所有其他项以检测与当前项的碰撞。
+    // Iterate over all other items in the layout to detect collisions with the current item。
     for (const other of workingLayout) {
       if (other.i === currentItem.i) continue;
 
       if (collides(currentItem, other)) {
-        // 如果与静态项（static=true）发生碰撞，则认为此次移动无效，立即返回原始布局。
+        // if with static items（static=true）Collision occurs，This move is considered invalid，Return to original layout immediately。
         if (other.static) {
           return layout;
         }
 
-        // 计算将 'other' 项向下推到的新y坐标。
+        // The calculation will 'other' item pushed down to newycoordinate。
         const pushToY = currentItem.y + currentItem.h;
 
-        // 只有当 'other' 项当前位置在推挤目标位置之上时，才执行推挤。
-        // 这可以防止不必要的移动和潜在的循环。
+        // only if 'other' When the current position of the item is above the push target position，before performing the push。
+        // This prevents unnecessary movement and potential loops。
         if (other.y < pushToY) {
           other.y = pushToY;
 
-          // 如果 'other' 项是第一次在此操作中被移动，则将其加入队列。
-          // 这确保了它引发的后续碰撞也会被处理。
+          // if 'other' Item is moved for the first time in this operation，then add it to the queue。
+          // This ensures that subsequent collisions it causes will also be handled。
           if (!movedItems.has(other.i)) {
             movedItems.add(other.i);
             queue.push(other);
@@ -406,25 +406,25 @@ export function moveItemWithCollisionHandling(
     }
   }
 
-  // 步骤4: 布局紧凑化
-  // 在所有碰撞处理完成后，对布局进行紧凑化，移除因推挤而产生的垂直间隙。
+  // step4: Compact layout
+  // After all collision handling is complete，Compact the layout，Remove vertical gaps caused by pushing。
   return compactLayout(workingLayout, cols);
 }
 
 /**
- * 深拷贝一个布局数组。
- * @param layout - 要克隆的布局。
- * @returns 返回一个新的布局数组，与原始布局完全独立。
+ * Deep copy a layout array。
+ * @param layout - layout to clone。
+ * @returns Returns a new layout array，Completely independent from the original layout。
  */
 function cloneLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[] {
   return JSON.parse(JSON.stringify(layout));
 }
 
 /**
- * 检测两个布局项是否发生碰撞。
- * @param item1 - 第一个布局项。
- * @param item2 - 第二个布局项。
- * @returns 如果两项重叠，则返回 true，否则返回 false。
+ * Detect if two layout items collide。
+ * @param item1 - first layout item。
+ * @param item2 - second layout item。
+ * @returns If two items overlap，then return true，Otherwise return false。
  */
 function collides(item1: GridLayoutPlusItem, item2: GridLayoutPlusItem): boolean {
   if (item1.i === item2.i) return false;

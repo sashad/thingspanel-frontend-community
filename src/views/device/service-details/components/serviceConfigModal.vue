@@ -105,7 +105,7 @@ const columns: any = ref([
 const submitSevice: () => void = async () => {
   // 0. Check service_access_id
   if (!device_config_id.value) {
-    window.$message?.error($t('card.serviceAccessIdNotSet') || '服务访问ID未设置，无法提交')
+    window.$message?.error($t('card.serviceAccessIdNotSet') || 'Service accessIDnot set，Unable to submit')
     return
   }
 
@@ -131,7 +131,7 @@ const submitSevice: () => void = async () => {
   })
 
   if (templateNotSetOnCurrentPage) {
-    window.$message?.error($t('card.checkedDeviceTemplateNotSet') || '当前页选中的设备中有未设置模板的，请检查。')
+    window.$message?.error($t('card.checkedDeviceTemplateNotSet') || 'Some of the devices selected on the current page do not have templates set.，Check, please。')
     return
   }
 
@@ -211,15 +211,15 @@ const openModal: (val: any, row: any, edit: any) => void = async (val, row, edit
     isEdit.value = edit
     queryInfo.value.voucher = val
     serviceModal.value = true
-    // 检查是否为自动模式
+    // Check if it is automatic mode
     if (row && row.auth_type === 'auto') {
       currentStep.value = 2
       form.value = {
-        mode: 'automatic', // 为了兼容AutomaticModeStep组件
+        mode: 'automatic', // For compatibilityAutomaticModeStepcomponents
         name: row.name
       }
     } else {
-      // 手动模式保持不变
+      // Manual mode remains unchanged
       currentStep.value = 1
       getLists()
       device_config_id.value = row
@@ -238,8 +238,8 @@ const close: () => void = () => {
 }
 
 const handleCheck = (rowKeys: any /*, rows: any, meta: any */) => {
-  // 移除即时校验和 chekeds 的处理
-  // checkedRowKeys.value 会由 v-model 自动更新
+  // Remove instant checksum chekeds processing
+  // checkedRowKeys.value will consist of v-model Automatic updates
 }
 
 defineExpose({ openModal })
@@ -247,9 +247,9 @@ defineExpose({ openModal })
 
 <template>
   <n-modal v-model:show="serviceModal" preset="dialog" :title="$t('card.configDevice')" class="device_model">
-    <!-- 自动模式的第二步 -->
+    <!-- Second step in automatic mode -->
     <AutomaticModeStep v-if="currentStep === 2" :access-point-name="form.name" :mode="form.mode" />
-    <!-- 手动模式或第一步 -->
+    <!-- Manual mode or first step -->
     <template v-else>
       <NDataTable
         ref="NTableRef"

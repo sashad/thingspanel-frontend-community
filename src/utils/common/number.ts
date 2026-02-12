@@ -1,17 +1,17 @@
 /**
- * 根据数字获取对应的汉字
+ * Get the corresponding Chinese characters based on the numbers
  *
- * @param num - 数字(0-10)
+ * @param num - number(0-10)
  */
 export function getHanByNumber(num: number) {
-  const HAN_STR = '零一二三四五六七八九十'
+  const HAN_STR = 'zero one two three four five six seven eight nine ten'
   return HAN_STR.charAt(num)
 }
 
 /**
- * 将总秒数转换成 分：秒
+ * Convert total seconds to point：Second
  *
- * @param seconds - 秒
+ * @param seconds - Second
  */
 export function transformToTimeCountDown(seconds: number) {
   const SECONDS_A_MINUTE = 60
@@ -25,10 +25,10 @@ export function transformToTimeCountDown(seconds: number) {
 }
 
 /**
- * 获取指定整数范围内的随机整数
+ * Get a random integer within a specified range of integers
  *
- * @param start - 开始范围
- * @param end - 结束范围
+ * @param start - start range
+ * @param end - end range
  */
 export function getRandomInteger(end: number, start = 0) {
   const range = end - start

@@ -1,10 +1,10 @@
 /**
- * 组件注册系统导出
+ * Component registration system export
  */
 
 export * from './auto-registry'
 export * from './component-registry'
 export * from './category-definition'
 
-// 默认导出组件注册表实例
+// Default export component registry instance
 export { componentRegistry } from './component-registry'

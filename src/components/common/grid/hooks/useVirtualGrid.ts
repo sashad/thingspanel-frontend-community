@@ -1,19 +1,19 @@
 /**
- * 虚拟化网格Hook - 优化大量网格项的渲染性能
+ * virtualized gridHook - Optimized rendering performance for large numbers of mesh items
  */
 
 import { computed, ref, watch, type Ref } from 'vue'
 import type { GridItem, GridConfig, VirtualizationConfig, GridCalculation } from '../types'
 
 /**
- * 虚拟化网格Hook
+ * virtualized gridHook
  */
 export function useVirtualGrid(
   items: Ref<GridItem[]>,
   config: Ref<Partial<GridConfig>>,
   containerElement?: Ref<HTMLElement | undefined>
 ) {
-  // 虚拟化配置
+  // Virtualization configuration
   const virtualizationConfig = computed<VirtualizationConfig>(() => ({
     enabled: config.value.virtualization || false,
     buffer: config.value.virtualBuffer || 5,
@@ -21,13 +21,13 @@ export function useVirtualGrid(
     overscan: 3
   }))
 
-  // 滚动位置
+  // scroll position
   const scrollTop = ref(0)
   const scrollLeft = ref(0)
   const containerHeight = ref(400)
   const containerWidth = ref(1200)
 
-  // 可视区域计算
+  // Viewable area calculation
   const visibleArea = computed(() => {
     if (!virtualizationConfig.value.enabled) {
       return {
@@ -54,7 +54,7 @@ export function useVirtualGrid(
     }
   })
 
-  // 可见的网格项
+  // Visible grid items
   const visibleItems = computed(() => {
     if (!virtualizationConfig.value.enabled) {
       return items.value
@@ -64,12 +64,12 @@ export function useVirtualGrid(
 
     return items.value.filter(item => {
       const itemEndRow = item.gridRow + item.gridRowSpan - 1
-      // 检查项目是否与可视区域重叠
+      // Check if the item overlaps the visible area
       return !(item.gridRow > endRow || itemEndRow < startRow)
     })
   })
 
-  // 虚拟偏移
+  // virtual offset
   const virtualOffset = computed(() => {
     if (!virtualizationConfig.value.enabled) {
       return { x: 0, y: 0 }
@@ -85,7 +85,7 @@ export function useVirtualGrid(
     }
   })
 
-  // 总内容高度
+  // total content height
   const totalHeight = computed(() => {
     if (items.value.length === 0) return config.value.minHeight || 400
 
@@ -96,7 +96,7 @@ export function useVirtualGrid(
     return maxRow * rowHeight + (maxRow - 1) * gap
   })
 
-  // 设置滚动监听
+  // Set up scroll monitoring
   const setupScrollListener = () => {
     if (!containerElement?.value) return
 
@@ -108,7 +108,7 @@ export function useVirtualGrid(
 
     containerElement.value.addEventListener('scroll', handleScroll, { passive: true })
 
-    // 监听容器大小变化
+    // Monitor container size changes
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         containerHeight.value = entry.contentRect.height
@@ -118,19 +118,19 @@ export function useVirtualGrid(
 
     resizeObserver.observe(containerElement.value)
 
-    // 返回清理函数
+    // Return cleaning function
     return () => {
       containerElement.value?.removeEventListener('scroll', handleScroll)
       resizeObserver.disconnect()
     }
   }
 
-  // 监听容器元素变化
+  // Monitor changes in container elements
   watch(
     containerElement,
     (newEl, oldEl) => {
       if (oldEl) {
-        // 清理旧的监听器
+        // Clean up old listeners
       }
       if (newEl) {
         setupScrollListener()
@@ -139,7 +139,7 @@ export function useVirtualGrid(
     { immediate: true }
   )
 
-  // 滚动到指定项目
+  // Scroll to specified item
   const scrollToItem = (itemId: string) => {
     const item = items.value.find(i => i.id === itemId)
     if (!item || !containerElement?.value) return
@@ -154,13 +154,13 @@ export function useVirtualGrid(
     })
   }
 
-  // 滚动到顶部
+  // scroll to top
   const scrollToTop = () => {
     if (!containerElement?.value) return
     containerElement.value.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // 滚动到底部
+  // scroll to bottom
   const scrollToBottom = () => {
     if (!containerElement?.value) return
     containerElement.value.scrollTo({
@@ -169,7 +169,7 @@ export function useVirtualGrid(
     })
   }
 
-  // 获取性能统计
+  // Get performance statistics
   const getPerformanceStats = () => {
     return {
       totalItems: items.value.length,
@@ -182,7 +182,7 @@ export function useVirtualGrid(
   }
 
   return {
-    // 响应式数据
+    // Responsive data
     visibleItems,
     visibleArea,
     virtualOffset,
@@ -192,20 +192,20 @@ export function useVirtualGrid(
     containerHeight,
     containerWidth,
 
-    // 方法
+    // method
     scrollToItem,
     scrollToTop,
     scrollToBottom,
     getPerformanceStats,
     setupScrollListener,
 
-    // 配置
+    // Configuration
     virtualizationConfig
   }
 }
 
 /**
- * 虚拟化项目计算
+ * Virtualization project calculations
  */
 export function calculateVirtualItems(
   items: GridItem[],
@@ -218,7 +218,7 @@ export function calculateVirtualItems(
     const itemEndRow = item.gridRow + item.gridRowSpan - 1
     const itemEndCol = item.gridCol + item.gridColSpan - 1
 
-    // 检查项目是否与可视区域重叠
+    // Check if the item overlaps the visible area
     return !(
       item.gridRow > visibleArea.endRow ||
       itemEndRow < visibleArea.startRow ||
@@ -229,12 +229,12 @@ export function calculateVirtualItems(
 }
 
 /**
- * 优化的渲染批次计算
+ * Optimized rendering batch calculation
  */
 export function calculateRenderBatches(items: GridItem[], batchSize: number = 50): GridItem[][] {
   const batches: GridItem[][] = []
 
-  // 按位置排序项目
+  // Sort items by location
   const sortedItems = [...items].sort((a, b) => {
     if (a.gridRow !== b.gridRow) {
       return a.gridRow - b.gridRow

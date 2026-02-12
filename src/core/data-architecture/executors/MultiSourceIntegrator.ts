@@ -1,66 +1,66 @@
 /**
- * 第四层：多源整合器 (MultiSourceIntegrator)
- * 职责：将多个数据源按key合成组件最终数据
+ * fourth floor：multi-source integrator (MultiSourceIntegrator)
+ * Responsibilities：Combine multiple data sources bykeySynthetic component final data
  */
 
 export interface ComponentData {
   [dataSourceKey: string]: {
-    /** 数据源类型 */
+    /** Data source type */
     type: string
-    /** 解析后的数据 */
+    /** parsed data */
     data: any
-    /** 最后更新时间 */
+    /** Last updated */
     lastUpdated: number
-    /** 元数据 */
+    /** metadata */
     metadata?: any
   }
 }
 
 export interface DataSourceResult {
-  /** 数据源ID */
+  /** data sourceID */
   sourceId: string
-  /** 数据源类型 */
+  /** Data source type */
   type: string
-  /** 合并后的数据 */
+  /** Merged data */
   data: any
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 错误信息 */
+  /** error message */
   error?: string
 }
 
 /**
- * 多源整合器接口
+ * Multi-source integrator interface
  */
 export interface IMultiSourceIntegrator {
   /**
-   * 按key整合多数据源
-   * @param sources 数据源结果列表
-   * @param componentId 组件ID
-   * @returns 组件最终数据，出错时返回空ComponentData
+   * according tokeyIntegrate multiple data sources
+   * @param sources Data source result list
+   * @param componentId componentsID
+   * @returns Component final data，Returns null on errorComponentData
    */
   integrateDataSources(sources: DataSourceResult[], componentId: string): Promise<ComponentData>
 }
 
 /**
- * 多源整合器实现类
+ * Multi-source integrator implementation class
  */
 export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   /**
-   * 多数据源整合主方法
+   * Main method of integrating multiple data sources
    */
   async integrateDataSources(sources: DataSourceResult[], componentId: string): Promise<ComponentData> {
     try {
       const result: ComponentData = {}
       const timestamp = Date.now()
 
-      // 处理每个数据源结果
+      // Process each data source result
       for (const source of sources) {
         if (!source.sourceId) {
           continue
         }
 
-        // 按key合成大对象
+        // according tokeyComposite large objects
         result[source.sourceId] = {
           type: source.type || 'unknown',
           data: source.success ? source.data : {},
@@ -74,26 +74,26 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
         }
       }
 
-      // 如果没有任何有效数据源，返回空的ComponentData
+      // If there are no valid data sources，Return emptyComponentData
       if (Object.keys(result).length === 0) {
         return {}
       }
 
       return result
     } catch (error) {
-      return {} // 统一错误处理：返回空ComponentData
+      return {} // Unified error handling：Return emptyComponentData
     }
   }
 
   /**
-   * 验证数据源结果的有效性
+   * Verify the validity of data source results
    */
   validateDataSourceResult(source: DataSourceResult): boolean {
     return !!(source && source.sourceId && source.type !== undefined)
   }
 
   /**
-   * 获取组件数据统计信息
+   * Get component data statistics
    */
   getDataStatistics(componentData: ComponentData): {
     totalSources: number
@@ -115,20 +115,20 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   }
 
   /**
-   * 检查组件数据是否有效
+   * Check if component data is valid
    */
   isValidComponentData(componentData: ComponentData): boolean {
     if (!componentData || typeof componentData !== 'object') {
       return false
     }
 
-    // 至少要有一个数据源
+    // There must be at least one data source
     const sourceKeys = Object.keys(componentData)
     if (sourceKeys.length === 0) {
       return false
     }
 
-    // 检查每个数据源的结构
+    // Check the structure of each data source
     return sourceKeys.every(key => {
       const source = componentData[key]
       return (
@@ -138,13 +138,13 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   }
 
   /**
-   * 合并多个ComponentData (用于组件数据的增量更新)
+   * Merge multipleComponentData (For incremental updates of component data)
    */
   mergeComponentData(existing: ComponentData, updates: ComponentData): ComponentData {
     const result = { ...existing }
 
     for (const [sourceId, sourceData] of Object.entries(updates)) {
-      // 使用时间戳判断是否需要更新
+      // Use timestamp to determine if updates are needed
       const existingData = result[sourceId]
       if (!existingData || existingData.lastUpdated < sourceData.lastUpdated) {
         result[sourceId] = sourceData
@@ -155,14 +155,14 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   }
 
   /**
-   * 清理过期的数据源数据
+   * Clean up expired data source data
    */
   cleanupExpiredData(componentData: ComponentData, maxAge: number = 5 * 60 * 1000): ComponentData {
     const now = Date.now()
     const result: ComponentData = {}
 
     for (const [sourceId, sourceData] of Object.entries(componentData)) {
-      // 保留未过期的数据
+      // Keep unexpired data
       if (now - sourceData.lastUpdated <= maxAge) {
         result[sourceId] = sourceData
       }
@@ -172,7 +172,7 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   }
 
   /**
-   * 转换为Visual Editor兼容格式
+   * Convert toVisual EditorCompatible formats
    */
   toVisualEditorFormat(componentData: ComponentData): any {
     const result: Record<string, any> = {}
@@ -185,7 +185,7 @@ export class MultiSourceIntegrator implements IMultiSourceIntegrator {
   }
 
   /**
-   * 转换为Card2.1兼容格式
+   * Convert toCard2.1Compatible formats
    */
   toCard21Format(componentData: ComponentData): any {
     return {

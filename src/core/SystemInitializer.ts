@@ -1,15 +1,15 @@
 /**
- * 系统统一初始化管理器
- * 整合所有子系统的初始化流程，提供统一的启动和状态管理
+ * System unified initialization manager
+ * Integrate the initialization process of all subsystems，Provide unified startup and status management
  */
 
-// 🔥 已删除：OptimizedConfigurationManager 过度设计的缓存层已移除
-// 使用 ConfigurationIntegrationBridge 提供配置管理服务
+// 🔥 Deleted：OptimizedConfigurationManager Over-engineered caching layer removed
+// use ConfigurationIntegrationBridge Provide configuration management services
 import { optimizedInitializationManager } from '@/card2.1/core2/OptimizedInitializationManager'
 import { typeCompatibilityChecker } from '@/core/data-architecture/TypeCompatibilityChecker'
 
 /**
- * 子系统状态枚举
+ * Subsystem status enumeration
  */
 export enum SubSystemStatus {
   PENDING = 'pending',
@@ -19,103 +19,103 @@ export enum SubSystemStatus {
 }
 
 /**
- * 子系统初始化配置
+ * Subsystem initialization configuration
  */
 export interface SubSystemConfig {
-  /** 子系统名称 */
+  /** Subsystem name */
   name: string
-  /** 子系统显示名称 */
+  /** Subsystem display name */
   displayName: string
-  /** 初始化优先级（越小越先执行） */
+  /** Initialization priority（The smaller the value, the earlier it is executed.） */
   priority: number
-  /** 初始化函数 */
+  /** initialization function */
   initialize: () => Promise<void>
-  /** 是否必需（失败时是否阻止系统启动） */
+  /** Is it necessary（Whether to prevent the system from starting on failure） */
   required: boolean
-  /** 依赖的其他子系统 */
+  /** Other dependent subsystems */
   dependencies: string[]
-  /** 超时时间（毫秒） */
+  /** timeout（millisecond） */
   timeout: number
-  /** 健康检查函数 */
+  /** health check function */
   healthCheck?: () => Promise<boolean>
-  /** 重试次数 */
+  /** Number of retries */
   retries?: number
 }
 
 /**
- * 子系统状态信息
+ * Subsystem status information
  */
 export interface SubSystemState {
-  /** 子系统名称 */
+  /** Subsystem name */
   name: string
-  /** 当前状态 */
+  /** Current status */
   status: SubSystemStatus
-  /** 初始化开始时间 */
+  /** Initialization start time */
   startTime?: number
-  /** 初始化结束时间 */
+  /** Initialization end time */
   endTime?: number
-  /** 初始化耗时（毫秒） */
+  /** Initialization time-consuming（millisecond） */
   duration?: number
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 重试次数 */
+  /** Number of retries */
   retriesCount: number
-  /** 健康检查状态 */
+  /** health check status */
   healthStatus?: boolean
 }
 
 /**
- * 系统初始化状态
+ * System initialization state
  */
 export interface SystemInitializationState {
-  /** 是否已初始化 */
+  /** Has it been initialized? */
   isInitialized: boolean
-  /** 是否正在初始化 */
+  /** Is initializing */
   isInitializing: boolean
-  /** 系统启动时间 */
+  /** System startup time */
   startTime?: number
-  /** 系统启动完成时间 */
+  /** System startup completion time */
   endTime?: number
-  /** 总初始化时长 */
+  /** Total initialization time */
   totalDuration?: number
-  /** 子系统状态映射 */
+  /** Subsystem state mapping */
   subSystems: Map<string, SubSystemState>
-  /** 初始化失败的子系统 */
+  /** Subsystem that failed to initialize */
   failedSubSystems: string[]
-  /** 成功初始化的子系统数量 */
+  /** Number of subsystems successfully initialized */
   successCount: number
-  /** 总子系统数量 */
+  /** Total number of subsystems */
   totalCount: number
 }
 
 /**
- * 初始化选项
+ * Initialization options
  */
 export interface InitializationOptions {
-  /** 是否强制重新初始化 */
+  /** Whether to force reinitialization */
   forceReload?: boolean
-  /** 是否允许部分失败 */
+  /** Whether to allow partial failure */
   allowPartialFailure?: boolean
-  /** 并发初始化数量限制 */
+  /** Limit on the number of concurrent initializations */
   concurrencyLimit?: number
-  /** 全局超时时间（毫秒） */
+  /** Global timeout（millisecond） */
   globalTimeout?: number
-  /** 是否启用健康检查 */
+  /** Whether to enable health checks */
   enableHealthCheck?: boolean
-  /** 要跳过的子系统 */
+  /** subsystem to skip */
   skipSubSystems?: string[]
 }
 
 /**
- * 统一系统初始化管理器
+ * Unified system initialization manager
  */
 export class SystemInitializer {
   private static instance: SystemInitializer | null = null
 
-  /** 子系统配置注册表 */
+  /** Subsystem configuration registry */
   private subSystemConfigs = new Map<string, SubSystemConfig>()
 
-  /** 系统初始化状态 */
+  /** System initialization state */
   private state: SystemInitializationState = {
     isInitialized: false,
     isInitializing: false,
@@ -125,10 +125,10 @@ export class SystemInitializer {
     totalCount: 0
   }
 
-  /** 初始化锁 */
+  /** Initialize lock */
   private initializationPromise: Promise<void> | null = null
 
-  /** 事件监听器 */
+  /** event listener */
   private eventListeners = new Map<string, Array<(...args: any[]) => void>>()
 
   private constructor() {
@@ -143,33 +143,33 @@ export class SystemInitializer {
   }
 
   /**
-   * 注册内置子系统
+   * Register built-in subsystem
    */
   private registerBuiltInSubSystems(): void {
-    // 1. 配置管理器
+    // 1. configuration manager
     this.registerSubSystem({
       name: 'configuration-manager',
-      displayName: '配置管理器',
+      displayName: 'configuration manager',
       priority: 1,
       required: true,
       dependencies: [],
       timeout: 5000,
       retries: 2,
       initialize: async () => {
-        // 配置管理器通常不需要异步初始化，但可以在这里执行预热
+        // Configuration managers generally do not require asynchronous initialization，But you can perform preheating here
         if (process.env.NODE_ENV === 'development') {
         }
       },
       healthCheck: async () => {
-        // 🔥 已迁移：配置管理现在通过 ConfigurationIntegrationBridge 处理
+        // 🔥 Migrated：Configuration management now passes ConfigurationIntegrationBridge deal with
         return true
       }
     })
 
-    // 2. Card2.1 系统
+    // 2. Card2.1 system
     this.registerSubSystem({
       name: 'card2-system',
-      displayName: 'Card2.1 组件系统',
+      displayName: 'Card2.1 component system',
       priority: 2,
       required: true,
       dependencies: ['configuration-manager'],
@@ -186,10 +186,10 @@ export class SystemInitializer {
       }
     })
 
-    // 3. 类型兼容性检查器
+    // 3. Type Compatibility Checker
     this.registerSubSystem({
       name: 'type-checker',
-      displayName: '类型兼容性检查器',
+      displayName: 'Type Compatibility Checker',
       priority: 3,
       required: false,
       dependencies: ['configuration-manager'],
@@ -198,7 +198,7 @@ export class SystemInitializer {
       initialize: async () => {
         if (process.env.NODE_ENV === 'development') {
         }
-        // 预热类型映射表
+        // Preheat type mapping table
         typeCompatibilityChecker.getTypeMappingStats()
       },
       healthCheck: async () => {
@@ -207,10 +207,10 @@ export class SystemInitializer {
       }
     })
 
-    // 4. 数据架构系统（可选）
+    // 4. data architecture system（Optional）
     this.registerSubSystem({
       name: 'data-architecture',
-      displayName: '数据架构系统',
+      displayName: 'data architecture system',
       priority: 4,
       required: false,
       dependencies: ['configuration-manager', 'type-checker'],
@@ -219,23 +219,23 @@ export class SystemInitializer {
       initialize: async () => {
         if (process.env.NODE_ENV === 'development') {
         }
-        // 这里可以初始化其他数据架构相关的组件
-        // 如果有其他异步初始化需求，可以在这里添加
+        // Here you can initialize other data architecture related components
+        // If there are other asynchronous initialization requirements，can be added here
       },
       healthCheck: async () => {
-        // 简单的健康检查
+        // Simple health check
         return true
       }
     })
   }
 
   /**
-   * 注册子系统
+   * Register subsystem
    */
   public registerSubSystem(config: SubSystemConfig): void {
     this.subSystemConfigs.set(config.name, config)
 
-    // 初始化子系统状态
+    // Initialize subsystem state
     this.state.subSystems.set(config.name, {
       name: config.name,
       status: SubSystemStatus.PENDING,
@@ -248,10 +248,10 @@ export class SystemInitializer {
   }
 
   /**
-   * 统一初始化所有子系统
+   * Initialize all subsystems uniformly
    */
   public async initialize(options: InitializationOptions = {}): Promise<void> {
-    // 防止重复初始化
+    // Prevent repeated initialization
     if (this.state.isInitialized && !options.forceReload) {
       if (process.env.NODE_ENV === 'development') {
       }
@@ -272,7 +272,7 @@ export class SystemInitializer {
   }
 
   /**
-   * 执行初始化流程
+   * Execute initialization process
    */
   private async performInitialization(options: InitializationOptions): Promise<void> {
     const {
@@ -293,27 +293,27 @@ export class SystemInitializer {
     this.emit('initialization-started', this.getInitializationState())
 
     try {
-      // 获取初始化顺序
+      // Get initialization sequence
       const initializationOrder = this.resolveInitializationOrder(skipSubSystems)
       if (process.env.NODE_ENV === 'development') {
       }
 
-      // 全局超时控制
+      // Global timeout control
       const initPromise = this.executeInitializationSequence(initializationOrder, concurrencyLimit, enableHealthCheck)
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('系统初始化超时')), globalTimeout)
+        setTimeout(() => reject(new Error('System initialization timeout')), globalTimeout)
       })
 
       await Promise.race([initPromise, timeoutPromise])
 
-      // 检查初始化结果
+      // Check initialization results
       const hasRequiredFailures = this.state.failedSubSystems.some(name => {
         const config = this.subSystemConfigs.get(name)
         return config?.required
       })
 
       if (hasRequiredFailures && !allowPartialFailure) {
-        throw new Error(`必需子系统初始化失败: ${this.state.failedSubSystems.join(', ')}`)
+        throw new Error(`Required subsystem initialization failed: ${this.state.failedSubSystems.join(', ')}`)
       }
 
       this.state.isInitialized = true
@@ -324,12 +324,12 @@ export class SystemInitializer {
       }
 
       if (this.state.failedSubSystems.length > 0) {
-        console.error(`⚠️ [SystemInitializer] 失败子系统: ${this.state.failedSubSystems.join(', ')}`)
+        console.error(`⚠️ [SystemInitializer] failed subsystem: ${this.state.failedSubSystems.join(', ')}`)
       }
 
       this.emit('initialization-completed', this.getInitializationState())
     } catch (error) {
-      console.error('❌ [SystemInitializer] 系统初始化失败:', error)
+      console.error('❌ [SystemInitializer] System initialization failed:', error)
       this.emit('initialization-failed', { error: error.message, state: this.getInitializationState() })
       throw error
     } finally {
@@ -338,19 +338,19 @@ export class SystemInitializer {
   }
 
   /**
-   * 解析初始化顺序（拓扑排序）
+   * Parse initialization sequence（topological sort）
    */
   private resolveInitializationOrder(skipSubSystems: string[]): SubSystemConfig[] {
     const configs = Array.from(this.subSystemConfigs.values()).filter(config => !skipSubSystems.includes(config.name))
 
-    // 简化的拓扑排序：按优先级和依赖关系排序
+    // Simplified topological sort：Sort by priority and dependencies
     const sorted: SubSystemConfig[] = []
     const visited = new Set<string>()
     const visiting = new Set<string>()
 
     const visit = (config: SubSystemConfig) => {
       if (visiting.has(config.name)) {
-        throw new Error(`检测到循环依赖: ${config.name}`)
+        throw new Error(`Circular dependency detected: ${config.name}`)
       }
 
       if (visited.has(config.name)) {
@@ -359,7 +359,7 @@ export class SystemInitializer {
 
       visiting.add(config.name)
 
-      // 先处理依赖
+      // Deal with dependencies first
       for (const depName of config.dependencies) {
         const depConfig = this.subSystemConfigs.get(depName)
         if (depConfig && !skipSubSystems.includes(depName)) {
@@ -372,7 +372,7 @@ export class SystemInitializer {
       sorted.push(config)
     }
 
-    // 按优先级排序后进行拓扑排序
+    // Topological sorting after sorting by priority
     const prioritySorted = configs.sort((a, b) => a.priority - b.priority)
     for (const config of prioritySorted) {
       if (!visited.has(config.name)) {
@@ -384,21 +384,21 @@ export class SystemInitializer {
   }
 
   /**
-   * 执行初始化序列
+   * Execute initialization sequence
    */
   private async executeInitializationSequence(
     configs: SubSystemConfig[],
     concurrencyLimit: number,
     enableHealthCheck: boolean
   ): Promise<void> {
-    // 简化版本：串行执行（可以后续优化为基于依赖的并行执行）
+    // Simplified version：serial execution（Can be subsequently optimized to dependency-based parallel execution）
     for (const config of configs) {
       await this.initializeSubSystem(config, enableHealthCheck)
     }
   }
 
   /**
-   * 初始化单个子系统
+   * Initialize a single subsystem
    */
   private async initializeSubSystem(config: SubSystemConfig, enableHealthCheck: boolean): Promise<void> {
     const state = this.state.subSystems.get(config.name)!
@@ -414,25 +414,25 @@ export class SystemInitializer {
         }
         this.emit('subsystem-initializing', { name: config.name, attempt: attempt + 1 })
 
-        // 执行初始化
+        // Perform initialization
         const initPromise = config.initialize()
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('初始化超时')), config.timeout)
+          setTimeout(() => reject(new Error('Initialization timeout')), config.timeout)
         })
 
         await Promise.race([initPromise, timeoutPromise])
 
-        // 健康检查
+        // health check
         if (enableHealthCheck && config.healthCheck) {
           const isHealthy = await config.healthCheck()
           state.healthStatus = isHealthy
 
           if (!isHealthy) {
-            throw new Error('健康检查失败')
+            throw new Error('Health check failed')
           }
         }
 
-        // 初始化成功
+        // Initialization successful
         state.status = SubSystemStatus.INITIALIZED
         state.endTime = Date.now()
         state.duration = state.endTime - state.startTime!
@@ -442,12 +442,12 @@ export class SystemInitializer {
         }
         this.emit('subsystem-initialized', { name: config.name, duration: state.duration })
 
-        return // 成功，退出重试循环
+        return // success，Exit retry loop
       } catch (error) {
-        console.error(`❌ [SystemInitializer] 子系统初始化失败: ${config.displayName}, 错误:`, error.message)
+        console.error(`❌ [SystemInitializer] Subsystem initialization failed: ${config.displayName}, mistake:`, error.message)
 
         if (attempt === maxRetries) {
-          // 所有重试都失败了
+          // All retries failed
           state.status = SubSystemStatus.FAILED
           state.error = error.message
           state.endTime = Date.now()
@@ -457,50 +457,50 @@ export class SystemInitializer {
           this.emit('subsystem-failed', { name: config.name, error: error.message, attempt: attempt + 1 })
 
           if (config.required) {
-            throw new Error(`必需子系统初始化失败: ${config.displayName}`)
+            throw new Error(`Required subsystem initialization failed: ${config.displayName}`)
           }
           return
         }
 
-        // 等待一段时间后重试
+        // Wait for some time and try again
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
       }
     }
   }
 
   /**
-   * 获取初始化状态
+   * Get initialization status
    */
   public getInitializationState(): SystemInitializationState {
     return {
       ...this.state,
-      subSystems: new Map(this.state.subSystems) // 创建副本
+      subSystems: new Map(this.state.subSystems) // Create a copy
     }
   }
 
   /**
-   * 获取子系统状态
+   * Get subsystem status
    */
   public getSubSystemState(name: string): SubSystemState | undefined {
     return this.state.subSystems.get(name)
   }
 
   /**
-   * 检查系统是否已初始化
+   * Check if the system has been initialized
    */
   public isInitialized(): boolean {
     return this.state.isInitialized
   }
 
   /**
-   * 检查是否正在初始化
+   * Check if initializing
    */
   public isInitializing(): boolean {
     return this.state.isInitializing
   }
 
   /**
-   * 执行系统健康检查
+   * Perform a system health check
    */
   public async performHealthCheck(): Promise<{ healthy: boolean; details: Record<string, boolean> }> {
     const details: Record<string, boolean> = {}
@@ -527,7 +527,7 @@ export class SystemInitializer {
   }
 
   /**
-   * 重新初始化失败的子系统
+   * Reinitializing failed subsystems
    */
   public async reinitializeFailedSystems(): Promise<void> {
     const failedSystems = [...this.state.failedSubSystems]
@@ -548,7 +548,7 @@ export class SystemInitializer {
   }
 
   /**
-   * 事件监听器
+   * event listener
    */
   public on(event: string, listener: (...args: any[]) => void): void {
     if (!this.eventListeners.has(event)) {
@@ -558,7 +558,7 @@ export class SystemInitializer {
   }
 
   /**
-   * 发射事件
+   * launch event
    */
   private emit(event: string, ...args: any[]): void {
     const listeners = this.eventListeners.get(event)
@@ -568,7 +568,7 @@ export class SystemInitializer {
   }
 
   /**
-   * 获取初始化统计
+   * Get initialization statistics
    */
   public getInitializationStats() {
     const subSystemStats = Array.from(this.state.subSystems.values()).reduce(
@@ -592,32 +592,32 @@ export class SystemInitializer {
 }
 
 /**
- * 导出单例实例
+ * Export singleton instance
  */
 export const systemInitializer = SystemInitializer.getInstance()
 
 /**
- * 便捷的初始化方法
+ * Convenient initialization method
  */
 export async function initializeSystem(options?: InitializationOptions): Promise<void> {
   await systemInitializer.initialize(options)
 }
 
 /**
- * 检查系统状态
+ * Check system status
  */
 export function getSystemInitializationState(): SystemInitializationState {
   return systemInitializer.getInitializationState()
 }
 
 /**
- * 执行系统健康检查
+ * Perform a system health check
  */
 export async function performSystemHealthCheck() {
   return await systemInitializer.performHealthCheck()
 }
 
-// 开发环境调试接口
+// Development environment debugging interface
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   ;(window as any).__SYSTEM_INITIALIZER__ = {
     initializer: systemInitializer,

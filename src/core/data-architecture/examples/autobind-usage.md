@@ -1,19 +1,19 @@
-# AutoBind 使用指南
+# AutoBind User Guide
 
-AutoBind 功能提供了简化的数据源配置，自动将组件属性绑定到HTTP参数，无需手动配置复杂的参数绑定表达式。
+AutoBind Features provide simplified data source configuration，Automatically bind component properties toHTTPparameter，No need to manually configure complex parameter binding expressions。
 
-## 基本概念
+## Basic concepts
 
-AutoBind 支持三种模式：
-- **strict**: 严格模式，仅绑定指定的属性
-- **loose**: 宽松模式，绑定所有可用属性，排除指定属性
-- **custom**: 自定义模式，使用自定义绑定规则
+AutoBind Support three modes：
+- **strict**: strict mode，Only bind specified properties
+- **loose**: Relaxed mode，Bind all available properties，Exclude specified attributes
+- **custom**: Custom mode，Use custom binding rules
 
-## 配置示例
+## Configuration example
 
-### 1. 宽松模式 (推荐)
+### 1. Relaxed mode (recommend)
 
-最简单的配置，自动绑定所有标准属性：
+The simplest configuration，Automatically bind all standard properties：
 
 ```typescript
 const dataSourceConfig = {
@@ -29,16 +29,16 @@ const dataSourceConfig = {
 }
 ```
 
-**自动绑定的属性：**
-- `base.deviceId` → `deviceId` 参数
-- `base.metricsList` → `metrics` 参数
-- `component.startTime` → `startTime` 参数
-- `component.endTime` → `endTime` 参数
-- `component.dataType` → `dataType` 参数
+**Automatically bound properties：**
+- `base.deviceId` → `deviceId` parameter
+- `base.metricsList` → `metrics` parameter
+- `component.startTime` → `startTime` parameter
+- `component.endTime` → `endTime` parameter
+- `component.dataType` → `dataType` parameter
 
-### 2. 严格模式
+### 2. strict mode
 
-仅绑定指定的属性：
+Only bind specified properties：
 
 ```typescript
 const dataSourceConfig = {
@@ -59,9 +59,9 @@ const dataSourceConfig = {
 }
 ```
 
-### 3. 宽松模式 + 排除属性
+### 3. Relaxed mode + exclude properties
 
-绑定所有属性，但排除某些不需要的：
+Bind all properties，but exclude some unnecessary：
 
 ```typescript
 const dataSourceConfig = {
@@ -74,16 +74,16 @@ const dataSourceConfig = {
     enabled: true,
     mode: 'loose',
     excludeProperties: [
-      'component.refreshInterval', // 排除刷新间隔
-      'component.filterCondition'  // 排除过滤条件
+      'component.refreshInterval', // Exclude refresh interval
+      'component.filterCondition'  // exclude filter
     ]
   }
 }
 ```
 
-### 4. 自定义模式
+### 4. Custom mode
 
-使用完全自定义的绑定规则：
+Use fully custom binding rules：
 
 ```typescript
 const dataSourceConfig = {
@@ -98,13 +98,13 @@ const dataSourceConfig = {
     customRules: [
       {
         propertyPath: 'base.deviceId',
-        paramName: 'device_id', // 自定义参数名
+        paramName: 'device_id', // Custom parameter name
         required: true
       },
       {
         propertyPath: 'component.customProperty',
         paramName: 'custom_param',
-        transform: (value) => `prefix_${value}`, // 自定义转换
+        transform: (value) => `prefix_${value}`, // Custom conversion
         required: false
       }
     ]
@@ -112,9 +112,9 @@ const dataSourceConfig = {
 }
 ```
 
-## 与传统方式的对比
+## Comparison with traditional methods
 
-### 传统方式（复杂）
+### traditional way（complex）
 
 ```typescript
 const dataSourceConfig = {
@@ -132,7 +132,7 @@ const dataSourceConfig = {
 }
 ```
 
-### AutoBind方式（简化）
+### AutoBindWay（simplify）
 
 ```typescript
 const dataSourceConfig = {
@@ -148,45 +148,45 @@ const dataSourceConfig = {
 }
 ```
 
-## 技术实现
+## Technical implementation
 
-AutoBind 功能由以下核心组件实现：
+AutoBind Functions are implemented by the following core components：
 
-1. **DataSourceBindingConfig**: 管理绑定规则和参数映射
-2. **SimpleDataFlow**: 处理属性变更和数据源触发
-3. **VisualEditorBridge**: 在数据源执行时注入自动绑定的参数
+1. **DataSourceBindingConfig**: Manage binding rules and parameter mapping
+2. **SimpleDataFlow**: Handle property changes and data source triggers
+3. **VisualEditorBridge**: Inject automatically bound parameters when the data source is executed
 
-### 绑定规则
+### Binding rules
 
-系统内置了以下标准绑定规则：
+The system has built-in the following standard binding rules：
 
-| 属性路径 | HTTP参数名 | 数据转换 | 是否必需 |
+| Property path | HTTPParameter name | data conversion | Is it necessary |
 |---------|-----------|---------|----------|
-| `base.deviceId` | `deviceId` | 无 | 是 |
-| `base.metricsList` | `metrics` | 数组 → 逗号分隔字符串 | 否 |
-| `component.startTime` | `startTime` | Date → ISO字符串 | 否 |
-| `component.endTime` | `endTime` | Date → ISO字符串 | 否 |
-| `component.dataType` | `dataType` | 无 | 否 |
-| `component.refreshInterval` | `refreshInterval` | 转换为整数 | 否 |
-| `component.filterCondition` | `filter` | 无 | 否 |
+| `base.deviceId` | `deviceId` | none | yes |
+| `base.metricsList` | `metrics` | array → comma separated string | no |
+| `component.startTime` | `startTime` | Date → ISOstring | no |
+| `component.endTime` | `endTime` | Date → ISOstring | no |
+| `component.dataType` | `dataType` | none | no |
+| `component.refreshInterval` | `refreshInterval` | Convert to integer | no |
+| `component.filterCondition` | `filter` | none | no |
 
-### 扩展绑定规则
+### Extend binding rules
 
-可以通过编程方式添加自定义绑定规则：
+Custom binding rules can be added programmatically：
 
 ```typescript
 import { dataSourceBindingConfig } from '@/core/data-architecture/DataSourceBindingConfig'
 
-// 添加全局绑定规则
+// Add global binding rules
 dataSourceBindingConfig.addCustomBindingRule({
   propertyPath: 'component.customField',
   paramName: 'custom_field',
   transform: (value) => value?.toString().toUpperCase(),
   required: false,
-  description: '自定义字段转换为大写'
+  description: 'Convert custom fields to uppercase'
 })
 
-// 为特定组件类型设置绑定配置
+// Set binding configuration for specific component types
 dataSourceBindingConfig.setComponentConfig('my-widget', {
   componentType: 'my-widget',
   autoBindEnabled: true,
@@ -200,12 +200,12 @@ dataSourceBindingConfig.setComponentConfig('my-widget', {
 })
 ```
 
-## 调试和诊断
+## Debugging and diagnostics
 
-启用开发模式后，可以在控制台查看AutoBind的执行日志：
+After enabling development mode，Can be viewed on the consoleAutoBindExecution log：
 
 ```
-🚀 [VisualEditorBridge] AutoBind参数注入完成: {
+🚀 [VisualEditorBridge] AutoBindParameter injection completed: {
   mode: "loose",
   autoBindParams: {
     deviceId: "device_001",
@@ -216,30 +216,30 @@ dataSourceBindingConfig.setComponentConfig('my-widget', {
 }
 ```
 
-可以使用全局调试对象检查绑定配置：
+Binding configuration can be inspected using the global debug object：
 
 ```javascript
-// 在浏览器控制台中
+// In browser console
 console.log(__dataSourceBindingConfig.getDebugInfo())
 ```
 
-## 最佳实践
+## best practices
 
-1. **优先使用宽松模式**: 对于大多数场景，宽松模式提供了最好的开发体验
-2. **合理使用排除属性**: 当某些属性不应该传递给后端时，使用`excludeProperties`
-3. **严格模式用于敏感场景**: 当需要精确控制哪些参数被发送时使用严格模式
-4. **自定义模式用于特殊需求**: 当需要复杂的参数转换或非标准参数名时使用自定义模式
-5. **测试参数绑定**: 确保在开发环境中验证AutoBind生成的参数是否符合API要求
+1. **Prefer relaxed mode**: For most scenarios，Relaxed mode provides the best development experience
+2. **合理use排除属性**: When certain properties should not be passed to the backend，use`excludeProperties`
+3. **Strict mode is used for sensitive scenarios**: Use strict mode when you need precise control over which parameters are sent
+4. **Custom mode for special needs**: Use custom patterns when complex parameter conversions or non-standard parameter names are required
+5. **Test parameter binding**: 确保在开发环境中验证AutoBindDo the generated parameters comply withAPIRequire
 
-## 性能考虑
+## Performance considerations
 
-- AutoBind在属性变更时会自动重新生成参数，确保数据的实时性
-- 内置防抖机制避免频繁的HTTP请求
-- 绑定规则缓存提供了良好的性能表现
+- AutoBindParameters are automatically regenerated when properties change，Ensure the real-time nature of data
+- Built-in anti-shake mechanism to avoid frequentHTTPask
+- Binding rule caching provides good performance
 
-## 向后兼容
+## backwards compatible
 
-AutoBind功能完全向后兼容：
-- 未配置autoBind的数据源继续使用传统的绑定表达式
-- 可以在同一个项目中混合使用AutoBind和传统方式
-- 现有的绑定表达式不受影响
+AutoBindFeatures are fully backwards compatible：
+- Not configuredautoBindData sources continue to use traditional binding expressions
+- Can be mixed in the same projectAutoBindand traditional way
+- Existing binding expressions are not affected

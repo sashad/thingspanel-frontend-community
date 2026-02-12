@@ -26,16 +26,16 @@ const modalTitle = ref('generate.add')
 
 let loading = ref(false)
 
-// 定义表单数据类型 - 放在 configForm 定义之前
+// Define form data types - put on configForm before definition
 interface ConfigFormData {
   id: string | number | null
   additional_info: string | null
   description: string | null
   device_conn_type: string | number | null
-  device_template_id: string | number | '' | null // 允许空字符串
+  device_template_id: string | number | '' | null // Allow empty string
   device_type: string | number | null
   name: string | null
-  protocol_config: Record<string, any> | string | null // 允许对象、字符串或 null
+  protocol_config: Record<string, any> | string | null // allowed objects、string or null
   protocol_type: string | number | null
   remark: string | null
   voucher_type: string | number | null
@@ -47,35 +47,35 @@ function defaultConfigForm(): ConfigFormData {
     additional_info: null,
     description: null,
     device_conn_type: null,
-    device_template_id: '', // 默认值是空字符串
+    device_template_id: '', // The default value is the empty string
     device_type: null,
     name: null,
-    protocol_config: null, // 默认是 null
+    protocol_config: null, // The default is null
     protocol_type: null,
     remark: null,
     voucher_type: null
   }
 }
 
-// 使用更具体的类型 ConfigFormData
+// Use a more specific type ConfigFormData
 const configForm = ref<ConfigFormData>(defaultConfigForm())
 const isEdit = ref(false)
 
-// 为 options 定义类型
+// for options define type
 interface Option {
   name: string
   id: string | number
-  [key: string]: any // 允许其他属性
+  [key: string]: any // Allow other attributes
 }
 
-// 合并字段
+// merge fields
 const typeOptions = ref<(SelectOption | SelectGroupOption)[]>([])
 const connectOptions = ref<SelectOption[]>([])
 const protocol_config = ref<Record<string, any>>({})
 type FormElementType = 'input' | 'table' | 'select'
 
-// 假设 Validate 是一个已定义的类型或接口，如果不是，需要定义或移除
-// 如果 Validate 是 naive-ui 的 FormItemRule，可以这样写：
+// hypothesis Validate is a defined type or interface，if not，Need to be defined or removed
+// if Validate yes naive-ui of FormItemRule，It can be written like this：
 // import type { FormItemRule } from 'naive-ui';
 // type Validate = FormItemRule | FormItemRule[];
 
@@ -85,7 +85,7 @@ interface FormElement {
   label: string
   options?: Option[]
   placeholder?: string
-  // validate?: Validate; // 暂时注释掉，除非能找到 Validate 定义
+  // validate?: Validate; // Comment out for now，unless it can be found Validate definition
   array?: FormElement[]
 }
 const formElements = ref<FormElement[]>([])
@@ -145,21 +145,21 @@ const handleClose = () => {
   router.go(-1)
 }
 
-// 提交表单
+// Submit form
 const handleSubmit = async () => {
   await configFormRef?.value?.validate()
 
   loading.value = true
 
-  // 1. 直接复制当前的表单值
+  // 1. Directly copy the current form value
   const postData = { ...configForm.value }
 
-  // 2. 单独处理 protocol_config，将其从对象转换为 JSON 字符串
+  // 2. Handle separately protocol_config，Convert it from object to JSON string
   postData.protocol_config = JSON.stringify(protocol_config.value || {})
 
   if (!configId.value) {
-    // 添加模式
-    // 确保添加时不传递 id (defaultConfigForm 已将 id 设为 null)
+    // Add mode
+    // Make sure not to pass when adding id (defaultConfigForm Already id set to null)
     const res = await deviceConfigAdd(postData)
 
     loading.value = false
@@ -170,8 +170,8 @@ const handleSubmit = async () => {
       message.error((res as any)?.message || $t('generate.addFailed'))
     }
   } else {
-    // 编辑模式
-    // 确保 postData 中包含正确的 id (来自 configForm.value)
+    // edit mode
+    // make sure postData contains the correct id (from configForm.value)
     const res = await deviceConfigEdit(postData).catch((error: AxiosError) => {
       message.error((error && 'message' in error && error.message) || $t('generate.editFailed'))
       return { error: true }
@@ -223,11 +223,11 @@ const getProtocolList = async (deviceCode: string | number) => {
   const queryData = { device_type: deviceCode }
   const res = await deviceProtocalServiceList(queryData)
   if (res.data) {
-    // 明确数组元素的类型
+    // Specify the type of array elements
     typeOptions.value = [
       {
         type: 'group',
-        label: $t('common.protocol'), // naive-ui group 使用 label
+        label: $t('common.protocol'), // naive-ui group use label
         key: 'protocol',
         children: (res.data.protocol || []).map((p: any) => ({
           label: p.name,
@@ -236,7 +236,7 @@ const getProtocolList = async (deviceCode: string | number) => {
       },
       {
         type: 'group',
-        label: $t('common.service'), // naive-ui group 使用 label
+        label: $t('common.service'), // naive-ui group use label
         key: 'service',
         children: (res.data.service || []).map((s: any) => ({
           label: s.name,
@@ -262,7 +262,7 @@ const getVoucherType = async (data: any) => {
     protocol_type: data
   })
   if (res.data) {
-    // 明确 map 返回类型
+    // clear map Return type
     connectOptions.value = Object.keys(res.data).map(key => {
       return { label: key, value: res.data[key] } as SelectOption
     })
@@ -275,7 +275,7 @@ const choseProtocolType = async data => {
   await getConfigForm(data)
 }
 
-// 定义设备类型及其帮助信息的数组
+// Array defining the device type and its help information
 const deviceTypes = ref([
   { value: '1', labelKey: 'generate.direct-connected-device', helpKey: 'generate.deviceTypeHelp.direct' },
   { value: '2', labelKey: 'generate.gateway', helpKey: 'generate.deviceTypeHelp.gateway' },
@@ -324,12 +324,12 @@ onMounted(async () => {
   }
 })
 
-// 新增：处理设备类型变更的函数
+// New：Functions that handle device type changes
 function handleDeviceTypeChange(newValue: string | number) {
   configFormRef.value?.restoreValidation()
-  // 在 script 块中访问，类型检查通常更可靠
+  // exist script access in block，Type checking is usually more reliable
   if (!configForm.value) {
-    // 可以保留检查以防万一
+    // Checks can be kept just in case
     console.error('configForm.value is unexpectedly null/undefined during device type change')
     return
   }
@@ -350,7 +350,7 @@ function handleDeviceTypeChange(newValue: string | number) {
   <div class="overflow-y-auto">
     <NCard :title="`${$t(modalTitle)}${$t('custom.devicePage.configTemplate')}`">
       <NForm ref="configFormRef" :model="configForm" :rules="configFormRules" label-placement="left" label-width="auto">
-        <!-- 第一个文件中的原表单项 -->
+        <!-- The original form item in the first file -->
         <NFormItem :label="$t('generate.device-configuration-name')" path="name" class="w-[600px]">
           <NInput v-model:value="configForm.name" :placeholder="$t('common.deviceConfigName')" />
         </NFormItem>
@@ -371,7 +371,7 @@ function handleDeviceTypeChange(newValue: string | number) {
             @update:value="handleDeviceTypeChange"
           >
             <n-space>
-              <!-- 使用 v-for 循环渲染 -->
+              <!-- use v-for Loop rendering -->
               <div v-for="dtype in deviceTypes" :key="dtype.value" class="flex">
                 <n-radio :value="dtype.value">{{ $t(dtype.labelKey) }}</n-radio>
                 <NTooltip
@@ -399,7 +399,7 @@ function handleDeviceTypeChange(newValue: string | number) {
           </n-radio-group>
         </NFormItem>
 
-        <!-- 第二个文件中的新增表单项 -->
+        <!-- New form items in the second file -->
         <template v-if="configForm.device_type">
           <NFormItem class="w-[600px]" :label="$t('generate.choose-protocol-or-Service')" path="protocol_type">
             <NSelect

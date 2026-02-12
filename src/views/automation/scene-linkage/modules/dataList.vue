@@ -39,14 +39,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const sceneLinkageList = ref([] as any)
 
-// 新建场景
+// Create new scene
 const linkAdd = () => {
   routerPushByKey('automation_linkage-edit', {
     query: { device_id: props.device_id, device_config_id: props.device_config_id, backType: props.backType }
   })
 }
 
-// 编辑场景
+// Edit scene
 const linkEdit = (item: any) => {
   // router.push({ path: '/automation/linkage-edit', query: { id: item.id, backType: props.backType }});
 
@@ -60,7 +60,7 @@ const linkEdit = (item: any) => {
   })
 }
 
-// 开启/关闭场景
+// turn on/Close scene
 const linkActivation = async (item: any) => {
   const res = await sceneAutomationsSwitch(item.id)
   if (!res.error) {
@@ -138,13 +138,13 @@ const getLogList = async () => {
   logDataTotal.value = res.data.total
 }
 
-// 查看日志
+// View log
 const openLog = (item: any) => {
   logQuery.value.scene_automation_id = item.id
   getLogList()
   showLog.value = true
 }
-// 删除场景
+// delete scene
 const deleteLink = async (item: any) => {
   dialog.warning({
     title: $t('common.deletePrompt'),
@@ -211,7 +211,7 @@ getData()
           hoverable
         >
           <template #default>{{ item.description }}</template>
-          <!-- 右上角开关 -->
+          <!-- Upper right corner switch -->
           <template #top-right-icon>
             <n-switch
               v-model:value="item.enabled"
@@ -221,7 +221,7 @@ getData()
             />
           </template>
 
-          <!-- 底部操作按钮 -->
+          <!-- Bottom operation button -->
           <template #footer>
             <div class="flex items-center gap-2 w-full justify-between">
               <NTooltip trigger="hover">
@@ -431,7 +431,7 @@ getData()
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
-  /* 去除每行尾多余的边距 */
+  /* Remove excess margins at the end of each line */
   .scene-item:nth-child(3n) {
     margin-right: 0;
   }

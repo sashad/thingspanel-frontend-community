@@ -94,18 +94,18 @@ const handleClose = () => {
   visible.value = false
   modalClose()
 }
-// 提交表单
+// Submit form
 const handleSubmit = async () => {
   await configFormRef?.value?.validate()
   if (props.modalType === 'add') {
     const res = await deviceConfigAdd(configForm.value)
     if (!res.error) {
-      // message.success('新增成功');
+      // message.success('Added successfully');
     }
   } else {
     const res = await deviceConfigEdit(configForm.value)
     if (!res.error) {
-      // message.success('修改成功');
+      // message.success('Modification successful');
     }
   }
   handleClose()

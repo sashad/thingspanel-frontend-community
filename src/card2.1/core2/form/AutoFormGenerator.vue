@@ -1,9 +1,9 @@
 <template>
   <div class="auto-form-generator">
-    <!-- 基于 TS 配置的表单生成 -->
+    <!-- based on TS Configured form generation -->
     <div v-if="mode === 'ts-only' && tsConfig" class="ts-config-form">
       <n-space vertical>
-        <!-- 分组显示 -->
+        <!-- Group display -->
         <div v-for="group in groupedFields" :key="group.name" class="form-group">
           <n-card v-if="group.label" size="small" class="group-card">
             <template #header>
@@ -20,7 +20,7 @@
               </div>
             </n-space>
           </n-card>
-          <!-- 无分组的字段 -->
+          <!-- Ungrouped fields -->
           <n-space v-else vertical :size="16">
             <div v-for="field in group.fields" :key="field.field" class="form-field">
               <FormField
@@ -35,7 +35,7 @@
       </n-space>
     </div>
 
-    <!-- 基于 Vue 组件的表单渲染 -->
+    <!-- based on Vue Component form rendering -->
     <div v-else-if="mode === 'vue-only' && vueConfig" class="vue-config-form">
       <component
         :is="vueConfig"
@@ -45,11 +45,11 @@
       />
     </div>
 
-    <!-- 混合模式 -->
+    <!-- blend mode -->
     <div v-else-if="mode === 'hybrid'" class="hybrid-config-form">
       <n-space vertical>
-        <!-- Vue 组件部分 -->
-        <n-card v-if="vueConfig" title="高级配置" size="small">
+        <!-- Vue Components section -->
+        <n-card v-if="vueConfig" title="Advanced configuration" size="small">
           <component
             :is="vueConfig"
             v-model="formData"
@@ -58,8 +58,8 @@
           />
         </n-card>
 
-        <!-- TS 配置部分 -->
-        <n-card v-if="tsConfig" title="基础配置" size="small">
+        <!-- TS Configuration section -->
+        <n-card v-if="tsConfig" title="Basic configuration" size="small">
           <n-space vertical :size="16">
             <div v-for="field in tsConfig.fields" :key="field.field" class="form-field">
               <FormField
@@ -74,18 +74,18 @@
       </n-space>
     </div>
 
-    <!-- 空状态 -->
+    <!-- Empty state -->
     <div v-else class="empty-state">
-      <n-empty description="暂无配置项" />
+      <n-empty description="No configuration items yet" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * AutoFormGenerator - 自动表单生成器
- * 根据 TS 配置或 Vue 组件配置自动生成配置表单
- * 支持多种模式：ts-only, vue-only, hybrid
+ * AutoFormGenerator - Automatic form builder
+ * according to TS configure or Vue Component configuration automatically generates configuration forms
+ * Support multiple modes：ts-only, vue-only, hybrid
  */
 
 import { ref, computed, watch, onMounted } from 'vue'
@@ -95,15 +95,15 @@ import FormField from './FormField.vue'
 import type { TSConfig, ConfigMode, ConfigValues, Setting, SettingGroup } from '@/card2.1/types/setting-config'
 
 interface Props {
-  // TS 配置
+  // TS Configuration
   tsConfig?: TSConfig
-  // Vue 组件配置
+  // Vue Component configuration
   vueConfig?: Component
-  // 配置模式
+  // configuration mode
   mode?: ConfigMode
-  // 当前值
+  // current value
   modelValue?: ConfigValues
-  // 是否只读
+  // Is it read-only?
   readonly?: boolean
 }
 
@@ -121,17 +121,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 表单数据
+// form data
 const formData = ref<ConfigValues>({})
 
-// 分组字段
+// grouping field
 const groupedFields = computed(() => {
   if (!props.tsConfig?.fields) return []
 
   const groups = props.tsConfig.groups || []
   const fields = props.tsConfig.fields
 
-  // 如果没有定义分组，创建默认分组
+  // If no grouping is defined，Create default group
   if (groups.length === 0) {
     return [{
       name: 'default',
@@ -140,10 +140,10 @@ const groupedFields = computed(() => {
     }]
   }
 
-  // 根据分组组织字段
+  // Organize fields according to groups
   const result: Array<{ name: string; label: string; fields: Setting[] }> = []
 
-  // 添加定义的分组
+  // Add defined grouping
   groups.forEach(group => {
     const groupFields = fields.filter(field =>
       group.fields.includes(field.field)
@@ -157,7 +157,7 @@ const groupedFields = computed(() => {
     }
   })
 
-  // 添加未分组的字段
+  // Add ungrouped fields
   const groupedFieldNames = groups.flatMap(g => g.fields)
   const ungroupedFields = fields.filter(field =>
     !groupedFieldNames.includes(field.field)
@@ -166,7 +166,7 @@ const groupedFields = computed(() => {
   if (ungroupedFields.length > 0) {
     result.push({
       name: 'ungrouped',
-      label: '其他设置',
+      label: 'Other settings',
       fields: ungroupedFields
     })
   }
@@ -174,33 +174,33 @@ const groupedFields = computed(() => {
   return result
 })
 
-// 获取字段值
+// Get field value
 const getFieldValue = (fieldPath: string) => {
   return getNestedValue(formData.value, fieldPath)
 }
 
-// 更新字段值
+// Update field value
 const updateFieldValue = (fieldPath: string, value: unknown) => {
   setNestedValue(formData.value, fieldPath, value)
   emit('update:modelValue', { ...formData.value })
   emit('change', { ...formData.value })
 }
 
-// 处理表单变化
+// Handle form changes
 const handleFormChange = (newData: ConfigValues) => {
   formData.value = { ...formData.value, ...newData }
   emit('update:modelValue', formData.value)
   emit('change', formData.value)
 }
 
-// 获取嵌套属性值
+// Get nested attribute values
 const getNestedValue = (obj: any, path: string): unknown => {
   return path.split('.').reduce((current, key) => {
     return current && current[key] !== undefined ? current[key] : undefined
   }, obj)
 }
 
-// 设置嵌套属性值
+// Set nested property values
 const setNestedValue = (obj: any, path: string, value: unknown) => {
   const keys = path.split('.')
   const lastKey = keys.pop()!
@@ -213,7 +213,7 @@ const setNestedValue = (obj: any, path: string, value: unknown) => {
   target[lastKey] = value
 }
 
-// 表单验证
+// form validation
 const validateForm = () => {
   const errors: string[] = []
   let valid = true
@@ -222,22 +222,22 @@ const validateForm = () => {
     props.tsConfig.fields.forEach(field => {
       const value = getFieldValue(field.field)
 
-      // 必填验证
+      // Required verification
       if (field.required && (value === undefined || value === null || value === '')) {
         valid = false
-        errors.push(`${field.label}为必填项`)
+        errors.push(`${field.label}is required`)
       }
 
-      // 最小值验证
+      // Minimum value verification
       if (field.min !== undefined && typeof value === 'number' && value < field.min) {
         valid = false
-        errors.push(`${field.label}不能小于${field.min}`)
+        errors.push(`${field.label}cannot be less than${field.min}`)
       }
 
-      // 最大值验证
+      // Maximum value verification
       if (field.max !== undefined && typeof value === 'number' && value > field.max) {
         valid = false
-        errors.push(`${field.label}不能大于${field.max}`)
+        errors.push(`${field.label}cannot be greater than${field.max}`)
       }
     })
   }
@@ -247,7 +247,7 @@ const validateForm = () => {
   return result
 }
 
-// 监听外部值变化
+// Monitor external value changes
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -258,14 +258,14 @@ watch(
   { immediate: true, deep: true }
 )
 
-// 组件挂载时初始化
+// Initialized when component is mounted
 onMounted(() => {
   if (props.modelValue) {
     formData.value = { ...props.modelValue }
   }
 })
 
-// 暴露验证方法
+// Exposed verification method
 defineExpose({
   validate: validateForm
 })

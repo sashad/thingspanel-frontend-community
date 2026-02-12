@@ -1,12 +1,12 @@
 /**
- * 智能深拷贝工具
- * 专门处理Vue 3响应式对象与structuredClone的兼容性问题
+ * Smart deep copy tool
+ * Specially handledVue 3Reactive objects andstructuredClonecompatibility issues
  */
 
 import { toRaw, isRef, unref, isReactive, isReadonly } from 'vue'
 
 /**
- * 检查对象是否为Vue响应式对象
+ * Check if the object isVueReactive objects
  */
 const isVueReactiveObject = (obj: any): boolean => {
   return (
@@ -18,37 +18,37 @@ const isVueReactiveObject = (obj: any): boolean => {
 }
 
 /**
- * 智能深度toRaw转换
- * 只对Vue响应式对象使用toRaw，避免不必要的处理
+ * Intelligent depthtoRawConvert
+ * only rightVueReactive object usagetoRaw，Avoid unnecessary processing
  */
 const smartDeepToRaw = <T>(obj: T): T => {
   if (obj === null || obj === undefined) return obj
 
-  // 处理基本类型
+  // Handling basic types
   if (typeof obj !== 'object') return obj
 
-  // 处理ref对象
+  // deal withrefobject
   if (isRef(obj)) {
     return smartDeepToRaw(unref(obj)) as T
   }
 
-  // 处理响应式对象
+  // Handle reactive objects
   let raw = obj
   if (isVueReactiveObject(obj)) {
     raw = toRaw(obj)
   }
 
-  // 处理数组
+  // Processing arrays
   if (Array.isArray(raw)) {
     return raw.map(smartDeepToRaw) as T
   }
 
-  // 处理Date、RegExp等内置对象
+  // deal withDate、RegExpWait for built-in objects
   if (raw instanceof Date || raw instanceof RegExp || raw instanceof Error) {
     return raw
   }
 
-  // 处理Set
+  // deal withSet
   if (raw instanceof Set) {
     const newSet = new Set()
     raw.forEach(value => {
@@ -57,7 +57,7 @@ const smartDeepToRaw = <T>(obj: T): T => {
     return newSet as T
   }
 
-  // 处理Map
+  // deal withMap
   if (raw instanceof Map) {
     const newMap = new Map()
     raw.forEach((value, key) => {
@@ -66,7 +66,7 @@ const smartDeepToRaw = <T>(obj: T): T => {
     return newMap as T
   }
 
-  // 处理普通对象
+  // Handle common objects
   if (raw.constructor === Object || raw.constructor === undefined) {
     const result: any = {}
     for (const [key, value] of Object.entries(raw)) {
@@ -75,25 +75,25 @@ const smartDeepToRaw = <T>(obj: T): T => {
     return result
   }
 
-  // 其他类型保持原样
+  // Leave other types as is
   return raw
 }
 
 /**
- * 性能优化的深拷贝函数
+ * Performance-optimized deep copy functions
  *
- * 策略：
- * 1. 优先使用高性能的 structuredClone()
- * 2. 对Vue响应式对象智能预处理
- * 3. 失败时降级到JSON方法
- * 4. 支持复杂对象类型(Set, Map等)
+ * Strategy：
+ * 1. Prioritize the use of high-performance structuredClone()
+ * 2. rightVue响应式right象智能预处理
+ * 3. On failure, downgrade toJSONmethod
+ * 4. Support complex object types(Set, Mapwait)
  */
 export const smartDeepClone = <T>(
   obj: T,
   options?: {
-    /** 是否启用详细日志 */
+    /** Whether to enable detailed logging */
     debug?: boolean
-    /** 强制使用JSON方法（用于测试） */
+    /** Mandatory useJSONmethod（for testing） */
     forceJSON?: boolean
   }
 ): T => {
@@ -102,7 +102,7 @@ export const smartDeepClone = <T>(
   if (obj === null || obj === undefined) return obj
 
   try {
-    // 第一步：智能预处理Vue响应式对象
+    // first step：Intelligent preprocessingVueReactive objects
     const rawObj = smartDeepToRaw(obj)
 
     if (debug) {
@@ -110,7 +110,7 @@ export const smartDeepClone = <T>(
       }
     }
 
-    // 第二步：尝试高性能的structuredClone
+    // Step 2：try high performancestructuredClone
     if (!forceJSON && typeof structuredClone !== 'undefined') {
       try {
         const cloned = structuredClone(rawObj)
@@ -121,13 +121,13 @@ export const smartDeepClone = <T>(
         return cloned
       } catch (structuredCloneError) {
         if (debug) {
-          console.error('⚠️ [smartDeepClone] structuredClone失败，降级到JSON:', structuredCloneError)
+          console.error('⚠️ [smartDeepClone] structuredClonefail，downgrade toJSON:', structuredCloneError)
         }
-        // 继续到JSON方法
+        // continue toJSONmethod
       }
     }
 
-    // 第三步：降级到JSON方法
+    // Step 3：downgrade toJSONmethod
     const jsonCloned = JSON.parse(JSON.stringify(rawObj))
     if (debug) {
       if (process.env.NODE_ENV === 'development') {
@@ -135,8 +135,8 @@ export const smartDeepClone = <T>(
     }
     return jsonCloned
   } catch (error) {
-    console.error('❌ [smartDeepClone] 所有克隆方法都失败了:', error)
-    // 最后的兜底：浅拷贝
+    console.error('❌ [smartDeepClone] All cloning methods fail:', error)
+    // The last tip：Shallow copy
     if (Array.isArray(obj)) {
       return [...obj] as T
     }
@@ -148,32 +148,32 @@ export const smartDeepClone = <T>(
 }
 
 /**
- * 简化版深拷贝（仅用于简单对象，性能更好）
+ * Simplified version of deep copy（Only for simple objects，Better performance）
  */
 export const simpleDeepClone = <T>(obj: T): T => {
   return smartDeepClone(obj)
 }
 
 /**
- * 批量深拷贝（用于数组等批量操作）
+ * Batch deep copy（Used for batch operations such as arrays）
  */
 export const batchDeepClone = <T>(items: T[]): T[] => {
   try {
-    // 尝试批量处理
+    // Try batch processing
     const rawItems = items.map(smartDeepToRaw)
     return structuredClone(rawItems)
   } catch {
-    // 降级到单个处理
+    // Downgrade to single processing
     return items.map(smartDeepClone)
   }
 }
 
 /**
- * 兼容性深拷贝（确保100%成功）
+ * Compatibility deep copy（make sure100%success）
  */
 export const safeDeepClone = <T>(obj: T): T => {
   return smartDeepClone(obj, { forceJSON: true })
 }
 
-// 默认导出
+// Default export
 export default smartDeepClone

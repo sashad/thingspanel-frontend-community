@@ -1,42 +1,42 @@
 /**
- * 基础类型定义 - 统一数据节点协议
+ * Basic type definition - Unified Data Node Protocol
  */
 
-// 位置信息
+// location information
 export interface Position {
   x: number
   y: number
 }
 
-// 尺寸信息
+// size information
 export interface Size {
   width: number
   height: number
 }
 
-// 统一数据节点协议
+// Unified Data Node Protocol
 export interface GraphData<TConfig = any, TItem = any> {
   id: string
   type: string
   x: number
   y: number
-  width: number // Canvas像素宽度
-  height: number // Canvas像素高度
+  width: number // CanvasPixel width
+  height: number // CanvasPixel height
   properties: TConfig
-  renderer: string[] // 适配的渲染器
+  renderer: string[] // Adapted renderer
 
-  // 不同渲染器的布局属性
+  // Layout properties for different renderers
   layout?: {
     canvas?: {
-      width: number // 像素
-      height: number // 像素
+      width: number // Pixel
+      height: number // Pixel
     }
     gridstack?: {
-      w: number // 网格宽度单位
-      h: number // 网格高度单位
+      w: number // grid width unit
+      h: number // grid height unit
     }
     kanban?: {
-      // 看板特有布局属性
+      // Kanban-specific layout properties
     }
   }
 
@@ -51,13 +51,13 @@ export interface GraphData<TConfig = any, TItem = any> {
   }
 }
 
-// 数据转换操作
+// Data conversion operations
 export interface TransformOperation {
   type: 'filter' | 'aggregate' | 'sort' | 'map'
   [key: string]: any
 }
 
-// 画布状态
+// Canvas state
 export interface CanvasState {
   nodes: GraphData[]
   selectedIds: string[]

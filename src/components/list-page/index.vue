@@ -2,21 +2,21 @@
   <div class="advanced-list-container">
     <n-card class="full-height-card" footer-style="padding-top: 0px; padding-bottom: 0px;">
       <div class="advanced-list-layout">
-        <!-- 搜索区域 -->
+        <!-- search area -->
         <div v-if="shouldShowSearchArea" class="search">
           <div class="search-form-content">
             <slot name="search-form-content" />
           </div>
         </div>
         <n-divider v-if="showAddButton" style="margin-top: 10px; margin-bottom: 10px" />
-        <!-- 内容区域 -->
+        <!-- content area -->
         <div class="list-content">
-          <!-- 内容头部 -->
+          <!-- Content header -->
           <div class="list-content-header">
-            <!-- 左侧操作区域 -->
+            <!-- Left operating area -->
             <div class="list-content-header-left">
               <slot name="header-left">
-                <!-- 默认新建按钮 -->
+                <!-- Default new button -->
                 <slot name="add-button">
                   <n-button v-if="showAddButton" type="primary" size="small" @click="handleAddNew">
                     <template #icon>
@@ -27,7 +27,7 @@
                 </slot>
               </slot>
             </div>
-            <!-- 右侧操作区域 -->
+            <!-- Right operating area -->
             <div class="list-content-header-right">
               <slot name="header-right">
                 <n-space v-if="shouldShowViewSwitcher || hasRefreshButton" align="center">
@@ -53,7 +53,7 @@
             </div>
           </div>
 
-          <!-- 内容主体 -->
+          <!-- Content body -->
 
           <div class="list-content-body">
             <div v-if="currentView === 'card' && hasSlot('card-view')" class="view-wrapper">
@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <!-- 底部区域 -->
+      <!-- bottom area -->
       <template v-if="hasSlot('footer')" #footer>
         <div class="list-content-footer">
           <slot name="footer" />
@@ -95,12 +95,12 @@ import {
   MapOutline as MapIcon
 } from '@vicons/ionicons5'
 
-// 定义组件名称
+// Define component name
 defineOptions({
   name: 'AdvancedListLayout'
 })
 
-// Props 定义
+// Props definition
 interface ViewItem {
   key: string
   icon: any
@@ -115,9 +115,9 @@ interface Props {
   showQueryButton?: boolean
   showResetButton?: boolean
   showAddButton?: boolean
-  mobileBreakpoint?: number // 移动端断点，默认768px
-  useViewMemory?: boolean // 是否启用视图记忆功能
-  memoryKey?: string // 视图记忆的唯一键
+  mobileBreakpoint?: number // Mobile breakpoints，default768px
+  useViewMemory?: boolean // Whether to enable view memory function
+  memoryKey?: string // Unique key for view memory
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -137,7 +137,7 @@ const props = withDefaults(defineProps<Props>(), {
   memoryKey: 'advanced-list-view'
 })
 
-// Emits 定义
+// Emits definition
 const emit = defineEmits<{
   query: [filterData: Record<string, any>]
   reset: []
@@ -146,21 +146,21 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-// 获取插槽
+// Get slot
 const slots = useSlots()
 
-// 响应式数据
+// Responsive data
 const storageView = props.useViewMemory ? useStorage(props.memoryKey, '') : ref('')
 const currentView = ref('')
 const windowWidth = ref<number>(window.innerWidth)
 
-// 监听窗口大小变化
+// Listen for window size changes
 const handleResize = () => {
   windowWidth.value = window.innerWidth
 }
 
 const shouldShowSearchArea = computed(() => {
-  // 如果有搜索表单内容插槽，或者显示查询/重置按钮，则显示搜索区域
+  // If there is a search form content slot，or display query/reset button，the search area is displayed
   return hasSlot('search-form-content') || props.showQueryButton || props.showResetButton
 })
 
@@ -169,19 +169,19 @@ const shouldShowViewSwitcher = computed(() => {
   return availableSlots.length > 1
 })
 
-const hasRefreshButton = computed(() => true) // 刷新按钮始终显示
+const hasRefreshButton = computed(() => true) // Refresh button always shows
 
 const getAvailableViewsWithSlots = () => {
   return props.availableViews.filter(view => hasSlot(`${view.key}-view`))
 }
 
-// 方法
+// method
 const hasSlot = (name: string): boolean => {
   return !!slots[name]
 }
 
 const getAddButtonText = (): string => {
-  // 优先使用传入的文本
+  // Prefer the text passed in
   if (props.addButtonText) {
     if (typeof props.addButtonText === 'function') {
       return props.addButtonText()
@@ -189,12 +189,12 @@ const getAddButtonText = (): string => {
     return props.addButtonText
   }
 
-  // 其次使用国际化key
+  // Secondly use internationalizationkey
   if (props.addButtonI18nKey) {
     return $t(props.addButtonI18nKey)
   }
 
-  // 最后使用默认值
+  // Finally use the default value
   return $t('card.addButton')
 }
 
@@ -207,33 +207,33 @@ const initializeView = () => {
   const available = getAvailableViewsWithSlots()
   let initial = ''
 
-  // 优先从 memory storage 中获取
+  // Prioritize from memory storage Get in
   if (props.useViewMemory && storageView.value && available.some(v => v.key === storageView.value)) {
     initial = storageView.value
   }
-  // 其次使用 initialView prop
+  // Secondly use initialView prop
   else if (props.initialView && available.some(v => v.key === props.initialView)) {
     initial = props.initialView
   }
-  // 最后使用第一个可用的视图
+  // Finally use the first available view
   else if (available.length > 0) {
     initial = available[0].key
   }
-  // 默认值
+  // default value
   else {
     initial = 'list'
   }
 
   currentView.value = initial
 
-  // 如果启用了记忆功能但 storage 为空，则用初始值填充
+  // If the memory function is enabled but storage is empty，Then fill it with the initial value
   if (props.useViewMemory && !storageView.value) {
     storageView.value = initial
   }
 }
 
 const handleReset = () => {
-  // 触发重置事件，父组件负责清空表单和刷新数据
+  // trigger reset event，The parent component is responsible for clearing the form and refreshing data
   emit('reset')
 }
 
@@ -255,7 +255,7 @@ const handleRefresh = () => {
   emit('refresh')
 }
 
-// 生命周期
+// life cycle
 onMounted(() => {
   initializeView()
   window.addEventListener('resize', handleResize)
@@ -271,37 +271,37 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 最外层容器：占满父容器的全部高度 */
+/* outermost container：Take up the entire height of the parent container */
 .advanced-list-container {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* 卡片容器：占满剩余高度 */
+/* card container：Take up remaining height */
 .full-height-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* 主布局容器：使用 flex 布局，确保高度分配 */
+/* main layout container：use flex layout，Ensure height allocation */
 .advanced-list-layout {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 防止内容溢出 */
+  overflow: hidden; /* Prevent content from overflowing */
 
-  /* 搜索区域：固定高度，不参与 flex 分配 */
+  /* search area：fixed height，Not participating flex distribute */
   .search {
     flex-shrink: 0;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    z-index: 10; /* 确保在滚动内容之上 */
+    z-index: 10; /* Make sure it's above the scrolling content */
 
-    /* 桌面端布局 */
+    /* Desktop layout */
     .search-form-content {
       flex: 1;
       min-width: 0;
@@ -314,7 +314,7 @@ onUnmounted(() => {
       gap: 8px;
     }
 
-    /* 移动端布局 */
+    /* Mobile layout */
     &:has(.search-button-mobile) {
       flex-direction: column;
       align-items: stretch;
@@ -335,14 +335,14 @@ onUnmounted(() => {
     }
   }
 
-  /* 列表内容区域：占用剩余空间，整个区域可滚动 */
+  /* List content area：Take up remaining space，The entire area is scrollable */
   .list-content {
     flex: 1;
     min-height: 0;
     overflow: hidden;
     position: relative;
 
-    /* 内容头部：固定在列表内容区域顶部 */
+    /* Content header：Pinned to top of list content area */
     .list-content-header {
       position: sticky;
       top: 0;
@@ -367,21 +367,21 @@ onUnmounted(() => {
       }
     }
 
-    /* 内容主体：可滚动区域 */
+    /* Content body：scrollable area */
     .list-content-body {
       height: 100%;
       margin-top: 20px;
 
-      /* 视图包装器：确保内容正确显示 */
+      /* View wrapper：Make sure content displays correctly */
       .view-wrapper {
-        height: calc(100% - 66px); /* 减去padding */
+        height: calc(100% - 66px); /* minuspadding */
         overflow: auto;
       }
     }
   }
 }
 
-/* 底部区域：固定高度 */
+/* bottom area：fixed height */
 .list-content-footer {
   flex-shrink: 0;
   height: 50px;
@@ -390,7 +390,7 @@ onUnmounted(() => {
   justify-content: end;
 }
 
-/* 移动端特定样式 */
+/* Mobile specific styles */
 @media (max-width: 768px) {
   .search {
     flex-direction: column !important;
@@ -412,12 +412,12 @@ onUnmounted(() => {
   }
 }
 
-/* 为了确保在 naive-ui 的 Card 组件中正确工作，需要覆盖一些默认样式 */
+/* In order to ensure that naive-ui of Card The component works correctly，Need to override some default styles */
 :deep(.n-card__content) {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px; /* 根据需要调整内边距 */
+  padding: 20px; /* Adjust padding as needed */
 }
 
 :deep(.full-height-card) {
@@ -426,7 +426,7 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* 确保 n-scrollbar 正确工作 */
+/* make sure n-scrollbar work correctly */
 :deep(.n-scrollbar) {
   height: 100%;
 }

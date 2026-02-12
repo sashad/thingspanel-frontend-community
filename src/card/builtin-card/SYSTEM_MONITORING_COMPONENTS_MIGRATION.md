@@ -1,19 +1,19 @@
-# 系统监控组件统一迁移指南
+# System Monitoring Component Unified Migration Guide
 
-## 📋 概述
+## 📋 Overview
 
-本文档针对系统监控相关的三个组件进行统一迁移规划：
-- `cpu-usage` - CPU使用率
-- `memory-usage` - 内存使用率  
-- `disk-usage` - 磁盘使用率
+This document provides a unified migration plan for the three components related to system monitoring.：
+- `cpu-usage` - CPUUsage rate
+- `memory-usage` - memory usage  
+- `disk-usage` - Disk usage
 
-这三个组件结构**完全相同**，仅在数据字段和显示颜色上有差异，是**合并重构的最佳候选**。
+These three component structures**exactly the same**，There are only differences in data fields and display colors，yes**Best candidate for merge refactoring**。
 
-## 🔍 组件分析
+## 🔍 component analysis
 
-### 共同特征
+### common characteristics
 ```vue
-<!-- 完全相同的结构模式 -->
+<!-- exactly the same structural pattern -->
 <template>
   <GradientBg :start-color="color1" :end-color="color2">
     <h3>{{ $t('card.xxxUsage') }}</h3>
@@ -29,121 +29,121 @@
 </template>
 ```
 
-### 共同API
-所有三个组件都调用同一个API接口：
+### commonAPI
+All three components call the sameAPIinterface：
 ```typescript
 getSystemMetricsCurrent(): Promise<{
   data: {
-    cpu_usage: number     // CPU使用率百分比
-    memory_usage: number  // 内存使用率百分比  
-    disk_usage: number    // 磁盘使用率百分比
+    cpu_usage: number     // CPUUtilization percentage
+    memory_usage: number  // Memory usage percentage  
+    disk_usage: number    // Disk usage percentage
   }
 }>
 ```
 
-### 共同逻辑
-1. **30秒定时刷新**
-2. **百分比显示** (单位: %)
-3. **加载状态管理**
-4. **错误处理和日志**
-5. **生命周期清理**
+### common logic
+1. **30Refresh every second**
+2. **Percent display** (unit: %)
+3. **Loading state management**
+4. **Error handling and logging**
+5. **lifecycle cleanup**
 
-### 唯一差异
-| 组件 | 数据字段 | 图标 | 渐变色 | 国际化key |
+### only difference
+| components | data fields | icon | gradient color | internationalizationkey |
 |------|----------|------|--------|-----------|
 | CPU | `cpu_usage` | `fa-microchip` | `#4ade80` → `#22c55e` | `card.cpuUsage` |
 | Memory | `memory_usage` | `fa-memory` | `#f59e0b` → `#d97706` | `card.memoryUsage` |
 | Disk | `disk_usage` | `fa-hdd` | `#6366f1` → `#4f46e5` | `card.diskUsage` |
 
-## 🎯 合并策略
+## 🎯 merge strategy
 
-### 方案选择：通用系统指标组件
-创建一个 `SystemMetricCard` 组件，通过配置支持不同的系统指标显示。
+### Solution selection：Common system indicator components
+Create a `SystemMetricCard` components，Support different system indicator display through configuration。
 
-### 合并收益
-- **减少代码量**: 3个组件 → 1个组件 + 3个配置
-- **统一维护**: 修改一处影响所有指标
-- **扩展性强**: 轻松添加新的系统指标
-- **一致性**: 保证所有指标显示风格统一
+### Consolidated earnings
+- **Reduce code size**: 3components → 1components + 3configuration
+- **Unified maintenance**: Modifying one place affects all indicators
+- **Strong scalability**: Easily add new system metrics
+- **consistency**: Ensure that all indicators display in a unified style
 
-## 🚀 具体实施方案
+## 🚀 Specific implementation plan
 
-### Phase 1: 创建通用系统指标组件
+### Phase 1: Create a common system indicator component
 
-#### 1.1 组件定义
+#### 1.1 Component definition
 ```typescript
 // src/card2.1/components/system-metric-card/component-definition.ts
 import type { ComponentDefinition } from '@/card2.1/core/types'
 
 export const systemMetricCardDefinition: ComponentDefinition = {
   type: 'SystemMetricCard',
-  name: '系统指标卡片',
-  description: '显示系统资源使用率的统计卡片',
+  name: 'System indicator card',
+  description: 'Statistics card showing system resource usage',
   category: 'system-monitoring',
   
-  // 数据需求
+  // data requirements
   dataRequirement: {
     fields: {
       systemMetrics: {
         type: 'object',
         required: true,
-        description: '系统指标数据',
+        description: 'System indicator data',
         properties: {
-          cpu_usage: { type: 'number', description: 'CPU使用率' },
-          memory_usage: { type: 'number', description: '内存使用率' },
-          disk_usage: { type: 'number', description: '磁盘使用率' }
+          cpu_usage: { type: 'number', description: 'CPUUsage rate' },
+          memory_usage: { type: 'number', description: 'memory usage' },
+          disk_usage: { type: 'number', description: 'Disk usage' }
         }
       }
     }
   },
   
-  // 配置选项
+  // Configuration options
   config: {
     metricType: {
       type: 'select',
       options: [
-        { label: 'CPU使用率', value: 'cpu' },
-        { label: '内存使用率', value: 'memory' },
-        { label: '磁盘使用率', value: 'disk' }
+        { label: 'CPUUsage rate', value: 'cpu' },
+        { label: 'memory usage', value: 'memory' },
+        { label: 'Disk usage', value: 'disk' }
       ],
       default: 'cpu',
-      label: '指标类型'
+      label: 'Indicator type'
     },
     title: {
       type: 'string',
       default: '',
-      label: '自定义标题'
+      label: 'Custom title'
     },
     icon: {
       type: 'icon-picker',
       default: '',
-      label: '自定义图标'
+      label: 'Custom icon'
     },
     gradientColors: {
       type: 'color-pair',
       default: ['#3b82f6', '#1d4ed8'],
-      label: '渐变颜色'
+      label: 'gradient color'
     },
     refreshInterval: {
       type: 'number',
       default: 30,
-      label: '刷新间隔(秒)'
+      label: 'refresh interval(Second)'
     },
     warningThreshold: {
       type: 'number',
       default: 80,
-      label: '警告阈值(%)'
+      label: 'warning threshold(%)'
     },
     criticalThreshold: {
       type: 'number',
       default: 90,
-      label: '严重阈值(%)'
+      label: 'severe threshold(%)'
     }
   }
 }
 ```
 
-#### 1.2 组件实现
+#### 1.2 Component implementation
 ```vue
 <!-- src/card2.1/components/system-metric-card/SystemMetricCard.vue -->
 <script setup lang="ts">
@@ -177,13 +177,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { t } = useI18n()
 
-// Card 2.1 数据绑定
+// Card 2.1 data binding
 const { data, loading, error } = useCard2DataBinding({
   componentType: 'SystemMetricCard',
   dataBinding: props.dataBinding
 })
 
-// 指标配置映射
+// Indicator configuration mapping
 const metricConfigs = {
   cpu: {
     dataKey: 'cpu_usage',
@@ -205,10 +205,10 @@ const metricConfigs = {
   }
 }
 
-// 当前指标配置
+// Current indicator configuration
 const currentConfig = computed(() => metricConfigs[props.config.metricType])
 
-// 显示数值
+// Display value
 const displayValue = computed(() => {
   if (loading.value || error.value) return 0
   const metrics = data.value?.systemMetrics
@@ -218,22 +218,22 @@ const displayValue = computed(() => {
   return typeof value === 'number' ? Math.round(value * 10) / 10 : 0
 })
 
-// 显示标题
+// show title
 const displayTitle = computed(() => {
   return props.config.title || t(currentConfig.value.defaultTitle)
 })
 
-// 显示图标
+// show icon
 const displayIcon = computed(() => {
   return props.config.icon || currentConfig.value.defaultIcon
 })
 
-// 显示颜色
+// Display color
 const displayColors = computed(() => {
   return props.config.gradientColors || currentConfig.value.defaultColors
 })
 
-// 状态判断
+// Status judgment
 const status = computed(() => {
   const value = displayValue.value
   const { criticalThreshold = 90, warningThreshold = 80 } = props.config
@@ -243,7 +243,7 @@ const status = computed(() => {
   return 'normal'
 })
 
-// 状态颜色
+// status color
 const statusColors = computed(() => {
   switch (status.value) {
     case 'critical':
@@ -255,13 +255,13 @@ const statusColors = computed(() => {
   }
 })
 
-// 动态刷新定时器
+// Dynamic refresh timer
 const refreshTimer = ref<number | null>(null)
 
 const setupRefreshTimer = () => {
   if (props.config.refreshInterval && props.config.refreshInterval > 0) {
     refreshTimer.value = window.setInterval(() => {
-      // 触发数据刷新
+      // Trigger data refresh
       if (props.dataBinding?.refresh) {
         props.dataBinding.refresh()
       }
@@ -291,18 +291,18 @@ onUnmounted(() => {
     :start-color="statusColors[0]"
     :end-color="statusColors[1]"
   >
-    <!-- 标题 -->
+    <!-- title -->
     <h3 class="title">{{ displayTitle }}</h3>
     
-    <!-- 内容区域 -->
+    <!-- content area -->
     <div class="content">
-      <!-- 图标 -->
+      <!-- icon -->
       <SvgIcon 
         :icon="displayIcon"
         class="metric-icon"
       />
       
-      <!-- 数值显示 -->
+      <!-- Numerical display -->
       <div class="value-container">
         <CountTo
           v-if="!loading && !error"
@@ -313,17 +313,17 @@ onUnmounted(() => {
           class="metric-value"
         />
         
-        <!-- 加载状态 -->
+        <!-- Loading status -->
         <div v-else-if="loading" class="loading-value">
           <n-spin size="small" />
         </div>
         
-        <!-- 错误状态 -->
+        <!-- error status -->
         <div v-else class="error-value">
           <span class="error-text">{{ t('card.noData') }}</span>
         </div>
         
-        <!-- 状态指示 -->
+        <!-- status indication -->
         <div v-if="!loading && !error" class="status-indicator">
           <n-tag
             :type="status === 'critical' ? 'error' : status === 'warning' ? 'warning' : 'success'"
@@ -394,7 +394,7 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 480px) {
   .content {
     flex-direction: column;
@@ -409,9 +409,9 @@ onUnmounted(() => {
 </style>
 ```
 
-### Phase 2: 创建预设配置
+### Phase 2: Create a preset configuration
 
-#### 2.1 CPU使用率预设
+#### 2.1 CPUUsage default
 ```typescript
 // src/card2.1/components/system-metric-card/presets/cpu-usage.ts
 import type { ComponentPreset } from '@/card2.1/core/types'
@@ -419,8 +419,8 @@ import { systemMetricsDataSource } from '../data-sources/system-metrics'
 
 export const cpuUsagePreset: ComponentPreset = {
   id: 'cpu-usage-metric',
-  name: 'CPU使用率',
-  description: '显示系统CPU使用率',
+  name: 'CPUUsage rate',
+  description: 'display systemCPUUsage rate',
   
   config: {
     metricType: 'cpu',
@@ -445,13 +445,13 @@ export const cpuUsagePreset: ComponentPreset = {
 }
 ```
 
-#### 2.2 内存使用率预设
+#### 2.2 Memory usage default
 ```typescript
 // src/card2.1/components/system-metric-card/presets/memory-usage.ts
 export const memoryUsagePreset: ComponentPreset = {
   id: 'memory-usage-metric',
-  name: '内存使用率',
-  description: '显示系统内存使用率',
+  name: 'memory usage',
+  description: 'Display system memory usage',
   
   config: {
     metricType: 'memory',
@@ -476,18 +476,18 @@ export const memoryUsagePreset: ComponentPreset = {
 }
 ```
 
-#### 2.3 磁盘使用率预设
+#### 2.3 Disk usage default
 ```typescript
 // src/card2.1/components/system-metric-card/presets/disk-usage.ts
 export const diskUsagePreset: ComponentPreset = {
   id: 'disk-usage-metric',
-  name: '磁盘使用率',
-  description: '显示系统磁盘使用率',
+  name: 'Disk usage',
+  description: 'Display system disk usage',
   
   config: {
     metricType: 'disk',
     gradientColors: ['#6366f1', '#4f46e5'],
-    refreshInterval: 60,  // 磁盘变化较慢，可以60秒刷新
+    refreshInterval: 60,  // Disk changes slowly，Can60Refresh in seconds
     warningThreshold: 85,
     criticalThreshold: 95
   },
@@ -507,7 +507,7 @@ export const diskUsagePreset: ComponentPreset = {
 }
 ```
 
-#### 2.4 数据源配置
+#### 2.4 Data source configuration
 ```typescript
 // src/card2.1/components/system-metric-card/data-sources/system-metrics.ts
 import { getSystemMetricsCurrent } from '@/service/api/system-data'
@@ -515,13 +515,13 @@ import type { DataSourceConfig } from '@/card2.1/core/data-binding/types'
 
 export const systemMetricsDataSource: DataSourceConfig = {
   type: 'api',
-  name: '系统指标数据',
-  description: '获取CPU、内存、磁盘使用率数据',
+  name: 'System indicator data',
+  description: 'GetCPU、Memory、Disk usage data',
   
   config: {
     endpoint: getSystemMetricsCurrent,
     
-    // 数据转换
+    // data conversion
     transform: (response: any) => ({
       systemMetrics: {
         cpu_usage: response?.data?.cpu_usage || 0,
@@ -530,9 +530,9 @@ export const systemMetricsDataSource: DataSourceConfig = {
       }
     }),
     
-    // 错误处理
+    // Error handling
     errorHandler: (error: any) => {
-      console.error('获取系统指标失败:', error)
+      console.error('Failed to obtain system indicators:', error)
       return {
         systemMetrics: {
           cpu_usage: 0,
@@ -542,50 +542,50 @@ export const systemMetricsDataSource: DataSourceConfig = {
       }
     },
     
-    // 缓存配置
+    // Cache configuration
     cache: {
       enabled: true,
-      ttl: 15000  // 15秒缓存，避免频繁请求
+      ttl: 15000  // 15second cache，Avoid frequent requests
     }
   }
 }
 ```
 
-## ✅ 迁移验证清单
+## ✅ Migration verification checklist
 
-### 功能对等验证
-- [ ] **CPU指标**: 数值显示正确，30秒刷新正常
-- [ ] **内存指标**: 数值显示正确，30秒刷新正常  
-- [ ] **磁盘指标**: 数值显示正确，60秒刷新正常
-- [ ] **渐变背景**: 三种指标颜色与原组件一致
-- [ ] **图标显示**: 图标类型和大小与原组件一致
-- [ ] **数值动画**: CountTo动画效果正常
-- [ ] **加载状态**: 数据加载时显示loading
-- [ ] **错误处理**: API错误时显示降级内容
-- [ ] **定时器清理**: 组件销毁时正确清理定时器
+### Functional equivalence verification
+- [ ] **CPUindex**: Values ​​are displayed correctly，30Refresh in seconds is normal
+- [ ] **Memory metrics**: Values ​​are displayed correctly，30Refresh in seconds is normal  
+- [ ] **Disk metrics**: Values ​​are displayed correctly，60Refresh in seconds is normal
+- [ ] **gradient background**: The colors of the three indicators are consistent with the original components
+- [ ] **Icon display**: The icon type and size are consistent with the original component
+- [ ] **numerical animation**: CountToAnimation effect is normal
+- [ ] **Loading status**: Shown when data is loadingloading
+- [ ] **Error handling**: APIShow downgraded content on error
+- [ ] **timer cleanup**: Correctly clean up timers when components are destroyed
 
-### 增强功能验证
-- [ ] **阈值警告**: 超过警告/严重阈值时颜色和标签变化
-- [ ] **状态指示**: 显示正常/警告/严重状态标签
-- [ ] **自定义配置**: 支持自定义标题、图标、颜色
-- [ ] **响应式**: 移动端显示适配良好
-- [ ] **主题适配**: 明暗主题下显示正常
+### Enhanced feature verification
+- [ ] **threshold warning**: Exceed warning/Color and label changes at critical threshold
+- [ ] **status indication**: Display normal/warn/critical status label
+- [ ] **Custom configuration**: Support custom title、icon、color
+- [ ] **Responsive**: Mobile display adapts well
+- [ ] **Theme adaptation**: Displays normally under light and dark themes
 
-## 🎯 预期收益
+## 🎯 expected return
 
-### 代码维护
-- **代码减少**: 从285行代码 → 约100行组件 + 配置
-- **维护统一**: 统一的逻辑和错误处理
-- **扩展简单**: 添加新指标只需新增配置
+### Code maintenance
+- **code reduction**: from285lines of code → about100row component + Configuration
+- **Maintain unity**: Unified logic and error handling
+- **Easy to extend**: To add a new indicator, you only need to add a new configuration
 
-### 功能增强  
-- **智能阈值**: 根据使用率自动调整显示颜色
-- **状态标签**: 直观显示系统健康状况
-- **灵活配置**: 支持自定义刷新间隔和阈值
+### Function enhancement  
+- **Smart threshold**: Automatically adjust display colors based on usage
+- **status label**: Visual display of system health status
+- **Flexible configuration**: Support custom refresh intervals and thresholds
 
-### 用户体验
-- **一致性**: 所有系统指标显示风格统一
-- **直观性**: 颜色编码让用户快速识别问题
-- **实时性**: 优化的刷新机制和缓存策略
+### user experience
+- **consistency**: All system indicators display in a unified style
+- **intuitiveness**: Color coding lets users quickly identify issues
+- **real-time**: Optimized refresh mechanism and caching strategy
 
-这个合并方案将3个高度重复的组件整合为1个强大的通用组件，大幅提升了代码质量和维护效率，同时增强了功能性。
+This merger plan will3highly repetitive components are integrated into1A powerful common component，Significantly improved code quality and maintenance efficiency，while enhancing functionality。

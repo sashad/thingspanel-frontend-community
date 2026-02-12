@@ -1,187 +1,187 @@
-# Card2.1 架构分析文档
+# Card2.1 Architecture Analysis Document
 
-## 目录结构总览
+## Directory structure overview
 
 ```
 src/card2.1/
-├── index.ts                    # 系统主入口
-├── components/                 # 组件目录
-│   ├── index.ts               # 组件统一导出
-│   ├── category-mapping.ts    # 分类映射
-│   ├── chart/                 # 图表组件
-│   │   ├── alarm/            # 告警相关
-│   │   ├── data/             # 数据展示
-│   │   └── ...               # 其他图表
-│   ├── common/               # 通用组件
-│   │   └── generic-card/     # 通用卡片组件
-│   └── system/               # 系统组件
-│       ├── alarm-management/ # 告警管理
-│       ├── device-status/    # 设备状态
-│       ├── system-monitoring/# 系统监控
-│       └── ...               # 其他系统组件
-├── core/                      # 核心模块
-│   ├── index.ts              # 核心模块导出
-│   ├── auto-registry.ts      # 自动注册系统
-│   ├── component-registry.ts # 组件注册表
-│   ├── types.ts              # 核心类型定义
-│   ├── PropertyExposureManager.ts # 属性暴露管理
-│   ├── permission-utils.ts   # 权限工具
-│   ├── data-source/          # 数据源系统
+├── index.ts                    # System main entrance
+├── components/                 # Component Catalog
+│   ├── index.ts               # Unified export of components
+│   ├── category-mapping.ts    # Classification mapping
+│   ├── chart/                 # chart component
+│   │   ├── alarm/            # Alarm related
+│   │   ├── data/             # Data display
+│   │   └── ...               # Other charts
+│   ├── common/               # Common components
+│   │   └── generic-card/     # Universal card component
+│   └── system/               # system components
+│       ├── alarm-management/ # Alarm management
+│       ├── device-status/    # Device status
+│       ├── system-monitoring/# System monitoring
+│       └── ...               # Other system components
+├── core/                      # core module
+│   ├── index.ts              # Core module export
+│   ├── auto-registry.ts      # Automatic registration system
+│   ├── component-registry.ts # component registry
+│   ├── types.ts              # core type definition
+│   ├── PropertyExposureManager.ts # Attribute exposure management
+│   ├── permission-utils.ts   # permission tool
+│   ├── data-source/          # Data source system
 │   │   ├── data-binding-manager.ts
 │   │   ├── reactive-data-manager.ts
 │   │   └── ...
-│   └── interaction-*.ts      # 交互系统
+│   └── interaction-*.ts      # interactive system
 ├── hooks/                     # React Hooks
 │   ├── index.ts
-│   ├── useComponentTree.ts   # 组件树管理
-│   └── useCard2Props.ts      # 属性管理
-├── types/                     # 类型定义
-│   ├── index.ts              # 统一类型导出
-│   ├── setting-config.ts     # 设置配置类型
-│   └── interaction-*.ts     # 交互类型
-├── integration/              # 集成模块
+│   ├── useComponentTree.ts   # Component tree management
+│   └── useCard2Props.ts      # Property management
+├── types/                     # type definition
+│   ├── index.ts              # Unified type export
+│   ├── setting-config.ts     # Set configuration type
+│   └── interaction-*.ts     # Interaction type
+├── integration/              # Integrated module
 │   └── visual-editor-config.ts
-└── docs/                      # 文档目录
+└── docs/                      # Document directory
 ```
 
-## 模块依赖关系分析
+## Module dependency analysis
 
-### 1. 核心入口模块 (`index.ts`)
-**功能**: 系统主入口，负责初始化整个 Card2.1 系统
-**依赖关系**:
-- `@/card2.1/core/component-registry` - 组件注册表
-- `@/card2.1/core/auto-registry` - 自动注册系统
-- `@/card2.1/core/permission-watcher` - 权限监听
+### 1. Core entry module (`index.ts`)
+**Function**: system主入口，Responsible for initializing the entire Card2.1 system
+**Dependencies**:
+- `@/card2.1/core/component-registry` - component registry
+- `@/card2.1/core/auto-registry` - Automatic registration system
+- `@/card2.1/core/permission-watcher` - Permission monitoring
 
-**对外提供**:
-- `initializeCard2System()` - 系统初始化
-- `getComponentTree()` - 获取组件树
-- `componentRegistry` - 组件注册表实例
+**provided externally**:
+- `initializeCard2System()` - System initialization
+- `getComponentTree()` - Get component tree
+- `componentRegistry` - Component registry instance
 
-### 2. 组件模块 (`components/`)
-**功能**: 存放所有可视化组件
-**组件结构模式**:
+### 2. component module (`components/`)
+**Function**: Store all visual components
+**Component structure pattern**:
 ```
-组件目录/
-├── index.ts          # 组件导出文件
-├── definition.ts     # 组件定义
-├── component.vue    # Vue组件实现
-├── setting.vue      # 设置界面
-└── settingConfig.ts # 设置配置
+Component Catalog/
+├── index.ts          # Component export file
+├── definition.ts     # Component definition
+├── component.vue    # VueComponent implementation
+├── setting.vue      # Setting interface
+└── settingConfig.ts # Set configuration
 ```
 
-**关键组件示例**:
-- `digit-indicator` (数字指示器)
-- `alarm-count` (告警计数)
-- `cpu-usage` (CPU使用率)
-- `generic-card` (通用卡片)
+**Key component examples**:
+- `digit-indicator` (digital indicator)
+- `alarm-count` (Alarm count)
+- `cpu-usage` (CPUUsage rate)
+- `generic-card` (General card)
 
-### 3. 核心模块 (`core/`)
-**功能**: 提供核心系统功能
+### 3. core module (`core/`)
+**Function**: 提供核心系统Function
 
-#### 3.1 组件注册系统
-- `component-registry.ts` - 组件注册管理
-- `auto-registry.ts` - 自动扫描注册
-- `PropertyExposureManager.ts` - 属性暴露管理
+#### 3.1 Component registration system
+- `component-registry.ts` - Component registration management
+- `auto-registry.ts` - Automatic scan registration
+- `PropertyExposureManager.ts` - Attribute exposure management
 
-#### 3.2 数据源系统
-- `data-binding-manager.ts` - 数据绑定管理
-- `reactive-data-manager.ts` - 响应式数据管理
-- `static-data-source.ts` - 静态数据源
+#### 3.2 Data source system
+- `data-binding-manager.ts` - Data binding management
+- `reactive-data-manager.ts` - Responsive data management
+- `static-data-source.ts` - Static data source
 
-#### 3.3 交互系统
-- `interaction-manager.ts` - 交互管理
-- `interaction-adapter.ts` - 交互适配器
-- `interaction-types.ts` - 交互类型定义
+#### 3.3 interactive system
+- `interaction-manager.ts` - Interaction management
+- `interaction-adapter.ts` - interactive adapter
+- `interaction-types.ts` - Interaction type definition
 
-### 4. Hooks 模块 (`hooks/`)
-**功能**: 提供 React/Vue 集成接口
-- `useComponentTree.ts` - 组件树管理 Hook
-- `useCard2Props.ts` - 属性管理 Hook
+### 4. Hooks module (`hooks/`)
+**Function**: supply React/Vue Integrated interface
+- `useComponentTree.ts` - Component tree management Hook
+- `useCard2Props.ts` - Property management Hook
 
-### 5. 类型模块 (`types/`)
-**功能**: 统一类型定义系统
-- 组件定义类型
-- 设置配置类型
-- 交互系统类型
-- 数据源类型
+### 5. type module (`types/`)
+**Function**: Unified type definition system
+- Component definition type
+- Set configuration type
+- Interactive system type
+- Data source type
 
-## 引用关系分析
+## Citation relationship analysis
 
-### 内部引用关系
+### Internal reference relationship
 
-1. **组件 → 核心类型**
-   - 所有组件定义文件都引用 `@/card2.1/core/types`
-   - 示例: `import type { ComponentDefinition } from '@/card2.1/core/types'`
+1. **components → core types**
+   - All component definition files reference `@/card2.1/core/types`
+   - Example: `import type { ComponentDefinition } from '@/card2.1/core/types'`
 
-2. **核心模块间引用**
-   - `component-registry.ts` → `PropertyExposureManager.ts` (动态导入)
+2. **References between core modules**
+   - `component-registry.ts` → `PropertyExposureManager.ts` (dynamic import)
    - `auto-registry.ts` → `component-registry.ts`
    - `data-binding-manager.ts` → `component-registry.ts`
 
-3. **Hooks → 核心功能**
-   - `useComponentTree.ts` → `@/card2.1/index` (系统入口)
+3. **Hooks → Core functions**
+   - `useComponentTree.ts` → `@/card2.1/index` (System entrance)
    - `useCard2Props.ts` → `PropertyExposureManager.ts`
 
-### 外部引用关系
+### External reference relationship
 
-1. **主应用引用**
-   - `src/main.ts` - 应用启动时初始化 Card2.1 系统
-   - `src/store/modules/visual-editor/card2-adapter.ts` - 可视化编辑器适配
+1. **Main application reference**
+   - `src/main.ts` - Initialized when application starts Card2.1 system
+   - `src/store/modules/visual-editor/card2-adapter.ts` - Visual editor adaptation
 
-2. **可视化编辑器集成**
-   - `src/components/visual-editor/` - 多个文件引用 Card2.1 系统
-   - `src/features/iot-visualization/` - IoT可视化功能集成
+2. **Visual editor integration**
+   - `src/components/visual-editor/` - Multiple file references Card2.1 system
+   - `src/features/iot-visualization/` - IoTVisualization function integration
 
-3. **交互系统集成**
-   - `src/core/interaction-system/` - 交互系统组件引用
+3. **Interactive system integration**
+   - `src/core/interaction-system/` - Interactive system component references
 
-## 架构特点分析
+## Architectural Features Analysis
 
-### 1. 模块化设计
-- **清晰的层次结构**: 入口 → 核心 → 组件 → 集成
-- **职责分离**: 注册、数据、交互、UI 分离
-- **插件化架构**: 支持动态组件注册
+### 1. Modular design
+- **clear hierarchy**: Entrance → core → components → integrated
+- **Segregation of duties**: register、data、interaction、UI separation
+- **plug-in architecture**: Support dynamic component registration
 
-### 2. 类型安全
-- **完整的 TypeScript 支持**
-- **泛型组件配置**
-- **严格的类型约束**
+### 2. type safety
+- **complete TypeScript support**
+- **Generic component configuration**
+- **Strict type constraints**
 
-### 3. 自动注册系统
-- **目录扫描**: 自动发现组件
-- **分类管理**: 基于路径的自动分类
-- **权限过滤**: 基于用户角色的组件过滤
+### 3. Automatic registration system
+- **directory scan**: Automatically discover components
+- **Classification management**: Path-based automatic classification
+- **Permission filtering**: Component filtering based on user roles
 
-### 4. 属性暴露系统
-- **白名单机制**: 安全的属性访问控制
-- **权限分级**: public/protected/private 三级权限
-- **审计日志**: 属性访问和修改记录
+### 4. Attribute exposure system
+- **Whitelist mechanism**: Secure attribute access control
+- **Permission classification**: public/protected/private Level three authority
+- **Audit log**: Property access and modification records
 
-### 5. 数据绑定系统
-- **多数据源支持**: static/api/websocket/mqtt
-- **响应式更新**: 实时数据同步
-- **字段映射**: 灵活的数据字段映射
+### 5. data binding system
+- **Multiple data sources support**: static/api/websocket/mqtt
+- **Responsive updates**: Real-time data synchronization
+- **Field mapping**: 灵活的数据Field mapping
 
-## 存在的问题和改进建议
+## Existing problems and improvement suggestions
 
-### 已修复的问题
-1. ✅ 路径解析错误 - 相对路径改为绝对路径
-2. ✅ 类型定义不完整 - 添加缺失的属性定义
-3. ✅ 导入错误 - 移除不存在的导入
-4. ✅ 调试代码清理 - 生产环境优化
+### Fixed issues
+1. ✅ Path parsing error - Change relative path to absolute path
+2. ✅ Incomplete type definition - Add missing attribute definitions
+3. ✅ import error - Remove non-existent imports
+4. ✅ Debug code cleanup - Production environment optimization
 
-### 待优化问题
-1. ⚠️ 循环依赖风险 - 需要进一步优化模块间引用
-2. ⚠️ 权限检查逻辑 - 支持动态权限变化
-3. ⚠️ 端口隔离复杂性 - 简化多环境支持
+### Problems to be optimized
+1. ⚠️ Circular dependency risk - Need to further optimize inter-module references
+2. ⚠️ Permission check logic - Support dynamic permission changes
+3. ⚠️ Port isolation complexity - Simplified multi-environment support
 
-### 架构改进建议
-1. **依赖注入**: 引入依赖注入容器管理模块依赖
-2. **事件总线**: 使用事件驱动架构解耦模块
-3. **配置中心**: 统一管理系统配置
-4. **性能监控**: 添加系统性能监控指标
+### Suggestions for architectural improvements
+1. **dependency injection**: Introducing dependency injection container management module dependencies
+2. **event bus**: Decoupling modules using event-driven architecture
+3. **Configuration center**: Unified management system configuration
+4. **Performance monitoring**: Add system performance monitoring indicators
 
-## 总结
+## Summarize
 
-Card2.1 是一个设计良好的组件化架构系统，具备完整的组件管理、数据绑定、权限控制和交互能力。系统采用模块化设计，类型安全，支持自动注册和动态扩展。通过持续的架构优化，可以进一步提升系统的稳定性和可维护性。
+Card2.1 It is a well-designed component architecture system，Has complete component management、data binding、Permission control and interaction capabilities。The system adopts modular design，type safety，Support automatic registration and dynamic expansion。Through continuous architectural optimization，Can further improve the stability and maintainability of the system。

@@ -1,22 +1,22 @@
 /**
- * 配置集成桥接器
- * 在新的ConfigurationStateManager和现有系统之间提供兼容层
+ * Configuring the integrated bridge
+ * in newConfigurationStateManagerProvides a compatibility layer with existing systems
  *
- * 职责：
- * 1. 适配现有的ConfigurationManager接口
- * 2. 集成EditorDataSourceManager的事件处理
- * 3. 提供平滑的迁移路径
- * 4. 维持向后兼容性
+ * Responsibilities：
+ * 1. Adapt to existingConfigurationManagerinterface
+ * 2. integratedEditorDataSourceManagerevent handling
+ * 3. Provide a smooth migration path
+ * 4. Maintain backward compatibility
  */
 
 import { configurationStateManager, type ConfigurationUpdateEvent } from '@/components/visual-editor/configuration/ConfigurationStateManager'
-// 导入数据缓存清理功能，确保配置变更时数据一致性
+// Import data cache cleaning function，Ensure data consistency when configuration changes
 import { simpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
-// 修复：导入配置事件总线，确保配置变更时发出事件
+// repair：Import configuration event bus，Ensure events are emitted when configuration changes
 import { configEventBus, type ConfigChangeEvent } from '@/core/data-architecture/ConfigEventBus'
-// 🚀 新增：导入简化数据流管理器
+// 🚀 New：Import Simplified Data Flow Manager
 import { simpleDataFlow } from '@/core/data-architecture/SimpleDataFlow'
-// 🔥 修复：导入数据源绑定配置管理器
+// 🔥 repair：Import data source binding configuration manager
 import { dataSourceBindingConfig } from '@/core/data-architecture/DataSourceBindingConfig'
 import type {
   IConfigurationManager,
@@ -29,79 +29,79 @@ import type {
 } from './types'
 
 /**
- * 配置集成桥接器类
- * 提供与现有ConfigurationManager兼容的接口，内部使用新的ConfigurationStateManager
+ * Configure the integration bridge class
+ * Provide and existingConfigurationManagerCompatible interface，Internally used newConfigurationStateManager
  */
 export class ConfigurationIntegrationBridge implements IConfigurationManager {
   private initialized = false
 
-  // 🔥 新增：配置变更去重缓存，防止重复触发
+  // 🔥 New：Configuration change deduplication cache，Prevent repeated triggering
   private configChangeCache = new Map<string, {
     lastConfigHash: string
     lastUpdateTime: number
     pendingEventTimeout?: NodeJS.Timeout
   }>()
 
-  // 配置变更去重的时间窗口（毫秒）
+  // Configuration change time window for deduplication（millisecond）
   private readonly CONFIG_CHANGE_DEBOUNCE_TIME = 50
 
   /**
-   * 初始化桥接器
+   * Initialize the bridge
    */
   async initialize(): Promise<void> {
     if (this.initialized) return
-    // 初始化配置状态管理器
-    // 设置与EditorDataSourceManager的集成
+    // Initialize configuration state manager
+    // Set up withEditorDataSourceManagerIntegration
     await this.setupEditorDataSourceIntegration()
 
     this.initialized = true
   }
 
   /**
-   * 获取组件配置
-   * 新增：自动迁移组件级设备配置到基础配置
+   * Get component configuration
+   * New：Automatically migrate component-level device configurations to base configurations
    */
   getConfiguration(widgetId: string): WidgetConfiguration | null {
     const config = configurationStateManager.getConfiguration(widgetId)
     if (!config) return null
 
-    // 🚀 执行配置迁移检查和处理
+    // 🚀 Perform configuration migration checking and processing
     return this.migrateConfigurationIfNeeded(widgetId, config)
   }
 
   /**
-   * 设置组件配置
-   * 新增：设置时自动迁移旧格式配置
-   * @param widgetId 组件ID
-   * @param config 配置对象
-   * @param componentType 组件类型，用于更精确的事件追踪
+   * Set component configuration
+   * New：Automatically migrate old format configurations during setup
+   * @param widgetId componentsID
+   * @param config Configuration object
+   * @param componentType Component type，for more precise event tracking
    */
   setConfiguration(widgetId: string, config: WidgetConfiguration, componentType?: string): void {
 
-    // 🚀 在设置前执行迁移检查，确保配置结构正确
+    // 🚀 Perform migration checks before setup，Make sure the configuration structure is correct
     const migratedConfig = this.performDeviceConfigurationMigrationForSet(widgetId, config)
 
     const updated = configurationStateManager.setConfiguration(widgetId, migratedConfig, 'user')
 
     if (updated) {
-      // 关键修复：配置更新时清理缓存，确保数据一致性
+      // critical fix：Clear cache when configuration is updated，Ensure data consistency
       simpleDataBridge.clearComponentCache(widgetId)
 
-      // 🔥 检查数据源配置内容
+      // 🔥 Check the data source configuration content
 
       const shouldTrigger = this.shouldTriggerDataExecution('dataSource', migratedConfig.dataSource)
 
-      // 修复：发出配置变更事件，使用正确的事件格式
+      // repair：Emit configuration change events，Use the correct event format
       const changeEvent: ConfigChangeEvent = {
         componentId: widgetId,
-        componentType: componentType || 'widget', // 使用传入的组件类型或默认为 'widget'
-        section: 'dataSource', // 配置全量更新时使用 dataSource
-        oldConfig: null, // 可以改进为保存之前的配置
+        componentType: componentType || 'widget', // Use the component type passed in or default to 'widget'
+        section: 'dataSource', // Used when configuring full update dataSource
+        oldConfig: null, // Can be improved to save previous configuration
         newConfig: migratedConfig,
         timestamp: Date.now(),
         source: 'user',
         context: {
-          // 🔥 关键修复：setConfiguration 时也需要设置触发标记
+          // 🔥 critical fix：setConfiguration You also need to set a trigger tag when
           shouldTriggerExecution: shouldTrigger
         }
       }
@@ -110,11 +110,11 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 新增：跨组件交互专用配置更新 - 强制触发事件
-   * @param widgetId 组件ID
-   * @param section 配置节
-   * @param config 配置数据
-   * @param componentType 组件类型
+   * New：Cross-component interaction-specific configuration updates - force trigger event
+   * @param widgetId componentsID
+   * @param section configuration section
+   * @param config Configuration data
+   * @param componentType Component type
    */
   updateConfigurationForInteraction<K extends keyof WidgetConfiguration>(
     widgetId: string,
@@ -122,41 +122,41 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     config: WidgetConfiguration[K],
     componentType?: string
   ): boolean {
-    // 关键：使用强制更新，确保即使配置相同也触发事件
+    // key：Use forced updates，Make sure the event is triggered even if the configuration is the same
     const updated = configurationStateManager.updateConfigurationSection(widgetId, section, config, 'interaction', true)
 
     if (updated) {
-      // 🔥 关键修复：配置部分更新时清理缓存，特别是 dataSource 更新
+      // 🔥 critical fix：Clear cache when configuration part is updated，in particular dataSource renew
       if (section === 'dataSource' || section === 'component') {
         simpleDataBridge.clearComponentCache(widgetId)
       }
 
-      // 🔥 新增：对于 base 层配置更新（deviceId、metricsList等），也需要触发数据源重新执行
+      // 🔥 New：for base Layer configuration update（deviceId、metricsListwait），It is also necessary to trigger the data source to re-execute
       if (section === 'base') {
         simpleDataBridge.clearComponentCache(widgetId)
 
-        // 🔥 修复：不再手动触发数据源重新执行，让正常的事件流程处理
-        // 避免多重执行导致的请求竞争和参数混乱
+        // 🔥 repair：No more manually triggering data sources to re-execute，Let the normal flow of events handle
+        // Avoid request competition and parameter confusion caused by multiple executions
       }
 
-      // 🔥 修复：发出配置部分更新事件，使用正确的 API
+      // 🔥 repair：Emit configuration partial update event，use the correct API
       const changeEvent: ConfigChangeEvent = {
         componentId: widgetId,
-        componentType: componentType || 'widget', // 使用传入的组件类型或默认为 'widget'
+        componentType: componentType || 'widget', // Use the component type passed in or default to 'widget'
         section: section as 'base' | 'component' | 'dataSource' | 'interaction',
         oldConfig: null,
         newConfig: config,
         timestamp: Date.now(),
-        source: 'interaction',  // 🔥 标记为交互触发
+        source: 'interaction',  // 🔥 Mark as interactive trigger
         context: {
-          // 🔥 关键修复：交互触发时也需要设置触发标记
+          // 🔥 critical fix：Trigger tags also need to be set when interactively triggering
           shouldTriggerExecution: this.shouldTriggerDataExecution(section, config)
         }
       }
 
       configEventBus.emitConfigChange(changeEvent)
 
-      // 🔥 关键修复：发送 card2-config-update 事件，让组件能接收到配置更新
+      // 🔥 critical fix：send card2-config-update event，Enable components to receive configuration updates
 
       window.dispatchEvent(new CustomEvent('card2-config-update', {
         detail: {
@@ -166,20 +166,20 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
         }
       }))
 
-      // 跨组件配置更新事件已发送
-      return true  // 🔥 返回成功状态
+      // Cross-component configuration update event sent
+      return true  // 🔥 Return success status
     } else {
-      console.error(`❌ [ConfigurationIntegrationBridge] 跨组件交互配置更新失败，事件不会触发`)
-      return false  // 🔥 返回失败状态
+      console.error(`❌ [ConfigurationIntegrationBridge] Cross-component interaction configuration update failed，event will not fire`)
+      return false  // 🔥 Return failure status
     }
   }
 
   /**
-   * 更新配置的某个部分 - 关键方法
-   * @param widgetId 组件ID
-   * @param section 配置节
-   * @param config 配置数据
-   * @param componentType 组件类型，用于更精确的事件追踪
+   * Update some part of the configuration - key methods
+   * @param widgetId componentsID
+   * @param section configuration section
+   * @param config Configuration data
+   * @param componentType Component type，for more precise event tracking
    */
   updateConfiguration<K extends keyof WidgetConfiguration>(
     widgetId: string,
@@ -187,51 +187,51 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     config: WidgetConfiguration[K],
     componentType?: string
   ): void {
-    // 🔄[DeviceID-HTTP-Debug] 配置更新检测开始
+    // 🔄[DeviceID-HTTP-Debug] Configuration update detection starts
 
 
-    // 🔥 关键修复：检查是否为真实的配置变更，避免无意义的重复触发
+    // 🔥 critical fix：Check if it is a real configuration change，Avoid meaningless repeated triggers
     if (!this.isRealConfigChange(widgetId, section, config)) {
-      return // 提前返回，避免无意义的更新和事件触发
+      return // Return early，Avoid meaningless updates and event triggers
     }
 
     const updated = configurationStateManager.updateConfigurationSection(widgetId, section, config, 'user')
 
     if (updated) {
-      // 🚀 新增：使用 SimpleDataFlow 处理配置更新
+      // 🚀 New：use SimpleDataFlow Handle configuration updates
       try {
-        // 确保组件在 SimpleDataFlow 中注册
+        // Make sure the component is in SimpleDataFlow Register in
         const fullConfig = configurationStateManager.getConfiguration(widgetId)
         if (fullConfig) {
-          // 注册组件（如果尚未注册）
+          // Register component（If not registered yet）
           simpleDataFlow.registerComponent(widgetId, {
             ...fullConfig,
             componentType: componentType || 'widget'
           })
 
-          // 通知 SimpleDataFlow 配置变更
+          // notify SimpleDataFlow Configuration changes
           simpleDataFlow.updateComponentConfig(widgetId, section as string, config)
         }
       } catch (error) {
-        console.error(`❌ [ConfigurationIntegrationBridge] SimpleDataFlow 处理失败:`, {
+        console.error(`❌ [ConfigurationIntegrationBridge] SimpleDataFlow Processing failed:`, {
           widgetId,
           section,
           error: error instanceof Error ? error.message : error
         })
-        // 继续使用原有逻辑作为fallback
+        // Continue to use the original logic asfallback
       }
 
-      // 关键修复：配置部分更新时清理缓存，特别是 dataSource 更新
+      // critical fix：Clear cache when configuration part is updated，in particular dataSource renew
       if (section === 'dataSource' || section === 'component') {
         simpleDataBridge.clearComponentCache(widgetId)
       }
 
-      // 🔥 对于base层配置更新（deviceId、metricsList等），触发数据源重新执行
+      // 🔥 forbaseLayer configuration update（deviceId、metricsListwait），Trigger data source to re-execute
       if (section === 'base') {
         simpleDataBridge.clearComponentCache(widgetId)
       }
 
-      // 🔥 使用防抖机制发送配置变更事件，避免短时间内的重复事件
+      // 🔥 Send configuration change events using debounce mechanism，Avoid repeated incidents within a short period of time
       this.debounceConfigEvent(() => {
         const changeEvent: ConfigChangeEvent = {
           componentId: widgetId,
@@ -242,15 +242,15 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
           timestamp: Date.now(),
           source: 'user',
           context: {
-            // 🔥 智能判断是否需要触发数据源执行
-            // 只有真正影响数据获取的配置变更才触发
+            // 🔥 Intelligently determine whether data source execution needs to be triggered
+            // Only configuration changes that actually affect data acquisition are triggered
             shouldTriggerExecution: this.shouldTriggerDataExecution(section, config)
           }
         }
 
         configEventBus.emitConfigChange(changeEvent)
 
-        // 发送 card2-config-update 事件，让组件能接收到配置更新
+        // send card2-config-update event，Enable components to receive configuration updates
         window.dispatchEvent(new CustomEvent('card2-config-update', {
           detail: {
             componentId: widgetId,
@@ -264,23 +264,23 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 🔥 修复：完全动态化的触发判断，消除硬编码
-   * @param section 配置节
-   * @param config 配置内容
-   * @returns 是否需要触发数据执行
+   * 🔥 repair：Completely dynamic trigger judgment，Eliminate hardcoding
+   * @param section configuration section
+   * @param config Configuration content
+   * @returns Do you need to trigger data execution?
    */
   private shouldTriggerDataExecution(section: keyof WidgetConfiguration, config: any): boolean {
 
-    // 🚀 修复：使用动态触发规则判断，不再硬编码字段列表
+    // 🚀 repair：Use dynamic trigger rules to determine，No more hardcoding field lists
     if (config && typeof config === 'object') {
       const configKeys = Object.keys(config)
       let shouldTrigger = false
 
-      // 检查每个配置属性是否在触发规则中
+      // Check if each configuration property is in the triggering rule
       for (const key of configKeys) {
         const propertyPath = `${section}.${key}`
 
-        // 🔥 关键修复：通过 dataSourceBindingConfig 动态检查是否应该触发
+        // 🔥 critical fix：pass dataSourceBindingConfig Dynamic check if should trigger
         if (dataSourceBindingConfig.shouldTriggerDataSource(propertyPath)) {
           shouldTrigger = true
         }
@@ -288,7 +288,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       return shouldTrigger
     }
 
-    // dataSource 层的变更通常需要触发
+    // dataSource Layer changes usually require triggering
     if (section === 'dataSource') {
       return true
     }
@@ -296,10 +296,10 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 重置配置到默认值
+   * Reset configuration to default
    */
   resetConfiguration(widgetId: string): void {
-    // 创建默认配置
+    // Create default configuration
     const defaultConfig: WidgetConfiguration = {
       base: {},
       component: {},
@@ -314,18 +314,18 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     }
 
     configurationStateManager.setConfiguration(widgetId, defaultConfig, 'system')
-    // 🔥 重置时也需要清理缓存
+    // 🔥 You also need to clear the cache when resetting
     simpleDataBridge.clearComponentCache(widgetId)
   }
 
   /**
-   * 初始化组件配置
+   * Initialize component configuration
    */
   initializeConfiguration(widgetId: string, customDefaults?: Partial<WidgetConfiguration>): void {
-    // 先初始化默认配置
+    // Initialize the default configuration first
     configurationStateManager.initializeConfiguration(widgetId)
 
-    // 如果有自定义默认值，应用它们
+    // If there is a custom default value，apply them
     if (customDefaults) {
       const currentConfig = configurationStateManager.getConfiguration(widgetId)
       if (currentConfig) {
@@ -336,20 +336,20 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 删除组件配置
+   * Delete component configuration
    */
   removeConfiguration(widgetId: string): boolean {
     const result = configurationStateManager.removeConfiguration(widgetId)
 
     if (result) {
-      // 🔥 删除配置时清理相关缓存
+      // 🔥 Clean related cache when deleting configuration
       simpleDataBridge.clearComponentCache(widgetId)
 
-      // 🚀 新增：从 SimpleDataFlow 中注销组件
+      // 🚀 New：from SimpleDataFlow Logout component
       try {
         simpleDataFlow.unregisterComponent(widgetId)
       } catch (error) {
-        console.error(`❌ [ConfigurationIntegrationBridge] SimpleDataFlow 注销失败:`, {
+        console.error(`❌ [ConfigurationIntegrationBridge] SimpleDataFlow Logout failed:`, {
           widgetId,
           error: error instanceof Error ? error.message : error
         })
@@ -360,11 +360,11 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 验证配置
+   * Verify configuration
    */
   validateConfiguration(config: WidgetConfiguration): ValidationResult {
-    // 这里可以复用原来的验证逻辑
-    // 为了简化，先返回总是验证成功
+    // The original verification logic can be reused here
+    // To simplify，Return first and always verify successfully
     return {
       valid: true,
       warnings: []
@@ -372,57 +372,57 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 导出配置
+   * Export configuration
    */
   exportConfiguration(widgetId: string): string {
     const config = configurationStateManager.getConfiguration(widgetId)
     if (!config) {
-      throw new Error(`配置不存在: ${widgetId}`)
+      throw new Error(`Configuration does not exist: ${widgetId}`)
     }
 
     try {
       return JSON.stringify(config, null, 2)
     } catch (error) {
-      throw new Error(`配置导出失败: ${error instanceof Error ? error.message : '未知错误'}`)
+      throw new Error(`Configuration export failed: ${error instanceof Error ? error.message : 'unknown error'}`)
     }
   }
 
   /**
-   * 导入配置
-   * 🔥 新增：导入时自动迁移旧格式配置
+   * Import configuration
+   * 🔥 New：Automatically migrate old format configurations when importing
    */
   importConfiguration(widgetId: string, configData: string): boolean {
     try {
       const config = JSON.parse(configData) as WidgetConfiguration
 
-      // 🚀 先迁移再验证，确保导入的配置结构正确
+      // 🚀 Migrate first and then verify，Make sure the imported configuration structure is correct
       const migratedConfig = this.migrateConfigurationIfNeeded(widgetId, config)
 
-      // 简单验证
+      // Simple verification
       const validationResult = this.validateConfiguration(migratedConfig)
       if (!validationResult.valid) {
-        console.error(`❌ [ConfigurationMigration] 导入的配置验证失败: ${widgetId}`)
+        console.error(`❌ [ConfigurationMigration] Imported configuration verification failed: ${widgetId}`)
         return false
       }
 
-      // 保存迁移后的配置
+      // Save the migrated configuration
       configurationStateManager.setConfiguration(widgetId, migratedConfig, 'import')
 
       if (process.env.NODE_ENV === 'development') {
       }
       return true
     } catch (error) {
-      console.error(`❌ [ConfigurationMigration] 配置导入失败: ${widgetId}`, error)
+      console.error(`❌ [ConfigurationMigration] Configuration import failed: ${widgetId}`, error)
       return false
     }
   }
 
   /**
-   * 监听配置变化 - 兼容原接口
+   * Listen for configuration changes - Compatible with original interface
    */
   onConfigurationChange(widgetId: string, callback: (config: WidgetConfiguration) => void): () => void {
     return configurationStateManager.onConfigurationUpdate(widgetId, (event: ConfigurationUpdateEvent) => {
-      // 获取最新的完整配置并传递给回调
+      // Get the latest complete configuration and pass it to the callback
       const fullConfig = configurationStateManager.getConfiguration(widgetId)
       if (fullConfig) {
         callback(fullConfig)
@@ -431,7 +431,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 获取所有配置
+   * Get all configurations
    */
   getAllConfigurations(): Map<string, WidgetConfiguration> {
     const allStates = configurationStateManager.getAllConfigurationStates()
@@ -445,7 +445,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 批量更新配置
+   * Batch update configuration
    */
   batchUpdateConfigurations(updates: Array<{ widgetId: string; config: Partial<WidgetConfiguration> }>): void {
     const timestamp = Date.now()
@@ -465,27 +465,27 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     }
   }
 
-  // ========== 私有方法 ==========
+  // ========== private method ==========
 
   /**
-   * 🔥 新增：计算配置对象的哈希值，用于检测真实变更
-   * @param config 配置对象
-   * @returns 配置哈希值
+   * 🔥 New：Calculate the hash value of the configuration object，Used to detect real changes
+   * @param config Configuration object
+   * @returns Configure hash value
    */
   private calculateConfigHash(config: any): string {
     try {
-      // 使用 JSON.stringify 并排序键来生成一致的哈希
+      // use JSON.stringify and sort the keys to generate consistent hashes
       const sortedConfig = this.sortObjectKeys(config)
       const configString = JSON.stringify(sortedConfig)
       return this.simpleHash(configString)
     } catch (error) {
-      // 如果JSON序列化失败，使用对象字符串表示
+      // ifJSONSerialization failed，Use object string representation
       return this.simpleHash(String(config))
     }
   }
 
   /**
-   * 🔥 新增：递归排序对象键，确保哈希一致性
+   * 🔥 New：Recursively sort object keys，Ensure hash consistency
    */
   private sortObjectKeys(obj: any): any {
     if (obj === null || typeof obj !== 'object') {
@@ -507,7 +507,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 🔥 新增：简单哈希函数
+   * 🔥 New：Simple hash function
    */
   private simpleHash(str: string): string {
     let hash = 0
@@ -516,18 +516,18 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i)
       hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 转换为32位整数
+      hash = hash & hash // Convert to32bit integer
     }
 
     return Math.abs(hash).toString(36)
   }
 
   /**
-   * 🔥 新增：检查配置变更是否为真实变更（避免重复事件）
-   * @param widgetId 组件ID
-   * @param section 配置节
-   * @param newConfig 新配置
-   * @returns 是否为真实变更
+   * 🔥 New：Check if configuration changes are real changes（avoid duplicate incidents）
+   * @param widgetId componentsID
+   * @param section configuration section
+   * @param newConfig New configuration
+   * @returns Is it a real change?
    */
   private isRealConfigChange(widgetId: string, section: keyof WidgetConfiguration, newConfig: any): boolean {
     const cacheKey = `${widgetId}.${section}`
@@ -537,28 +537,28 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     const cached = this.configChangeCache.get(cacheKey)
 
     if (cached) {
-      // 🔥 关键修复：优先检查配置内容是否真的变化了
+      // 🔥 critical fix：Prioritize checking whether the configuration content has really changed
       if (cached.lastConfigHash === configHash) {
         return false
       }
 
-      // 🔥 改进：配置内容不同时，减少时间检查的严格性
+      // 🔥 improve：When the configuration content is different，Reduce the rigor of time checks
       const timeDiff = now - cached.lastUpdateTime
       if (timeDiff < this.CONFIG_CHANGE_DEBOUNCE_TIME) {
-        // 🔥 关键修复：对于base层的配置变更（如deviceId），放宽时间限制
+        // 🔥 critical fix：forbaseLayer configuration changes（likedeviceId），relax time limit
         if (section !== 'base') {
-          // base层配置变更（如deviceId）即使时间间隔短也要允许.
+          // baseLayer configuration changes（likedeviceId）Allow even if the time interval is short.
           return false
         }
       }
 
-      // 清理之前的待处理事件
+      // Clean up previously pending events
       if (cached.pendingEventTimeout) {
         clearTimeout(cached.pendingEventTimeout)
       }
     }
 
-    // 🔥 关键修复：对于数据源配置，额外检查数据项内容是否真的变化了
+    // 🔥 critical fix：For data source configuration，Additional check whether the content of the data item has really changed
     if (section === 'dataSource' && newConfig && typeof newConfig === 'object') {
       const currentConfig = configurationStateManager.getConfiguration(widgetId)
       const existingDataSourceConfig = currentConfig?.dataSource
@@ -570,20 +570,20 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
         }
       }
     }
-    // 更新缓存
+    // Update cache
     this.configChangeCache.set(cacheKey, {
       lastConfigHash: configHash,
       lastUpdateTime: now
     })
 
-    return true // 是真实变更
+    return true // is a real change
   }
 
   /**
-   * 🔥 新增：防抖事件发送，避免短时间内的重复事件
-   * @param eventCallback 事件回调函数
-   * @param widgetId 组件ID
-   * @param section 配置节
+   * 🔥 New：Anti-shake event sending，Avoid repeated incidents within a short period of time
+   * @param eventCallback event callback function
+   * @param widgetId componentsID
+   * @param section configuration section
    */
   private debounceConfigEvent(
     eventCallback: () => void,
@@ -600,12 +600,12 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     const timeout = setTimeout(() => {
       eventCallback()
 
-      // 清理超时引用
+      // Clean up timeout references
       const currentCached = this.configChangeCache.get(cacheKey)
       if (currentCached) {
         delete currentCached.pendingEventTimeout
       }
-    }, 30) // 30ms 防抖延迟，减少延迟提高响应性
+    }, 30) // 30ms Anti-shake delay，Reduce latency and improve responsiveness
 
     if (cached) {
       cached.pendingEventTimeout = timeout
@@ -619,29 +619,29 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 🔥 新增：配置迁移核心逻辑
-   * 检查并迁移组件级设备配置到基础配置层
-   * @param widgetId 组件ID
-   * @param config 原始配置
-   * @returns 迁移后的配置
+   * 🔥 New：Configure migration core logic
+   * Check and migrate component-level device configuration to the base configuration layer
+   * @param widgetId componentsID
+   * @param config original configuration
+   * @returns Configuration after migration
    */
   private migrateConfigurationIfNeeded(widgetId: string, config: WidgetConfiguration): WidgetConfiguration {
-    // 检查组件配置中是否包含设备字段
+    // Check if the device field is included in the component configuration
     const componentConfig = config.component || {}
     const hasDeviceFields = this.hasComponentLevelDeviceFields(componentConfig)
 
     if (!hasDeviceFields) {
-      // 无需迁移，直接返回原配置
+      // No need to migrate，Return directly to the original configuration
       return config
     }
 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行迁移
+    // Execute migration
     const migrationResult = this.performDeviceConfigurationMigration(config)
 
-    // 🚀 只有实际迁移了才保存配置
+    // 🚀 Only save the configuration after actual migration
     if (migrationResult.migrated) {
       configurationStateManager.setConfiguration(widgetId, migrationResult.config, 'migration')
       if (process.env.NODE_ENV === 'development') {
@@ -652,29 +652,29 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 检查组件配置是否包含设备字段
-   * @param componentConfig 组件配置对象
-   * @returns 是否包含设备字段
+   * Check if component configuration contains device field
+   * @param componentConfig Component configuration object
+   * @returns Whether to include the device field
    */
   private hasComponentLevelDeviceFields(componentConfig: any): boolean {
     if (!componentConfig || typeof componentConfig !== 'object') {
       return false
     }
 
-    // 检查直接设备字段
+    // Check the direct device field
     const hasDirectDeviceFields = !!(componentConfig.deviceId || componentConfig.metricsList)
 
-    // 检查嵌套在customize中的设备字段（兼容某些组件结构）
+    // Check nested incustomizedevice field in（Compatible with certain component structures）
     const hasNestedDeviceFields = !!(componentConfig.customize?.deviceId || componentConfig.customize?.metricsList)
 
     return hasDirectDeviceFields || hasNestedDeviceFields
   }
 
   /**
-   * 执行设备配置迁移
-   * 将组件级设备字段迁移到基础配置层
-   * @param config 原始配置
-   * @returns 迁移后的配置
+   * Perform device configuration migration
+   * Migrate component-level device fields to the base configuration layer
+   * @param config original configuration
+   * @returns Configuration after migration
    */
   private performDeviceConfigurationMigration(config: WidgetConfiguration): {
     config: WidgetConfiguration
@@ -683,14 +683,14 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
     const result = this.deepClone(config)
     let hasMigrated = false
 
-    // 确保基础配置存在
+    // Make sure the basic configuration exists
     if (!result.base) {
       result.base = {}
     }
 
     const componentConfig = result.component || {}
 
-    // 🚀 迁移设备ID
+    // 🚀 Migrate deviceID
     if (componentConfig.deviceId && !result.base.deviceId) {
       result.base.deviceId = componentConfig.deviceId
       delete componentConfig.deviceId
@@ -699,7 +699,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       hasMigrated = true
     }
 
-    // 🚀 迁移指标列表
+    // 🚀 Migration indicator list
     if (componentConfig.metricsList && !result.base.metricsList) {
       result.base.metricsList = Array.isArray(componentConfig.metricsList) ? componentConfig.metricsList : []
       delete componentConfig.metricsList
@@ -708,7 +708,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       hasMigrated = true
     }
 
-    // 🚀 处理嵌套在customize中的设备字段
+    // 🚀 Handle nested incustomizedevice field in
     if (componentConfig.customize) {
       if (componentConfig.customize.deviceId && !result.base.deviceId) {
         result.base.deviceId = componentConfig.customize.deviceId
@@ -729,7 +729,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       }
     }
 
-    // 🔥 修复：只对实际执行了迁移的配置更新元数据
+    // 🔥 repair：Only update metadata for configurations that were actually migrated
     if (hasMigrated) {
       if (!result.metadata) {
         result.metadata = {}
@@ -746,29 +746,29 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 🔥 新增：为setConfiguration专门设计的迁移逻辑
-   * 与migrateConfigurationIfNeeded类似，但不自动保存，避免循环调用
-   * @param widgetId 组件ID
-   * @param config 待设置的配置
-   * @returns 迁移后的配置
+   * 🔥 New：forsetConfigurationSpecially designed migration logic
+   * andmigrateConfigurationIfNeededsimilar，but not automatically saved，Avoid circular calls
+   * @param widgetId componentsID
+   * @param config Configuration to be set
+   * @returns Configuration after migration
    */
   private performDeviceConfigurationMigrationForSet(
     widgetId: string,
     config: WidgetConfiguration
   ): WidgetConfiguration {
-    // 检查是否需要迁移
+    // Check if migration is required
     const componentConfig = config.component || {}
     const hasDeviceFields = this.hasComponentLevelDeviceFields(componentConfig)
 
     if (!hasDeviceFields) {
-      // 无需迁移，直接返回原配置
+      // No need to migrate，Return directly to the original configuration
       return config
     }
 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行迁移但不自动保存（避免循环调用setConfiguration）
+    // Execute migration without automatically saving（Avoid circular callssetConfiguration）
     const migrationResult = this.performDeviceConfigurationMigration(config)
 
     if (migrationResult.migrated) {
@@ -781,36 +781,36 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 设置数据源集成 (已迁移到核心数据架构系统)
+   * Set up data source integration (Migrated to core data architecture system)
    */
   private async setupEditorDataSourceIntegration(): Promise<void> {
     try {
-      // 🔥 已迁移：数据源管理现在通过核心数据架构系统处理
-      // VisualEditorBridge 和 DataWarehouse 提供统一的数据源服务
+      // 🔥 Migrated：Data source management is now handled through the Core Data Architecture system
+      // VisualEditorBridge and DataWarehouse Provide unified data source services
     } catch (error) {}
   }
 
   /**
-   * 为特定组件设置数据源执行集成 (已迁移到核心数据架构系统)
+   * Set up a data source for a specific component to perform integration (Migrated to core data architecture system)
    */
   setupComponentDataSourceIntegration(componentId: string): void {
-    // 🔥 已迁移：数据源执行集成现在通过 ConfigEventBus 和 VisualEditorBridge 处理
-    // 配置变更事件会自动触发 VisualEditorBridge 更新组件执行器
+    // 🔥 Migrated：Data source execution integration now works via ConfigEventBus and VisualEditorBridge deal with
+    // Configuration change events are automatically triggered VisualEditorBridge Update component executor
 
-    // 核心架构系统会自动处理配置变更和数据源执行
-    // 通过 ConfigEventBus 事件和 EditorDataSourceManager 的事件监听器
+    // The core architecture system automatically handles configuration changes and data source execution
+    // pass ConfigEventBus events and EditorDataSourceManager event listener
   }
 
   /**
-   * 🔥 新增：触发数据源重新执行
-   * 当base层配置（如deviceId、metricsList等动态参数）变更时调用
-   * @param componentId 组件ID
-   * @param componentType 组件类型
+   * 🔥 New：Trigger data source to re-execute
+   * whenbaseLayer configuration（likedeviceId、metricsListand other dynamic parameters）Called on change
+   * @param componentId componentsID
+   * @param componentType Component type
    */
   private async triggerDataSourceReExecution(componentId: string, componentType: string): Promise<void> {
     try {
 
-      // 获取当前组件的数据源配置
+      // Get the data source configuration of the current component
       const currentConfig = configurationStateManager.getConfiguration(componentId)
       const dataSourceConfig = currentConfig?.dataSource
 
@@ -819,15 +819,15 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       }
 
 
-      // 🔥 关键：清理缓存确保获取最新数据
+      // 🔥 key：Clear the cache to ensure you get the latest data
       simpleDataBridge.clearComponentCache(componentId)
 
-      // 🔥 使用 VisualEditorBridge 重新执行数据源
+      // 🔥 use VisualEditorBridge Re-execute the data source
       const { getVisualEditorBridge } = await import('@/core/data-architecture/VisualEditorBridge')
       const visualEditorBridge = getVisualEditorBridge()
 
-      // 🔥 关键修复：传入完整的配置对象，而不是仅仅数据源配置
-      // VisualEditorBridge需要完整配置来正确注入base层属性到数据源参数中
+      // 🔥 critical fix：Pass in the complete configuration object，Instead of just data source configuration
+      // VisualEditorBridgeFull configuration is required to inject correctlybaseLayer attributes to data source parameters
       const fullConfig = {
         base: currentConfig?.base || {},
         dataSource: dataSourceConfig,
@@ -836,16 +836,16 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       }
 
 
-      // 重新执行数据源，传入完整的配置对象
+      // Re-execute the data source，Pass in the complete configuration object
       const result = await visualEditorBridge.updateComponentExecutor(
         componentId,
         componentType,
-        fullConfig // 传递完整配置，确保base层属性能被正确注入
+        fullConfig // Pass complete configuration，make surebaseLayer properties can be injected correctly
       )
 
-      // 数据源重新执行完成
+      // Data source re-execution completed
 
-      // 重要：发出数据源执行完成事件，通知其他系统组件
+      // important：Emit data source execution completion event，Notify other system components
       configEventBus.emitConfigChange({
         componentId,
         componentType,
@@ -857,13 +857,13 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
       })
 
     } catch (error) {
-      console.error(`❌ [ConfigurationIntegrationBridge] 数据源重新执行失败 ${componentId}:`, error)
-      // 不抛出错误，避免影响其他流程
+      console.error(`❌ [ConfigurationIntegrationBridge] Data source re-execution failed ${componentId}:`, error)
+      // Don't throw an error，Avoid affecting other processes
     }
   }
 
   /**
-   * 深度合并对象
+   * Deep merge objects
    */
   private deepMerge<T>(target: T, source: Partial<T>): T {
     const result = this.deepClone(target)
@@ -894,7 +894,7 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 
   /**
-   * 深克隆对象
+   * deep clone object
    */
   private deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== 'object') return obj
@@ -911,13 +911,13 @@ export class ConfigurationIntegrationBridge implements IConfigurationManager {
   }
 }
 
-// 创建全局桥接器实例
+// Create a global bridge instance
 export const configurationIntegrationBridge = new ConfigurationIntegrationBridge()
 
-// 向后兼容的导出
+// Backwards compatible export
 export const configurationManager = configurationIntegrationBridge
 
-// 🔥 新增：暴露全局实例供其他模块使用
+// 🔥 New：Expose global instances for use by other modules
 if (typeof globalThis !== 'undefined') {
   (globalThis as any).__configurationIntegrationBridge = configurationIntegrationBridge
 }

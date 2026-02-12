@@ -1,106 +1,106 @@
-# ThingsPanel 脚本引擎系统
+# ThingsPanel Script engine system
 
-## 概述
+## Overview
 
-ThingsPanel 脚本引擎是一个功能强大的 JavaScript 脚本执行系统，专为物联网数据处理场景设计。它提供了安全的沙箱环境、丰富的模板库、灵活的上下文管理和完善的执行监控功能。
+ThingsPanel The script engine is a powerful JavaScript script execution system，Specifically designed for IoT data processing scenarios。It provides a secure sandbox environment、Rich template library、Flexible context management and comprehensive execution monitoring capabilities。
 
-### 🎯 核心特性
+### 🎯 Core features
 
-- **🔒 安全沙箱**：隔离执行环境，防止恶意代码攻击
-- **📋 模板系统**：预制脚本模板，支持参数化配置
-- **🎛️ 上下文管理**：多种执行上下文，支持变量和函数管理
-- **📊 性能监控**：实时执行统计、内存使用监控
-- **🔧 工具集成**：内置数据处理、时间处理、网络请求等工具
-- **🚀 异步支持**：支持异步脚本执行和流式结果
+- **🔒 security sandbox**：Isolated execution environment，Prevent malicious code attacks
+- **📋 template system**：Pre-made script templates，Support parameterized configuration
+- **🎛️ context management**：Multiple execution contexts，Supports variable and function management
+- **📊 Performance monitoring**：Real-time execution statistics、Memory usage monitoring
+- **🔧 Tool integration**：Built-in data processing、time processing、Tools such as network requests
+- **🚀 Asynchronous support**：Supports asynchronous script execution and streaming results
 
-## 🏗️ 系统架构
+## 🏗️ System architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      ScriptEngine (主引擎)                      │
+│                      ScriptEngine (main engine)                      │
 ├─────────────────┬─────────────────┬─────────────────┬──────────────┤
 │  ScriptExecutor │ ScriptSandbox   │ TemplateManager │ ContextMgr   │
-│  (脚本执行器)    │ (安全沙箱)       │ (模板管理)       │ (上下文管理)  │
+│  (script executor)    │ (security sandbox)       │ (Template management)       │ (context management)  │
 ├─────────────────┼─────────────────┼─────────────────┼──────────────┤
-│ • 执行控制      │ • 安全检查       │ • 模板CRUD      │ • 上下文CRUD │
-│ • 统计收集      │ • 沙箱隔离       │ • 代码生成      │ • 变量管理   │
-│ • 错误处理      │ • 超时控制       │ • 参数验证      │ • 函数管理   │
-│ • 日志收集      │ • 内置工具       │ • 分类管理      │ • 克隆合并   │
+│ • executive control      │ • security check       │ • templateCRUD      │ • contextCRUD │
+│ • Statistics collection      │ • sandbox isolation       │ • code generation      │ • Variable management   │
+│ • Error handling      │ • Timeout control       │ • Parameter validation      │ • Function management   │
+│ • Log collection      │ • Built-in tools       │ • Classification management      │ • clone merge   │
 └─────────────────┴─────────────────┴─────────────────┴──────────────┘
 ```
 
-## 📁 文件结构
+## 📁 File structure
 
 ```
 src/core/script-engine/
-├── index.ts                    # 主入口文件
-├── types.ts                    # TypeScript 类型定义
-├── script-engine.ts            # 主引擎实现
-├── executor.ts                 # 脚本执行器
-├── sandbox.ts                  # 安全沙箱
-├── template-manager.ts         # 模板管理器
-├── context-manager.ts          # 上下文管理器
-├── components/                 # Vue 组件
-│   └── index.ts               # 组件导出
-└── templates/                  # 模板库
-    └── built-in-templates.ts  # 内置模板定义
+├── index.ts                    # Main entry file
+├── types.ts                    # TypeScript type definition
+├── script-engine.ts            # Main engine implementation
+├── executor.ts                 # script executor
+├── sandbox.ts                  # security sandbox
+├── template-manager.ts         # Template manager
+├── context-manager.ts          # context manager
+├── components/                 # Vue components
+│   └── index.ts               # Component export
+└── templates/                  # Template library
+    └── built-in-templates.ts  # Built-in template definition
 ```
 
-## 🚀 快速开始
+## 🚀 quick start
 
-### 基本使用
+### Basic usage
 
 ```typescript
 import { defaultScriptEngine } from '@/core/script-engine'
 
-// 1. 简单脚本执行
+// 1. Simple script execution
 const result = await defaultScriptEngine.execute('return Math.random() * 100')
-console.log(result.data) // 随机数结果
+console.log(result.data) // random number result
 
-// 2. 带上下文执行
+// 2. Execute with context
 const contextResult = await defaultScriptEngine.execute(
-  'return temperature * 1.8 + 32', // 摄氏度转华氏度
+  'return temperature * 1.8 + 32', // Celsius to Fahrenheit
   { temperature: 25 }
 )
 console.log(contextResult.data) // 77
 
-// 3. 使用模板执行
+// 3. Execute using template
 const templateResult = await defaultScriptEngine.executeTemplate(
   'random-data-generator', 
   { count: 5, fields: [{ name: 'temp', type: 'number' }] }
 )
 ```
 
-### 高级功能
+### Advanced features
 
 ```typescript
-// 批量执行
+// Batch execution
 const batchResults = await defaultScriptEngine.executeBatch([
   { code: 'return new Date().getTime()', context: {} },
   { code: 'return Math.PI * radius * radius', context: { radius: 5 } }
 ])
 
-// 流式执行（实时反馈）
+// Streaming execution（real time feedback）
 await defaultScriptEngine.executeStream(
   'return "Processing..." + Date.now()',
   {},
   (partialResult) => {
-    console.log('进度更新:', partialResult)
+    console.log('progress update:', partialResult)
   }
 )
 
-// 安全检查
+// security check
 const securityCheck = defaultScriptEngine.checkScriptSecurity(
   'eval("malicious code")'
 )
 console.log(securityCheck) // { safe: false, issues: [...] }
 ```
 
-## 🔧 核心组件详解
+## 🔧 Detailed explanation of core components
 
-### 1. ScriptExecutor (脚本执行器)
+### 1. ScriptExecutor (script executor)
 
-负责实际的脚本执行、结果处理和性能统计。
+Responsible for actual script execution、Results processing and performance statistics。
 
 ```typescript
 interface IScriptExecutor {
@@ -110,16 +110,16 @@ interface IScriptExecutor {
 }
 ```
 
-**主要功能：**
-- ✅ 脚本语法验证
-- ✅ 安全执行控制
-- ✅ 执行时间统计
-- ✅ 错误处理和日志收集
-- ✅ 并发执行管理
+**Main functions：**
+- ✅ Script syntax verification
+- ✅ Security execution controls
+- ✅ Execution time statistics
+- ✅ Error handling and log collection
+- ✅ Concurrent execution management
 
-### 2. ScriptSandbox (安全沙箱)
+### 2. ScriptSandbox (security sandbox)
 
-提供隔离的执行环境，防止恶意代码攻击。
+Provide an isolated execution environment，Prevent malicious code attacks。
 
 ```typescript
 interface IScriptSandbox {
@@ -130,14 +130,14 @@ interface IScriptSandbox {
 }
 ```
 
-**安全特性：**
-- 🔒 禁用危险函数 (`eval`, `Function`, `require` 等)
-- 🔒 全局对象访问控制
-- 🔒 原型污染防护
-- 🔒 执行超时控制
-- 🔒 自定义安全策略
+**security features：**
+- 🔒 Disable dangerous functions (`eval`, `Function`, `require` wait)
+- 🔒 Global object access control
+- 🔒 Prototype contamination protection
+- 🔒 Execution timeout control
+- 🔒 Custom security policy
 
-**允许的安全全局对象：**
+**Allowed security global objects：**
 ```typescript
 allowedGlobals: [
   'Math', 'Date', 'JSON', 'Promise',
@@ -148,9 +148,9 @@ allowedGlobals: [
 ]
 ```
 
-### 3. ScriptTemplateManager (模板管理器)
+### 3. ScriptTemplateManager (Template manager)
 
-管理可重用的脚本模板，支持参数化和分类管理。
+Manage reusable script templates，Support parameterization and classification management。
 
 ```typescript
 interface IScriptTemplateManager {
@@ -161,31 +161,31 @@ interface IScriptTemplateManager {
 }
 ```
 
-**内置模板分类：**
-- 📊 **数据生成** (`data-generation`)
-  - 模拟设备数据
-  - 随机时序数据
-  - 数值范围生成
-- 🔄 **数据处理** (`data-processing`)
-  - 数值计算处理
-  - 数组过滤排序
-  - 智能对象合并
-- 🌐 **API集成** (`api-integration`)
-  - HTTP API调用
-  - 响应处理
-  - 错误重试
-- ⏱️ **时序数据** (`time-series`)
-  - 时间序列生成
-  - 时序数据合并
-  - 时间格式化
-- 🛠️ **工具函数** (`utility`)
-  - 数据验证
-  - 性能监控
-  - 格式转换
+**Built-in template classification：**
+- 📊 **Data generation** (`data-generation`)
+  - Analog device data
+  - Random time series data
+  - Numeric range generation
+- 🔄 **Data processing** (`data-processing`)
+  - Numerical calculation processing
+  - Array filter sorting
+  - Smart object merge
+- 🌐 **APIintegrated** (`api-integration`)
+  - HTTP APIcall
+  - response handling
+  - Retry on error
+- ⏱️ **Time series data** (`time-series`)
+  - Time series generation
+  - Time series data merging
+  - time formatting
+- 🛠️ **Utility function** (`utility`)
+  - Data validation
+  - Performance monitoring
+  - format conversion
 
-### 4. ScriptContextManager (上下文管理器)
+### 4. ScriptContextManager (context manager)
 
-管理脚本执行时的上下文环境，包括变量和函数。
+Manage the context in which scripts are executed，Includes variables and functions。
 
 ```typescript
 interface IScriptContextManager {
@@ -196,17 +196,17 @@ interface IScriptContextManager {
 }
 ```
 
-**预设上下文：**
-- 🏠 **默认上下文**：应用基础信息和通用工具
-- 📊 **数据处理上下文**：数据验证和转换函数
-- 🏭 **IoT设备上下文**：设备消息解析和数据生成
+**default context：**
+- 🏠 **default context**：Apply basic information and common tools
+- 📊 **data processing context**：Data validation and conversion functions
+- 🏭 **IoTdevice context**：Device message parsing and data generation
 
-## 🛠️ 内置工具函数
+## 🛠️ Built-in utility functions
 
-### 数据生成工具 (`_utils.mockData`)
+### Data generation tools (`_utils.mockData`)
 
 ```javascript
-// 在脚本中使用
+// Use in script
 const randomNum = _utils.mockData.randomNumber(1, 100)
 const randomStr = _utils.mockData.randomString(10)
 const randomBool = _utils.mockData.randomBoolean()
@@ -214,35 +214,35 @@ const randomDate = _utils.mockData.randomDate()
 const randomArr = _utils.mockData.randomArray(['A', 'B', 'C'], 2)
 ```
 
-### 数据处理工具 (`_utils.dataUtils`)
+### data processing tools (`_utils.dataUtils`)
 
 ```javascript
-// 深拷贝对象
+// deep copy object
 const cloned = _utils.dataUtils.deepClone(originalObj)
 
-// 对象属性选择/排除
+// Object attribute selection/exclude
 const picked = _utils.dataUtils.pick(obj, ['name', 'age'])
 const omitted = _utils.dataUtils.omit(obj, ['password'])
 
-// 数组分组和排序
+// Array grouping and sorting
 const grouped = _utils.dataUtils.groupBy(array, 'category')
 const sorted = _utils.dataUtils.sortBy(array, 'timestamp')
 ```
 
-### 时间处理工具 (`_utils.timeUtils`)
+### Time management tools (`_utils.timeUtils`)
 
 ```javascript
-// 时间格式化
+// time formatting
 const formatted = _utils.timeUtils.format(Date.now(), 'YYYY-MM-DD HH:mm:ss')
 
-// 日期计算
+// date calculation
 const nextWeek = _utils.timeUtils.addDays(new Date(), 7)
 const daysDiff = _utils.timeUtils.diffDays(date1, date2)
 ```
 
-## 📊 性能监控
+## 📊 Performance monitoring
 
-### 执行统计
+### Execution statistics
 
 ```typescript
 const stats = defaultScriptEngine.getExecutionStats()
@@ -255,14 +255,14 @@ console.log({
 })
 ```
 
-### 内存使用监控
+### Memory usage monitoring
 
 ```javascript
-// 在模板中使用性能监控
+// Using performance monitoring in templates
 const startTime = performance.now()
 const memoryBefore = performance.memory?.usedJSHeapSize || 0
 
-// ... 数据处理逻辑 ...
+// ... Data processing logic ...
 
 const endTime = performance.now()
 const memoryAfter = performance.memory?.usedJSHeapSize || 0
@@ -276,54 +276,54 @@ return {
 }
 ```
 
-## 🔒 安全最佳实践
+## 🔒 Security Best Practices
 
-### 1. 代码安全检查
+### 1. Code security check
 
 ```typescript
-// 执行前检查代码安全性
+// Check code security before execution
 const securityCheck = defaultScriptEngine.checkScriptSecurity(userCode)
 if (!securityCheck.safe) {
-  console.error('安全检查失败:', securityCheck.issues)
+  console.error('Security check failed:', securityCheck.issues)
   return
 }
 ```
 
-### 2. 执行超时设置
+### 2. Execution timeout settings
 
 ```typescript
 const config: ScriptConfig = {
   code: userScript,
-  timeout: 10000,        // 10秒超时
-  maxMemory: 50 * 1024 * 1024,  // 50MB内存限制
-  strictMode: true,      // 严格模式
-  allowNetworkAccess: false     // 禁止网络访问
+  timeout: 10000,        // 10seconds timeout
+  maxMemory: 50 * 1024 * 1024,  // 50MBmemory limit
+  strictMode: true,      // strict mode
+  allowNetworkAccess: false     // Disable network access
 }
 ```
 
-### 3. 沙箱配置
+### 3. Sandbox configuration
 
 ```typescript
 const sandboxConfig: SandboxConfig = {
   enabled: true,
-  allowedGlobals: ['Math', 'Date', 'JSON'],  // 只允许安全的全局对象
+  allowedGlobals: ['Math', 'Date', 'JSON'],  // Allow only safe global objects
   blockedGlobals: ['eval', 'Function', 'window'],
   allowEval: false,
   allowFunction: false,
   allowPrototypePollution: false,
   customSecurityPolicy: (code: string) => {
-    // 自定义安全检查逻辑
+    // Custom security check logic
     return !code.includes('dangerous_pattern')
   }
 }
 ```
 
-## 🎯 使用场景
+## 🎯 Usage scenarios
 
-### 1. IoT 数据处理
+### 1. IoT Data processing
 
 ```typescript
-// 传感器数据处理模板
+// Sensor data processing template
 const sensorDataScript = `
 const { temperature, humidity, timestamp } = data
 return {
@@ -341,10 +341,10 @@ function calculateHeatIndex(t, h) {
 `
 ```
 
-### 2. 数据可视化预处理
+### 2. Data visualization preprocessing
 
 ```typescript
-// 图表数据格式化
+// Chart data formatting
 const chartDataScript = `
 const chartData = data.map((item, index) => ({
   x: index,
@@ -366,10 +366,10 @@ return {
 `
 ```
 
-### 3. 规则引擎
+### 3. rules engine
 
 ```typescript
-// 设备告警规则
+// Device alarm rules
 const alertRuleScript = `
 const rules = [
   { field: 'temperature', operator: '>', threshold: 30, level: 'warning' },
@@ -396,7 +396,7 @@ rules.forEach(rule => {
         value: value,
         threshold: rule.threshold,
         level: rule.level,
-        message: \`\${rule.field} 值 \${value} \${rule.operator} \${rule.threshold}\`
+        message: \`\${rule.field} value \${value} \${rule.operator} \${rule.threshold}\`
       })
     }
   }
@@ -406,13 +406,13 @@ return { alerts, hasAlerts: alerts.length > 0 }
 `
 ```
 
-## 🔧 配置选项
+## 🔧 Configuration options
 
-### 引擎配置
+### Engine configuration
 
 ```typescript
 const engineConfig: ScriptEngineConfig = {
-  // 默认脚本配置
+  // Default script configuration
   defaultScriptConfig: {
     timeout: 5000,
     strictMode: true,
@@ -422,38 +422,38 @@ const engineConfig: ScriptEngineConfig = {
     allowFileSystemAccess: false
   },
   
-  // 沙箱配置
+  // Sandbox configuration
   sandboxConfig: {
     enabled: true,
     allowedGlobals: ['Math', 'Date', 'JSON', 'Promise'],
     blockedGlobals: ['eval', 'Function', 'window', 'document']
   },
   
-  // 缓存配置
+  // Cache configuration
   enableCache: true,
-  cacheTTL: 5 * 60 * 1000,  // 5分钟
+  cacheTTL: 5 * 60 * 1000,  // 5minute
   
-  // 并发控制
+  // Concurrency control
   maxConcurrentExecutions: 10,
   
-  // 性能监控
+  // Performance monitoring
   enablePerformanceMonitoring: true
 }
 
 const customEngine = new ScriptEngine(engineConfig)
 ```
 
-## 📝 开发指南
+## 📝 Development Guide
 
-### 创建自定义模板
+### Create a custom template
 
 ```typescript
 import { defaultScriptEngine } from '@/core/script-engine'
 
-// 创建自定义模板
+// Create a custom template
 const customTemplate = defaultScriptEngine.templateManager.createTemplate({
-  name: '自定义数据处理',
-  description: '根据业务需求处理数据',
+  name: 'Custom data processing',
+  description: 'Process data according to business needs',
   category: 'custom',
   code: `
     const threshold = {{threshold}}
@@ -469,14 +469,14 @@ const customTemplate = defaultScriptEngine.templateManager.createTemplate({
     {
       name: 'threshold',
       type: 'number',
-      description: '过滤阈值',
+      description: 'filter threshold',
       required: true,
       defaultValue: 0
     },
     {
       name: 'field',
       type: 'string', 
-      description: '比较字段',
+      description: 'Compare fields',
       required: true,
       defaultValue: 'value'
     }
@@ -485,12 +485,12 @@ const customTemplate = defaultScriptEngine.templateManager.createTemplate({
 })
 ```
 
-### 扩展上下文功能
+### Extended context capabilities
 
 ```typescript
-// 创建专用上下文
+// Create a dedicated context
 const deviceContext = defaultScriptEngine.contextManager.createContext(
-  '设备专用上下文',
+  'device-specific context',
   {
     deviceType: 'sensor',
     location: 'building_a',
@@ -498,7 +498,7 @@ const deviceContext = defaultScriptEngine.contextManager.createContext(
   }
 )
 
-// 添加自定义函数
+// Add custom function
 defaultScriptEngine.contextManager.addFunction(
   deviceContext.id,
   'parseDeviceMessage',
@@ -512,28 +512,28 @@ defaultScriptEngine.contextManager.addFunction(
 )
 ```
 
-### 错误处理和调试
+### Error handling and debugging
 
 ```typescript
 try {
   const result = await defaultScriptEngine.execute(userScript, context)
   
   if (!result.success) {
-    console.error('脚本执行失败:', result.error?.message)
-    console.log('执行日志:', result.logs)
-    console.log('上下文快照:', result.contextSnapshot)
+    console.error('Script execution failed:', result.error?.message)
+    console.log('execution log:', result.logs)
+    console.log('context snapshot:', result.contextSnapshot)
   } else {
-    console.log('执行成功:', result.data)
-    console.log('执行时间:', result.executionTime + 'ms')
+    console.log('Executed successfully:', result.data)
+    console.log('Execution time:', result.executionTime + 'ms')
   }
 } catch (error) {
-  console.error('引擎异常:', error)
+  console.error('Engine abnormality:', error)
 }
 ```
 
-## 🧪 测试和调试
+## 🧪 Testing and Debugging
 
-### 单元测试示例
+### Unit test example
 
 ```typescript
 import { ScriptEngine } from '@/core/script-engine'
@@ -545,13 +545,13 @@ describe('ScriptEngine', () => {
     engine = new ScriptEngine()
   })
 
-  test('基本脚本执行', async () => {
+  test('Basic script execution', async () => {
     const result = await engine.execute('return 1 + 1')
     expect(result.success).toBe(true)
     expect(result.data).toBe(2)
   })
 
-  test('模板执行', async () => {
+  test('Template execution', async () => {
     const result = await engine.executeTemplate('random-data-generator', {
       count: 3,
       fields: [{ name: 'test', type: 'number' }]
@@ -561,7 +561,7 @@ describe('ScriptEngine', () => {
     expect(result.data.length).toBe(3)
   })
 
-  test('安全检查', () => {
+  test('security check', () => {
     const check = engine.checkScriptSecurity('eval("malicious")')
     expect(check.safe).toBe(false)
     expect(check.issues.length).toBeGreaterThan(0)
@@ -569,27 +569,27 @@ describe('ScriptEngine', () => {
 })
 ```
 
-## 🚀 性能优化
+## 🚀 Performance optimization
 
-### 1. 预热引擎
+### 1. Warm up engine
 
 ```typescript
-// 应用启动时预热引擎
+// Warm up engine when application starts
 await defaultScriptEngine.warmup()
 ```
 
-### 2. 缓存常用脚本
+### 2. Cache frequently used scripts
 
 ```typescript
-// 使用模板而不是重复的内联脚本
+// Use templates instead of repeated inline scripts
 const templateId = 'data-processor'
 const result = await defaultScriptEngine.executeTemplate(templateId, params)
 ```
 
-### 3. 批量处理
+### 3. Batch processing
 
 ```typescript
-// 批量执行而不是单个循环
+// Execute in batches instead of a single loop
 const scripts = dataItems.map(item => ({
   code: 'return processItem(data)',
   context: { data: item }
@@ -597,52 +597,52 @@ const scripts = dataItems.map(item => ({
 const results = await defaultScriptEngine.executeBatch(scripts)
 ```
 
-## 📈 监控和运维
+## 📈 Monitoring and operation
 
-### 引擎状态导出
+### Engine status export
 
 ```typescript
-// 导出引擎状态用于备份
+// Export engine status for backup
 const engineState = defaultScriptEngine.exportState()
 localStorage.setItem('script-engine-backup', JSON.stringify(engineState))
 
-// 恢复引擎状态
+// Restore engine status
 const savedState = JSON.parse(localStorage.getItem('script-engine-backup'))
 defaultScriptEngine.importState(savedState)
 ```
 
-### 性能指标监控
+### Performance indicator monitoring
 
 ```typescript
-// 定期收集性能指标
+// Collect performance metrics regularly
 setInterval(() => {
   const stats = defaultScriptEngine.getExecutionStats()
   
-  // 发送到监控系统
+  // Send to monitoring system
   sendMetrics({
     totalExecutions: stats.executor.totalExecutions,
     successRate: stats.executor.successfulExecutions / stats.executor.totalExecutions,
     avgExecutionTime: stats.executor.averageExecutionTime,
     currentConcurrency: stats.executor.currentConcurrentExecutions
   })
-}, 60000) // 每分钟一次
+}, 60000) // once per minute
 ```
 
-## 🤝 贡献指南
+## 🤝 Contribution Guide
 
-1. **添加新模板**：在 `templates/built-in-templates.ts` 中添加
-2. **扩展工具函数**：在 `sandbox.ts` 的 `createBuiltinUtils` 方法中添加
-3. **增强安全检查**：在 `sandbox.ts` 的 `checkCodeSecurity` 方法中添加规则
-4. **优化性能**：关注执行时间和内存使用
+1. **Add new template**：exist `templates/built-in-templates.ts` Add in
+2. **Extended utility functions**：exist `sandbox.ts` of `createBuiltinUtils` Add in method
+3. **Enhanced security checks**：exist `sandbox.ts` of `checkCodeSecurity` Add rules to method
+4. **Optimize performance**：Pay attention to execution time and memory usage
 
-## 📄 许可证
+## 📄 license
 
-本项目基于 MIT 许可证开源。
+This project is based on MIT License open source。
 
 ---
 
-## 📞 技术支持
+## 📞 Technical support
 
-如有问题或建议，请提交 Issue 或联系开发团队。
+If you have any questions or suggestions，Please submit Issue Or contact the development team。
 
-**🌟 享受使用 ThingsPanel 脚本引擎的强大功能！**
+**🌟 Enjoy using ThingsPanel The power of scripting engines！**

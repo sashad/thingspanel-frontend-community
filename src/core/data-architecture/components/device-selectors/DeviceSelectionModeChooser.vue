@@ -1,11 +1,11 @@
 <!--
-  设备选择模式选择器
-  让用户选择使用哪种设备选择模式
+  Device selection mode selector
+  Let the user choose which device selection mode to use
 -->
 <script setup lang="ts">
 /**
- * DeviceSelectionModeChooser - 设备选择模式选择器
- * 让用户在3种不同复杂度的设备选择模式中选择
+ * DeviceSelectionModeChooser - Device selection mode selector
+ * Let users3Choose from device selection modes of varying complexity
  */
 
 import { ref } from 'vue'
@@ -18,7 +18,7 @@ import {
 import type { DeviceParameterSourceType, DeviceSelectionMode } from '@/core/data-architecture/types/device-parameter-group'
 
 interface Props {
-  /** 预选择的模式（编辑时使用） */
+  /** Pre-selected mode（Used when editing） */
   preSelectedMode?: DeviceParameterSourceType
 }
 
@@ -30,33 +30,33 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// 当前选择的模式
+// Currently selected mode
 const selectedMode = ref<DeviceParameterSourceType>(props.preSelectedMode || 'device-id')
 
 /**
- * 可用的选择模式配置
+ * Available selection mode configurations
  */
 const availableModes: DeviceSelectionMode[] = [
   {
     mode: 'device-id',
-    title: '简单模式：设备ID',
-    description: '只选择设备，生成deviceId参数',
+    title: 'Simple mode：equipmentID',
+    description: 'Select only devices，generatedeviceIdparameter',
     icon: 'device',
     enabled: true,
     expectedParams: 1
   },
   {
     mode: 'device-metric',
-    title: '指标模式：设备+指标',
-    description: '选择设备和指标，生成deviceId + metric参数',
+    title: 'indicator mode：equipment+index',
+    description: 'Select device and indicator，generatedeviceId + metricparameter',
     icon: 'metric',
     enabled: true,
     expectedParams: 2
   },
   {
     mode: 'telemetry',
-    title: '遥测模式：灵活选择',
-    description: '灵活选择多个参数（暂未开放，敬请期待）',
+    title: 'telemetry mode：Flexible choice',
+    description: 'Flexible selection of multiple parameters（Not open yet，Stay tuned）',
     icon: 'telemetry',
     enabled: false,
     expectedParams: 3
@@ -64,7 +64,7 @@ const availableModes: DeviceSelectionMode[] = [
 ]
 
 /**
- * 获取模式图标组件
+ * Get the modal icon component
  */
 const getModeIcon = (iconType: string) => {
   const iconMap = {
@@ -76,7 +76,7 @@ const getModeIcon = (iconType: string) => {
 }
 
 /**
- * 获取模式颜色
+ * Get mode color
  */
 const getModeColor = (mode: DeviceParameterSourceType) => {
   const colorMap = {
@@ -88,14 +88,14 @@ const getModeColor = (mode: DeviceParameterSourceType) => {
 }
 
 /**
- * 确认选择模式
+ * Confirm selection mode
  */
 const confirmMode = () => {
   emit('modeSelected', selectedMode.value)
 }
 
 /**
- * 取消选择
+ * Deselect
  */
 const cancelSelection = () => {
   emit('cancel')
@@ -104,15 +104,15 @@ const cancelSelection = () => {
 
 <template>
   <div class="mode-chooser">
-    <!-- 标题 -->
+    <!-- title -->
     <div class="chooser-header">
-      <n-text strong style="font-size: 16px">选择参数生成方式</n-text>
+      <n-text strong style="font-size: 16px">Select parameter generation method</n-text>
       <n-text depth="3" style="font-size: 12px; margin-top: 4px">
-        不同模式会生成不同数量和类型的参数，请根据需要选择
+        Different modes generate different numbers and types of parameters，Please select according to your needs
       </n-text>
     </div>
 
-    <!-- 模式选择 -->
+    <!-- Mode selection -->
     <div class="mode-selection">
       <n-radio-group v-model:value="selectedMode">
         <n-space vertical size="large">
@@ -127,15 +127,15 @@ const cancelSelection = () => {
           >
             <n-card :bordered="false" class="mode-card" :class="{ selected: selectedMode === modeConfig.mode }">
               <n-space align="center">
-                <!-- 单选按钮 -->
+                <!-- radio button -->
                 <n-radio :value="modeConfig.mode" :disabled="!modeConfig.enabled" />
 
-                <!-- 模式图标 -->
+                <!-- mode icon -->
                 <n-icon size="24" :color="modeConfig.enabled ? getModeColor(modeConfig.mode) : '#ccc'">
                   <component :is="getModeIcon(modeConfig.icon)" />
                 </n-icon>
 
-                <!-- 模式信息 -->
+                <!-- Mode information -->
                 <div class="mode-info">
                   <n-text strong :class="{ 'text-disabled': !modeConfig.enabled }" style="font-size: 14px">
                     {{ modeConfig.title }}
@@ -148,20 +148,20 @@ const cancelSelection = () => {
                     {{ modeConfig.description }}
                   </n-text>
 
-                  <!-- 参数数量提示 -->
+                  <!-- Tips on the number of parameters -->
                   <div class="param-hint">
                     <n-text
                       :class="{ 'text-disabled': !modeConfig.enabled }"
                       style="font-size: 11px; color: var(--success-color)"
                     >
-                      预期生成 {{ modeConfig.expectedParams }} 个参数
+                      expected build {{ modeConfig.expectedParams }} parameters
                     </n-text>
                   </div>
                 </div>
 
-                <!-- 禁用标识 -->
+                <!-- disable flag -->
                 <div v-if="!modeConfig.enabled" class="disabled-badge">
-                  <n-text depth="3" style="font-size: 11px">敬请期待</n-text>
+                  <n-text depth="3" style="font-size: 11px">Stay tuned</n-text>
                 </div>
               </n-space>
             </n-card>
@@ -170,26 +170,26 @@ const cancelSelection = () => {
       </n-radio-group>
     </div>
 
-    <!-- 选择预览 -->
+    <!-- Select Preview -->
     <div class="selection-preview">
       <div v-if="selectedMode" class="preview-content">
         <n-text depth="3" style="font-size: 12px">
-          当前选择：
+          Current selection：
           <strong>{{ availableModes.find(m => m.mode === selectedMode)?.title }}</strong>
         </n-text>
       </div>
     </div>
 
-    <!-- 操作按钮 -->
+    <!-- Action button -->
     <div class="chooser-actions">
       <n-space justify="end">
-        <n-button @click="cancelSelection">取消</n-button>
+        <n-button @click="cancelSelection">Cancel</n-button>
         <n-button
           type="primary"
           :disabled="!availableModes.find(m => m.mode === selectedMode)?.enabled"
           @click="confirmMode"
         >
-          下一步
+          Next step
         </n-button>
       </n-space>
     </div>

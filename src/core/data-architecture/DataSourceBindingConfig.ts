@@ -1,210 +1,210 @@
 /**
- * 数据源绑定配置
- * 集中管理动态参数绑定规则和触发白名单
+ * Data source binding configuration
+ * Centrally manage dynamic parameter binding rules and trigger whitelists
  *
- * 支持：
- * 1. 自动参数绑定规则配置
- * 2. 属性变更触发白名单管理
- * 3. 自定义绑定规则扩展
- * 4. 组件特定的绑定配置
+ * support：
+ * 1. Automatic parameter binding rule configuration
+ * 2. Attribute changes trigger whitelist management
+ * 3. Custom binding rule extension
+ * 4. Component specific binding configuration
  */
 
 /**
- * 参数绑定规则接口
+ * Parameter binding rule interface
  */
 export interface BindingRule {
-  /** 属性路径，如 'base.deviceId' */
+  /** Property path，like 'base.deviceId' */
   propertyPath: string
-  /** HTTP参数名 */
+  /** HTTPParameter name */
   paramName: string
-  /** 数据转换函数（可选） */
+  /** data conversion function（Optional） */
   transform?: (value: any) => any
-  /** 是否必需参数 */
+  /** Are parameters required? */
   required?: boolean
-  /** 参数说明 */
+  /** Parameter description */
   description?: string
 }
 
 /**
- * 触发规则接口
+ * Trigger rule interface
  */
 export interface TriggerRule {
-  /** 属性路径 */
+  /** Property path */
   propertyPath: string
-  /** 是否启用 */
+  /** Whether to enable */
   enabled: boolean
-  /** 防抖时间（毫秒），默认使用全局配置 */
+  /** Anti-shake time（millisecond），Use global configuration by default */
   debounceMs?: number
-  /** 规则说明 */
+  /** Rule description */
   description?: string
 }
 
 /**
- * 组件特定配置接口
+ * Component specific configuration interface
  */
 export interface ComponentBindingConfig {
-  /** 组件类型 */
+  /** Component type */
   componentType: string
-  /** 额外的绑定规则 */
+  /** Additional binding rules */
   additionalBindings?: BindingRule[]
-  /** 额外的触发规则 */
+  /** Additional triggering rules */
   additionalTriggers?: TriggerRule[]
-  /** 是否启用自动绑定 */
+  /** Whether to enable automatic binding */
   autoBindEnabled?: boolean
 }
 
 /**
- * 自动绑定配置接口
- * 用于简化数据源配置，提供autoBind选项
+ * Automatic binding configuration interface
+ * Used to simplify data source configuration，supplyautoBindOptions
  */
 export interface AutoBindConfig {
-  /** 是否启用自动绑定 */
+  /** Whether to enable automatic binding */
   enabled: boolean
-  /** 绑定模式 */
+  /** binding mode */
   mode: 'strict' | 'loose' | 'custom'
-  /** 自定义绑定规则 */
+  /** Custom binding rules */
   customRules?: BindingRule[]
-  /** 排除的属性列表 */
+  /** Excluded attribute list */
   excludeProperties?: string[]
-  /** 包含的属性列表（仅在strict模式下生效） */
+  /** List of properties included（only instrictEffective in mode） */
   includeProperties?: string[]
 }
 
 /**
- * 🚀 完全动态化的数据源绑定配置类
- * 消除所有硬编码，支持运行时动态配置绑定规则
+ * 🚀 Completely dynamic data source binding configuration class
+ * Eliminate all hard coding，Support dynamic configuration of binding rules at runtime
  */
 export class DataSourceBindingConfig {
-  // 🔥 修复：改为动态注册的绑定规则，不再硬编码任何字段
+  // 🔥 repair：Change to dynamically registered binding rules，No more hardcoding any fields
   private bindingRules: Map<string, BindingRule> = new Map()
 
-  // 🔥 修复：改为动态注册的触发规则，不再硬编码任何字段
+  // 🔥 repair：Change to dynamic registration triggering rules，No more hardcoding any fields
   private triggerRules: Map<string, TriggerRule> = new Map()
 
   constructor() {
-    // 🚀 初始化时注册默认规则（但可以被覆盖或删除）
+    // 🚀 Register default rules during initialization（but can be overwritten or deleted）
     this.initializeDefaultRules()
   }
 
   /**
-   * 🚀 初始化默认规则 - 可以被动态修改
-   * 这些不是硬编码，而是默认建议，可以完全替换
+   * 🚀 Initialize default rules - Can be modified dynamically
+   * These are not hardcoded，Instead, the default recommendation is，Can be completely replaced
    */
   private initializeDefaultRules(): void {
-    // 注册默认绑定规则
+    // Register default binding rules
     this.registerBindingRule({
       propertyPath: 'base.deviceId',
       paramName: 'deviceId',
       required: true,
-      description: '设备ID - 默认规则，可修改或删除'
+      description: 'equipmentID - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'base.metricsList',
       paramName: 'metrics',
       transform: (value: any[]) => Array.isArray(value) ? value.join(',') : value,
-      description: '指标列表 - 默认规则，可修改或删除'
+      description: 'Indicator list - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'component.startTime',
       paramName: 'startTime',
       transform: (value: any) => value instanceof Date ? value.toISOString() : value,
-      description: '开始时间 - 默认规则，可修改或删除'
+      description: 'start time - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'component.endTime',
       paramName: 'endTime',
       transform: (value: any) => value instanceof Date ? value.toISOString() : value,
-      description: '结束时间 - 默认规则，可修改或删除'
+      description: 'end time - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'component.dataType',
       paramName: 'dataType',
-      description: '数据类型 - 默认规则，可修改或删除'
+      description: 'data type - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'component.refreshInterval',
       paramName: 'refreshInterval',
       transform: (value: any) => parseInt(value) || 30,
-      description: '刷新间隔 - 默认规则，可修改或删除'
+      description: 'refresh interval - Default rules，Can be modified or deleted'
     })
 
     this.registerBindingRule({
       propertyPath: 'component.filterCondition',
       paramName: 'filter',
-      description: '过滤条件 - 默认规则，可修改或删除'
+      description: 'filter conditions - Default rules，Can be modified or deleted'
     })
 
-    // 注册默认触发规则
+    // Register default trigger rules
     this.registerTriggerRule({
       propertyPath: 'base.deviceId',
       enabled: true,
       debounceMs: 100,
-      description: '设备ID触发 - 默认规则，可修改或删除'
+      description: 'equipmentIDtrigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'base.metricsList',
       enabled: true,
       debounceMs: 200,
-      description: '指标列表触发 - 默认规则，可修改或删除'
+      description: 'Indicator list trigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'component.startTime',
       enabled: true,
       debounceMs: 300,
-      description: '开始时间触发 - 默认规则，可修改或删除'
+      description: 'start time trigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'component.endTime',
       enabled: true,
       debounceMs: 300,
-      description: '结束时间触发 - 默认规则，可修改或删除'
+      description: 'end time trigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'component.dataType',
       enabled: true,
       debounceMs: 150,
-      description: '数据类型触发 - 默认规则，可修改或删除'
+      description: 'Data type trigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'component.refreshInterval',
       enabled: false,
-      description: '刷新间隔触发 - 默认规则，可修改或删除'
+      description: 'Refresh interval trigger - Default rules，Can be modified or deleted'
     })
 
     this.registerTriggerRule({
       propertyPath: 'component.filterCondition',
       enabled: true,
       debounceMs: 250,
-      description: '过滤条件触发 - 默认规则，可修改或删除'
+      description: 'Filter condition triggers - Default rules，Can be modified or deleted'
     })
   }
 
   /**
-   * 🚀 新增：动态注册绑定规则
+   * 🚀 New：Dynamic registration binding rules
    */
   registerBindingRule(rule: BindingRule): void {
     this.bindingRules.set(rule.propertyPath, rule)
   }
 
   /**
-   * 🚀 新增：动态注册触发规则
+   * 🚀 New：Dynamic registration triggering rules
    */
   registerTriggerRule(rule: TriggerRule): void {
     this.triggerRules.set(rule.propertyPath, rule)
   }
 
   /**
-   * 🚀 新增：移除绑定规则
+   * 🚀 New：Remove binding rule
    */
   removeBindingRule(propertyPath: string): boolean {
     const removed = this.bindingRules.delete(propertyPath)
@@ -212,7 +212,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 🚀 新增：移除触发规则
+   * 🚀 New：Remove trigger rule
    */
   removeTriggerRule(propertyPath: string): boolean {
     const removed = this.triggerRules.delete(propertyPath)
@@ -220,31 +220,31 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 🚀 新增：清空所有规则（完全自定义）
+   * 🚀 New：Clear all rules（Fully customizable）
    */
   clearAllRules(): void {
     this.bindingRules.clear()
     this.triggerRules.clear()
   }
 
-  // 组件特定配置
+  // Component specific configuration
   private componentConfigs: Map<string, ComponentBindingConfig> = new Map()
 
-  // 用户自定义规则
+  // User-defined rules
   private customBindingRules: BindingRule[] = []
   private customTriggerRules: TriggerRule[] = []
 
   /**
-   * 🔥 修复：获取所有有效的绑定规则（完全动态化）
+   * 🔥 repair：Get all valid binding rules（Fully dynamic）
    */
   getAllBindingRules(componentType?: string): BindingRule[] {
-    // 从动态Map中获取所有规则
+    // From dynamicMapGet all rules in
     const rules = Array.from(this.bindingRules.values())
 
-    // 添加用户自定义规则（保持向后兼容）
+    // Add user-defined rules（Stay backwards compatible）
     rules.push(...this.customBindingRules)
 
-    // 添加组件特定的绑定规则
+    // Add component-specific binding rules
     if (componentType) {
       const componentConfig = this.componentConfigs.get(componentType)
       if (componentConfig?.additionalBindings) {
@@ -256,16 +256,16 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 🔥 修复：获取所有有效的触发规则（完全动态化）
+   * 🔥 repair：Get all valid trigger rules（Fully dynamic）
    */
   getAllTriggerRules(componentType?: string): TriggerRule[] {
-    // 从动态Map中获取所有规则
+    // From dynamicMapGet all rules in
     const rules = Array.from(this.triggerRules.values())
 
-    // 添加用户自定义规则（保持向后兼容）
+    // Add user-defined rules（Stay backwards compatible）
     rules.push(...this.customTriggerRules)
 
-    // 添加组件特定的触发规则
+    // Add component-specific triggering rules
     if (componentType) {
       const componentConfig = this.componentConfigs.get(componentType)
       if (componentConfig?.additionalTriggers) {
@@ -277,7 +277,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 根据属性路径获取绑定规则
+   * Get binding rules based on attribute path
    */
   getBindingRule(propertyPath: string, componentType?: string): BindingRule | undefined {
     const allRules = this.getAllBindingRules(componentType)
@@ -285,7 +285,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 根据属性路径获取触发规则
+   * Get trigger rules based on attribute path
    */
   getTriggerRule(propertyPath: string, componentType?: string): TriggerRule | undefined {
     const allRules = this.getAllTriggerRules(componentType)
@@ -293,7 +293,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 检查属性是否应该触发数据源执行
+   * Check if a property should trigger data source execution
    */
   shouldTriggerDataSource(propertyPath: string, componentType?: string): boolean {
     const triggerRule = this.getTriggerRule(propertyPath, componentType)
@@ -301,7 +301,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 构建HTTP参数对象
+   * BuildHTTPparameter object
    */
   buildHttpParams(componentConfig: any, componentType?: string): Record<string, any> {
     const httpParams: Record<string, any> = {}
@@ -314,18 +314,18 @@ export class DataSourceBindingConfig {
       if (sectionConfig && sectionConfig[property] !== undefined) {
         let value = sectionConfig[property]
 
-        // 应用数据转换函数
+        // Apply data transformation functions
         if (rule.transform && typeof rule.transform === 'function') {
           try {
             value = rule.transform(value)
           } catch (error) {
-            console.warn(`⚠️ [DataSourceBindingConfig] 参数转换失败:`, {
+            console.warn(`⚠️ [DataSourceBindingConfig] Parameter conversion failed:`, {
               propertyPath: rule.propertyPath,
               paramName: rule.paramName,
               originalValue: sectionConfig[property],
               error: error instanceof Error ? error.message : error
             })
-            // 转换失败时使用原值
+            // Use original value if conversion fails
             value = sectionConfig[property]
           }
         }
@@ -338,11 +338,11 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 🚀 新增：使用autoBind配置自动构建HTTP参数
-   * @param componentConfig 组件配置
-   * @param autoBindConfig 自动绑定配置
-   * @param componentType 组件类型
-   * @returns 自动绑定的HTTP参数
+   * 🚀 New：useautoBindConfigure automatic buildHTTPparameter
+   * @param componentConfig Component configuration
+   * @param autoBindConfig Automatic binding configuration
+   * @param componentType Component type
+   * @returns automatically boundHTTPparameter
    */
   buildAutoBindParams(
     componentConfig: any,
@@ -357,15 +357,15 @@ export class DataSourceBindingConfig {
 
     switch (autoBindConfig.mode) {
       case 'strict':
-        // 严格模式：仅绑定指定的属性
+        // strict mode：Only bind specified properties
         return this.buildStrictModeParams(componentConfig, autoBindConfig, componentType)
 
       case 'loose':
-        // 宽松模式：绑定所有可用属性，排除指定属性
+        // Relaxed mode：Bind all available properties，Exclude specified attributes
         return this.buildLooseModeParams(componentConfig, autoBindConfig, componentType)
 
       case 'custom':
-        // 自定义模式：使用自定义绑定规则
+        // Custom mode：Use custom binding rules
         return this.buildCustomModeParams(componentConfig, autoBindConfig, componentType)
 
       default:
@@ -374,7 +374,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 构建严格模式参数
+   * Build strict mode parameters
    */
   private buildStrictModeParams(
     componentConfig: any,
@@ -384,7 +384,7 @@ export class DataSourceBindingConfig {
     const httpParams: Record<string, any> = {}
     const includeProperties = autoBindConfig.includeProperties || []
 
-    // 只处理指定的属性
+    // Only process specified attributes
     const bindingRules = this.getAllBindingRules(componentType)
       .filter(rule => includeProperties.includes(rule.propertyPath))
 
@@ -411,7 +411,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 构建宽松模式参数
+   * Build relaxed mode parameters
    */
   private buildLooseModeParams(
     componentConfig: any,
@@ -421,7 +421,7 @@ export class DataSourceBindingConfig {
     const httpParams: Record<string, any> = {}
     const excludeProperties = autoBindConfig.excludeProperties || []
 
-    // 处理所有属性，排除指定属性
+    // Process all properties，Exclude specified attributes
     const bindingRules = this.getAllBindingRules(componentType)
       .filter(rule => !excludeProperties.includes(rule.propertyPath))
 
@@ -448,7 +448,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 构建自定义模式参数
+   * Build custom pattern parameters
    */
   private buildCustomModeParams(
     componentConfig: any,
@@ -458,7 +458,7 @@ export class DataSourceBindingConfig {
     const httpParams: Record<string, any> = {}
     const customRules = autoBindConfig.customRules || []
 
-    // 使用自定义绑定规则
+    // Use custom binding rules
     for (const rule of customRules) {
       const [section, property] = rule.propertyPath.split('.')
       const sectionConfig = componentConfig[section]
@@ -482,10 +482,10 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 添加自定义绑定规则
+   * Add custom binding rules
    */
   addCustomBindingRule(rule: BindingRule): void {
-    // 检查是否已存在相同的属性路径
+    // Check if the same property path already exists
     const existingIndex = this.customBindingRules.findIndex(r => r.propertyPath === rule.propertyPath)
     if (existingIndex >= 0) {
       this.customBindingRules[existingIndex] = rule
@@ -496,10 +496,10 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 添加自定义触发规则
+   * Add custom trigger rules
    */
   addCustomTriggerRule(rule: TriggerRule): void {
-    // 检查是否已存在相同的属性路径
+    // Check if the same property path already exists
     const existingIndex = this.customTriggerRules.findIndex(r => r.propertyPath === rule.propertyPath)
     if (existingIndex >= 0) {
       this.customTriggerRules[existingIndex] = rule
@@ -510,7 +510,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 设置组件特定配置
+   * Set component specific configuration
    */
   setComponentConfig(componentType: string, config: ComponentBindingConfig): void {
     this.componentConfigs.set(componentType, config)
@@ -518,14 +518,14 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 获取组件特定配置
+   * Get component specific configuration
    */
   getComponentConfig(componentType: string): ComponentBindingConfig | undefined {
     return this.componentConfigs.get(componentType)
   }
 
   /**
-   * 移除自定义规则
+   * Remove custom rules
    */
   removeCustomBindingRule(propertyPath: string): boolean {
     const index = this.customBindingRules.findIndex(r => r.propertyPath === propertyPath)
@@ -537,7 +537,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 移除自定义触发规则
+   * Remove custom trigger rules
    */
   removeCustomTriggerRule(propertyPath: string): boolean {
     const index = this.customTriggerRules.findIndex(r => r.propertyPath === propertyPath)
@@ -549,7 +549,7 @@ export class DataSourceBindingConfig {
   }
 
   /**
-   * 获取调试信息
+   * Get debugging information
    */
   getDebugInfo(componentType?: string): any {
     return {
@@ -572,10 +572,10 @@ export class DataSourceBindingConfig {
   }
 }
 
-// 创建全局配置实例
+// Create a global configuration instance
 export const dataSourceBindingConfig = new DataSourceBindingConfig()
 
-// 全局暴露，供调试使用
+// global exposure，for debugging
 if (typeof globalThis !== 'undefined') {
   (globalThis as any).__dataSourceBindingConfig = dataSourceBindingConfig
 }

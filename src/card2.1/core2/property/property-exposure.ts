@@ -1,50 +1,50 @@
 /**
- * Card2.1 属性暴露管理器
- * 简化的属性白名单管理机制
+ * Card2.1 Property Exposure Manager
+ * Simplified attribute whitelist management mechanism
  */
 
 import type { ComponentPropertyWhitelist, PropertyExposureConfig, IPropertyExposureManager } from '../types'
 
 /**
- * 属性暴露管理器类
+ * Property exposure manager class
  */
 export class PropertyExposureManager implements IPropertyExposureManager {
   private propertyWhitelists = new Map<string, ComponentPropertyWhitelist>()
 
   /**
-   * 注册组件属性白名单
+   * Register component attribute whitelist
    */
   registerPropertyWhitelist(componentType: string, whitelist: ComponentPropertyWhitelist | any): void {
     if (!componentType) {
-      console.warn('❌ [PropertyExposureManager] 组件类型不能为空')
+      console.warn('❌ [PropertyExposureManager] Component type cannot be empty')
       return
     }
 
-    // 兼容旧系统的嵌套结构 { properties: {...}, enabled: true, ... }
+    // Compatible with nested structures of older systems { properties: {...}, enabled: true, ... }
     let normalizedWhitelist: ComponentPropertyWhitelist
     if (whitelist && typeof whitelist === 'object' && 'properties' in whitelist) {
-      // 旧系统格式：提取 properties 字段
+      // old system format：extract properties Field
       normalizedWhitelist = whitelist.properties as ComponentPropertyWhitelist
     } else {
-      // 新系统格式：直接使用
+      // new system format：Use directly
       normalizedWhitelist = whitelist as ComponentPropertyWhitelist
     }
 
-    // 添加全局基础属性
+    // Add global basic properties
     const enhancedWhitelist = this.addGlobalBaseProperties(normalizedWhitelist)
 
     this.propertyWhitelists.set(componentType, enhancedWhitelist)
   }
 
   /**
-   * 获取组件属性白名单
+   * Get component attribute whitelist
    */
   getPropertyWhitelist(componentType: string): ComponentPropertyWhitelist | undefined {
     return this.propertyWhitelists.get(componentType)
   }
 
   /**
-   * 获取所有属性白名单
+   * Get all attribute whitelist
    */
   getAllPropertyWhitelists(): Record<string, ComponentPropertyWhitelist> {
     const result: Record<string, ComponentPropertyWhitelist> = {}
@@ -55,15 +55,15 @@ export class PropertyExposureManager implements IPropertyExposureManager {
   }
 
   /**
-   * 添加全局基础属性
-   * 注意：不再自动添加 deviceId 和 metricsList
-   * 这两个属性由 ComponentPropertySelector 作为强制必需属性处理
+   * Add global basic properties
+   * Notice：no longer added automatically deviceId and metricsList
+   * These two properties are represented by ComponentPropertySelector Handled as a mandatory required attribute
    */
   addGlobalBaseProperties(whitelist: ComponentPropertyWhitelist): ComponentPropertyWhitelist {
-    // 规范化组件特定属性（兼容旧系统的额外字段）
+    // Normalize component-specific properties（Extra fields compatible with older systems）
     const normalizedWhitelist: ComponentPropertyWhitelist = {}
     for (const [propName, config] of Object.entries(whitelist)) {
-      // 提取核心字段，忽略旧系统的额外字段（如 level, visibleInInteraction 等）
+      // Extract core fields，Ignore extra fields from old systems（like level, visibleInInteraction wait）
       normalizedWhitelist[propName] = {
         type: config.type || 'string',
         label: config.label || propName,
@@ -78,22 +78,22 @@ export class PropertyExposureManager implements IPropertyExposureManager {
       }
     }
 
-    // 只返回规范化后的属性，不添加全局基础属性
+    // Return only normalized properties，Do not add global basic properties
     return normalizedWhitelist
   }
 
   /**
-   * 验证属性配置
+   * Verify property configuration
    */
   validatePropertyConfig(config: PropertyExposureConfig): { isValid: boolean; errors: string[] } {
     const errors: string[] = []
 
     if (!config.type || !['string', 'number', 'boolean', 'array', 'object'].includes(config.type)) {
-      errors.push('属性类型必须是有效的类型')
+      errors.push('Property type must be a valid type')
     }
 
     if (!config.label || typeof config.label !== 'string') {
-      errors.push('属性标签必须是非空字符串')
+      errors.push('Property labels must be non-empty strings')
     }
 
     return {
@@ -103,7 +103,7 @@ export class PropertyExposureManager implements IPropertyExposureManager {
   }
 
   /**
-   * 获取属性统计信息
+   * Get attribute statistics
    */
   getStats() {
     const whitelists = this.getAllPropertyWhitelists()
@@ -121,15 +121,15 @@ export class PropertyExposureManager implements IPropertyExposureManager {
   }
 
   /**
-   * 清空所有白名单
+   * Clear all whitelists
    */
   clear(): void {
     this.propertyWhitelists.clear()
   }
 
   /**
-   * 获取组件的白名单属性（向后兼容旧系统）
-   * 兼容旧系统的 getWhitelistedProperties 方法
+   * Get the whitelist properties of a component（Backwards compatible with older systems）
+   * Compatible with old systems getWhitelistedProperties method
    */
   getWhitelistedProperties(
     componentType: string,
@@ -142,12 +142,12 @@ export class PropertyExposureManager implements IPropertyExposureManager {
       return {}
     }
 
-    // 将新格式转换为旧格式（添加 level 等字段以兼容旧系统）
+    // Convert new format to old format（Add to level and other fields to be compatible with old systems）
     const result: Record<string, any> = {}
     for (const [propName, config] of Object.entries(whitelist)) {
       result[propName] = {
         ...config,
-        level: 'public', // 新系统简化了访问级别，统一设为 public
+        level: 'public', // New system simplifies access levels，Set uniformly to public
         readonly: false,
         visibleInInteraction: true,
         visibleInDebug: true
@@ -158,8 +158,8 @@ export class PropertyExposureManager implements IPropertyExposureManager {
   }
 
   /**
-   * 安全地获取暴露的属性（向后兼容旧系统）
-   * 兼容旧系统的 getExposedProperty 方法
+   * Safely obtain exposed properties（Backwards compatible with older systems）
+   * Compatible with old systems getExposedProperty method
    */
   getExposedProperty<T = any>(
     componentType: string,
@@ -185,7 +185,7 @@ export class PropertyExposureManager implements IPropertyExposureManager {
       }
     }
 
-    // 属性存在于白名单中，允许访问
+    // Property exists in whitelist，Allow access
     return {
       allowed: true,
       value: currentValue,
@@ -201,11 +201,11 @@ export class PropertyExposureManager implements IPropertyExposureManager {
 }
 
 /**
- * 全局属性暴露管理器实例
+ * Global property exposure manager instance
  */
 export const propertyExposureManager = new PropertyExposureManager()
 
 /**
- * 默认导出
+ * Default export
  */
 export default propertyExposureManager

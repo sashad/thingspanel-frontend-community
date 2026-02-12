@@ -1,31 +1,31 @@
 /**
- * Grid 验证工具函数
- * 专门处理网格项和布局的验证逻辑
+ * Grid Verification tool function
+ * Validation logic that specifically handles grid items and layouts
  */
 
 import type { GridLayoutPlusItem, LayoutOperationResult } from '../gridLayoutPlusTypes'
 
 /**
- * 验证网格项基础属性
- * 🔥 扩展版本：支持0-99列范围
+ * Verify grid item base properties
+ * 🔥 extended version：support0-99column range
  */
 export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): LayoutOperationResult<boolean> {
   try {
-    // 检查必要字段
+    // Check required fields
     if (!item.i || typeof item.i !== 'string') {
       return {
         success: false,
         error: new Error('Grid item must have a valid string id'),
-        message: '网格项必须有有效的字符串ID'
+        message: 'Grid item must have a valid stringID'
       }
     }
 
-    // 🔥 扩展：检查位置和尺寸 - 支持更大范围
+    // 🔥 Expand：Check position and size - Support wider range
     if (item.x < 0 || item.x >= maxCols) {
       return {
         success: false,
         error: new Error(`Grid X position must be between 0 and ${maxCols - 1}`),
-        message: `网格X位置必须在0到${maxCols - 1}之间`
+        message: `gridXLocation must be in0arrive${maxCols - 1}between`
       }
     }
 
@@ -33,7 +33,7 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error('Grid Y position must be >= 0'),
-        message: '网格Y位置必须大于等于0'
+        message: 'gridYPosition must be greater than or equal to0'
       }
     }
 
@@ -41,7 +41,7 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error(`Grid width must be between 1 and ${maxCols}`),
-        message: `网格宽度必须在1到${maxCols}之间`
+        message: `Grid width must be within1arrive${maxCols}between`
       }
     }
 
@@ -49,25 +49,25 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error('Grid height must be > 0'),
-        message: '网格高度必须大于0'
+        message: 'Grid height must be greater than0'
       }
     }
 
-    // 🔥 新增：检查是否超出边界
+    // 🔥 New：Check if bounds are exceeded
     if (item.x + item.w > maxCols) {
       return {
         success: false,
         error: new Error(`Grid item extends beyond boundary (x:${item.x} + w:${item.w} > maxCols:${maxCols})`),
-        message: `网格项超出边界（x:${item.x} + w:${item.w} > 最大列数:${maxCols}）`
+        message: `Grid item exceeds bounds（x:${item.x} + w:${item.w} > Maximum number of columns:${maxCols}）`
       }
     }
 
-    // 检查约束条件
+    // Check constraints
     if (item.minW && item.w < item.minW) {
       return {
         success: false,
         error: new Error('Width is less than minimum'),
-        message: '宽度小于最小值'
+        message: 'width less than minimum'
       }
     }
 
@@ -75,7 +75,7 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error('Width exceeds maximum'),
-        message: '宽度超过最大值'
+        message: 'Width exceeds maximum'
       }
     }
 
@@ -83,7 +83,7 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error('Height is less than minimum'),
-        message: '高度小于最小值'
+        message: 'height less than minimum'
       }
     }
 
@@ -91,7 +91,7 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
       return {
         success: false,
         error: new Error('Height exceeds maximum'),
-        message: '高度超过最大值'
+        message: 'Height exceeds maximum'
       }
     }
 
@@ -100,30 +100,30 @@ export function validateGridItem(item: GridLayoutPlusItem, maxCols = 99): Layout
     return {
       success: false,
       error: error as Error,
-      message: '网格项验证失败'
+      message: 'Grid item validation failed'
     }
   }
 }
 
 /**
- * 验证布局完整性
+ * Verify layout integrity
  */
 export function validateLayout(layout: GridLayoutPlusItem[]): LayoutOperationResult<boolean> {
   try {
-    // 检查是否为空布局
+    // Check if layout is empty
     if (!Array.isArray(layout)) {
       return {
         success: false,
         error: new Error('Layout must be an array'),
-        message: '布局必须是数组类型'
+        message: 'Layout must be of array type'
       }
     }
 
     if (layout.length === 0) {
-      return { success: true, data: true } // 空布局是有效的
+      return { success: true, data: true } // Empty layout is valid
     }
 
-    // 检查ID唯一性
+    // examineIDuniqueness
     const ids = layout.map(item => item.i)
     const uniqueIds = new Set(ids)
     if (ids.length !== uniqueIds.size) {
@@ -131,18 +131,18 @@ export function validateLayout(layout: GridLayoutPlusItem[]): LayoutOperationRes
       return {
         success: false,
         error: new Error(`Duplicate item IDs found: ${duplicates.join(', ')}`),
-        message: `发现重复ID: ${duplicates.join(', ')}`
+        message: `Duplicate foundID: ${duplicates.join(', ')}`
       }
     }
 
-    // 逐个验证网格项
+    // Validate grid items one by one
     for (let i = 0; i < layout.length; i++) {
       const itemValidation = validateGridItem(layout[i])
       if (!itemValidation.success) {
         return {
           success: false,
           error: itemValidation.error,
-          message: `第 ${i + 1} 个网格项验证失败: ${itemValidation.message}`
+          message: `No. ${i + 1} Grid item validation failed: ${itemValidation.message}`
         }
       }
     }
@@ -152,13 +152,13 @@ export function validateLayout(layout: GridLayoutPlusItem[]): LayoutOperationRes
     return {
       success: false,
       error: error as Error,
-      message: '布局验证失败'
+      message: 'Layout validation failed'
     }
   }
 }
 
 /**
- * 验证网格位置是否有效
+ * Verify that the grid position is valid
  */
 export function validateGridPosition(
   x: number,
@@ -168,21 +168,21 @@ export function validateGridPosition(
   cols: number
 ): LayoutOperationResult<boolean> {
   try {
-    // 检查基本范围
+    // Check base range
     if (x < 0 || y < 0 || w <= 0 || h <= 0) {
       return {
         success: false,
         error: new Error('Invalid position or size'),
-        message: '无效的位置或尺寸'
+        message: 'Invalid position or size'
       }
     }
 
-    // 检查是否超出列数
+    // Check if the number of columns is exceeded
     if (x + w > cols) {
       return {
         success: false,
         error: new Error(`Item width exceeds column limit: ${x + w} > ${cols}`),
-        message: `项目宽度超出列数限制: ${x + w} > ${cols}`
+        message: `Item width exceeds column limit: ${x + w} > ${cols}`
       }
     }
 
@@ -191,13 +191,13 @@ export function validateGridPosition(
     return {
       success: false,
       error: error as Error,
-      message: '网格位置验证失败'
+      message: 'Grid location verification failed'
     }
   }
 }
 
 /**
- * 检查两个网格项是否重叠
+ * Check if two grid items overlap
  */
 export function checkItemsOverlap(item1: GridLayoutPlusItem, item2: GridLayoutPlusItem): boolean {
   try {
@@ -214,7 +214,7 @@ export function checkItemsOverlap(item1: GridLayoutPlusItem, item2: GridLayoutPl
 }
 
 /**
- * 检查布局中是否有重叠的项目
+ * Check if there are overlapping items in the layout
  */
 export function validateNoOverlaps(layout: GridLayoutPlusItem[]): LayoutOperationResult<boolean> {
   try {
@@ -224,7 +224,7 @@ export function validateNoOverlaps(layout: GridLayoutPlusItem[]): LayoutOperatio
           return {
             success: false,
             error: new Error(`Items overlap: ${layout[i].i} and ${layout[j].i}`),
-            message: `项目重叠: ${layout[i].i} 和 ${layout[j].i}`
+            message: `Project overlap: ${layout[i].i} and ${layout[j].i}`
           }
         }
       }
@@ -235,13 +235,13 @@ export function validateNoOverlaps(layout: GridLayoutPlusItem[]): LayoutOperatio
     return {
       success: false,
       error: error as Error,
-      message: '重叠检查失败'
+      message: 'Overlap check failed'
     }
   }
 }
 
 /**
- * 验证响应式配置
+ * Verify reactive configuration
  */
 export function validateResponsiveConfig(
   breakpoints: Record<string, number>,
@@ -251,35 +251,35 @@ export function validateResponsiveConfig(
     const breakpointNames = Object.keys(breakpoints)
     const colNames = Object.keys(cols)
 
-    // 检查断点和列配置是否匹配
+    // Check if breakpoints and column configuration match
     for (const bp of breakpointNames) {
       if (!(bp in cols)) {
         return {
           success: false,
           error: new Error(`Missing column config for breakpoint: ${bp}`),
-          message: `断点 ${bp} 缺少列配置`
+          message: `breakpoint ${bp} Missing column configuration`
         }
       }
     }
 
-    // 检查断点值是否有效
+    // Check if breakpoint value is valid
     for (const [bp, width] of Object.entries(breakpoints)) {
       if (width < 0) {
         return {
           success: false,
           error: new Error(`Invalid breakpoint width: ${bp} = ${width}`),
-          message: `无效的断点宽度: ${bp} = ${width}`
+          message: `Invalid breakpoint width: ${bp} = ${width}`
         }
       }
     }
 
-    // 检查列数是否有效
+    // Check if the number of columns is valid
     for (const [bp, colCount] of Object.entries(cols)) {
       if (colCount <= 0) {
         return {
           success: false,
           error: new Error(`Invalid column count: ${bp} = ${colCount}`),
-          message: `无效的列数: ${bp} = ${colCount}`
+          message: `Invalid number of columns: ${bp} = ${colCount}`
         }
       }
     }
@@ -289,15 +289,15 @@ export function validateResponsiveConfig(
     return {
       success: false,
       error: error as Error,
-      message: '响应式配置验证失败'
+      message: 'Reactive configuration validation failed'
     }
   }
 }
 
-// 🔥 新增：扩展网格工具函数
+// 🔥 New：Extended grid tool functions
 
 /**
- * 验证扩展网格配置（支持0-99列）
+ * Verify extended grid configuration（support0-99List）
  */
 export function validateExtendedGridConfig(colNum: number): LayoutOperationResult<boolean> {
   try {
@@ -305,7 +305,7 @@ export function validateExtendedGridConfig(colNum: number): LayoutOperationResul
       return {
         success: false,
         error: new Error(`Column count must be between 1 and 99, got ${colNum}`),
-        message: `列数必须在1到99之间，当前为${colNum}`
+        message: `The number of columns must be within1arrive99between，Currently${colNum}`
       }
     }
 
@@ -314,13 +314,13 @@ export function validateExtendedGridConfig(colNum: number): LayoutOperationResul
     return {
       success: false,
       error: error as Error,
-      message: '扩展网格配置验证失败'
+      message: 'Extended grid configuration verification failed'
     }
   }
 }
 
 /**
- * 验证大网格布局性能
+ * Verify large grid layout performance
  */
 export function validateLargeGridPerformance(
   layout: GridLayoutPlusItem[],
@@ -328,25 +328,25 @@ export function validateLargeGridPerformance(
 ): LayoutOperationResult<{ warning?: string; recommendation?: string }> {
   try {
     const itemCount = layout.length
-    const gridSize = colNum * Math.max(...layout.map(item => item.y + item.h), 10) // 估算行数
+    const gridSize = colNum * Math.max(...layout.map(item => item.y + item.h), 10) // Estimate number of rows
 
-    // 性能警告阈值
+    // Performance warning threshold
     const warnings = []
     const recommendations = []
 
     if (colNum > 50 && itemCount > 50) {
-      warnings.push('大网格（>50列）配合大量组件（>50个）可能影响性能')
-      recommendations.push('考虑使用虚拟滚动或分页加载')
+      warnings.push('large grid（>50List）Works with a large number of components（>50indivual）May affect performance')
+      recommendations.push('Consider using virtual scrolling or paged loading')
     }
 
     if (gridSize > 5000) {
-      warnings.push('网格总单元格数量过大，可能导致渲染缓慢')
-      recommendations.push('优化网格密度或减少组件数量')
+      warnings.push('The total number of grid cells is too large，May cause slow rendering')
+      recommendations.push('Optimize mesh density or reduce component count')
     }
 
     if (colNum > 80) {
-      warnings.push('超过80列的网格在小屏幕上可能难以操作')
-      recommendations.push('启用响应式配置，在小屏幕上减少列数')
+      warnings.push('Exceed80Grid of columns can be difficult to operate on small screens')
+      recommendations.push('Enable responsive configuration，Reduce the number of columns on small screens')
     }
 
     return {
@@ -360,13 +360,13 @@ export function validateLargeGridPerformance(
     return {
       success: false,
       error: error as Error,
-      message: '大网格性能验证失败'
+      message: 'Large grid performance verification failed'
     }
   }
 }
 
 /**
- * 自动优化网格项尺寸（适配大网格）
+ * Automatically optimize grid item sizes（Adapt to large grids）
  */
 export function optimizeItemForLargeGrid(
   item: GridLayoutPlusItem,
@@ -378,14 +378,14 @@ export function optimizeItemForLargeGrid(
 
     const ratio = targetCols / sourceCols
 
-    // 按比例调整位置和尺寸
+    // Adjust position and size proportionally
     const optimized = {
       ...item,
       x: Math.floor(item.x * ratio),
       w: Math.max(1, Math.floor(item.w * ratio))
     }
 
-    // 确保不超出边界
+    // Make sure to stay within the boundaries
     if (optimized.x + optimized.w > targetCols) {
       optimized.x = Math.max(0, targetCols - optimized.w)
     }

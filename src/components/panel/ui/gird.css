@@ -311,7 +311,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --chart-legend-color: #2f241c;
 }
-/* 科技蓝 */
+/* Technology blue */
 .theme-tech-blue.vue-grid-layout {
   background: linear-gradient(135deg, #04206c, #0b47ed);
   color: rgb(253, 253, 255);
@@ -325,7 +325,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --chart-legend-color: rgb(219, 234, 254);
 }
-/* 添加悬停效果 */
+/* Add hover effect */
 .theme-tech-blue.vue-grid-layout .n-card:hover {
   background-color: rgba(69, 66, 243, 0.6);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -340,7 +340,7 @@
 .theme-tech-blue.vue-grid-layout .n-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):hover > .n-data-table-td {
   color: black;
 }
-/* 苹果紫 */
+/* apple purple */
 .theme-royal-purple.vue-grid-layout {
   background: linear-gradient(135deg, #ae04c1, #3307e0);
   color: #ffffff;
@@ -365,31 +365,31 @@
   color: black;
 }
 
-/* 添加悬停效果 */
+/* Add hover effect */
 .theme-royal-purple.vue-grid-layout .n-card:hover {
   background-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 微软Windows风格 */
+/* MicrosoftWindowsstyle */
 .theme-microsoft-style.vue-grid-layout {
-  background: linear-gradient(135deg, #0078D4, #005A9E);  /* 微软蓝色渐变 */
+  background: linear-gradient(135deg, #0078D4, #005A9E);  /* microsoft blue gradient */
   color: #ffffff;
 }
 
 .theme-microsoft-style.vue-grid-layout .n-card {
-  color: rgba(255, 255, 255, 0.9);  /* 略微降低文字不透明度 */
-  background-color: rgba(255, 255, 255, 0.1);  /* 降低卡片背景不透明度 */
-  border-radius: 0.5rem;  /* 稍微减小圆角 */
+  color: rgba(255, 255, 255, 0.9);  /* Reduce text opacity slightly */
+  background-color: rgba(255, 255, 255, 0.1);  /* Lower card background opacity */
+  border-radius: 0.5rem;  /* Reduce the rounded corners slightly */
   border-width: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);  /* 调整阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);  /* Adjust shadows */
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);  /* Safari支持 */
-  --chart-legend-color: rgba(255, 255, 255, 0.7);  /* 调整图表图例颜色 */
-  transition: all 0.2s ease;  /* 平滑过渡效果 */
+  -webkit-backdrop-filter: blur(15px);  /* Safarisupport */
+  --chart-legend-color: rgba(255, 255, 255, 0.7);  /* Adjust chart legend color */
+  transition: all 0.2s ease;  /* smooth transition effect */
 }
 
-/* 添加悬停效果 */
+/* Add hover effect */
 .theme-microsoft-style.vue-grid-layout .n-card:hover {
   background-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -406,24 +406,24 @@
   color: black;
 }
 
-/* 酷炫黑风格 */
+/* cool black style */
 .theme-cool-black.vue-grid-layout {
-  background: linear-gradient(135deg, #000000, #020010);  /* 微软蓝色渐变 */
+  background: linear-gradient(135deg, #000000, #020010);  /* microsoft blue gradient */
   color: #ffffff;
 }
 .theme-cool-black.vue-grid-layout .n-card {
-  color: rgba(255, 255, 255, 0.9);  /* 略微降低文字不透明度 */
-  background-color: rgb(12, 2, 45);  /* 降低卡片背景不透明度 */
-  border-radius:  0.5rem;  /* 稍微减小圆角 */
+  color: rgba(255, 255, 255, 0.9);  /* Reduce text opacity slightly */
+  background-color: rgb(12, 2, 45);  /* Lower card background opacity */
+  border-radius:  0.5rem;  /* Reduce the rounded corners slightly */
   border-width: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);  /* 调整阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);  /* Adjust shadows */
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);  /* Safari支持 */
-  --chart-legend-color: rgba(255, 255, 255, 0.7);  /* 调整图表图例颜色 */
-  transition: all 0.2s ease;  /* 平滑过渡效果 */
+  -webkit-backdrop-filter: blur(15px);  /* Safarisupport */
+  --chart-legend-color: rgba(255, 255, 255, 0.7);  /* Adjust chart legend color */
+  transition: all 0.2s ease;  /* smooth transition effect */
 }
 
-/* 添加悬停效果 */
+/* Add hover effect */
 .theme-cool-black.vue-grid-layout .n-card:hover {
   background-color: rgb(13, 2, 69);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

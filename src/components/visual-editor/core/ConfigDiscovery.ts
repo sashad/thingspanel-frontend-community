@@ -1,13 +1,13 @@
 /**
- * 配置组件自动发现机制
- * 自动扫描和注册所有配置组件，支持多种配置组件格式
+ * Configure component automatic discovery mechanism
+ * Automatically scan and register all configuration components，Supports multiple configuration component formats
  *
- * 性能优化特性：
- * - 缓存机制：避免重复扫描同一文件
- * - 并行扫描：同时处理多个扫描任务
- * - 懒加载：按需加载配置组件
- * - 智能过滤：提前过滤无效路径
- * - 性能监控：追踪扫描耗时和统计信息
+ * Performance optimization features：
+ * - caching mechanism：Avoid scanning the same file twice
+ * - parallel scan：Handle multiple scanning tasks simultaneously
+ * - Lazy loading：Load configuration components on demand
+ * - Smart filtering：Filter invalid paths in advance
+ * - Performance monitoring：Track scan time and statistics
  */
 
 import { defineAsyncComponent, type Component } from 'vue'
@@ -18,9 +18,9 @@ import { createLogger } from '@/utils/logger'
 
 const logger = createLogger('ConfigDiscovery')
 
-// ====== 配置组件路径模式 ======
+// ====== Configure component path mode ======
 
-// Card 2.1 配置组件路径
+// Card 2.1 Configure component path
 const CARD21_CONFIG_PATTERNS = [
   './src/card2.1/components/*/*/card-config.vue',
   './src/card2.1/components/*/*/config.vue',
@@ -28,19 +28,19 @@ const CARD21_CONFIG_PATTERNS = [
   './src/card2.1/components/*/*/*Config.vue'
 ]
 
-// 原始 Panel 配置组件路径
+// original Panel Configure component path
 const LEGACY_CONFIG_PATTERNS = [
-  './src/card/builtin-card/*/component.vue', // 内置卡片没有单独配置
+  './src/card/builtin-card/*/component.vue', // Built-in cards are not individually configured
   './src/card/chart-card/*/card-config.vue',
-  './src/card/chart-card/*/switch-config.vue' // 特殊的 switch 配置
+  './src/card/chart-card/*/switch-config.vue' // special switch Configuration
 ]
 
-// Visual Editor 专用配置组件路径
+// Visual Editor Private configuration component path
 const VISUAL_EDITOR_CONFIG_PATTERNS = [
   './src/components/visual-editor/components/config/*Config.vue'
 ]
 
-// ====== 配置组件元数据 ======
+// ====== Configure component metadata ======
 
 interface ConfigComponentMeta {
   id: string
@@ -49,15 +49,15 @@ interface ConfigComponentMeta {
   type: 'card21' | 'legacy' | 'visual-editor'
   format: 'vue-component' | 'async-component'
   componentId?: string
-  priority: number // 优先级，数字越大优先级越高
-  // 性能优化字段
-  lastModified?: number // 文件最后修改时间
-  loadTime?: number // 组件加载耗时(ms)
-  cached?: boolean // 是否已缓存
-  loadCount?: number // 加载次数
+  priority: number // priority，数字越大priority越高
+  // Performance optimization fields
+  lastModified?: number // File last modified time
+  loadTime?: number // Component loading time(ms)
+  cached?: boolean // Is it cached?
+  loadCount?: number // Load times
 }
 
-// 缓存接口
+// cache interface
 interface ScanCache {
   timestamp: number
   filePaths: Set<string>
@@ -65,7 +65,7 @@ interface ScanCache {
   stats: PerformanceStats
 }
 
-// 性能统计接口
+// Performance statistics interface
 interface PerformanceStats {
   totalScanTime: number
   fileCount: number
@@ -76,17 +76,17 @@ interface PerformanceStats {
   lastScanTime?: number
 }
 
-// ====== 配置发现器类 ======
+// ====== Configure the discoverer class ======
 
 export class ConfigDiscovery {
   private discovered = new Map<string, ConfigComponentMeta>()
   private isInitialized = false
   private isScanning = false
 
-  // 性能优化属性
+  // Performance optimization properties
   private scanCache: ScanCache | null = null
-  private cacheExpireTime = 5 * 60 * 1000 // 5分钟缓存过期
-  private maxConcurrency = 4 // 最大并发扫描数
+  private cacheExpireTime = 5 * 60 * 1000 // 5minutes cache expiration
+  private maxConcurrency = 4 // Maximum number of concurrent scans
   private performanceStats: PerformanceStats = {
     totalScanTime: 0,
     fileCount: 0,
@@ -101,19 +101,19 @@ export class ConfigDiscovery {
     this.loadCacheFromStorage()
   }
 
-  // ====== 初始化和扫描 ======
+  // ====== Initialize and scan ======
 
   /**
-   * 初始化配置发现器
+   * Initialize configuration discoverer
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      logger.info('配置发现器已初始化')
+      logger.info('Configuration discoverer initialized')
       return
     }
 
     if (this.isScanning) {
-      logger.info('配置发现器正在扫描中...')
+      logger.info('Configuration discoverer is scanning...')
       return
     }
 
@@ -121,24 +121,24 @@ export class ConfigDiscovery {
 
     try {
       this.isScanning = true
-      logger.info('开始初始化配置发现器...')
+      logger.info('Start initializing configuration discoverer...')
 
-      // 检查缓存是否可用
+      // Check if cache is available
       if (this.isCacheValid()) {
-        logger.info('使用缓存数据加载配置组件')
+        logger.info('Load configuration components using cached data')
         this.loadFromCache()
         this.performanceStats.cacheHitCount++
       } else {
-        logger.info('缓存过期或无效，重新扫描配置组件')
+        logger.info('Cache expired or invalid，Rescan configuration components')
 
-        // 并行扫描各种类型的配置组件
+        // Scan various types of configuration components in parallel
         await Promise.all([this.scanCard21Configs(), this.scanLegacyConfigs(), this.scanVisualEditorConfigs()])
 
-        // 保存到缓存
+        // Save to cache
         this.saveCacheToStorage()
       }
 
-      // 注册发现的配置组件
+      // Register discovered configuration components
       await this.registerDiscoveredConfigs()
 
       this.isInitialized = true
@@ -148,11 +148,11 @@ export class ConfigDiscovery {
       this.performanceStats.lastScanTime = Date.now()
 
       logger.info(
-        `配置发现器初始化完成，发现 ${this.discovered.size} 个配置组件，耗时 ${Math.round(this.performanceStats.totalScanTime)}ms`
+        `配置Discover器初始化完成，Discover ${this.discovered.size} configuration components，time consuming ${Math.round(this.performanceStats.totalScanTime)}ms`
       )
     } catch (error) {
       this.performanceStats.errorCount++
-      logger.error('配置发现器初始化失败:', error)
+      logger.error('Configuration discoverer initialization failed:', error)
       throw error
     } finally {
       this.isScanning = false
@@ -160,14 +160,14 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 扫描 Card 2.1 配置组件
+   * scanning Card 2.1 Configure components
    */
   private async scanCard21Configs(): Promise<void> {
     const scanStart = performance.now()
-    logger.info('扫描 Card 2.1 配置组件...')
+    logger.info('scanning Card 2.1 Configure components...')
 
     try {
-      // 使用 Vite 的 import.meta.glob 扫描配置文件
+      // use Vite of import.meta.glob Scan profile
       const configModules = import.meta.glob([
         '/src/card2.1/components/*/*/card-config.vue',
         '/src/card2.1/components/*/*/config.vue',
@@ -178,16 +178,16 @@ export class ConfigDiscovery {
       const filePaths = Object.keys(configModules)
       this.performanceStats.fileCount += filePaths.length
 
-      // 智能过滤：只处理有效的文件路径
+      // Smart filtering：Only handle valid file paths
       const validPaths = this.filterValidPaths(filePaths, 'card21')
 
-      // 并发限制处理
+      // Concurrency limit handling
       await this.processBatch(validPaths, async filePath => {
         const moduleLoader = configModules[filePath]
         const componentLoadStart = performance.now()
 
         try {
-          // 从文件路径推断组件ID
+          // Infer components from file pathID
           const componentId = this.extractComponentIdFromPath(filePath, 'card21')
 
           if (componentId) {
@@ -198,7 +198,7 @@ export class ConfigDiscovery {
               type: 'card21',
               format: 'async-component',
               componentId,
-              priority: 100, // Card 2.1 配置优先级最高
+              priority: 100, // Card 2.1 Configuration has the highest priority
               loadTime: performance.now() - componentLoadStart,
               cached: false,
               loadCount: 0
@@ -206,30 +206,30 @@ export class ConfigDiscovery {
 
             this.discovered.set(configMeta.id, configMeta)
             this.performanceStats.successCount++
-            logger.debug(`发现 Card 2.1 配置组件: ${componentId}`)
+            logger.debug(`Discover Card 2.1 Configure components: ${componentId}`)
           }
         } catch (error) {
           this.performanceStats.errorCount++
-          logger.warn(`扫描 Card 2.1 配置组件失败: ${filePath}`, error)
+          logger.warn(`scanning Card 2.1 Failed to configure component: ${filePath}`, error)
         }
       })
 
       const scanTime = performance.now() - scanStart
-      logger.info(`扫描 Card 2.1 配置组件完成，发现 ${validPaths.length} 个，耗时 ${Math.round(scanTime)}ms`)
+      logger.info(`scanning Card 2.1 Configuration component completed，Discover ${validPaths.length} indivual，time consuming ${Math.round(scanTime)}ms`)
     } catch (error) {
       this.performanceStats.errorCount++
-      logger.error('扫描 Card 2.1 配置组件失败:', error)
+      logger.error('scanning Card 2.1 Failed to configure component:', error)
     }
   }
 
   /**
-   * 扫描原始 Panel 配置组件
+   * Scan original Panel Configure components
    */
   private async scanLegacyConfigs(): Promise<void> {
-    logger.info('扫描原始 Panel 配置组件...')
+    logger.info('Scan original Panel Configure components...')
 
     try {
-      // 扫描 chart-card 配置组件
+      // scanning chart-card Configure components
       const chartConfigModules = import.meta.glob([
         '/src/card/chart-card/*/card-config.vue',
         '/src/card/chart-card/*/switch-config.vue'
@@ -240,10 +240,10 @@ export class ConfigDiscovery {
           const componentId = this.extractComponentIdFromPath(filePath, 'legacy')
 
           if (componentId) {
-            // 检查是否已有 Card 2.1 版本
+            // Check if there is already Card 2.1 Version
             const card21Version = `${componentId}-config`
             if (this.discovered.has(card21Version)) {
-              logger.debug(`跳过原始配置组件 ${componentId}，已有 Card 2.1 版本`)
+              logger.debug(`Skip original configuration components ${componentId}，Already Card 2.1 Version`)
               continue
             }
 
@@ -254,28 +254,28 @@ export class ConfigDiscovery {
               type: 'legacy',
               format: 'async-component',
               componentId,
-              priority: 50 // 原始配置优先级中等
+              priority: 50 // Original configuration priority is medium
             }
 
             this.discovered.set(configMeta.id, configMeta)
-            logger.debug(`发现原始配置组件: ${componentId}`)
+            logger.debug(`Discover original configuration components: ${componentId}`)
           }
         } catch (error) {
-          logger.warn(`扫描原始配置组件失败: ${filePath}`, error)
+          logger.warn(`Scanning original configuration components failed: ${filePath}`, error)
         }
       }
 
-      logger.info(`扫描原始配置组件完成，发现 ${Object.keys(chartConfigModules).length} 个`)
+      logger.info(`Scanning original configuration components completed，Discover ${Object.keys(chartConfigModules).length} indivual`)
     } catch (error) {
-      logger.error('扫描原始配置组件失败:', error)
+      logger.error('Scanning original configuration components failed:', error)
     }
   }
 
   /**
-   * 扫描 Visual Editor 专用配置组件
+   * scanning Visual Editor Dedicated configuration components
    */
   private async scanVisualEditorConfigs(): Promise<void> {
-    logger.info('扫描 Visual Editor 配置组件...')
+    logger.info('scanning Visual Editor Configure components...')
 
     try {
       const visualEditorConfigModules = import.meta.glob([
@@ -294,36 +294,36 @@ export class ConfigDiscovery {
               type: 'visual-editor',
               format: 'async-component',
               componentId,
-              priority: 75 // Visual Editor 配置优先级较高
+              priority: 75 // Visual Editor Configuration priority is higher
             }
 
             this.discovered.set(configMeta.id, configMeta)
-            logger.debug(`发现 Visual Editor 配置组件: ${componentId}`)
+            logger.debug(`Discover Visual Editor Configure components: ${componentId}`)
           }
         } catch (error) {
-          logger.warn(`扫描 Visual Editor 配置组件失败: ${filePath}`, error)
+          logger.warn(`scanning Visual Editor Failed to configure component: ${filePath}`, error)
         }
       }
 
-      logger.info(`扫描 Visual Editor 配置组件完成，发现 ${Object.keys(visualEditorConfigModules).length} 个`)
+      logger.info(`scanning Visual Editor Configuration component completed，Discover ${Object.keys(visualEditorConfigModules).length} indivual`)
     } catch (error) {
-      logger.error('扫描 Visual Editor 配置组件失败:', error)
+      logger.error('scanning Visual Editor Failed to configure component:', error)
     }
   }
 
-  // ====== 性能优化工具方法 ======
+  // ====== Performance optimization tool methods ======
 
   /**
-   * 智能过滤有效文件路径
+   * Intelligent filtering of valid file paths
    */
   private filterValidPaths(filePaths: string[], type: string): string[] {
     return filePaths.filter(path => {
-      // 基本路径验证
+      // Basic path verification
       if (!path || path.includes('/node_modules/') || path.includes('/.git/')) {
         return false
       }
 
-      // 类型特定验证
+      // type specific validation
       switch (type) {
         case 'card21':
           return (
@@ -343,7 +343,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 批量处理文件，支持并发控制
+   * Process files in batches，Support concurrency control
    */
   private async processBatch<T>(items: T[], processor: (item: T) => Promise<void>): Promise<void> {
     const batches: T[][] = []
@@ -357,7 +357,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 创建优化的异步组件
+   * Create optimized asynchronous components
    */
   private createOptimizedAsyncComponent(moduleLoader: any, componentId: string): Component {
     return defineAsyncComponent({
@@ -367,7 +367,7 @@ export class ConfigDiscovery {
           const module = await moduleLoader()
           const loadTime = performance.now() - loadStart
 
-          // 更新统计信息
+          // Update statistics
           const meta = this.discovered.get(`${componentId}-config`)
           if (meta) {
             meta.loadCount = (meta.loadCount || 0) + 1
@@ -376,14 +376,14 @@ export class ConfigDiscovery {
 
           return module
         } catch (error) {
-          logger.error(`加载配置组件失败: ${componentId}`, error)
+          logger.error(`Failed to load configuration component: ${componentId}`, error)
           throw error
         }
       },
       delay: 200,
       timeout: 5000,
       errorComponent: () => {
-        logger.warn(`配置组件加载超时: ${componentId}`)
+        logger.warn(`Configure component loading timeout: ${componentId}`)
         return null
       },
       loadingComponent: () => null
@@ -391,7 +391,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 检查缓存是否有效
+   * Check if cache is valid
    */
   private isCacheValid(): boolean {
     if (!this.scanCache) return false
@@ -403,7 +403,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 从缓存加载数据
+   * Load data from cache
    */
   private loadFromCache(): void {
     if (!this.scanCache) return
@@ -414,12 +414,12 @@ export class ConfigDiscovery {
       this.discovered.set(id, meta)
     }
 
-    // 恢复性能统计
+    // Restore performance statistics
     Object.assign(this.performanceStats, this.scanCache.stats)
   }
 
   /**
-   * 从本地存储加载缓存
+   * Load cache from local storage
    */
   private loadCacheFromStorage(): void {
     try {
@@ -429,7 +429,7 @@ export class ConfigDiscovery {
       if (cached) {
         const parsedCache = JSON.parse(cached)
 
-        // 重建 Map 和 Set 对象
+        // reconstruction Map and Set object
         this.scanCache = {
           timestamp: parsedCache.timestamp,
           filePaths: new Set(parsedCache.filePaths),
@@ -437,16 +437,16 @@ export class ConfigDiscovery {
           stats: parsedCache.stats
         }
 
-        logger.debug('从本地存储加载缓存成功')
+        logger.debug('Load cache from local storage successfully')
       }
     } catch (error) {
-      logger.warn('从本地存储加载缓存失败:', error)
+      logger.warn('Loading cache from local storage failed:', error)
       this.scanCache = null
     }
   }
 
   /**
-   * 保存缓存到本地存储
+   * Save cache to local storage
    */
   private saveCacheToStorage(): void {
     try {
@@ -466,16 +466,16 @@ export class ConfigDiscovery {
       }
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheData))
-      logger.debug('缓存已保存到本地存储')
+      logger.debug('Cache saved to local storage')
     } catch (error) {
-      logger.warn('保存缓存到本地存储失败:', error)
+      logger.warn('Failed to save cache to local storage:', error)
     }
   }
 
-  // ====== 工具方法 ======
+  // ====== Tool method ======
 
   /**
-   * 从文件路径提取组件ID
+   * Extract components from file pathID
    */
   private extractComponentIdFromPath(filePath: string, type: string): string | null {
     try {
@@ -485,7 +485,7 @@ export class ConfigDiscovery {
         // Card 2.1: /src/card2.1/components/digit-indicator/DigitIndicatorConfig.vue -> chart-digit
         const match = filePath.match(/\/card2\.1\/components\/([^/]+)\//)
         if (match) {
-          // 映射路径到组件ID
+          // Map paths to componentsID
           const pathToIdMap: Record<string, string> = {
             'digit-indicator': 'chart-digit'
           }
@@ -511,62 +511,62 @@ export class ConfigDiscovery {
 
       return componentId
     } catch (error) {
-      logger.warn(`从路径提取组件ID失败: ${filePath}`, error)
+      logger.warn(`Extract components from pathIDfail: ${filePath}`, error)
       return null
     }
   }
 
   /**
-   * 注册发现的配置组件
+   * Register discovered configuration components
    */
   private async registerDiscoveredConfigs(): Promise<void> {
-    logger.info('注册发现的配置组件...')
+    logger.info('Register discovered configuration components...')
 
-    // 按优先级排序
+    // Sort by priority
     const sortedConfigs = Array.from(this.discovered.values()).sort((a, b) => b.priority - a.priority)
 
     for (const configMeta of sortedConfigs) {
       try {
         if (configMeta.componentId) {
-          // 检查组件是否存在
+          // Check if the component exists
           const componentExists = componentRegistry.has(configMeta.componentId)
 
           if (componentExists || configMeta.type === 'visual-editor') {
             const configComponent: IConfigComponent = configMeta.component
 
-            // 注册到配置注册表
+            // Register to the configuration registry
             if (!configRegistry.has(configMeta.componentId)) {
               configRegistry.register(configMeta.componentId, configComponent)
-              logger.debug(`注册配置组件: ${configMeta.componentId} (${configMeta.type})`)
+              logger.debug(`Register configuration component: ${configMeta.componentId} (${configMeta.type})`)
             } else {
-              logger.debug(`配置组件已存在，跳过注册: ${configMeta.componentId} (${configMeta.type})`)
+              logger.debug(`Configuration component already exists，Skip registration: ${configMeta.componentId} (${configMeta.type})`)
             }
           } else {
-            logger.warn(`组件 ${configMeta.componentId} 不存在，跳过配置注册`)
+            logger.warn(`components ${configMeta.componentId} does not exist，Skip configuration registration`)
           }
         }
       } catch (error) {
-        logger.error(`注册配置组件失败: ${configMeta.id}`, error)
+        logger.error(`Failed to register configuration component: ${configMeta.id}`, error)
       }
     }
 
-    logger.info(`配置组件注册完成，成功注册 ${sortedConfigs.length} 个`)
+    logger.info(`Configuration component registration completed，Successfully registered ${sortedConfigs.length} indivual`)
   }
 
-  // ====== 查询方法 ======
+  // ====== Query method ======
 
   /**
-   * 获取所有发现的配置组件
+   * Get all discovered configuration components
    */
   getDiscoveredConfigs(): ConfigComponentMeta[] {
     return Array.from(this.discovered.values())
   }
 
   /**
-   * 根据组件ID获取配置组件
+   * According to componentsIDGet configuration components
    */
   getConfigForComponent(componentId: string): ConfigComponentMeta | null {
-    // 按优先级查找配置组件
+    // Find configuration components by priority
     const candidates = Array.from(this.discovered.values())
       .filter(config => config.componentId === componentId)
       .sort((a, b) => b.priority - a.priority)
@@ -575,23 +575,23 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 获取指定类型的配置组件
+   * Get the configuration component of the specified type
    */
   getConfigsByType(type: 'card21' | 'legacy' | 'visual-editor'): ConfigComponentMeta[] {
     return Array.from(this.discovered.values()).filter(config => config.type === type)
   }
 
   /**
-   * 检查配置组件是否存在
+   * Check if configuration component exists
    */
   hasConfigForComponent(componentId: string): boolean {
     return this.getConfigForComponent(componentId) !== null
   }
 
-  // ====== 运行时管理 ======
+  // ====== Runtime management ======
 
   /**
-   * 动态添加配置组件
+   * Dynamically add configuration components
    */
   addConfigComponent(meta: Omit<ConfigComponentMeta, 'id'>): void {
     const id = `${meta.componentId}-${meta.type}-config`
@@ -599,21 +599,21 @@ export class ConfigDiscovery {
 
     this.discovered.set(id, configMeta)
 
-    // 立即注册
+    // Register now
     if (meta.componentId) {
       const configComponent: IConfigComponent = meta.component
 
       if (!configRegistry.has(meta.componentId)) {
         configRegistry.register(meta.componentId, configComponent)
-        logger.info(`动态添加配置组件: ${meta.componentId}`)
+        logger.info(`Dynamically add configuration components: ${meta.componentId}`)
       } else {
-        logger.info(`配置组件已存在，跳过动态添加: ${meta.componentId}`)
+        logger.info(`Configuration component already exists，Skip dynamic addition: ${meta.componentId}`)
       }
     }
   }
 
   /**
-   * 移除配置组件
+   * Remove configuration component
    */
   removeConfigComponent(componentId: string): void {
     const configsToRemove = Array.from(this.discovered.entries()).filter(
@@ -627,43 +627,43 @@ export class ConfigDiscovery {
       }
     })
 
-    logger.info(`移除配置组件: ${componentId}`)
+    logger.info(`Remove configuration component: ${componentId}`)
   }
 
   /**
-   * 重新扫描配置组件
+   * Rescan configuration components
    */
   async rescan(): Promise<void> {
-    logger.info('重新扫描配置组件...')
+    logger.info('Rescan configuration components...')
 
-    // 清空现有发现
+    // Clear existing findings
     this.discovered.clear()
     configRegistry.clear()
 
-    // 重新初始化
+    // Reinitialize
     this.isInitialized = false
     await this.initialize()
   }
 
-  // ====== 错误处理 ======
+  // ====== Error handling ======
 
   /**
-   * 设置全局错误处理器
+   * Set global error handler
    */
   private setupGlobalErrorHandler(): void {
-    // 处理异步组件加载错误
+    // Handling asynchronous component loading errors
     window.addEventListener('unhandledrejection', event => {
       if (event.reason?.message?.includes('config')) {
-        logger.error('配置组件加载错误:', event.reason)
-        // 可以在这里实现错误恢复逻辑
+        logger.error('Configuration component loading error:', event.reason)
+        // Error recovery logic can be implemented here
       }
     })
   }
 
-  // ====== 调试和统计 ======
+  // ====== Debugging and statistics ======
 
   /**
-   * 获取发现统计信息
+   * Get discovery statistics
    */
   getStats() {
     const avgLoadTime =
@@ -715,7 +715,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 获取详细的性能报告
+   * Get detailed performance reports
    */
   getPerformanceReport() {
     const loadTimes = Array.from(this.discovered.values())
@@ -759,7 +759,7 @@ export class ConfigDiscovery {
   }
 
   /**
-   * 清除性能统计
+   * Clear performance statistics
    */
   clearStats(): void {
     this.performanceStats = {
@@ -770,24 +770,24 @@ export class ConfigDiscovery {
       cacheHitCount: 0,
       avgLoadTime: 0
     }
-    logger.info('性能统计已清除')
+    logger.info('Performance statistics cleared')
   }
 
   /**
-   * 清除缓存
+   * clear cache
    */
   clearCache(): void {
     try {
       localStorage.removeItem('config-discovery-cache')
       this.scanCache = null
-      logger.info('缓存已清除')
+      logger.info('cache cleared')
     } catch (error) {
-      logger.warn('清除缓存失败:', error)
+      logger.warn('Clear cache failed:', error)
     }
   }
 
   /**
-   * 导出配置发现信息
+   * Export configuration discovery information
    */
   exportDiscoveryInfo() {
     return {
@@ -814,42 +814,42 @@ export class ConfigDiscovery {
     }
   }
 
-  // ====== 清理资源 ======
+  // ====== Clean up resources ======
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   dispose(): void {
-    // 清理发现的组件
+    // Clean discovered components
     this.discovered.clear()
 
-    // 重置状态
+    // reset state
     this.isInitialized = false
     this.isScanning = false
 
-    // 清除缓存
+    // clear cache
     this.scanCache = null
 
-    // 清除性能统计
+    // Clear performance statistics
     this.clearStats()
 
-    // 清除本地存储缓存
+    // Clear local storage cache
     try {
       localStorage.removeItem('config-discovery-cache')
     } catch (error) {
-      logger.warn('清除本地存储缓存失败:', error)
+      logger.warn('Clearing local storage cache failed:', error)
     }
 
-    logger.info('ConfigDiscovery 资源已清理')
+    logger.info('ConfigDiscovery Resources have been cleared')
   }
 }
 
-// ====== 全局实例 ======
+// ====== global instance ======
 
 let globalConfigDiscovery: ConfigDiscovery | null = null
 
 /**
- * 获取全局配置发现器实例
+ * Get global configuration discoverer instance
  */
 export function getConfigDiscovery(): ConfigDiscovery {
   if (!globalConfigDiscovery) {
@@ -859,7 +859,7 @@ export function getConfigDiscovery(): ConfigDiscovery {
 }
 
 /**
- * 初始化配置发现器（应用启动时调用）
+ * Initialize configuration discoverer（Called when the application starts）
  */
 export async function initializeConfigDiscovery(): Promise<void> {
   const discovery = getConfigDiscovery()
@@ -867,7 +867,7 @@ export async function initializeConfigDiscovery(): Promise<void> {
 }
 
 /**
- * 重置配置发现器
+ * Reset configuration discoverer
  */
 export function resetConfigDiscovery(): void {
   if (globalConfigDiscovery) {

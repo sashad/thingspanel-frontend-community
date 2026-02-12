@@ -1,74 +1,74 @@
 <template>
   <div class="gauge-chart-setting">
     <n-space vertical :size="16">
-      <!-- 数据配置 -->
-      <n-card title="📊 数据配置" size="small" embedded>
+      <!-- Data configuration -->
+      <n-card title="📊 Data configuration" size="small" embedded>
         <n-space vertical :size="12">
-          <n-form-item label="当前值">
+          <n-form-item label="current value">
             <n-input-number
               v-model:value="localConfig.value"
               :min="0"
               :max="1000"
               @update:value="handleUpdate"
-              placeholder="请输入当前值"
+              placeholder="Please enter current value"
             />
           </n-form-item>
-          <n-form-item label="最小值">
+          <n-form-item label="minimum value">
             <n-input-number
               v-model:value="localConfig.min"
               @update:value="handleUpdate"
-              placeholder="请输入最小值"
+              placeholder="Please enter minimum value"
             />
           </n-form-item>
-          <n-form-item label="最大值">
+          <n-form-item label="maximum value">
             <n-input-number
               v-model:value="localConfig.max"
               @update:value="handleUpdate"
-              placeholder="请输入最大值"
+              placeholder="Please enter the maximum value"
             />
           </n-form-item>
-          <n-form-item label="单位">
+          <n-form-item label="unit">
             <n-input
               v-model:value="localConfig.unit"
               @update:value="handleUpdate"
-              placeholder="如：℃、%、RPM"
+              placeholder="like：℃、%、RPM"
             />
           </n-form-item>
         </n-space>
       </n-card>
 
-      <!-- 样式配置 -->
-      <n-card title="🎨 样式配置" size="small" embedded>
+      <!-- Style configuration -->
+      <n-card title="🎨 Style configuration" size="small" embedded>
         <n-space vertical :size="12">
-          <n-form-item label="标题">
+          <n-form-item label="title">
             <n-input
               v-model:value="localConfig.title"
               @update:value="handleUpdate"
-              placeholder="请输入标题"
+              placeholder="Please enter a title"
             />
           </n-form-item>
-          <n-form-item label="标题颜色">
+          <n-form-item label="title color">
             <n-color-picker
               v-model:value="localConfig.titleColor"
               @update:value="handleUpdate"
               :show-alpha="false"
             />
           </n-form-item>
-          <n-form-item label="数值颜色">
+          <n-form-item label="numerical color">
             <n-color-picker
               v-model:value="localConfig.valueColor"
               @update:value="handleUpdate"
               :show-alpha="false"
             />
           </n-form-item>
-          <n-form-item label="仪表盘大小">
+          <n-form-item label="Dashboard size">
             <n-input
               v-model:value="localConfig.radius"
               @update:value="handleUpdate"
-              placeholder="如：75%"
+              placeholder="like：75%"
             />
           </n-form-item>
-          <n-form-item label="指针厚度">
+          <n-form-item label="Pointer thickness">
             <n-input-number
               v-model:value="localConfig.thickness"
               :min="1"
@@ -79,9 +79,9 @@
         </n-space>
       </n-card>
 
-      <!-- 动画配置 -->
-      <n-card title="⚡ 动画配置" size="small" embedded>
-        <n-form-item label="动画时长（毫秒）">
+      <!-- Animation configuration -->
+      <n-card title="⚡ Animation configuration" size="small" embedded>
+        <n-form-item label="Animation duration（millisecond）">
           <n-input-number
             v-model:value="localConfig.animationDuration"
             :min="0"
@@ -97,8 +97,8 @@
 
 <script setup lang="ts">
 /**
- * 仪表盘图表配置面板
- * 用于配置仪表盘组件的各项参数
+ * Dashboard chart configuration panel
+ * Parameters used to configure dashboard components
  */
 
 import { ref, watch } from 'vue'
@@ -128,11 +128,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 本地配置副本
+// local configuration copy
 const localConfig = ref<GaugeChartCustomize>({ ...customConfig, ...props.config })
 
 /**
- * 处理配置更新
+ * Handle configuration updates
  */
 const handleUpdate = () => {
   emit('update:config', { ...localConfig.value })
@@ -140,7 +140,7 @@ const handleUpdate = () => {
 }
 
 /**
- * 监听外部配置变化
+ * Monitor external configuration changes
  */
 watch(
   () => props.config,

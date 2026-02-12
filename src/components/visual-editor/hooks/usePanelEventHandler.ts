@@ -1,6 +1,6 @@
 /**
- * 面板编辑器事件处理组合式函数
- * 负责UI交互、拖拽、组件操作、导入导出等事件处理
+ * Panel editor event handling combined function
+ * ResponsibleUIinteraction、drag、Component operations、Import and export event processing
  */
 
 import { useMessage } from 'naive-ui'
@@ -8,12 +8,12 @@ import { $t } from '@/locales'
 import type { RendererType } from '@/components/visual-editor/types'
 
 /**
- * 事件处理相关函数集合
+ * Collection of event processing related functions
  */
 export function usePanelEventHandler(
   props: { panelId: string },
   dependencies: {
-    // 状态管理
+    // Status management
     showLeftDrawer: any
     showRightDrawer: any
     isDragging: any
@@ -25,11 +25,11 @@ export function usePanelEventHandler(
     multiDataSourceConfigStore: any
     selectedNodeId: any
 
-    // 配置管理
+    // Configuration management
     editorConfig: any
     panelData: any
 
-    // 编辑器功能
+    // Editor features
     stateManager: any
     addWidget: any
     setState: any
@@ -41,10 +41,10 @@ export function usePanelEventHandler(
 ) {
   const message = useMessage()
 
-  // ===== 抽屉控制事件处理 =====
+  // ===== Drawer control event handling =====
 
   /**
-   * 切换左侧抽屉显示状态
+   * Switch the display status of the left drawer
    */
   const handleToggleLeftDrawer = () => {
     dependencies.showLeftDrawer.value = !dependencies.showLeftDrawer.value
@@ -52,18 +52,18 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 切换右侧抽屉显示状态
+   * Switch the display status of the right drawer
    */
   const handleToggleRightDrawer = () => {
     dependencies.showRightDrawer.value = !dependencies.showRightDrawer.value
     dependencies.hasChanges.value = true
   }
 
-  // ===== 拖拽事件处理 =====
+  // ===== Drag event handling =====
 
   /**
-   * 开始拖拽组件
-   * @param componentType 组件类型
+   * Start dragging components
+   * @param componentType Component type
    */
   const handleDragStart = (componentType: string) => {
     dependencies.isDragging.value = true
@@ -71,18 +71,18 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 结束拖拽
+   * End drag
    */
   const handleDragEnd = () => {
     dependencies.isDragging.value = false
     dependencies.draggedComponent.value = null
   }
 
-  // ===== 渲染器和视图控制 =====
+  // ===== Renderers and view controls =====
 
   /**
-   * 处理渲染器变更
-   * @param renderer 新的渲染器类型
+   * Handle renderer changes
+   * @param renderer New renderer type
    */
   const handleRendererChange = (renderer: RendererType) => {
     if (process.env.NODE_ENV === 'development') {
@@ -92,19 +92,19 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 切换组件标题显示状态
-   * @param value 是否显示标题
+   * Toggle component title display state
+   * @param value Whether to display title
    */
   const handleToggleWidgetTitles = (value: boolean) => {
     dependencies.showWidgetTitles.value = value
     dependencies.hasChanges.value = true
   }
 
-  // ===== 组件操作事件处理 =====
+  // ===== Component operation event handling =====
 
   /**
-   * 添加组件到编辑器
-   * @param widget 组件信息
+   * Add components to the editor
+   * @param widget Component information
    */
   const handleAddWidget = async (widget: { type: string }) => {
     try {
@@ -115,13 +115,13 @@ export function usePanelEventHandler(
       message.success($t('visualEditor.addWidgetSuccess', { type: widgetType }))
     } catch (error: any) {
       const widgetType = widget.type
-      console.error(`❌ 添加组件失败 [${widgetType}]:`, error)
-      message.error($t('visualEditor.addWidgetFailed', { type: widgetType, error: error.message || '未知错误' }))
+      console.error(`❌ Failed to add component [${widgetType}]:`, error)
+      message.error($t('visualEditor.addWidgetFailed', { type: widgetType, error: error.message || 'unknown error' }))
     }
   }
 
   /**
-   * 清除所有组件
+   * Clear all components
    */
   const handleClearAll = () => {
     dependencies.stateManager.reset()
@@ -129,30 +129,30 @@ export function usePanelEventHandler(
     message.success($t('visualEditor.clearAllSuccess'))
   }
 
-  // ===== 导入导出处理 =====
+  // ===== Import and export processing =====
 
   /**
-   * 导入配置
-   * @param config 配置对象
+   * Import configuration
+   * @param config Configuration object
    */
   const handleImportConfig = (config: Record<string, any>) => {
     try {
       if (process.env.NODE_ENV === 'development') {
       }
 
-      // 验证配置格式
+      // Verify configuration format
       if (config && typeof config === 'object') {
-        // 如果是新格式配置
+        // If it is a new format configuration
         if (config.visualEditor) {
           dependencies.editorConfig.value = config.visualEditor
           dependencies.setState(config.visualEditor)
         }
-        // 如果是直接的编辑器配置
+        // If it is a direct editor configuration
         else if (config.nodes || config.canvasConfig) {
           dependencies.editorConfig.value = config
           dependencies.setState(config)
         }
-        // 否则当作旧格式处理
+        // Otherwise, it will be treated as the old format.
         else {
           const newConfig = dependencies.getDefaultConfig()
           dependencies.editorConfig.value = newConfig
@@ -165,13 +165,13 @@ export function usePanelEventHandler(
         throw new Error('Invalid config format')
       }
     } catch (error: any) {
-      console.error('导入配置失败:', error)
-      message.error($t('visualEditor.configImportFailed', { error: error.message || '未知错误' }))
+      console.error('Import configuration failed:', error)
+      message.error($t('visualEditor.configImportFailed', { error: error.message || 'unknown error' }))
     }
   }
 
   /**
-   * 导出配置
+   * Export configuration
    */
   const handleExportConfig = () => {
     try {
@@ -183,14 +183,14 @@ export function usePanelEventHandler(
             version: '1.0.0',
             exportedAt: Date.now(),
             editorType: 'visual-editor',
-            // 导出时的面板信息
+            // Panel information when exporting
             panelInfo: {
               id: props.panelId,
               name: dependencies.panelData.value?.name || '',
               homeFlag: dependencies.panelData.value?.home_flag || false,
               exportedAt: Date.now()
             },
-            // 导出时的编辑器状态
+            // Editor state when exporting
             exportInfo: {
               totalNodes: currentState.nodes.length,
               rendererType: currentState.currentRenderer,
@@ -202,7 +202,7 @@ export function usePanelEventHandler(
         }
       }
 
-      // 创建下载链接
+      // Create download link
       const blob = new Blob([JSON.stringify(exportConfig, null, 2)], {
         type: 'application/json'
       })
@@ -217,16 +217,16 @@ export function usePanelEventHandler(
 
       message.success($t('visualEditor.configExportSuccess'))
     } catch (error: any) {
-      console.error('导出配置失败:', error)
-      message.error($t('visualEditor.configExportFailed', { error: error.message || '未知错误' }))
+      console.error('Export configuration failed:', error)
+      message.error($t('visualEditor.configExportFailed', { error: error.message || 'unknown error' }))
     }
   }
 
-  // ===== 配置变更处理 =====
+  // ===== Configuration change handling =====
 
   /**
-   * 处理网格配置变更
-   * @param newGridConfig 新的网格配置
+   * Handle grid configuration changes
+   * @param newGridConfig New grid configuration
    */
   const handleGridConfigChange = (newGridConfig: any) => {
     dependencies.editorConfig.value.gridConfig = { ...dependencies.editorConfig.value.gridConfig, ...newGridConfig }
@@ -234,8 +234,8 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 处理Gridstack配置变更
-   * @param newGridConfig 新的Gridstack配置
+   * deal withGridstackConfiguration changes
+   * @param newGridConfig newGridstackConfiguration
    */
   const handleGridstackConfigChange = (newGridConfig: any) => {
     dependencies.editorConfig.value.gridConfig = { ...dependencies.editorConfig.value.gridConfig, ...newGridConfig }
@@ -243,8 +243,8 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 处理画布配置变更
-   * @param newCanvasConfig 新的画布配置
+   * Handle canvas configuration changes
+   * @param newCanvasConfig New canvas configuration
    */
   const handleCanvasConfigChange = (newCanvasConfig: any) => {
     dependencies.editorConfig.value.canvasConfig = {
@@ -254,109 +254,109 @@ export function usePanelEventHandler(
     dependencies.hasChanges.value = true
   }
 
-  // ===== 数据源处理 =====
+  // ===== Data source processing =====
 
   /**
-   * 处理多数据源数据更新
-   * @param widgetId 组件ID
-   * @param dataSources 数据源数据
+   * Handle data updates from multiple data sources
+   * @param widgetId componentsID
+   * @param dataSources Data source data
    */
   const handleMultiDataSourceUpdate = (widgetId: string, dataSources: Record<string, any>) => {
-    // 存储数据源数据
+    // Store data source data
     dependencies.multiDataSourceStore.value[widgetId] = dataSources
 
-    // 标记有变化
+    // Tags have changed
     dependencies.hasChanges.value = true
   }
 
   /**
-   * 处理多数据源配置更新
-   * @param widgetId 组件ID
-   * @param config 配置对象
+   * Handle multiple data source configuration updates
+   * @param widgetId componentsID
+   * @param config Configuration object
    */
   const handleMultiDataSourceConfigUpdate = (widgetId: string, config: any) => {
-    // 存储配置信息
+    // Store configuration information
     dependencies.multiDataSourceConfigStore.value[widgetId] = config
 
-    // 标记有变化
+    // Tags have changed
     dependencies.hasChanges.value = true
   }
 
-  // ===== 画布操作控制 =====
+  // ===== Canvas operation control =====
 
   /**
-   * 放大视图
+   * Enlarge view
    */
   const handleZoomIn = () => {
-    // TODO: 实现缩放功能
+    // TODO: Implement zoom function
     if (process.env.NODE_ENV === 'development') {
     }
   }
 
   /**
-   * 缩小视图
+   * Zoom out
    */
   const handleZoomOut = () => {
-    // TODO: 实现缩放功能
+    // TODO: Implement zoom function
   }
 
   /**
-   * 重置缩放
+   * Reset zoom
    */
   const handleResetZoom = () => {
-    // TODO: 实现重置缩放功能
+    // TODO: Implement reset zoom function
     if (process.env.NODE_ENV === 'development') {
     }
   }
 
   /**
-   * 撤销操作
+   * Undo operation
    */
   const handleUndo = () => {
-    // TODO: 实现撤销功能
+    // TODO: Implement undo function
   }
 
   /**
-   * 重做操作
+   * redo operation
    */
   const handleRedo = () => {
-    // TODO: 实现重做功能
+    // TODO: Implement redo function
     if (process.env.NODE_ENV === 'development') {
     }
   }
 
-  // ===== 渲染器事件处理 =====
+  // ===== Renderer event handling =====
 
   /**
-   * 渲染器准备就绪
+   * Renderer ready
    */
   const handleRendererReady = () => {}
 
   /**
-   * 渲染器错误处理
-   * @param error 错误对象
+   * Renderer error handling
+   * @param error error object
    */
   const handleRendererError = (error: Error) => {
-    console.error('❌ 渲染器错误:', error)
+    console.error('❌ renderer error:', error)
     message.error($t('visualEditor.rendererLoadFailed', { error: error.message }))
   }
 
-  // ===== 节点选择和交互 =====
+  // ===== Node selection and interaction =====
 
   /**
-   * 处理节点选择
-   * @param nodeId 节点ID
+   * Handle node selection
+   * @param nodeId nodeID
    */
   const handleNodeSelect = (nodeId: string) => {
     dependencies.selectedNodeId.value = nodeId
     dependencies.selectNode(nodeId)
-    // 节点选择通常不触发保存，但可以标记为有变化
+    // Node selection usually does not trigger save，but can be marked as changed
     // dependencies.hasChanges.value = true
   }
 
   /**
-   * 请求设置面板
-   * @param nodeId 节点ID
+   * Request settings panel
+   * @param nodeId nodeID
    */
   const handleRequestSettings = (nodeId: string) => {
     if (nodeId) {
@@ -367,138 +367,138 @@ export function usePanelEventHandler(
   }
 
   /**
-   * 处理画布点击（取消选择）
+   * Handling canvas clicks（Deselect）
    */
   const handleCanvasClick = () => {
     dependencies.selectedNodeId.value = ''
     dependencies.selectNode('')
-    // 取消选中时可以选择性隐藏属性面板（或保持展开）
+    // Properties panel can be selectively hidden when unchecked（or keep expanded）
     // rightCollapsed.value = true
   }
 
-  // ===== 组件生命周期事件 =====
+  // ===== Component life cycle events =====
 
   /**
-   * 处理组件添加事件
-   * @param node 节点数据
+   * Handle component addition event
+   * @param node Node data
    */
   const handleComponentAdded = async (node: any) => {
     try {
-      // 检查是否有数据源配置
+      // Check if there is data source configuration
       const config = dependencies.multiDataSourceConfigStore.value[node.id]
       if (config && Object.keys(config).length > 0) {
-        // 注册到编辑器数据源管理器
+        // Register to the Editor Data Source Manager
         dependencies.editorDataSourceManager.registerComponentDataSource(
           node.id,
           node.type,
           config,
-          { type: 'timer', interval: 30000 } // 默认30秒轮询
+          { type: 'timer', interval: 30000 } // default30Second polling
         )
       }
     } catch (error) {
-      console.error(`❌ [PanelEditor] 处理组件添加失败: ${node.id}`, error)
+      console.error(`❌ [PanelEditor] Handle component addition failure: ${node.id}`, error)
     }
   }
 
   /**
-   * 处理组件删除事件
-   * @param componentId 组件ID
+   * Handle component deletion events
+   * @param componentId componentsID
    */
   const handleComponentRemoved = async (componentId: string) => {
     try {
-      // 从编辑器数据源管理器移除
+      // Remove from Editor Data Source Manager
       dependencies.editorDataSourceManager.removeComponentDataSource(componentId)
 
-      // 清理本地配置存储
+      // Clean local configuration store
       delete dependencies.multiDataSourceConfigStore.value[componentId]
       delete dependencies.multiDataSourceStore.value[componentId]
     } catch (error) {
-      console.error(`❌ [PanelEditor] 处理组件删除失败: ${componentId}`, error)
+      console.error(`❌ [PanelEditor] Processing component deletion failed: ${componentId}`, error)
     }
   }
 
   /**
-   * 处理组件配置变更事件
-   * @param componentId 组件ID
-   * @param config 新配置
+   * Handle component configuration change events
+   * @param componentId componentsID
+   * @param config New configuration
    */
   const handleComponentConfigChanged = async (componentId: string, config: any) => {
-    // 🔥 错误边界：确保数据源管理器已初始化
+    // 🔥 error bounds：Make sure the data source manager is initialized
     if (!dependencies.editorDataSourceManager.isInitialized()) {
-      console.error(`⚠️ [PanelEditor] 数据源管理器未初始化，跳过配置变更: ${componentId}`)
+      console.error(`⚠️ [PanelEditor] Data source manager not initialized，Skip configuration changes: ${componentId}`)
       return
     }
 
     try {
-      // 如果组件已在数据源管理器中注册，更新配置
+      // If the component is registered in the data source manager，Update configuration
       const existingConfig = dependencies.editorDataSourceManager.getComponentConfig(componentId)
       if (existingConfig) {
-        // 先移除旧配置
+        // Remove the old configuration first
         dependencies.editorDataSourceManager.removeComponentDataSource(componentId)
 
-        // 重新注册新配置
+        // Re-register new configuration
         const node = dependencies.stateManager.nodes.find(n => n.id === componentId)
         if (node) {
           dependencies.editorDataSourceManager.registerComponentDataSource(
             componentId,
             node.type,
             config,
-            { type: 'timer', interval: 30000 } // 默认30秒轮询
+            { type: 'timer', interval: 30000 } // default30Second polling
           )
         }
       }
     } catch (error) {
-      console.error(`❌ [PanelEditor] 处理组件配置变更失败: ${componentId}`, error)
+      console.error(`❌ [PanelEditor] Failed to process component configuration changes: ${componentId}`, error)
     }
   }
 
   return {
-    // 抽屉控制
+    // Drawer control
     handleToggleLeftDrawer,
     handleToggleRightDrawer,
 
-    // 拖拽处理
+    // Drag and drop processing
     handleDragStart,
     handleDragEnd,
 
-    // 渲染器和视图控制
+    // Renderers and view controls
     handleRendererChange,
     handleToggleWidgetTitles,
 
-    // 组件操作
+    // Component operations
     handleAddWidget,
     handleClearAll,
 
-    // 导入导出
+    // Import and export
     handleImportConfig,
     handleExportConfig,
 
-    // 配置变更
+    // Configuration changes
     handleGridConfigChange,
     handleGridstackConfigChange,
     handleCanvasConfigChange,
 
-    // 数据源处理
+    // Data source processing
     handleMultiDataSourceUpdate,
     handleMultiDataSourceConfigUpdate,
 
-    // 画布操作控制
+    // Canvas operation control
     handleZoomIn,
     handleZoomOut,
     handleResetZoom,
     handleUndo,
     handleRedo,
 
-    // 渲染器事件处理
+    // Renderer event handling
     handleRendererReady,
     handleRendererError,
 
-    // 节点选择和交互
+    // Node selection and interaction
     handleNodeSelect,
     handleRequestSettings,
     handleCanvasClick,
 
-    // 组件生命周期事件
+    // Component life cycle events
     handleComponentAdded,
     handleComponentRemoved,
     handleComponentConfigChanged

@@ -2,9 +2,9 @@
 import { computed } from 'vue'
 
 interface Props {
-  /** 渐变开始的颜色 */
+  /** The color at which the gradient starts */
   startColor?: string
-  /** 渐变结束的颜色 */
+  /** The color at which the gradient ends */
   endColor?: string
 }
 

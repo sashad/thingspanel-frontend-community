@@ -1,8 +1,8 @@
 /**
- * 插件类型定义
+ * Plug-in type definition
  */
 
-// 插件接口
+// Plug-in interface
 export interface IPlugin {
   name: string
   version: string
@@ -10,13 +10,13 @@ export interface IPlugin {
   uninstall?(): void
 }
 
-// 插件上下文
+// plugin context
 export interface PluginContext {
   hooks: PluginHooks
   registerAPI: (_name: string, _fn: (..._args: any[]) => any) => void
 }
 
-// 插件钩子
+// Plugin hook
 export interface PluginHooks {
   beforeRender: Hook
   afterRender: Hook
@@ -26,12 +26,12 @@ export interface PluginHooks {
   registerComponent: Hook
 }
 
-// 钩子类型
+// hook type
 export interface Hook {
   tap: (_name: string, _fn: (..._args: any[]) => any) => void
 }
 
-// 插件配置
+// Plug-in configuration
 export interface PluginConfig {
   enabled: boolean
   options: Record<string, any>

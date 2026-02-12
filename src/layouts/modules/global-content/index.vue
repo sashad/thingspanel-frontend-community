@@ -23,7 +23,7 @@ const routeStore = useRouteStore()
 
 <template>
   <RouterView v-slot="{ Component, route }">
-    <!-- 导致场景联动切换到其他组件时空白无法跳转,具体原因不清楚 -->
+    <!-- As a result, when the scene linkage is switched to other components, the blank space cannot be jumped.,The specific reason is unclear -->
     <!--
  <Transition :name="themeStore.page.animateMode" mode="out-in" @before-leave="appStore.setContentXScrollable(true)"
       @after-enter="appStore.setContentXScrollable(false)">

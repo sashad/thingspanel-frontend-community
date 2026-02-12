@@ -1,10 +1,10 @@
 /**
- * 编辑器相关类型定义
+ * Editor related type definitions
  */
 
 import type { RendererType } from '@/components/visual-editor/types/renderer'
 
-// 编辑器配置
+// Editor configuration
 export interface EditorConfig {
   width: number
   height: number
@@ -14,7 +14,7 @@ export interface EditorConfig {
   gridSize: number
 }
 
-// 看板配置
+// Kanban configuration
 export interface KanbanConfig extends EditorConfig {
   rendererType: 'kanban'
   columns: KanbanColumn[]
@@ -32,7 +32,7 @@ export interface KanbanCard {
   content: string
 }
 
-// 大屏配置
+// Large screen configuration
 export interface DashboardConfig extends EditorConfig {
   rendererType: 'dashboard'
   backgroundColor: string

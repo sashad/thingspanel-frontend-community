@@ -18,7 +18,7 @@ const dataTypeOptions = ref([
 ])
 
 onMounted(() => {
-  // 设置配置项的默认值
+  // Set default values ​​for configuration items
   if (!ctx.config.iconName) ctx.config.iconName = 'Play'
   if (!ctx.config.buttonIconColor) ctx.config.buttonIconColor = '#FFFFFF'
   if (!ctx.config.buttonColor) ctx.config.buttonColor = '#ff4d4f'

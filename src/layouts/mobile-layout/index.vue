@@ -17,13 +17,13 @@ const appStore = useAppStore()
 const routeStore = useRouteStore()
 const { routerPushByKey } = useRouterPush()
 
-// 移动端主要菜单项
+// Main menu items on mobile
 const mobileMenus = computed(() => {
   const mainMenus = routeStore.menus.filter(menu => {
-    // 过滤出主要的一级菜单项，适合在底部导航显示
+    // Filter out the main first-level menu items，Suitable for bottom navigation display
     return ['home', 'device', 'dashboard', 'visualization'].includes(menu.routeKey as string)
   })
-  return mainMenus.slice(0, 4) // 最多显示4个主要菜单
+  return mainMenus.slice(0, 4) // Show most4main menu
 })
 
 const currentRoute = computed(() => routeStore.currentRoute)
@@ -32,17 +32,17 @@ function handleMenuClick(menu: any) {
   routerPushByKey(menu.routeKey)
 }
 
-// 获取图标组件
+// Get the icon component
 function getIconComponent(iconString: string) {
-  // 这里可以根据图标字符串返回对应的图标组件
-  // 简化处理，直接返回图标字符串
+  // Here you can return the corresponding icon component according to the icon string
+  // Simplified processing，Directly returns the icon string
   return iconString
 }
 </script>
 
 <template>
   <div class="mobile-layout">
-    <!-- 移动端头部 -->
+    <!-- Mobile head -->
     <header class="mobile-header">
       <div class="header-content">
         <GlobalLogo class="logo" />
@@ -51,12 +51,12 @@ function getIconComponent(iconString: string) {
       </div>
     </header>
 
-    <!-- 主内容区域 -->
+    <!-- main content area -->
     <main :id="LAYOUT_SCROLL_EL_ID" class="mobile-main">
       <GlobalContent :show-padding="true" />
     </main>
 
-    <!-- 移动端底部导航 -->
+    <!-- Mobile bottom navigation -->
     <nav class="mobile-bottom-nav">
       <div class="nav-items">
         <div
@@ -144,7 +144,7 @@ function getIconComponent(iconString: string) {
   }
 }
 
-// 深色模式支持
+// Dark mode support
 [data-theme='dark'] {
   .mobile-header,
   .mobile-bottom-nav {

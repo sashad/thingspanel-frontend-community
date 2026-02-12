@@ -1,7 +1,7 @@
 <template>
   <div class="base-config-form">
     <n-form :model="formData" label-placement="left" label-width="80" size="small">
-      <!-- 🔥 设备配置 - 最高优先级 -->
+      <!-- 🔥 Device configuration - highest priority -->
       <n-divider title-placement="left">{{ t('config.base.device.section') }}</n-divider>
 
       <n-form-item :label="t('config.base.deviceId')">
@@ -26,7 +26,7 @@
         />
       </n-form-item>
 
-      <!-- 标题配置 -->
+      <!-- Title configuration -->
       <n-divider title-placement="left">{{ t('config.base.title.section') }}</n-divider>
 
       <n-form-item :label="t('config.base.showTitle')">
@@ -42,7 +42,7 @@
         />
       </n-form-item>
 
-      <!-- 显示配置 -->
+      <!-- show configuration -->
       <n-divider title-placement="left">{{ t('config.base.display.section') }}</n-divider>
 
       <n-form-item :label="t('config.base.visible')">
@@ -60,7 +60,7 @@
         />
       </n-form-item>
 
-      <!-- 样式配置 -->
+      <!-- Style configuration -->
       <n-divider title-placement="left">{{ t('config.base.style.section') }}</n-divider>
 
       <n-form-item :label="t('config.base.backgroundColor')">
@@ -97,7 +97,7 @@
         />
       </n-form-item>
 
-      <!-- 间距配置 -->
+      <!-- spacing configuration -->
       <n-divider title-placement="left">{{ t('config.base.layout.section') }}</n-divider>
 
       <n-form-item :label="t('config.base.padding')">
@@ -122,7 +122,7 @@
         />
       </n-form-item>
 
-      <!-- 快捷操作 -->
+      <!-- Quick operation -->
       <n-divider title-placement="left">{{ t('config.base.advanced.section') }}</n-divider>
 
       <n-space>
@@ -135,8 +135,8 @@
 
 <script setup lang="ts">
 /**
- * Base配置表单 - 简化版本
- * 模仿SimpleTestConfig的简洁UI风格
+ * BaseConfiguration form - Simplified version
+ * imitateSimpleTestConfigThe simplicityUIstyle
  */
 
 import { reactive, watch, computed, onMounted, onUnmounted, shallowReactive, inject, ref } from 'vue'
@@ -148,7 +148,7 @@ import type { MetricItem } from '@/card2.1/core2'
 import { getDeviceListForSelect } from '@/service/api/device-template-model'
 import DeviceSelectSingle from '@/components/DeviceSelectSingle.vue'
 
-// 接收props
+// take overprops
 interface Props {
   nodeId?: string
   readonly?: boolean
@@ -156,7 +156,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// 定义emits
+// definitionemits
 interface Emits {
   (e: 'apply', config: BaseConfiguration): void
   (e: 'reset'): void
@@ -164,18 +164,18 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 组合式函数
+// Combined functions
 const { t } = useI18n()
 const message = useMessage()
 
-// 注入编辑器上下文
+// Inject editor context
 const editorContext = inject('editorContext', null) as any
 
-// 防止循环更新的标记
+// Tags that prevent cyclic updates
 let isUpdating = false
 
 /**
- * 表单数据结构 - 简化版本，使用单一数值控制间距，包含设备字段
+ * form data structure - Simplified version，Control spacing using a single value，Contains device fields
  */
 const formData = shallowReactive({
   showTitle: false,
@@ -187,13 +187,13 @@ const formData = shallowReactive({
   borderColor: '#d9d9d9',
   borderStyle: 'solid',
   borderRadius: 6,
-  paddingValue: 0, // 统一的内边距值
-  marginValue: 0, // 统一的外边距值
-  // 🔥 新增：设备相关字段
-  deviceId: '', // 设备ID
-  metricsListTags: [] as string[], // 指标列表（标签形式）
-  metricsList: [] as MetricItem[], // 实际的指标列表对象
-  // 实际的padding和margin对象（内部使用）
+  paddingValue: 0, // Uniform padding values
+  marginValue: 0, // Uniform margin values
+  // 🔥 New：Device related fields
+  deviceId: '', // equipmentID
+  metricsListTags: [] as string[], // Indicator list（label form）
+  metricsList: [] as MetricItem[], // The actual indicator list object
+  // actualpaddingandmarginobject（Internal use）
   padding: {
     top: 0,
     right: 0,
@@ -209,7 +209,7 @@ const formData = shallowReactive({
 })
 
 /**
- * 边框样式选项
+ * Border style options
  */
 const borderStyleOptions = [
   { label: t('config.base.borderStyles.solid'), value: 'solid' },
@@ -218,7 +218,7 @@ const borderStyleOptions = [
   { label: t('config.base.borderStyles.double'), value: 'double' }
 ]
 
-// 🔥 设备选择相关状态 - 无限滚动版本
+// 🔥 Device selection related status - infinite scroll version
 const deviceOptions = ref<Api.Device.DeviceSelectItem[]>([])
 const loadingDevices = ref(false)
 const hasMoreDevices = ref(true)
@@ -227,7 +227,7 @@ const pageSize = 20
 const searchKeyword = ref('')
 
 /**
- * 加载初始设备列表
+ * Load initial device list
  */
 const loadInitialDevices = async () => {
   if (loadingDevices.value) return
@@ -240,7 +240,7 @@ const loadInitialDevices = async () => {
 }
 
 /**
- * 加载更多设备
+ * Load more devices
  */
 const loadMoreDevices = async () => {
   if (loadingDevices.value || !hasMoreDevices.value) return
@@ -250,7 +250,7 @@ const loadMoreDevices = async () => {
 }
 
 /**
- * 加载设备分页数据
+ * Load device paging data
  */
 const loadDevicePage = async () => {
   loadingDevices.value = true
@@ -265,18 +265,18 @@ const loadDevicePage = async () => {
     if (response.data && response.data.list) {
       const { list, total } = response.data
 
-      // 追加数据而不是替换（修复无限滚动）
+      // Append data instead of replace（Fix infinite scroll）
       if (currentPage.value === 1) {
         deviceOptions.value = list
       } else {
         deviceOptions.value.push(...list)
       }
 
-      // 检查是否还有更多数据
+      // Check if there is more data
       hasMoreDevices.value = deviceOptions.value.length < total
     }
   } catch (error) {
-    console.error('加载设备列表失败:', error)
+    console.error('Failed to load device list:', error)
     message.error(t('config.base.loadDevicesFailed'))
   } finally {
     loadingDevices.value = false
@@ -284,45 +284,45 @@ const loadDevicePage = async () => {
 }
 
 /**
- * 处理设备搜索
+ * Handle device searches
  */
 const handleDeviceSearch = (keyword: string) => {
   searchKeyword.value = keyword
-  // 搜索时重置分页
+  // Reset pagination when searching
   currentPage.value = 1
   deviceOptions.value = []
   hasMoreDevices.value = true
 
-  // 延迟执行搜索，避免频繁请求
+  // Delayed search execution，Avoid frequent requests
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
     loadDevicePage()
   }, 300)
 }
 
-// 搜索防抖定时器
+// Search for anti-shake timer
 let searchTimer: number | null = null
 
 /**
- * 监听设备选择变化
+ * Listen for device selection changes
  */
 watch(() => formData.deviceId, (newDeviceId) => {
-  // 设备ID变化时触发配置更新
+  // equipmentIDTrigger configuration updates when changes occur
   handleUpdate()
 }, { deep: true })
 
-// 当前选中的节点ID
+// Currently selected nodeID
 const selectedNodeId = computed(() => {
   return props.nodeId || null
 })
 
 /**
- * 防抖更新定时器
+ * Anti-shake update timer
  */
 let updateTimer: number | null = null
 
 /**
- * 处理内边距更新
+ * Handling padding updates
  */
 const handlePaddingUpdate = () => {
   const value = formData.paddingValue
@@ -336,7 +336,7 @@ const handlePaddingUpdate = () => {
 }
 
 /**
- * 处理外边距更新
+ * Handle margin updates
  */
 const handleMarginUpdate = () => {
   const value = formData.marginValue
@@ -350,37 +350,37 @@ const handleMarginUpdate = () => {
 }
 
 /**
- * 处理指标列表更新
- * 将标签形式转换为 MetricItem 对象数组
+ * Handling indicator list updates
+ * Convert label form to MetricItem object array
  */
 const handleMetricsListUpdate = (tags: string[]) => {
-  // 将字符串标签转换为 MetricItem 对象
+  // Convert string label to MetricItem object
   formData.metricsList = tags.map(tag => ({
-    id: tag.toLowerCase().replace(/\s+/g, '_'), // 生成简单的ID
+    id: tag.toLowerCase().replace(/\s+/g, '_'), // Generate simpleID
     name: tag,
     unit: '',
-    description: `指标: ${tag}`,
+    description: `index: ${tag}`,
     dataType: 'number' as const,
     aggregation: 'last' as const
   }))
 
-  // 更新配置
+  // Update configuration
   handleUpdate()
 }
 
 /**
- * 🔥 直接与卡片层通信更新配置
- * 使用可靠的配置管理器方法，避免DOM查询
+ * 🔥 Communicate directly with the card layer to update configurations
+ * Use a reliable configuration manager approach，avoidDOMQuery
  */
 const updateCardLayerConfig = (baseConfig: BaseConfiguration) => {
   const nodeId = selectedNodeId.value
   if (!nodeId) return false
 
   try {
-    // 🔥 方法1: 优先使用配置管理器更新配置
+    // 🔥 method1: Prioritize updating configuration using Configuration Manager
     configurationManager.updateConfiguration(nodeId, 'base', baseConfig)
 
-    // 🔥 方法2: 发送自定义事件通知卡片层（用于实时更新）
+    // 🔥 method2: Send custom event notification card layer（for real-time updates）
     window.dispatchEvent(new CustomEvent('card2-config-update', {
       detail: {
         componentId: nodeId,
@@ -391,13 +391,13 @@ const updateCardLayerConfig = (baseConfig: BaseConfiguration) => {
 
     return true
   } catch (error) {
-    console.error('🔥 [BaseConfigForm] 卡片层通信失败:', error)
+    console.error('🔥 [BaseConfigForm] Card layer communication failed:', error)
     return false
   }
 }
 
 /**
- * 处理配置更新 - 防抖处理
+ * Handle configuration updates - Anti-shake processing
  */
 const handleUpdate = () => {
   const nodeId = selectedNodeId.value
@@ -405,14 +405,14 @@ const handleUpdate = () => {
     return
   }
 
-  // 防抖处理
+  // Anti-shake processing
   if (updateTimer) {
     clearTimeout(updateTimer)
   }
 
   updateTimer = window.setTimeout(() => {
     try {
-      // 构建base配置对象，包含设备字段
+      // BuildbaseConfiguration object，Contains device fields
       const baseConfig: BaseConfiguration = {
         showTitle: formData.showTitle,
         title: formData.title,
@@ -425,16 +425,16 @@ const handleUpdate = () => {
         borderRadius: formData.borderRadius > 0 ? formData.borderRadius : undefined,
         padding: { ...formData.padding },
         margin: { ...formData.margin },
-        // 🔥 设备字段
+        // 🔥 Device field
         deviceId: formData.deviceId || '',
         metricsList: formData.metricsList
       }
 
-      // 🔥 优先尝试与卡片层直接通信
+      // 🔥 Prioritize trying to communicate directly with the card layer
       const cardUpdateSuccess = updateCardLayerConfig(baseConfig)
 
       if (!cardUpdateSuccess) {
-        // 回退到使用configurationManager
+        // Fallback to usingconfigurationManager
         configurationManager.updateConfiguration(nodeId, 'base', baseConfig)
       }
     } catch (error) {
@@ -444,18 +444,18 @@ const handleUpdate = () => {
 }
 
 /**
- * 🔥 从卡片层获取配置数据
- * 使用可靠的配置管理器方法，避免DOM查询
+ * 🔥 Get configuration data from card layer
+ * Use a reliable configuration manager approach，avoidDOMQuery
  */
 const getCardLayerConfig = (nodeId: string): BaseConfiguration | null => {
   try {
-    // 🔥 方法1: 优先使用配置管理器获取配置
+    // 🔥 method1: Prefer using the configuration manager to obtain configuration
     const config = configurationManager.getConfiguration(nodeId)
     if (config?.base) {
       return config.base
     }
 
-    // 🔥 方法2: 发送自定义事件请求配置（用于获取实时配置）
+    // 🔥 method2: Send custom event request configuration（Used to get real-time configuration）
     const configRequestEvent = new CustomEvent('card2-config-request', {
       detail: { componentId: nodeId, layer: 'base' }
     })
@@ -473,13 +473,13 @@ const getCardLayerConfig = (nodeId: string): BaseConfiguration | null => {
 
     return receivedConfig
   } catch (error) {
-    console.error('🔥 [BaseConfigForm] 获取卡片层配置失败:', error)
+    console.error('🔥 [BaseConfigForm] Failed to obtain card layer configuration:', error)
     return null
   }
 }
 
 /**
- * 从卡片层或configurationManager加载配置数据到表单
+ * from the card layer orconfigurationManagerLoad configuration data into the form
  */
 const loadConfigurationFromManager = async () => {
   const nodeId = selectedNodeId.value
@@ -488,22 +488,22 @@ const loadConfigurationFromManager = async () => {
     return
   }
 
-  // 防止循环更新
+  // Prevent cyclic updates
   isUpdating = true
 
   try {
-    // 🔥 优先尝试从卡片层获取配置
+    // 🔥 Prioritize trying to obtain configuration from the card layer
     let baseConfig = getCardLayerConfig(nodeId)
 
-    // 回退到从configurationManager获取配置
+    // fall back to fromconfigurationManagerGet configuration
     if (!baseConfig) {
-      console.warn('🔥 [BaseConfigForm] 卡片层配置获取失败，回退到configurationManager')
+      console.warn('🔥 [BaseConfigForm] Failed to obtain card layer configuration，Fallback toconfigurationManager')
       const config = configurationManager.getConfiguration(nodeId)
       baseConfig = config?.base
     }
 
     if (baseConfig) {
-      // 同步配置到表单
+      // Synchronize configuration to form
       formData.showTitle = baseConfig.showTitle ?? false
       formData.title = baseConfig.title || ''
       formData.opacity = baseConfig.opacity ?? 1
@@ -514,19 +514,19 @@ const loadConfigurationFromManager = async () => {
       formData.borderStyle = baseConfig.borderStyle || 'solid'
       formData.borderRadius = baseConfig.borderRadius ?? 6
 
-      // 🔥 加载设备字段
+      // 🔥 Load device fields
       formData.deviceId = baseConfig.deviceId || ''
       formData.metricsList = baseConfig.metricsList || []
 
-      // 将 MetricItem 对象转换为标签形式显示
+      // Will MetricItem Objects are converted to labels and displayed
       formData.metricsListTags = formData.metricsList.map(metric => metric.name)
 
-      // 如果有选中的设备ID，确保设备列表中包含该设备信息
+      // If there is a selected deviceID，Make sure the device information is included in the device list
       if (formData.deviceId && deviceOptions.value.length === 0) {
         await loadInitialDevices()
       }
 
-      // 处理padding - 取最大值作为统一值
+      // deal withpadding - Take the maximum value as the unified value
       if (baseConfig.padding) {
         const padding = baseConfig.padding
         formData.paddingValue = Math.max(padding.top || 0, padding.right || 0, padding.bottom || 0, padding.left || 0)
@@ -536,7 +536,7 @@ const loadConfigurationFromManager = async () => {
         formData.padding = { top: 0, right: 0, bottom: 0, left: 0 }
       }
 
-      // 处理margin - 取最大值作为统一值
+      // deal withmargin - Take the maximum value as the unified value
       if (baseConfig.margin) {
         const margin = baseConfig.margin
         formData.marginValue = Math.max(margin.top || 0, margin.right || 0, margin.bottom || 0, margin.left || 0)
@@ -549,10 +549,10 @@ const loadConfigurationFromManager = async () => {
       resetToDefaults()
     }
   } catch (error) {
-    console.error('🔥 [BaseConfigForm] 配置加载失败:', error)
+    console.error('🔥 [BaseConfigForm] Configuration load failed:', error)
     resetToDefaults()
   } finally {
-    // 延迟重置标记
+    // delayed reset flag
     setTimeout(() => {
       isUpdating = false
     }, 50)
@@ -560,7 +560,7 @@ const loadConfigurationFromManager = async () => {
 }
 
 /**
- * 重置为默认值
+ * reset to default
  */
 const resetToDefaults = () => {
   formData.showTitle = false
@@ -576,35 +576,35 @@ const resetToDefaults = () => {
   formData.marginValue = 0
   formData.padding = { top: 0, right: 0, bottom: 0, left: 0 }
   formData.margin = { top: 0, right: 0, bottom: 0, left: 0 }
-  // 🔥 新增：重置设备字段
+  // 🔥 New：Reset device fields
   formData.deviceId = ''
   formData.metricsListTags = []
   formData.metricsList = []
 }
 
-// 配置变化监听器
+// Configure change listener
 let removeConfigListener: (() => void) | null = null
 
 /**
- * 监听选中节点变化，重新加载配置
+ * Monitor changes in selected nodes，Reload configuration
  */
 watch(
   selectedNodeId,
   (newNodeId, oldNodeId) => {
-    // 移除旧的监听器
+    // Remove old listener
     if (removeConfigListener) {
       removeConfigListener()
       removeConfigListener = null
     }
 
-    // 加载新节点的配置
+    // Load the configuration of the new node
     loadConfigurationFromManager()
 
-    // 如果有新节点，添加配置变化监听器
+    // If there is a new node，Add configuration change listener
     if (newNodeId) {
       try {
         removeConfigListener = configurationManager.onConfigurationChange(newNodeId, newConfig => {
-          // 重新加载配置（防止外部修改配置时表单不同步）
+          // Reload configuration（Prevent the form from being desynchronized when the configuration is modified externally）
           loadConfigurationFromManager()
         })
       } catch (error) {}
@@ -613,15 +613,15 @@ watch(
   { immediate: true }
 )
 
-// 组件挂载时初始化
+// Initialized when component is mounted
 onMounted(() => {
   loadConfigurationFromManager()
-  // 初始化设备列表
+  // Initialize device list
   loadInitialDevices()
 })
 
 /**
- * 应用配置
+ * Application configuration
  */
 const applyConfig = () => {
   handleUpdate()
@@ -641,7 +641,7 @@ const applyConfig = () => {
   })
 }
 
-// 组件卸载时清理
+// Cleanup when components are uninstalled
 onUnmounted(() => {
   if (removeConfigListener) {
     try {
@@ -664,7 +664,7 @@ onUnmounted(() => {
   padding: 12px;
 }
 
-/* 表单项样式优化 */
+/* Form item style optimization */
 :deep(.n-form-item) {
   margin-bottom: 12px;
 }
@@ -674,19 +674,19 @@ onUnmounted(() => {
   color: var(--text-color-2);
 }
 
-/* 输入控件样式 */
+/* Input control style */
 :deep(.n-input),
 :deep(.n-input-number),
 :deep(.n-select) {
   width: 100%;
 }
 
-/* 滑块样式 */
+/* Slider style */
 :deep(.n-slider) {
   margin: 8px 0;
 }
 
-/* 分割线样式 */
+/* Divider style */
 :deep(.n-divider) {
   margin: 16px 0 12px 0;
 }
@@ -697,12 +697,12 @@ onUnmounted(() => {
   color: var(--text-color);
 }
 
-/* 颜色选择器 */
+/* color picker */
 :deep(.n-color-picker) {
   width: 100%;
 }
 
-/* 设备选择器容器样式 */
+/* Device selector container style */
 :deep(.device-select-popover-content) {
   min-width: 280px;
   max-width: 400px;

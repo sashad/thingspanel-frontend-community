@@ -1,11 +1,11 @@
 <!--
-  HTTP配置第2步 - 请求头配置组件
-  使用DynamicParameterEditor配置HTTP请求头
+  HTTPConfiguration section2step - Request header configuration component
+  useDynamicParameterEditorConfigurationHTTPRequest header
 -->
 <script setup lang="ts">
 /**
- * HttpConfigStep2 - HTTP请求头配置步骤
- * 使用通用的动态参数编辑器配置请求头
+ * HttpConfigStep2 - HTTPRequest header configuration steps
+ * Configure request headers using the universal dynamic parameter editor
  */
 
 import type { HttpConfig } from '@/core/data-architecture/types/http-config'
@@ -13,11 +13,11 @@ import type { EnhancedParameter } from '@/core/data-architecture/types/parameter
 import DynamicParameterEditor from '@/core/data-architecture/components/common/DynamicParameterEditor.vue'
 
 interface Props {
-  /** HTTP配置数据 */
+  /** HTTPConfiguration data */
   modelValue: Partial<HttpConfig>
-  /** 当前选择的内部接口信息 */
+  /** Currently selected internal interface information */
   currentApiInfo?: any
-  /** 🔥 新增：当前组件ID，用于属性绑定 */
+  /** 🔥 New：current componentID，for property binding */
   componentId?: string
 }
 
@@ -29,7 +29,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 /**
- * 更新请求头配置
+ * Update request header configuration
  */
 const updateHeaders = (headers: EnhancedParameter[]) => {
   const updatedValue = {
@@ -43,7 +43,7 @@ const updateHeaders = (headers: EnhancedParameter[]) => {
 
 <template>
   <div class="http-config-step2">
-    <!-- 默认请求头提示框 -->
+    <!-- Default request header prompt box -->
     <n-alert
       v-if="showDefaultHeadersAlert && isInternalApi"
       type="info"
@@ -53,35 +53,35 @@ const updateHeaders = (headers: EnhancedParameter[]) => {
     >
       <template #header>
         <n-space align="center">
-          <span>✨ 建议添加默认请求头</span>
+          <span>✨ It is recommended to add a default request header</span>
         </n-space>
       </template>
 
       <n-space vertical size="small">
         <n-text depth="3">
-          内部接口通常需要以下请求头：
+          Internal interfaces typically require the following request headers：
           <n-text type="info" strong>Accept: application/json</n-text>
         </n-text>
 
         <n-space>
           <n-button type="primary" size="small" @click="applyDefaultHeaders">
-            添加默认请求头
+            Add default request header
           </n-button>
           <n-button size="small" @click="dismissAlert">
-            手动配置
+            Manual configuration
           </n-button>
         </n-space>
       </n-space>
     </n-alert>
 
-    <!-- 请求头配置 -->
+    <!-- Request header configuration -->
     <DynamicParameterEditor
       :model-value="modelValue.headers || []"
       parameter-type="header"
-      title="请求头配置"
-      add-button-text="添加请求头"
-      key-placeholder="头部名称（如：Content-Type）"
-      value-placeholder="头部值（如：application/json）"
+      title="Request header configuration"
+      add-button-text="Add request header"
+      key-placeholder="Header name（like：Content-Type）"
+      value-placeholder="header value（like：application/json）"
       :current-api-info="currentApiInfo"
       :current-component-id="componentId"
       @update:model-value="updateHeaders"

@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router';
 import type { FormInst } from 'naive-ui';
 import { NButton, NSpace, useMessage, NInputNumber, NTooltip, NIcon, NInput, NSelect, NSwitch } from 'naive-ui';
 import { deviceConfigInfo, deviceDetail, deviceLocation } from '@/service/api';
-// 移除deviceConfigEdit导入，不再调用设备配置接口
+// RemovedeviceConfigEditimport，No longer call the device configuration interface
 import { $t } from '@/locales';
-import TencentMap from './public/tencent-map.vue'; // 路径根据实际位置调整
+import TencentMap from './public/tencent-map.vue'; // The path is adjusted based on the actual location
 import { getCoordinateStringValidationError } from '@/utils/common/map-validator';
 
 const props = defineProps<{
@@ -16,12 +16,12 @@ const props = defineProps<{
 const latitude = ref('');
 const longitude = ref('');
 const isShow = ref(false);
-// 扩展信息数据
+// extended information data
 const additionInfo = ref([] as ExtensionInfo[]);
-// 表单引用
+// form reference
 const extensionFormRef = ref<HTMLElement & FormInst>();
 
-// 扩展信息接口定义
+// Extended information interface definition
 interface ExtensionInfo {
   name: string;
   type: 'String' | 'Number' | 'Boolean' | 'Enum';
@@ -29,7 +29,7 @@ interface ExtensionInfo {
   value?: string | number | boolean | null;
   desc?: string;
   enable: boolean;
-  options?: Array<{ label: string; value: string }>; // 枚举类型的选项
+  options?: Array<{ label: string; value: string }>; // Enum type options
 }
 
 const safeParseJSON = <T,>(payload: string | null | undefined, fallback: T): T => {
@@ -75,26 +75,26 @@ const coerceValueByType = (value: unknown, type: ExtensionInfo['type']) => {
       return String(value);
   }
 };
-// postData变量已移除，不再需要调用设备配置接口
+// postDataVariable removed，No need to call the device configuration interface anymore
 const { query } = useRoute();
 const message = useMessage();
 const handleSave = async () => {
   try {
-    // 验证经纬度是否有效
+    // Verify whether the latitude and longitude is valid
     if (latitude.value && longitude.value) {
       const error = getCoordinateStringValidationError(latitude.value, longitude.value);
       if (error) {
-        message.error(`经纬度无效: ${error}`);
+        message.error(`Invalid latitude and longitude: ${error}`);
         return;
       }
     }
 
-    // 验证扩展信息表单
+    // Validate extended information form
     if (extensionFormRef.value) {
       await extensionFormRef.value.validate();
     }
 
-    // 需要把扩展信息内容提取为key-value
+    // The extended information content needs to be extracted askey-value
     const extentedInfoObject = additionInfo.value.reduce<Record<string, string | number | boolean | null | undefined>>(
       (acc, item) => {
         acc[item.name] = item.value;
@@ -103,7 +103,7 @@ const handleSave = async () => {
       {}
     );
 
-    // 只调用设备位置接口，将扩展信息一并保存
+    // Only call the device location interface，Save extended information together
     const res = await deviceLocation({
       id: props.id,
       location: `${longitude.value},${latitude.value}`,
@@ -113,15 +113,15 @@ const handleSave = async () => {
       message.success($t('common.modifySuccess'))
     }
   } catch (error) {
-    message.error('保存失败')
+    message.error('Save failed')
   }
 };
-// 移除单独的扩展信息保存函数，统一使用底部保存按钮
-// 不再调用设备配置接口，只通过设备位置接口保存扩展信息
+// Remove separate extended information saving function，Use the save button at the bottom uniformly
+// No longer call the device configuration interface，Only save extended information through the device location interface
 
-// handleSwitchChange函数已移除，因为开关功能已被移除
-// 扩展信息的启用/禁用状态通过过滤逻辑处理
-// 根据类型渲染表单控件
+// handleSwitchChangeFunction removed，Because the switch function has been removed
+// Enable extended information/Disabled status is handled via filtering logic
+// Render form controls based on type
 const renderFormControl = (item: ExtensionInfo, index: number) => {
   const { type, options, default_value } = item;
 
@@ -130,14 +130,14 @@ const renderFormControl = (item: ExtensionInfo, index: number) => {
       return (
         <NInput
           v-model:value={additionInfo.value[index].value}
-          placeholder={`默认值: ${default_value || ''}`}
+          placeholder={`default value: ${default_value || ''}`}
         />
       );
     case 'Number':
       return (
         <NInputNumber
           v-model:value={additionInfo.value[index].value}
-          placeholder={`默认值: ${default_value || ''}`}
+          placeholder={`default value: ${default_value || ''}`}
           class="w-full"
         />
       );
@@ -154,14 +154,14 @@ const renderFormControl = (item: ExtensionInfo, index: number) => {
         <NSelect
           v-model:value={additionInfo.value[index].value}
           options={options || []}
-          placeholder={`默认值: ${default_value || ''}`}
+          placeholder={`default value: ${default_value || ''}`}
         />
       );
     default:
       return (
         <NInput
           v-model:value={additionInfo.value[index].value}
-          placeholder={`默认值: ${default_value || ''}`}
+          placeholder={`default value: ${default_value || ''}`}
         />
       );
   }
@@ -174,11 +174,11 @@ const onPositionSelected = position => {
 };
 
 const openMapAndGetPosition = () => {
-  // 验证当前输入的经纬度是否有效
+  // Verify whether the currently entered latitude and longitude is valid
   if (latitude.value && longitude.value) {
     const error = getCoordinateStringValidationError(latitude.value, longitude.value);
     if (error) {
-      window.$message?.error(`当前经纬度无效: ${error}`);
+      window.$message?.error(`The current latitude and longitude is invalid: ${error}`);
       return;
     }
   }
@@ -233,13 +233,13 @@ onMounted(getConfigInfo);
     </NCard>
 
     <NCard :title="$t('generate.extension-info')" class="mb-4">
-      <!-- 扩展信息表单 -->
+      <!-- Extended information form -->
       <div v-if="additionInfo.filter(item => item.enable === true).length > 0">
         <NForm ref="extensionFormRef" class="mt-4">
           <div class="space-y-4">
             <div v-for="item in additionInfo.filter(item => item.enable === true)" :key="item.name"
               class="flex items-center gap-3">
-              <!-- 名称和信息图标 -->
+              <!-- Name and information icons -->
               <div class="w-40 text-sm font-medium text-gray-700 flex-shrink-0 flex items-center gap-1">
                 <span class="truncate" :title="item.name">{{ item.name }}</span>
                 <NTooltip trigger="hover">
@@ -252,15 +252,15 @@ onMounted(getConfigInfo);
                     </NIcon>
                   </template>
                   <div class="max-w-xs">
-                    <div class="text-sm font-medium mb-1">名称: {{ item.name }}</div>
-                    <div class="text-sm font-medium mb-1">类型: {{ item.type }}</div>
-                    <div class="text-sm mb-1">默认值: {{ item.default_value }}</div>
-                    <div class="text-sm text-gray-600">{{ item.desc || '无描述' }}</div>
+                    <div class="text-sm font-medium mb-1">name: {{ item.name }}</div>
+                    <div class="text-sm font-medium mb-1">type: {{ item.type }}</div>
+                    <div class="text-sm mb-1">default value: {{ item.default_value }}</div>
+                    <div class="text-sm text-gray-600">{{ item.desc || 'No description' }}</div>
                   </div>
                 </NTooltip>
               </div>
 
-              <!-- 表单控件 -->
+              <!-- form control -->
               <div class="flex-1">
                 <component
                   :is="renderFormControl(item, additionInfo.findIndex(originalItem => originalItem.name === item.name))" />

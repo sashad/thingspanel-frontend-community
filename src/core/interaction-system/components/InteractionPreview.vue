@@ -1,6 +1,6 @@
 <template>
   <div class="interaction-preview">
-    <!-- 预览控制区 -->
+    <!-- Preview control area -->
     <div class="preview-controls">
       <n-space justify="space-between" align="center">
         <div class="preview-info">
@@ -28,7 +28,7 @@
       </n-space>
     </div>
 
-    <!-- 预览画布 -->
+    <!-- Preview canvas -->
     <div class="preview-canvas">
       <div
         ref="previewElement"
@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <!-- 交互列表 -->
+    <!-- interactive list -->
     <div class="interactions-list">
       <h4 class="list-title">{{ t('interaction.preview.configList') }}</h4>
 
@@ -98,7 +98,7 @@
             </div>
           </template>
 
-          <!-- 响应动作列表 -->
+          <!-- Response action list -->
           <div class="responses-preview">
             <div
               v-for="(response, responseIndex) in interaction.responses"
@@ -131,7 +131,7 @@
       </div>
     </div>
 
-    <!-- 执行日志 -->
+    <!-- execution log -->
     <div class="execution-log">
       <div class="log-header">
         <span class="log-title">{{ t('interaction.preview.executionLog') }}</span>
@@ -156,8 +156,8 @@
 
 <script setup lang="ts">
 /**
- * 交互预览组件
- * 提供实时的交互效果预览和测试功能
+ * Interactive preview component
+ * Provide real-time interactive effect preview and testing functions
  */
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
@@ -193,11 +193,11 @@ const emit = defineEmits<Emits>()
 const message = useMessage()
 const { t } = useI18n()
 
-// 响应式状态
+// Responsive state
 const previewElement = ref<HTMLElement>()
 const currentContent = ref('')
 
-// 初始化内容
+// Initialization content
 onMounted(() => {
   currentContent.value = t('interaction.editor.previewElement')
 })
@@ -206,7 +206,7 @@ const activeInteractions = ref<Set<number>>(new Set())
 const executionLog = ref<LogEntry[]>([])
 const isHovering = ref(false)
 
-// 计算属性
+// Computed properties
 const hasActiveInteractions = computed(() => {
   return props.interactions.some(interaction => interaction.enabled)
 })
@@ -221,7 +221,7 @@ const previewElementStyles = computed(() => {
   }
 })
 
-// 工具方法
+// Tool method
 const getEventTagType = (event: InteractionEventType) => {
   const typeMap = {
     click: 'success',
@@ -308,14 +308,14 @@ const isInteractionActive = (interaction: InteractionConfig) => {
   return activeInteractions.value.has(index)
 }
 
-// 事件处理
+// event handling
 const handleEvent = (eventType: InteractionEventType, isActive = true) => {
   if (eventType === 'hover') {
     isHovering.value = isActive
     if (isActive) {
       executeInteractionsByEvent('hover')
     } else {
-      // 悬停结束，可以添加恢复逻辑
+      // Hover over，Recovery logic can be added
       addLog('info', t('interaction.preview.hoverEnd'))
     }
   } else {
@@ -376,7 +376,7 @@ const executeInteraction = (interaction: InteractionConfig, index: number) => {
     }, delay)
   })
 
-  // 标记交互完成
+  // Mark interaction complete
   setTimeout(
     () => {
       activeInteractions.value.delete(index)
@@ -391,7 +391,7 @@ const executeResponse = (response: InteractionResponse) => {
   const element = previewElement.value
   const { action, value, duration = 300, easing = 'ease' } = response
 
-  // 设置过渡效果
+  // Set transition effects
   element.style.transition = `all ${duration}ms ${easing}`
 
   switch (action) {
@@ -423,15 +423,15 @@ const executeResponse = (response: InteractionResponse) => {
       currentContent.value = String(value)
       break
     case 'triggerAnimation':
-      // 移除之前的动画
+      // Remove previous animation
       element.style.animation = ''
-      // 强制重排
+      // force rearrangement
       element.offsetHeight
-      // 应用新动画
+      // Apply new animation
       element.style.animation = `${value} ${duration}ms ${easing}`
       break
     case 'custom':
-      // 自定义动作，尝试应用为样式对象
+      // Custom action，Try applying as style object
       if (typeof value === 'object' && value) {
         Object.assign(element.style, value)
       }
@@ -447,7 +447,7 @@ const testSingleInteraction = (interaction: InteractionConfig) => {
 const runAllInteractions = () => {
   addLog('info', t('interaction.preview.startExecutingAll'))
 
-  // 模拟触发所有事件类型
+  // Simulation triggers all event types
   const eventTypes: InteractionEventType[] = ['click', 'hover', 'focus', 'blur', 'custom']
 
   eventTypes.forEach(eventType => {
@@ -463,12 +463,12 @@ const resetPreview = () => {
 
   const element = previewElement.value
 
-  // 重置所有样式
+  // Reset all styles
   element.style.cssText = ''
   element.className = 'preview-element'
   currentContent.value = t('interaction.editor.previewElement')
 
-  // 清空活动状态
+  // Clear activity status
   activeInteractions.value.clear()
 
   addLog('info', t('interaction.messages.previewReset'))
@@ -489,7 +489,7 @@ const addLog = (type: LogEntry['type'], message: string) => {
     timestamp: new Date()
   })
 
-  // 限制日志数量
+  // Limit the number of logs
   if (executionLog.value.length > 100) {
     executionLog.value = executionLog.value.slice(0, 100)
   }
@@ -500,10 +500,10 @@ const clearLog = () => {
   addLog('info', t('interaction.messages.logCleared'))
 }
 
-// 生命周期
+// life cycle
 onMounted(() => {
   if (previewElement.value) {
-    // 保存原始样式
+    // Save original style
     const computedStyles = window.getComputedStyle(previewElement.value)
     originalStyles.value = {
       backgroundColor: computedStyles.backgroundColor,
@@ -742,7 +742,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .interaction-preview {
     height: auto;
@@ -763,7 +763,7 @@ onUnmounted(() => {
   }
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .interactions-grid::-webkit-scrollbar,
 .log-content::-webkit-scrollbar {
   width: 6px;
@@ -786,7 +786,7 @@ onUnmounted(() => {
   background: var(--text-color-3);
 }
 
-/* 动画效果 */
+/* Animation effects */
 .interaction-item {
   animation: slideIn 0.3s ease-out;
 }
@@ -802,7 +802,7 @@ onUnmounted(() => {
   }
 }
 
-/* 预览元素的交互状态 */
+/* Preview the interactive state of an element */
 .preview-element:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);

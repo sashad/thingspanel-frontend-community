@@ -29,8 +29,8 @@ const device_number = ref('');
 const layout = ref<ICardView[]>([]);
 const showDefaultCards = ref(false);
 const showAppChart = ref(false);
-const cardHeight = ref(160); // 卡片的高度
-const cardMargin = ref(15); // 卡片的间距
+const cardHeight = ref(160); // card height
+const cardMargin = ref(15); // card spacing
 
 const cr = ref<ICardRender>();
 

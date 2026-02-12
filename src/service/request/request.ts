@@ -57,18 +57,18 @@ export const request = createFlatRequest<App.Service.DEVResponse>(
       // when the requestTs is fail, you can show error message
 
       if (error?.response?.status === 401) {
-        // 检查错误码
+        // Check error code
         const errorData = error?.response?.data
         const errorCode = errorData?.code
 
         if (errorCode === 40102) {
-          // 尝试刷新token
+          // try to refreshtoken
           const { useAuthStore } = await import('@/store/modules/auth')
           const authStore = useAuthStore()
           const refreshSuccess = await authStore.refreshToken()
 
           if (refreshSuccess) {
-            // 刷新成功，重试原请求
+            // Refresh successful，Retry original request
             const originalRequest = error.config
             if (originalRequest && !(originalRequest as any)._retry) {
               (originalRequest as any)._retry = true;
@@ -79,9 +79,9 @@ export const request = createFlatRequest<App.Service.DEVResponse>(
               }
             }
           } else {
-            // 刷新失败，跳转到登录页
+            // Refresh failed，Jump to login page
             window.$message?.destroyAll()
-            window.$message?.error('登录已过期，请重新登录。')
+            window.$message?.error('Login has expired，Please log in again。')
 
             setTimeout(() => {
               localStg.remove('token')
@@ -91,9 +91,9 @@ export const request = createFlatRequest<App.Service.DEVResponse>(
             }, 1000)
           }
         } else if (errorCode === 40100 || errorCode === 40101) {
-          // 缺少认证信息或无效Token，直接跳转到登录页
+          // Authentication information is missing or invalidToken，Jump directly to the login page
           window.$message?.destroyAll()
-          window.$message?.error('认证失败，请重新登录。')
+          window.$message?.error('Authentication failed，Please log in again。')
 
           setTimeout(() => {
             localStg.remove('token')
@@ -102,9 +102,9 @@ export const request = createFlatRequest<App.Service.DEVResponse>(
             window.location.reload()
           }, 1000)
         } else {
-          // 处理其他所有401情况（默认处理，防止页面卡死）
+          // Handle everything else401Condition（Default processing，Prevent page from freezing）
           window.$message?.destroyAll()
-          window.$message?.error('登录已过期，请重新登录。')
+          window.$message?.error('Login has expired，Please log in again。')
 
           setTimeout(() => {
             localStg.remove('token')
@@ -119,7 +119,7 @@ export const request = createFlatRequest<App.Service.DEVResponse>(
       let message = error.message
       if (error.response?.status === 404) {
         window.$message?.destroyAll()
-        window.$message?.error('请求的资源未找到 (404)。')
+        window.$message?.error('The requested resource was not found (404)。')
         return
       }
       // show backend error message

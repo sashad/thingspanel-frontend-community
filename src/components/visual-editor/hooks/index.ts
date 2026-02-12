@@ -1,12 +1,12 @@
 /**
- * Visual Editor Hooks 统一导出
+ * Visual Editor Hooks Unified export
  */
 
-// 编辑器核心hooks
+// Editor corehooks
 export { useEditor, createEditor } from '@/components/visual-editor/hooks/useEditor'
 
-// 预览模式管理hooks
+// Preview mode managementhooks
 export { usePreviewMode } from '@/components/visual-editor/hooks/usePreviewMode'
 
-// 重新导出编辑器相关类型
+// Re-export editor related types
 export type { EditorContext, StateManager, WidgetDragData } from '@/components/visual-editor/hooks/useEditor'

@@ -6,8 +6,8 @@
 
 <script setup lang="ts">
 /**
- * 折线图组件
- * 使用 ECharts 实现折线图可视化
+ * Line chart component
+ * use ECharts Implement line chart visualization
  */
 
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
@@ -16,14 +16,14 @@ import type { LineChartCustomize } from './settingConfig'
 import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
 
-// 组件属性接口
+// Component property interface
 interface Props {
   config: LineChartCustomize
   data?: Record<string, unknown>
   componentId?: string
 }
 
-// 组件事件
+// Component events
 interface Emits {
   (e: 'update:config', config: LineChartCustomize): void
   (e: 'update:unified-config', config: UnifiedCard2Configuration): void
@@ -35,19 +35,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 🔥 关键：使用 computed 包装 props.data
+// 🔥 key：use computed Package props.data
 const { unifiedConfig, displayData } = useCard2Props({
   config: props.config,
   data: computed(() => props.data),
   componentId: props.componentId
 })
 
-// ECharts 实例和容器引用
+// ECharts Instance and container references
 const chartRef = ref<HTMLElement>()
 const chartContainerRef = ref<HTMLElement>()
 let chartInstance: echarts.ECharts | null = null
 
-// 计算显示数据（数据源优先）
+// Calculate display data（Data source first）
 const displayXData = computed(() => {
   const dataSourceXData = displayData.value?.main?.data?.xData
   return Array.isArray(dataSourceXData) ? dataSourceXData : ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00']
@@ -59,25 +59,25 @@ const displayYData = computed(() => {
 })
 
 /**
- * 初始化 ECharts 实例
+ * initialization ECharts Example
  */
 const initChart = () => {
   if (!chartRef.value) return
 
-  // 如果已存在实例，先销毁
+  // If an instance already exists，Destroy first
   if (chartInstance) {
     chartInstance.dispose()
   }
 
-  // 创建新实例
+  // Create new instance
   chartInstance = echarts.init(chartRef.value)
 
-  // 更新图表
+  // Update chart
   updateChart()
 }
 
 /**
- * 更新图表配置
+ * Update chart configuration
  */
 const updateChart = () => {
   if (!chartInstance) return
@@ -86,7 +86,7 @@ const updateChart = () => {
 
   const option: EChartsOption = {
     title: {
-      text: config.title || '数据趋势',
+      text: config.title || 'Data trends',
       left: 'center',
       textStyle: {
         color: 'var(--text-color-1, #333)',
@@ -117,7 +117,7 @@ const updateChart = () => {
     xAxis: {
       type: 'category',
       data: displayXData.value,
-      name: config.xAxisLabel || '时间',
+      name: config.xAxisLabel || 'time',
       nameTextStyle: {
         color: 'var(--text-color-2, #666)'
       },
@@ -127,7 +127,7 @@ const updateChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: config.yAxisLabel || '数值',
+      name: config.yAxisLabel || 'numerical value',
       nameTextStyle: {
         color: 'var(--text-color-2, #666)'
       },
@@ -142,7 +142,7 @@ const updateChart = () => {
     },
     series: [
       {
-        name: config.title || '数据',
+        name: config.title || 'data',
         type: 'line',
         smooth: config.smooth ?? true,
         data: displayYData.value,
@@ -173,7 +173,7 @@ const updateChart = () => {
 }
 
 /**
- * 处理窗口大小变化
+ * Handling window size changes
  */
 const handleResize = () => {
   if (chartInstance) {
@@ -181,7 +181,7 @@ const handleResize = () => {
   }
 }
 
-// 监听配置变化
+// Listen for configuration changes
 watch(
   () => unifiedConfig.value.component,
   () => {
@@ -192,7 +192,7 @@ watch(
   { deep: true }
 )
 
-// 监听数据变化
+// Monitor data changes
 watch(
   () => props.data,
   () => {
@@ -203,23 +203,23 @@ watch(
   { deep: true }
 )
 
-// 监听显示数据变化
+// Monitor display data changes
 watch([displayXData, displayYData], () => {
   nextTick(() => {
     updateChart()
   })
 })
 
-// 组件挂载
+// Component mounting
 onMounted(() => {
   nextTick(() => {
     initChart()
   })
 
-  // 监听窗口大小变化
+  // Listen for window size changes
   window.addEventListener('resize', handleResize)
 
-  // 使用 ResizeObserver 监听容器大小变化
+  // use ResizeObserver Monitor container size changes
   if (chartContainerRef.value) {
     const resizeObserver = new ResizeObserver(() => {
       handleResize()
@@ -228,7 +228,7 @@ onMounted(() => {
   }
 })
 
-// 组件卸载
+// Component uninstallation
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 

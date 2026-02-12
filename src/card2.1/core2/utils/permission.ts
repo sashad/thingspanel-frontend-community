@@ -1,47 +1,47 @@
 /**
- * 权限工具函数
- * 简化的权限检查系统
+ * Permission tool function
+ * Simplified permission checking system
  */
 
 import type { ComponentDefinition, UserAuthority } from '../types'
 
 /**
- * 从存储中获取用户权限
+ * Get user permissions from storage
  */
 export function getUserAuthorityFromStorage(): UserAuthority {
   try {
-    // 这里应该从实际的存储中获取用户权限
-    // 暂时返回默认值
+    // Here the user permissions should be obtained from the actual storage
+    // Temporarily return to default value
     return 'TENANT_ADMIN'
   } catch (error) {
-    console.warn('❌ [permission] 获取用户权限失败，使用默认权限')
+    console.warn('❌ [permission] Failed to obtain user permissions，Use default permissions')
     return 'TENANT_ADMIN'
   }
 }
 
 /**
- * 检查组件权限
+ * Check component permissions
  */
 export function checkComponentPermission(definition: ComponentDefinition, userAuthority?: UserAuthority): boolean {
-  const permission = definition.permission || '不限'
+  const permission = definition.permission || 'NO_LIMIT'
   const authority = userAuthority || getUserAuthorityFromStorage()
 
-  // 如果组件权限是"不限"，则所有用户都可以访问
-  if (permission === '不限') {
+  // If the component permissions are"NO_LIMIT"，then all users can access
+  if (permission === 'NO_LIMIT') {
     return true
   }
 
-  // 如果用户权限是"不限"，则不能访问任何有权限限制的组件
-  if (authority === '不限') {
+  // If the user permission is"NO_LIMIT"，You cannot access any permission-restricted components
+  if (authority === 'NO_LIMIT') {
     return false
   }
 
-  // 权限等级检查
+  // Permission level check
   const permissionLevels = {
     SYS_ADMIN: 4,
     TENANT_ADMIN: 3,
     TENANT_USER: 2,
-    不限: 1
+    NO_LIMIT: 1
   }
 
   const componentLevel = permissionLevels[permission as keyof typeof permissionLevels]
@@ -52,7 +52,7 @@ export function checkComponentPermission(definition: ComponentDefinition, userAu
 }
 
 /**
- * 过滤组件列表（按权限）
+ * Filter component list（by permissions）
  */
 export function filterComponentsByPermission(components: ComponentDefinition[]): ComponentDefinition[] {
   const userAuthority = getUserAuthorityFromStorage()

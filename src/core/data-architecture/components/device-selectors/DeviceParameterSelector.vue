@@ -1,11 +1,11 @@
 <!--
-  设备参数选择器主控制器
-  整合所有设备选择模式，提供统一的入口
+  Device parameter selector master controller
+  Integrate all device selection modes，Provide a unified entrance
 -->
 <script setup lang="ts">
 /**
- * DeviceParameterSelector - 设备参数选择器主控制器
- * 统一管理3种设备选择模式的切换和参数生成
+ * DeviceParameterSelector - Device parameter selector master controller
+ * Unified management3Switching of device selection modes and parameter generation
  */
 
 import { ref, computed, nextTick } from 'vue'
@@ -30,15 +30,15 @@ import type {
 import type { EnhancedParameter } from '@/core/data-architecture/types/parameter-editor'
 
 interface Props {
-  /** 是否显示选择器 */
+  /** Whether to show the selector */
   visible: boolean
-  /** 编辑模式：如果提供了现有参数组则为编辑模式 */
+  /** edit mode：Edit mode if an existing parameter group is provided */
   editingGroupId?: string
-  /** 预选择的设备（编辑模式） */
+  /** Pre-selected devices（edit mode） */
   preSelectedDevice?: DeviceInfo
-  /** 预选择的指标（编辑模式） */
+  /** Pre-selected indicators（edit mode） */
   preSelectedMetric?: DeviceMetric
-  /** 预选择的模式（编辑模式） */
+  /** Pre-selected mode（edit mode） */
   preSelectedMode?: DeviceParameterSourceType
 }
 
@@ -51,49 +51,49 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// 当前选择步骤：'mode' | 'selector' | 'completed'
+// Current selection step：'mode' | 'selector' | 'completed'
 const currentStep = ref<'mode' | 'selector' | 'completed'>('mode')
 
-// 选择的模式
+// Selected mode
 const selectedMode = ref<DeviceParameterSourceType>('device-id')
 
-// 是否为编辑模式
+// Is it in edit mode?
 const isEditMode = computed(() => !!props.editingGroupId)
 
-// 抽屉标题
+// Drawer title
 const drawerTitle = computed(() => {
   if (isEditMode.value) {
-    return '编辑设备参数组'
+    return 'Edit device parameter group'
   }
 
   switch (currentStep.value) {
     case 'mode':
-      return '选择参数生成方式'
+      return 'Select parameter generation method'
     case 'selector':
       return getStepTitle()
     default:
-      return '设备参数选择'
+      return 'Equipment parameter selection'
   }
 })
 
 /**
- * 获取当前步骤标题
+ * Get the current step title
  */
 const getStepTitle = (): string => {
   switch (selectedMode.value) {
     case 'device-id':
-      return '设备ID选择器'
+      return 'equipmentIDselector'
     case 'device-metric':
-      return '设备指标选择器'
+      return 'Device Metrics Selector'
     case 'telemetry':
-      return '遥测数据选择器'
+      return 'Telemetry data selector'
     default:
-      return '设备参数选择器'
+      return 'Device parameter selector'
   }
 }
 
 /**
- * 初始化编辑模式
+ * Initialize edit mode
  */
 const initEditMode = () => {
   if (isEditMode.value && props.preSelectedMode) {
@@ -105,7 +105,7 @@ const initEditMode = () => {
 }
 
 /**
- * 处理模式选择
+ * Processing mode selection
  */
 const handleModeSelected = (mode: DeviceParameterSourceType) => {
   selectedMode.value = mode
@@ -113,24 +113,24 @@ const handleModeSelected = (mode: DeviceParameterSourceType) => {
 }
 
 /**
- * 处理设备ID选择完成
+ * processing equipmentIDSelect Done
  */
 const handleDeviceIdSelected = (device: DeviceInfo) => {
-  // 生成参数
+  // Generate parameters
   const result = generateDeviceIdParameters(device)
   const parameters = convertToEnhancedParameters(result)
 
-  // 注册参数组
+  // Register parameter group
   globalParameterGroupManager.addGroup(result.groupInfo)
 
   if (isEditMode.value) {
-    // 编辑模式：发射更新事件
+    // edit mode：emit update event
     emit('parametersUpdated', {
       groupId: props.editingGroupId!,
       parameters
     })
   } else {
-    // 新建模式：发射选择事件
+    // New mode：emit selection event
     emit('parametersSelected', parameters)
   }
 
@@ -138,24 +138,24 @@ const handleDeviceIdSelected = (device: DeviceInfo) => {
 }
 
 /**
- * 处理设备指标选择完成
+ * Processing device indicator selection completed
  */
 const handleDeviceMetricSelected = (data: { device: DeviceInfo; metric: DeviceMetric }) => {
-  // 生成参数
+  // Generate parameters
   const result = generateDeviceMetricParameters(data.device, data.metric)
   const parameters = convertToEnhancedParameters(result)
 
-  // 注册参数组
+  // Register parameter group
   globalParameterGroupManager.addGroup(result.groupInfo)
 
   if (isEditMode.value) {
-    // 编辑模式：发射更新事件
+    // edit mode：emit update event
     emit('parametersUpdated', {
       groupId: props.editingGroupId!,
       parameters
     })
   } else {
-    // 新建模式：发射选择事件
+    // New mode：emit selection event
     emit('parametersSelected', parameters)
   }
 
@@ -163,24 +163,24 @@ const handleDeviceMetricSelected = (data: { device: DeviceInfo; metric: DeviceMe
 }
 
 /**
- * 处理取消选择
+ * Handle deselection
  */
 const handleCancel = () => {
   if (currentStep.value === 'selector' && !isEditMode.value) {
-    // 返回模式选择
+    // Return to mode selection
     currentStep.value = 'mode'
   } else {
-    // 关闭抽屉
+    // close drawer
     closeDrawer()
   }
 }
 
 /**
- * 关闭抽屉
+ * close drawer
  */
 const closeDrawer = () => {
   emit('update:visible', false)
-  // 延迟重置状态，避免关闭动画时看到状态变化
+  // Delayed reset state，Avoid seeing state changes when animation is turned off
   nextTick(() => {
     currentStep.value = 'mode'
     selectedMode.value = 'device-id'
@@ -188,7 +188,7 @@ const closeDrawer = () => {
 }
 
 /**
- * 监听抽屉显示状态
+ * Monitor drawer display status
  */
 const handleDrawerVisibilityChange = (visible: boolean) => {
   if (visible) {
@@ -202,7 +202,7 @@ const handleDrawerVisibilityChange = (visible: boolean) => {
 <template>
   <n-drawer :show="visible" width="600" placement="right" @update:show="handleDrawerVisibilityChange">
     <n-drawer-content :title="drawerTitle" closable>
-      <!-- 模式选择步骤 -->
+      <!-- Mode selection steps -->
       <DeviceSelectionModeChooser
         v-if="currentStep === 'mode'"
         :pre-selected-mode="selectedMode"
@@ -210,7 +210,7 @@ const handleDrawerVisibilityChange = (visible: boolean) => {
         @cancel="handleCancel"
       />
 
-      <!-- 设备ID选择器 -->
+      <!-- equipmentIDselector -->
       <DeviceIdSelector
         v-else-if="currentStep === 'selector' && selectedMode === 'device-id'"
         :pre-selected-device="preSelectedDevice"
@@ -219,7 +219,7 @@ const handleDrawerVisibilityChange = (visible: boolean) => {
         @cancel="handleCancel"
       />
 
-      <!-- 设备指标选择器 -->
+      <!-- Device Metrics Selector -->
       <DeviceMetricSelector
         v-else-if="currentStep === 'selector' && selectedMode === 'device-metric'"
         :pre-selected-device="preSelectedDevice"
@@ -229,14 +229,14 @@ const handleDrawerVisibilityChange = (visible: boolean) => {
         @cancel="handleCancel"
       />
 
-      <!-- 遥测选择器（预留） -->
+      <!-- telemetry selector（reserved） -->
       <div
         v-else-if="currentStep === 'selector' && selectedMode === 'telemetry'"
         style="padding: 40px; text-align: center"
       >
-        <n-text depth="3">遥测模式选择器正在开发中，敬请期待...</n-text>
+        <n-text depth="3">Telemetry mode selector is under development，Stay tuned...</n-text>
         <div style="margin-top: 20px">
-          <n-button @click="handleCancel">返回</n-button>
+          <n-button @click="handleCancel">return</n-button>
         </div>
       </div>
     </n-drawer-content>
@@ -244,5 +244,5 @@ const handleDrawerVisibilityChange = (visible: boolean) => {
 </template>
 
 <style scoped>
-/* 抽屉内容样式由各个子组件自行处理 */
+/* The drawer content style is handled by each sub-component. */
 </style>

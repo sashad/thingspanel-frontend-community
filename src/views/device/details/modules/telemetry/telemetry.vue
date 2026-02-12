@@ -61,16 +61,16 @@ const operationOptions = [
   { label: $t('custom.device_details.whole'), value: '' },
   { label: $t('custom.device_details.manualOperation'), value: '1' },
   { label: $t('custom.device_details.triggerOperation'), value: '2' }
-  // 其他操作类型选项...
+  // Other operation type options...
 ]
 const resultOptions = [
   { label: $t('custom.device_details.whole'), value: '' },
   { label: $t('custom.devicePage.success'), value: '1' },
   { label: $t('custom.devicePage.fail'), value: '2' }
-  // 其他发送结果选项...
+  // Other options for sending results...
 ]
-const cardHeight = ref(160) // 卡片的高度
-const cardMargin = ref(15) // 卡片的间距
+const cardHeight = ref(160) // card height
+const cardMargin = ref(15) // card spacing
 const log_page = ref(1)
 const showError = ref(false)
 const erroMessage = ref('')
@@ -208,7 +208,7 @@ const fetchTelemetry = async () => {
   const { data, error } = await telemetryDataCurrent(props.id)
   if (!error && data) {
     telemetryData.value = data
-    initTelemetryData.value = data[0] || {} // 存储一份模板
+    initTelemetryData.value = data[0] || {} // Save a template
     initTelemetryData.value.device_id = props.id
     const dataw = {
       // eslint-disable-next-line no-constant-binary-expression
@@ -277,7 +277,7 @@ const handlePositiveClick = async () => {
   if (isJSON(formValue.value)) {
     let res: any = {}
     if (form.expected) {
-      // 新增期望消息
+      // Add desired message
       const expiry = new Date().getTime() + (form.time ? form.time * 60 * 60 * 1000 : 0)
       res = await expectMessageAdd({
         device_id: props.id,
@@ -286,7 +286,7 @@ const handlePositiveClick = async () => {
         expiry: moment(expiry).format('YYYY-MM-DDTHH:mm:ssZ')
       })
     } else {
-      // 发送属性的逻辑...
+      // Logic for sending attributes...
       res = await telemetryDataPub({
         device_id: props.id,
         value: formValue.value
@@ -381,7 +381,7 @@ const inputFeedback = computed(() => {
 
 <template>
   <n-card class="w-full">
-    <!-- 第一行 -->
+    <!-- first line -->
     <NFlex justify="space-between">
       <n-button type="primary" class="mb-4" @click="openDialog">{{ $t('generate.issue-control') }}</n-button>
 
@@ -390,7 +390,7 @@ const inputFeedback = computed(() => {
       </n-button>
     </NFlex>
 
-    <!-- 自定义控制 -->
+    <!-- Custom controls -->
     <NGrid x-gap="20" y-gap="20" cols="1 s:2 m:3 l:4" responsive="screen" class="mb-4">
       <NGridItem v-for="item in controlList" :key="item.id">
         <NCard hoverable>
@@ -401,7 +401,7 @@ const inputFeedback = computed(() => {
       </NGridItem>
     </NGrid>
 
-    <!-- 第二行 -->
+    <!-- second line -->
     <n-card class="mb-4">
       <n-grid :x-gap="cardMargin" :y-gap="cardMargin" cols="1 600:2 900:3 1200:4">
         <n-gi v-for="(i, index) in telemetryData" :key="i.tenant_id">
@@ -484,7 +484,7 @@ const inputFeedback = computed(() => {
       </n-grid>
     </n-card>
 
-    <!-- 第三行 -->
+    <!-- The third line -->
     <n-space>
       <n-select
         v-model:value="operationType"
@@ -495,7 +495,7 @@ const inputFeedback = computed(() => {
       <n-select v-model:value="sendResult" :options="resultOptions" style="width: 200px" @update:value="fetchData" />
     </n-space>
 
-    <!-- 第四行 -->
+    <!-- fourth line -->
 
     <n-data-table :loading="loading" class="mt-4" :columns="columns" :data="tableData" :pagination="false" />
     <div class="mt-4 w-full flex justify-end">
@@ -598,7 +598,7 @@ const inputFeedback = computed(() => {
                   {{ $t('generate.send') }}
                 </n-button>
               </template>
-              确定发送指令吗
+              Are you sure you want to send the command?
             </n-popconfirm>
           </n-space>
         </n-form>

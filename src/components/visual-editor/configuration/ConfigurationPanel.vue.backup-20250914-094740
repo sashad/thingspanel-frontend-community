@@ -1,11 +1,11 @@
 ·
 <template>
   <div class="configuration-panel">
-    <!-- 全局设置 (无选中组件时显示) -->
+    <!-- Global settings (Displayed when no component is selected) -->
     <div v-if="!selectedWidget" class="global-settings">
       <h3 class="panel-title">{{ $t('config.global.title') }}</h3>
 
-      <!-- 画布全局设置 -->
+      <!-- Canvas global settings -->
       <n-form label-placement="left" label-width="auto" size="small" class="global-form">
         <n-form-item :label="$t('config.global.showWidgetTitles')">
           <n-switch :value="showWidgetTitles" @update:value="onToggleWidgetTitles" />
@@ -38,18 +38,18 @@
       </n-form>
     </div>
 
-    <!-- 组件配置 (选中组件时显示) -->
+    <!-- Component configuration (Shown when component is selected) -->
     <div v-else class="widget-configuration">
-      <!-- 配置面板标题 -->
+      <!-- Configure panel title -->
       <div class="config-header">
         <h3 class="panel-title">{{ widgetDisplayName }} {{ $t('config.widget.settings') }}</h3>
       </div>
 
-      <!-- 配置标签页 - 动态结构 -->
+      <!-- Configure tab page - dynamic structure -->
       <n-tabs v-model:value="activeTab" type="line" animated size="small" class="config-tabs">
-        <!-- 动态生成配置标签页 -->
+        <!-- Dynamically generate configuration tabs -->
         <n-tab-pane v-for="layer in configLayers" :key="layer.name" :name="layer.name" :tab="$t(layer.label)">
-          <!-- Base配置特殊处理 -->
+          <!-- BaseConfigure special handling -->
           <template v-if="layer.name === 'base'">
             <component
               :is="layer.component"
@@ -61,7 +61,7 @@
             />
           </template>
 
-          <!-- 组件配置特殊处理 -->
+          <!-- Special handling of component configuration -->
           <template v-else-if="layer.name === 'component'">
             <component
               :is="layer.component"
@@ -73,11 +73,11 @@
             />
           </template>
 
-          <!-- 数据源配置特殊处理 -->
+          <!-- Data source configuration special processing -->
           <template v-else-if="layer.name === 'dataSource'">
             <div class="data-source-config">
-              <!-- 使用现有的数据源配置组件 -->
-              <!-- 🔄 使用v-model双向绑定取代手动事件处理 -->
+              <!-- Configure the component using an existing data source -->
+              <!-- 🔄 usev-modelTwo-way binding replaces manual event handling -->
               <component
                 :is="layer.component"
                 ref="dataSourceConfigRef"
@@ -90,7 +90,7 @@
                 :global-polling-enabled="props.globalPollingEnabled"
                 @request-current-data="handleCurrentDataRequest"
                 @update:model-value="(newValue) => {
-                  console.log('🔥 [ConfigurationPanel] 数据源配置组件发出更新:', newValue)
+                  console.log('🔥 [ConfigurationPanel] Data source configuration component issues updates:', newValue)
                   if (props.selectedWidget) {
                     dataSourceConfig = newValue
                   }
@@ -99,7 +99,7 @@
             </div>
           </template>
 
-          <!-- 交互配置特殊处理 -->
+          <!-- Interactive configuration special handling -->
           <template v-else-if="layer.name === 'interaction'">
             <component
               :is="layer.component"
@@ -112,14 +112,14 @@
             />
           </template>
 
-          <!-- 默认通用处理 -->
+          <!-- Default general processing -->
           <template v-else>
             <component :is="layer.component" v-bind="getLayerProps(layer)" @validate="handleValidation" />
           </template>
         </n-tab-pane>
       </n-tabs>
 
-      <!-- 配置状态信息 -->
+      <!-- Configuration status information -->
       <div v-if="configurationStatus" class="config-status">
         <n-alert v-if="!configurationStatus.valid" type="error" :title="$t('config.status.error')" size="small">
           <ul v-if="configurationStatus.errors">
@@ -148,8 +148,8 @@
 
 <script setup lang="ts">
 /**
- * V6配置面板组件 - 纯粹的数据协调器
- * 简化的配置面板，直接传递definition和配置数据，专注于协调数据流
+ * V6Configure panel components - Pure data coordinator
+ * Simplified configuration panel，pass directlydefinitionand configuration data，Focus on coordinating data flow
  */
 
 import { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick, inject } from 'vue'
@@ -176,10 +176,10 @@ import { Settings as SettingsIcon, DocumentOutline } from '@vicons/ionicons5'
 import { $t } from '@/locales'
 import { smartDeepClone } from '@/utils/deep-clone'
 
-// 导入配置组件注册中心
+// Import configuration component registration center
 import { getVisibleConfigLayers, getConfigLayer } from '@/components/visual-editor/configuration/component-registry'
 
-// 导入配置管理器和类型
+// Import configuration managers and types
 import { configurationIntegrationBridge as configurationManager } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 import { getComponentDataRequirements } from '@/components/visual-editor/core/component-data-requirements'
 import type {
@@ -191,29 +191,29 @@ import type {
 } from './types'
 import type { VisualEditorWidget } from '@/components/visual-editor/types'
 
-// 🔥 导入交互管理器用于读取最新状态
+// 🔥 Import the interaction manager to read the latest status
 import { interactionManager } from '@/card2.1/core/interaction-manager'
-// 🔥 注入编辑器上下文，用于配置同步
+// 🔥 Inject editor context，for configuration synchronization
 const editorContext = inject('editorContext', null) as any
 
-// 🔄 重构：移除直接导入执行器管理器，改为事件通信
+// 🔄 Refactor：Remove direct import executor manager，Change to event communication
 
 interface Props {
-  /** 选中的组件 */
+  /** selected component */
   selectedWidget: VisualEditorWidget | null
-  /** 网格配置 */
+  /** Grid configuration */
   gridConfig?: any
-  /** 网格配置变更回调 */
+  /** Grid configuration change callback */
   onGridConfigChange?: (config: any) => void
-  /** 是否显示组件标题 */
+  /** Whether to display the component title */
   showWidgetTitles?: boolean
-  /** 切换显示标题回调 */
+  /** Switch display title callback */
   onToggleWidgetTitles?: (value: boolean) => void
-  /** 是否只读模式 */
+  /** Whether to read-only mode */
   readonly?: boolean
-  /** 是否为预览模式 - 轮询功能仅在预览模式下生效 */
+  /** Whether it is preview mode - Polling function only works in preview mode */
   previewMode?: boolean
-  /** 全局轮询开关 - 用于性能控制 */
+  /** Global polling switch - for performance control */
   globalPollingEnabled?: boolean
 }
 
@@ -239,35 +239,35 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 消息提示
+// Message prompt
 const message = useMessage()
 
-// 获取配置层级定义 - 传入组件ID和widget实例以检查数据源需求
+// Get configuration level definition - Pass in componentIDandwidgetExample to check data source requirements
 const configLayers = computed(() => getVisibleConfigLayers(props.selectedWidget?.id, props.selectedWidget))
 
-// 响应式状态 - 默认显示第一个可见层级
-// 🚨 避免在初始化时依赖 computed 值，使用静态默认值
+// Responsive state - Displays the first visible level by default
+// 🚨 Avoid dependencies during initialization computed value，Use static defaults
 const activeTab = ref('base')
 
-// 多数据源数据状态
+// Multiple data source data status
 const multiDataSourceData = ref<Record<string, any>>({})
 
-// 🔄 dataMappingConfig 已被 dataSourceConfig computed 取代
+// 🔄 dataMappingConfig has been dataSourceConfig computed replace
 
-// DataSourceConfigForm 组件引用
+// DataSourceConfigForm component reference
 const dataSourceFormRef = ref<any>(null)
 
-// DataSourceConfigForm 组件引用（现有系统）
+// DataSourceConfigForm component reference（Existing system）
 const dataSourceConfigRef = ref<any>(null)
 
-// 配置数据
+// Configuration data
 const baseConfig = ref({})
-// 🔥 统一配置架构：组件配置改为computed属性，直接与统一配置同步
+// 🔥 Unified configuration architecture：The component configuration is changed tocomputedproperty，Sync directly with unified configuration
 const componentConfig = computed<ComponentConfiguration>({
   get: () => {
     if (!props.selectedWidget) return { properties: {}, styles: {}, behavior: {}, validation: { required: [], rules: {} } }
     
-    // 🔥 从统一配置中获取组件配置
+    // 🔥 Get component configuration from unified configuration
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig
     if (unifiedConfig?.component) {
       return {
@@ -278,7 +278,7 @@ const componentConfig = computed<ComponentConfiguration>({
       }
     }
     
-    // 回退到传统配置获取方式
+    // Falling back to the traditional configuration acquisition method
     const config = configurationManager.getConfiguration(props.selectedWidget.id)
     return {
       properties: config?.component?.properties || {},
@@ -290,10 +290,10 @@ const componentConfig = computed<ComponentConfiguration>({
   set: value => {
     if (!props.selectedWidget) return
     
-    console.log('🚫 [ConfigurationPanel] 组件配置更新已禁用 - 等待Card组件事件通信:', value)
-    console.warn('⚠️ [ConfigurationPanel] 组件配置直接编辑器操作已禁用')
+    console.log('🚫 [ConfigurationPanel] Component configuration update disabled - waitCardComponent event communication:', value)
+    console.warn('⚠️ [ConfigurationPanel] Component configuration direct editor operations disabled')
     
-    // 🚫 禁用组件配置的直接编辑器操作
+    // 🚫 Disable direct editor manipulation of component configuration
     /*
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig || {}
     const updatedUnifiedConfig = {
@@ -315,30 +315,30 @@ const componentConfig = computed<ComponentConfiguration>({
   }
 })
 
-// 🔥 统一配置架构：数据源配置改为与统一配置同步
+// 🔥 Unified configuration architecture：The data source configuration is changed to be synchronized with the unified configuration
 const dataSourceConfig = computed<DataSourceConfiguration | null>({
   get: () => {
     if (!props.selectedWidget) return null
     
-    // 🔥 从统一配置中获取数据源配置
+    // 🔥 Get data source configuration from unified configuration
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig
     if (unifiedConfig?.dataSource) {
       return unifiedConfig.dataSource
     }
     
-    // 回退到传统配置获取方式
+    // Falling back to the traditional configuration acquisition method
     const config = configurationManager.getConfiguration(props.selectedWidget.id)
     return config?.dataSource || null
   },
   set: value => {
     if (!props.selectedWidget || !value) return
     
-    // 🔥 更新统一配置中的数据源配置部分
+    // 🔥 Update the data source configuration section in unified configuration
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig || {}
     const updatedUnifiedConfig = {
       ...unifiedConfig,
       dataSource: {
-        // 保持原有类型，不硬编码为 'data-source-bindings'
+        // Keep the original type，Not hardcoded as 'data-source-bindings'
         type: value.type || 'data-source-bindings',
         enabled: true,
         ...value,
@@ -351,17 +351,17 @@ const dataSourceConfig = computed<DataSourceConfiguration | null>({
       }
     }
     
-    // 🚫 禁用直接编辑器操作 - 改为通过Card组件事件通信
-    console.log('🔥 [ConfigurationPanel] 数据源配置更新 - 通过事件通信:', {
+    // 🚫 Disable direct editor operations - pass insteadCardComponent event communication
+    console.log('🔥 [ConfigurationPanel] Data source configuration update - Communicate via events:', {
       componentId: props.selectedWidget.id,
       dataSourceConfig: value,
       updatedUnifiedConfig
     })
     
-    // TODO: 改为通过Card组件事件发射配置更新
-    console.warn('⚠️ [ConfigurationPanel] 直接编辑器操作已禁用，等待Card组件事件通信实现')
+    // TODO: pass insteadCardComponent event emission configuration update
+    console.warn('⚠️ [ConfigurationPanel] Direct editor operations disabled，waitCardComponent event communication implementation')
     
-    // 🚫 暂时禁用所有直接编辑器更新
+    // 🚫 Temporarily disable all direct editor updates
     /*
     if (editorContext?.updateNode) {
       editorContext.updateNode(props.selectedWidget.id, {
@@ -374,7 +374,7 @@ const dataSourceConfig = computed<DataSourceConfiguration | null>({
     }
     */
     
-    // 🔄 重构：发出数据源配置更新事件，由外部系统负责数据执行
+    // 🔄 Refactor：Emit a data source configuration update event，The external system is responsible for data execution
     const eventData = {
       componentId: props.selectedWidget.id,
       componentType: props.selectedWidget.type,
@@ -385,32 +385,32 @@ const dataSourceConfig = computed<DataSourceConfiguration | null>({
   }
 })
 
-// 🔥 统一配置架构：交互配置改为computed属性，与统一配置同步
+// 🔥 Unified configuration architecture：The interaction configuration is changed tocomputedproperty，Synchronize with unified configuration
 const interactionConfig = computed<InteractionConfiguration>({
   get: () => {
     if (!props.selectedWidget) return {}
     
-    // 🔥 从统一配置中获取交互配置
+    // 🔥 Get interaction configuration from unified configuration
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig
     if (unifiedConfig?.interaction) {
       return unifiedConfig.interaction
     }
     
-    // 回退到传统配置获取方式
+    // Falling back to the traditional configuration acquisition method
     const config = configurationManager.getConfiguration(props.selectedWidget.id)
     return config?.interaction || {}
   },
   set: value => {
     if (!props.selectedWidget) return
     
-    // 🔥 更新统一配置中的交互配置部分
+    // 🔥 Update the interactive configuration section in unified configuration
     const unifiedConfig = props.selectedWidget.metadata?.unifiedConfig || {}
     const updatedUnifiedConfig = {
       ...unifiedConfig,
       interaction: { ...value }
     }
     
-    // 同步到编辑器上下文
+    // Sync to editor context
     if (editorContext?.updateNode) {
       editorContext.updateNode(props.selectedWidget.id, {
         metadata: {
@@ -423,17 +423,17 @@ const interactionConfig = computed<InteractionConfiguration>({
   }
 })
 
-// 配置状态
+// configuration status
 const configurationStatus = ref<ValidationResult | null>(null)
 
-// 计算属性
+// Computed properties
 const interactionConfigList = computed({
   get: () => {
-    // 从 interactionConfig 中提取 configs 数组，如果没有则返回空数组
+    // from interactionConfig extracted from configs array，If not, return an empty array
     return interactionConfig.value.configs || []
   },
   set: newConfigs => {
-    // 将配置数组存储到 interactionConfig 中
+    // Store the configuration array into interactionConfig middle
     interactionConfig.value = {
       ...interactionConfig.value,
       configs: newConfigs,
@@ -450,30 +450,30 @@ const widgetDisplayName = computed(() => {
   return props.selectedWidget.metadata?.card2Definition?.name || props.selectedWidget.type || 'Unknown Component'
 })
 
-// V6: 获取组件定义 - 直接从组件元数据获取
+// V6: Get component definition - Obtained directly from component metadata
 const componentDefinition = computed(() => {
   if (!props.selectedWidget) return null
 
-  // V6: 优先从Card2.1组件元数据获取定义
+  // V6: Prioritize fromCard2.1Component metadata acquisition definition
   const card2Definition = props.selectedWidget.metadata?.card2Definition
   if (card2Definition) {
     return card2Definition
   }
 
-  // 回退到传统的数据需求获取方式
+  // Falling back to traditional methods of obtaining data requirements
   return getComponentDataRequirements(props.selectedWidget.type)
 })
 
-// 组件数据源信息 - 适配现有 DataSourceConfigForm 的数据格式
+// Component data source information - Adapt to existing DataSourceConfigForm data format
 const componentDataSources = computed(() => {
   const definition = componentDefinition.value
 
-  // 🔥 修复：处理 Card2.1 组件的 dataRequirements 格式
+  // 🔥 repair：deal with Card2.1 component dataRequirements Format
   if (definition?.dataRequirements) {
-    // 🔥 处理多数据源：为每个 dataFields 项创建独立的数据源配置
+    // 🔥 Handle multiple data sources：for each dataFields Create an independent data source configuration
     if (definition.dataRequirements.dataFields && Array.isArray(definition.dataRequirements.dataFields)) {
       return definition.dataRequirements.dataFields.map((field: any) => {
-        // 为每个数据字段创建字段映射
+        // Create field mapping for each data field
         const fieldMappings: Record<string, any> = {
           [field.name]: {
             path: field.name,
@@ -483,14 +483,14 @@ const componentDataSources = computed(() => {
           }
         }
 
-        // 如果有示例数据，添加到字段映射中
+        // If there is sample data，Add to field mapping
         if (field.example) {
           fieldMappings[field.name].example = field.example
         }
 
         return {
-          key: field.name, // 使用字段名作为key（如 dataSource1, dataSource2）
-          name: field.description || field.name, // 使用描述作为显示名称
+          key: field.name, // Use field name askey（like dataSource1, dataSource2）
+          name: field.description || field.name, // Use description as display name
           type: field.type || 'object',
           fieldsToMap: [
             {
@@ -502,12 +502,12 @@ const componentDataSources = computed(() => {
           expectedDataFormat: field.type || 'object',
           validationRules: {},
           description: field.description || `${field.name} ${$t('visualEditor.dataSource')}`,
-          example: field.example // 传递示例数据
+          example: field.example // Pass sample data
         }
       })
     }
 
-    // 🔥 回退：处理单数据源格式（使用 primaryData）
+    // 🔥 rollback：Working with single data source formats（use primaryData）
     if (definition.dataRequirements.primaryData) {
       const primaryData = definition.dataRequirements.primaryData
       const fieldMappings: Record<string, any> = {
@@ -522,7 +522,7 @@ const componentDataSources = computed(() => {
       return [
         {
           key: primaryData.name || 'main',
-          name: primaryData.description || primaryData.name || '主数据源',
+          name: primaryData.description || primaryData.name || 'master data source',
           type: primaryData.type || 'object',
           fieldsToMap: [
             {
@@ -533,12 +533,12 @@ const componentDataSources = computed(() => {
           fieldMappings,
           expectedDataFormat: primaryData.type || 'object',
           validationRules: {},
-          description: primaryData.description || '组件的主要数据源'
+          description: primaryData.description || 'The component's primary data source'
         }
       ]
     }
 
-    // 🔥 最后回退：兼容旧格式 (fields/primary)
+    // 🔥 final rollback：Compatible with older formats (fields/primary)
     const fieldsToMap = definition.dataRequirements.fields?.map((field: any) => ({
       key: field.name,
       targetProperty: field.type || 'string'
@@ -549,7 +549,7 @@ const componentDataSources = computed(() => {
     ]
     const fieldMappings: Record<string, any> = {}
 
-    // 构建字段映射
+    // Build field mapping
     definition.dataRequirements.fields?.forEach((field: any) => {
       fieldMappings[field.name] = {
         path: field.name,
@@ -562,18 +562,18 @@ const componentDataSources = computed(() => {
     return [
       {
         key: 'main',
-        name: definition.dataRequirements.primary?.name || '主数据源',
+        name: definition.dataRequirements.primary?.name || 'master data source',
         type: definition.dataRequirements.primary?.type || 'object',
         fieldsToMap,
         fieldMappings,
         expectedDataFormat: definition.dataRequirements.primary?.type || 'object',
         validationRules: {},
-        description: definition.dataRequirements.primary?.description || '组件的主要数据源'
+        description: definition.dataRequirements.primary?.description || 'The component's primary data source'
       }
     ]
   }
 
-  // 🔥 处理标准的 dataSources 格式
+  // 🔥 processing standard dataSources Format
   if (definition?.dataSources) {
     return definition.dataSources.map((dataSource: any) => ({
       key: dataSource.key || dataSource.name,
@@ -583,12 +583,12 @@ const componentDataSources = computed(() => {
       fieldMappings: dataSource.fieldMappings || {},
       expectedDataFormat: dataSource.expectedDataFormat,
       validationRules: dataSource.validationRules || {},
-      // 🔥 修复：传递原始数据源对象，包含所有示例数据
+      // 🔥 repair：Pass the original data source object，Contains all sample data
       originalData: dataSource
     }))
   }
 
-  // 🔥 如果都没有找到，提供默认配置
+  // 🔥 If not found，Provide default configuration
   return [
     {
       key: 'main',
@@ -608,9 +608,9 @@ const componentDataSources = computed(() => {
   ]
 })
 
-// 增强的数据源信息 - 包含完整的组件定义信息（保持向后兼容）
+// Enhanced data source information - Contains complete component definition information（Stay backwards compatible）
 const enrichedDataSources = computed(() => {
-  // 🔥 修复：使用 componentDataSources 的结果，确保一致性
+  // 🔥 repair：use componentDataSources the result，ensure consistency
   const basicDataSources = componentDataSources.value
 
   if (!basicDataSources || basicDataSources.length === 0) {
@@ -619,23 +619,23 @@ const enrichedDataSources = computed(() => {
 
   return basicDataSources.map(dataSource => ({
     ...dataSource,
-    // 传递完整的字段映射规则
+    // Pass complete field mapping rules
     fieldMappings: dataSource.fieldMappings || {},
-    // 从组件定义中提取示例数据
+    // Extract sample data from component definition
     exampleData: extractExampleDataFromDefinition(dataSource),
-    // 数据处理脚本（如果有）
+    // Data processing script（if there is）
     dataProcessScript: dataSource.dataProcessScript || '',
-    // 传递标签信息
+    // Pass label information
     label: dataSource.name || dataSource.key
   }))
 })
 
 /**
- * 从组件定义中提取示例数据
- * 🔥 统一标准：只使用 example 字段，确保组件间示例数据标准一致
+ * Extract sample data from component definition
+ * 🔥 unified standards：only use example Field，Ensure consistent sample data standards across components
  */
 function extractExampleDataFromDefinition(dataSource: any) {
-  // 1. 从 fieldMappings 的 defaultValue 构建示例数据
+  // 1. from fieldMappings of defaultValue Build sample data
   if (dataSource.fieldMappings) {
     const exampleFromMappings: Record<string, any> = {}
     let hasDefaults = false
@@ -652,12 +652,12 @@ function extractExampleDataFromDefinition(dataSource: any) {
     }
   }
 
-  // 2. 🔥 统一标准：只检查 example 字段
+  // 2. 🔥 unified standards：Check only example Field
   if (dataSource.originalData?.example) {
     return dataSource.originalData.example
   }
 
-  // 3. 检查组件元数据中的测试数据
+  // 3. Check test data in component metadata
   if (componentDefinition.value?.metadata?.testData) {
     const testData = componentDefinition.value.metadata.testData[dataSource.key]
     if (testData) {
@@ -665,35 +665,35 @@ function extractExampleDataFromDefinition(dataSource: any) {
     }
   }
 
-  // 4. 使用通用默认数据
-  return null // 返回 null，让 DataSourceConfigForm 使用自己的默认数据生成逻辑
+  // 4. Use common default data
+  return null // return null，let DataSourceConfigForm Use your own default data generation logic
 }
 
-// 配置变更监听器清理函数
+// Configure change listener cleanup function
 let configChangeCleanup: (() => void) | null = null
 
-// 🔥 修复：增强防循环机制，使用多重保护
+// 🔥 repair：Enhance anti-circulation mechanism，Use multiple protections
 let isUpdatingFromManager = false
 let lastSyncTime = 0
 let lastSyncConfig: string | null = null
 
-// 监听配置变化并同步到ConfigurationManager
-// 🚨 注意：dataSourceConfig 被排除，因为它有自己的 computed setter 处理机制
+// Monitor configuration changes and synchronize toConfigurationManager
+// 🚨 Notice：dataSourceConfig excluded，because it has its own computed setter processing mechanism
 watch(
   [baseConfig, componentConfig, interactionConfig],
   () => {
-    // 防止循环更新的多重检查
+    // Multiple checks to prevent cyclic updates
     if (!props.selectedWidget || isUpdatingFromManager) {
       return
     }
 
-    // 🔥 新增：防抖机制，避免短时间内重复同步
+    // 🔥 New：Anti-shake mechanism，Avoid repeated synchronization in a short period of time
     const now = Date.now()
     if (now - lastSyncTime < 100) {
       return
     }
 
-    // 🔥 新增：内容去重，避免相同配置重复同步
+    // 🔥 New：Content deduplication，Avoid repeated synchronization of the same configuration
     const currentConfig = JSON.stringify({
       base: baseConfig.value,
       component: componentConfig.value,
@@ -710,15 +710,15 @@ watch(
   { deep: true }
 )
 
-// 🔄 V6监听器已被 dataSourceConfig computed 响应式系统取代
+// 🔄 V6The listener has been dataSourceConfig computed Responsive system replacement
 
-// 🔥 新增：执行器数据更新回调清理函数
+// 🔥 New：Executor data update callback cleanup function
 let executorDataUpdateCleanup: (() => void) | null = null
 
-// 生命周期
+// life cycle
 onMounted(() => {
-  // 🔄 重构：移除直接的执行器监听器，数据更新通过事件机制处理
-  // 数据更新将通过PanelEditor的事件系统传递，不在此处直接监听
+  // 🔄 Refactor：Remove direct executor listener，Data updates are handled through the event mechanism
+  // Data updates will be viaPanelEditorevent system delivery，Don’t listen directly here
 })
 
 onUnmounted(() => {
@@ -726,46 +726,46 @@ onUnmounted(() => {
     configChangeCleanup()
   }
 
-  // 🔥 新增：清理执行器数据更新回调
+  // 🔥 New：Cleanup executor data update callback
   if (executorDataUpdateCleanup) {
     executorDataUpdateCleanup()
   }
 })
 
-// 方法实现
+// Method implementation
 
 /**
- * 加载组件配置
+ * Load component configuration
  */
 const loadWidgetConfiguration = async (widgetId: string) => {
-  // 设置防循环标记
+  // Set anti-loop flag
   isUpdatingFromManager = true
 
   try {
     let config = configurationManager.getConfiguration(widgetId)
 
     if (!config) {
-      // 初始化默认配置
+      // Initialize default configuration
       configurationManager.initializeConfiguration(widgetId)
       config = configurationManager.getConfiguration(widgetId)
     }
 
     if (config) {
-      // 🔧 现在加载所有层级的配置
+      // 🔧 Now load the configuration for all levels
       baseConfig.value = { ...config.base }
 
-      // 🔥 关键修复：优先从 InteractionManager 获取最新的组件状态
+      // 🔥 critical fix：Prioritize from InteractionManager Get the latest component status
       const latestInteractionState = interactionManager.getLatestComponentState(widgetId)
 
-      // 合并配置管理器的配置和交互管理器的最新状态
+      // Merge the configuration manager's configuration and the latest status of the interaction manager
       const mergedComponentConfig = {
         ...config.component,
         properties: {
           ...config.component.properties,
-          // 从交互状态中提取关键属性
+          // Extract key attributes from interaction state
           ...(latestInteractionState.deviceId !== undefined && { deviceId: latestInteractionState.deviceId }),
           ...(latestInteractionState.metricsList !== undefined && { metricsList: latestInteractionState.metricsList }),
-          // 处理 customize 对象
+          // deal with customize object
           customize: {
             ...config.component.properties?.customize,
             ...(latestInteractionState.title !== undefined && { title: latestInteractionState.title }),
@@ -776,7 +776,7 @@ const loadWidgetConfiguration = async (widgetId: string) => {
         },
         styles: {
           ...config.component.styles,
-          // 从交互状态中提取样式属性
+          // Extract style properties from interaction state
           ...(latestInteractionState.backgroundColor !== undefined && {
             backgroundColor: latestInteractionState.backgroundColor
           }),
@@ -789,13 +789,13 @@ const loadWidgetConfiguration = async (widgetId: string) => {
 
       componentConfig.value = mergedComponentConfig
 
-      // 🚨 不直接设置 dataSourceConfig，因为它是 computed 属性
-      // dataSourceConfig 会通过 getter 自动从 ConfigurationManager 获取最新值
+      // 🚨 Not set directly dataSourceConfig，because it is computed property
+      // dataSourceConfig will pass getter automatically from ConfigurationManager Get the latest value
       interactionConfig.value = { ...config.interaction }
 
-      // 🔄 重构：如果有保存的数据源配置，通过事件通知执行数据获取
+      // 🔄 Refactor：If you have a saved data source configuration，Perform data retrieval via event notification
       if (config.dataSource?.config && Object.keys(config.dataSource.config).length > 0) {
-        // 发出事件让PanelEditor处理数据执行
+        // Send an event toPanelEditorprocessing data execution
         emit('data-source-manager-update', {
           componentId: widgetId,
           componentType: props.selectedWidget?.type || '',
@@ -809,54 +809,54 @@ const loadWidgetConfiguration = async (widgetId: string) => {
     }
   } catch (error) {
     message.error($t('visualEditor.configLoadFailed'))
-    console.error('配置加载失败:', error)
+    console.error('Configuration load failed:', error)
   } finally {
-    // 🔥 修复：延迟重置防循环标记，确保Vue响应式更新完成
+    // 🔥 repair：Delayed reset of anti-loop flags，make sureVueResponsive update completed
     nextTick(() => {
       setTimeout(() => {
         isUpdatingFromManager = false
-      }, 50) // 50ms延迟确保所有响应式更新完成
+      }, 50) // 50msDelay ensures all responsive updates complete
     })
   }
 }
 
 /**
- * 处理来自ConfigurationManager的配置变化
+ * processing fromConfigurationManagerconfiguration changes
  */
 const handleConfigurationChange = (config: WidgetConfiguration) => {
-  // 设置防循环标记
+  // Set anti-loop flag
   isUpdatingFromManager = true
 
   try {
-    // 更新本地配置状态
-    // 🔧 现在加载所有层级的配置
+    // Update local configuration status
+    // 🔧 Now load the configuration for all levels
     baseConfig.value = { ...config.base }
     componentConfig.value = { ...config.component }
-    // dataSourceConfig 是 computed 属性，会自动通过 getter 从 ConfigurationManager 获取
-    // 不需要手动设置：dataSourceConfig.value = config.dataSource ? { ...config.dataSource } : null
+    // dataSourceConfig yes computed property，will automatically pass getter from ConfigurationManager Get
+    // No manual settings required：dataSourceConfig.value = config.dataSource ? { ...config.dataSource } : null
     interactionConfig.value = { ...config.interaction }
 
-    // V6: 数据源配置由dataSourceConfig computed属性管理
-    // dataMappingConfig已移除，配置通过dataSourceConfig.value处理
+    // V6: The data source is configured bydataSourceConfig computedProperty management
+    // dataMappingConfigRemoved，Configuration passeddataSourceConfig.valuedeal with
   } finally {
-    // 🔥 修复：延迟重置防循环标记，确保Vue响应式更新完成
+    // 🔥 repair：Delayed reset of anti-loop flags，make sureVueResponsive update completed
     nextTick(() => {
       setTimeout(() => {
         isUpdatingFromManager = false
-      }, 50) // 50ms延迟确保所有响应式更新完成
+      }, 50) // 50msDelay ensures all responsive updates complete
     })
   }
 }
 
 /**
- * 同步本地配置到ConfigurationManager
+ * Synchronize local configuration toConfigurationManager
  */
 const syncConfigurationToManager = async () => {
   if (!props.selectedWidget) return
 
   try {
     const config: WidgetConfiguration = {
-      base: { ...baseConfig.value }, // 🔧 现在包含base配置
+      base: { ...baseConfig.value }, // 🔧 now containsbaseConfiguration
       component: { ...componentConfig.value },
       dataSource: dataSourceConfig.value ? { ...dataSourceConfig.value } : {},
       interaction: { ...interactionConfig.value },
@@ -872,10 +872,10 @@ const syncConfigurationToManager = async () => {
 }
 
 /**
- * 重置本地配置
+ * Reset local configuration
  */
 const resetLocalConfiguration = () => {
-  // 🔧 重置所有配置层级
+  // 🔧 Reset all configuration levels
   baseConfig.value = {}
   componentConfig.value = {
     properties: {},
@@ -888,55 +888,55 @@ const resetLocalConfiguration = () => {
   interactionConfig.value = { configs: [], enabled: true }
   configurationStatus.value = null
 
-  // V6: 数据源配置重置由dataSourceConfig computed属性处理
-  // dataMappingConfig已移除
+  // V6: Data source configuration reset bydataSourceConfig computedAttribute handling
+  // dataMappingConfigRemoved
 }
 
 /**
- * 处理验证结果
+ * Handle verification results
  */
 const handleValidation = (result: ValidationResult) => {
   configurationStatus.value = result
 }
 
 /**
- * 处理多数据源数据更新
+ * Handle data updates from multiple data sources
  */
 const handleDataSourceUpdate = (data: Record<string, any>) => {
-  // 更新本地数据状态
+  // Update local data status
   multiDataSourceData.value = { ...data }
 
-  // 发射事件给父组件，传递给实际的组件
+  // Emit events to the parent component，passed to the actual component
   if (props.selectedWidget) {
     emit('multi-data-source-update', props.selectedWidget.id, data)
   }
 }
 
 /**
- * 处理动态数据源更新
+ * Handling dynamic data source updates
  */
 const handleDynamicDataSourceUpdate = (key: string, data: any) => {
-  // 更新本地数据状态
+  // Update local data status
   multiDataSourceData.value = {
     ...multiDataSourceData.value,
     [key]: data
   }
 
-  // 同时更新 ConfigurationManager 中的数据源配置
+  // Update simultaneously ConfigurationManager Data source configuration in
   if (props.selectedWidget) {
-    // 创建符合 Card2Wrapper 期望的数据结构
+    // Create a match Card2Wrapper expected data structure
     const dataSourceBindings: Record<string, any> = {}
 
-    // 将每个数据源的数据包装成 Card2Wrapper 期望的格式
+    // Pack the data from each data source into Card2Wrapper expected format
     Object.entries(multiDataSourceData.value).forEach(([dataSourceKey, data]) => {
       dataSourceBindings[dataSourceKey] = {
-        rawData: JSON.stringify(data), // Card2Wrapper 期望的 rawData 字段
-        fieldMappings: {}, // 字段映射（暂时为空）
-        filterPath: '' // 过滤路径（暂时为空，后续扩展）
+        rawData: JSON.stringify(data), // Card2Wrapper expected rawData Field
+        fieldMappings: {}, // Field mapping（Temporarily empty）
+        filterPath: '' // filter path（Temporarily empty，Subsequent expansion）
       }
     })
 
-    // 创建或更新数据源配置
+    // Create or update data source configuration
     const dataSourceConfig: DataSourceConfiguration = {
       type: 'data-source-bindings',
       enabled: true,
@@ -948,16 +948,16 @@ const handleDynamicDataSourceUpdate = (key: string, data: any) => {
       }
     }
 
-    // 更新 ConfigurationManager
+    // renew ConfigurationManager
     configurationManager.updateConfiguration(props.selectedWidget.id, 'dataSource', dataSourceConfig)
 
-    // 发射事件给父组件
+    // Emit events to the parent component
     emit('multi-data-source-update', props.selectedWidget.id, multiDataSourceData.value)
   }
 }
 
 /**
- * 获取初始数据源值（从已保存的配置中恢复）
+ * Get initial data source value（Restore from saved configuration）
  */
 const getInitialDataSourceValues = () => {
   if (!props.selectedWidget) {
@@ -970,39 +970,39 @@ const getInitialDataSourceValues = () => {
   if (config?.dataSource?.type === 'data-source-bindings' && config.dataSource.config?.dataSourceBindings) {
     Object.entries(config.dataSource.config.dataSourceBindings).forEach(([key, binding]: [string, any]) => {
       if (binding.rawData) {
-        initialData[key] = binding.rawData // 直接使用保存的 JSON 字符串
+        initialData[key] = binding.rawData // Directly use the saved JSON string
       }
     })
   }
   return initialData
 }
 
-// 🔄 handleDataSourceConfigUpdate 已被 dataSourceConfig computed setter 取代
+// 🔄 handleDataSourceConfigUpdate has been dataSourceConfig computed setter replace
 
 /**
- * 处理来自 EditorDataSourceConfig 的配置更新（保持向后兼容）
+ * processing from EditorDataSourceConfig configuration update（Stay backwards compatible）
  */
 const handleEditorDataSourceUpdate = (config: any) => {
-  // 重定向到新的处理方法
+  // Redirect to new handling method
   handleDataSourceConfigUpdate(config)
 }
 
 /**
- * 处理当前数据请求 - 🔥 提供运行时数据给配置面板
+ * Handle current data request - 🔥 Provide runtime data to the configuration panel
  */
 const handleCurrentDataRequest = (widgetId: string) => {
-  // 请求父组件（PanelEditor）提供当前运行时数据
+  // Request parent component（PanelEditor）Provide current runtime data
   emit('request-current-data', widgetId)
 }
 
-// 🔄 getDataSourceEventListeners 已被 v-model 和响应式系统取代
+// 🔄 getDataSourceEventListeners has been v-model and reactive systems
 
-// V6: 移除handleDataMappingConfigUpdate - 数据变化自动处理
+// V6: RemovehandleDataMappingConfigUpdate - Automatic processing of data changes
 
-// V6: 移除handlePreviewUpdate - SimpleDataMappingForm内部处理预览
+// V6: RemovehandlePreviewUpdate - SimpleDataMappingFormInternal processing preview
 
 /**
- * 处理Base配置应用
+ * deal withBaseConfigure application
  */
 const handleBaseConfigApply = (config: any) => {
   if (props.selectedWidget) {
@@ -1011,19 +1011,19 @@ const handleBaseConfigApply = (config: any) => {
 }
 
 /**
- * 处理组件配置更新 - 性能优化：防抖批量更新 + 减少日志
+ * Handle component configuration updates - Performance optimization：Anti-shake batch update + Reduce logging
  */
 let componentConfigUpdateTimer: number | null = null
 let isConfigUpdating = false
 const handleComponentConfigUpdate = (config: any) => {
   if (!props.selectedWidget?.id || isConfigUpdating) return
 
-  // 立即更新Widget properties以获得即时反馈
+  // Update nowWidget propertiesto get instant feedback
   if (props.selectedWidget.metadata?.isCard2Component && props.selectedWidget.properties) {
     Object.assign(props.selectedWidget.properties, config)
   }
 
-  // 防抖保存到configurationManager
+  // Image stabilization saved toconfigurationManager
   if (componentConfigUpdateTimer) {
     clearTimeout(componentConfigUpdateTimer)
   }
@@ -1033,7 +1033,7 @@ const handleComponentConfigUpdate = (config: any) => {
 
     try {
       if (props.selectedWidget.metadata?.isCard2Component) {
-        // 更新组件配置层级
+        // Update component configuration hierarchy
         configurationManager.updateConfiguration(props.selectedWidget.id, 'component', {
           properties: config,
           styles: {},
@@ -1041,7 +1041,7 @@ const handleComponentConfigUpdate = (config: any) => {
           validation: { required: [], rules: {} }
         })
       } else {
-        // 传统组件配置保存
+        // Traditional component configuration saving
         configurationManager.updateConfiguration(props.selectedWidget.id, 'component', config)
       }
     } catch (error) {
@@ -1049,31 +1049,31 @@ const handleComponentConfigUpdate = (config: any) => {
       isConfigUpdating = false
       componentConfigUpdateTimer = null
     }
-  }, 300) // 增加到300ms防抖，与配置表单保持一致
+  }, 300) // increase to300msAnti-shake，Be consistent with the configuration form
 }
 
 /**
- * 处理交互配置更新
+ * Handling interactive configuration updates
  */
 const handleInteractionConfigChange = (configs: any[]) => {
   if (!props.selectedWidget?.id) return
 
-  // 通过计算属性setter自动更新本地交互配置
+  // via computed propertiessetterAutomatically update local interaction configuration
   interactionConfigList.value = configs
 
-  // 保存到配置管理器 - 现在传递完整的交互配置对象
+  // Save to configuration manager - Now pass the complete interaction configuration object
   configurationManager.updateConfiguration(props.selectedWidget.id, 'interaction', interactionConfig.value)
 }
 
 /**
- * 处理Base配置重置
+ * deal withBaseConfiguration reset
  */
 const handleBaseConfigReset = () => {
   baseConfig.value = {}
 }
 
 /**
- * 获取层级的props
+ * get hierarchicalprops
  */
 const getLayerProps = (layer: any) => {
   const commonProps = {
@@ -1113,13 +1113,13 @@ const getLayerProps = (layer: any) => {
 }
 
 /**
- * 处理网格配置变化
+ * Handling grid configuration changes
  */
 const handleGridConfigChange = () => {
   if (props.gridConfig) {
-    // 优先使用事件发射
+    // Prioritize event emission
     emit('grid-config-change', props.gridConfig)
-    // 兼容属性回调
+    // Compatible attribute callback
     if (props.onGridConfigChange) {
       props.onGridConfigChange(props.gridConfig)
     }
@@ -1127,24 +1127,24 @@ const handleGridConfigChange = () => {
 }
 
 /**
- * 切换显示标题
+ * Toggle display title
  */
 const onToggleWidgetTitles = (value: boolean) => {
-  // 优先使用事件发射
+  // Prioritize event emission
   emit('toggle-widget-titles', value)
-  // 兼容属性回调
+  // Compatible attribute callback
   if (props.onToggleWidgetTitles) {
     props.onToggleWidgetTitles(value)
   }
 }
 
-// 监听选中组件变化 - 在所有函数定义后执行
+// Monitor changes in selected components - Executed after all function definitions
 watch(
   () => props.selectedWidget,
   async (newWidget, oldWidget) => {
     if (newWidget?.id === oldWidget?.id) return
 
-    // 清理旧的监听器
+    // Clean up old listeners
     if (configChangeCleanup) {
       configChangeCleanup()
       configChangeCleanup = null
@@ -1153,22 +1153,22 @@ watch(
     if (newWidget) {
       await loadWidgetConfiguration(newWidget.id)
 
-      // 监听配置变化
+      // Listen for configuration changes
       configChangeCleanup = configurationManager.onConfigurationChange(newWidget.id, handleConfigurationChange)
     } else {
-      // 清空配置
+      // Clear configuration
       resetLocalConfiguration()
     }
   },
   { immediate: true }
 )
 
-// 🔥 监听 configLayers 变化，确保 activeTab 指向有效的标签页
+// 🔥 monitor configLayers change，make sure activeTab Point to a valid tab
 watch(
   configLayers,
   newLayers => {
     if (newLayers.length > 0) {
-      // 如果当前 activeTab 不在新的层级列表中，切换到第一个可用的
+      // If currently activeTab Not in the new level list，Switch to the first available
       const currentTabExists = newLayers.some(layer => layer.name === activeTab.value)
       if (!currentTabExists) {
         activeTab.value = newLayers[0].name
@@ -1178,8 +1178,8 @@ watch(
   { immediate: true }
 )
 
-// 🚨 移除标签页切换时的配置重载，避免循环依赖
-// 配置的加载应该由组件选择变化触发，而不是标签页切换
+// 🚨 Removed configuration reloading when switching tabs，Avoid circular dependencies
+// Loading of configuration should be triggered by component selection change，Instead of tab switching
 </script>
 
 <style scoped>
@@ -1240,18 +1240,18 @@ watch(
   padding: 0;
 }
 
-/* 只对特定的配置类型添加padding */
+/* Add only for specific configuration typespadding */
 .config-tabs :deep(.n-tab-pane) {
   height: 100%;
 }
 
-/* 基础配置和其他需要padding的配置 */
+/* Basic configuration and other needspaddingconfiguration */
 .config-tabs :deep(.n-tab-pane:not([name='component'])) {
   padding: 8px;
   overflow-y: auto;
 }
 
-/* 组件配置占满全部空间，不需要padding */
+/* Component configuration takes up all space，unnecessarypadding */
 .config-tabs :deep(.n-tab-pane[name='component']) {
   padding: 0;
   height: 100%;
@@ -1268,7 +1268,7 @@ watch(
   font-size: 12px;
 }
 
-/* 滚动条样式 */
+/* Scroll bar style */
 .config-tabs :deep(.n-tabs-content)::-webkit-scrollbar {
   width: 6px;
 }
@@ -1287,7 +1287,7 @@ watch(
   background: #a8a8a8;
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .config-header {
     flex-direction: column;
@@ -1307,7 +1307,7 @@ watch(
   }
 }
 
-/* V6样式 - 简化的数据配置区域 */
+/* V6style - Simplified data configuration area */
 .v6-data-config {
   display: flex;
   flex-direction: column;
@@ -1322,7 +1322,7 @@ watch(
   padding: 8px;
 }
 
-/* 数据源配置样式 */
+/* Data source configuration style */
 .data-source-config {
   height: 100%;
   overflow: hidden;

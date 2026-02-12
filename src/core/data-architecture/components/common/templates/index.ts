@@ -1,92 +1,92 @@
 /**
- * 参数值模板管理 v2.0
- * 支持复杂组件模板：手动输入、下拉选择、属性绑定、组件模板
+ * Parameter value template management v2.0
+ * Support complex component templates：Manual entry、drop down selection、Property binding、component template
  */
 
 import type { Component, AsyncComponentLoader } from 'vue'
 
-// 模板类型枚举
+// Template type enum
 export enum ParameterTemplateType {
-  MANUAL = 'manual', // 手动输入
-  DROPDOWN = 'dropdown', // 下拉选择
-  PROPERTY = 'property', // 属性绑定（动态）
-  COMPONENT = 'component' // 复杂组件模板
+  MANUAL = 'manual', // Manual entry
+  DROPDOWN = 'dropdown', // drop down selection
+  PROPERTY = 'property', // Property binding（dynamic）
+  COMPONENT = 'component' // Complex component template
 }
 
-// 模板选项接口
+// Template options interface
 export interface TemplateOption {
   label: string
   value: string | number | boolean
   description?: string
 }
 
-// 组件模板配置接口
+// Component template configuration interface
 export interface ComponentTemplateConfig {
-  /** 组件名称字符串或组件导入函数或组件实例 */
+  /** Component name string or component import function or component instance */
   component: string | Component | AsyncComponentLoader<Component>
-  /** 传递给组件的props */
+  /** passed to the componentprops */
   props?: Record<string, any>
-  /** 组件事件监听器映射 */
+  /** Component event listener mapping */
   events?: Record<string, string>
-  /** 组件插槽配置 */
+  /** Component slot configuration */
   slots?: Record<string, any>
-  /** 组件渲染配置 */
+  /** Component rendering configuration */
   renderConfig?: {
-    /** 是否包装在容器中 */
+    /** Whether packaged in a container */
     wrapped?: boolean
-    /** 容器样式类 */
+    /** Container style class */
     containerClass?: string
-    /** 最小高度 */
+    /** minimum height */
     minHeight?: string
   }
 }
 
-// 模板配置接口
+// Template configuration interface
 export interface ParameterTemplate {
   id: string
   name: string
   type: ParameterTemplateType
   description: string
-  // 下拉选择模板的选项
+  // Drop down options to select a template
   options?: TemplateOption[]
-  // 默认值
+  // default value
   defaultValue?: any
-  // 是否支持自定义输入（针对下拉选择模板）
+  // Whether to support custom input（Select template for dropdown）
   allowCustom?: boolean
-  // 🔥 新增：组件模板配置
+  // 🔥 New：Component template configuration
   componentConfig?: ComponentTemplateConfig
 }
 
 /**
- * 内置模板列表
+ * Built-in template list
  */
 export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   {
     id: 'manual',
-    name: '手动输入',
+    name: 'Manual entry',
     type: ParameterTemplateType.MANUAL,
-    description: '直接输入固定值',
+    description: 'Enter fixed value directly',
     defaultValue: ''
   },
   {
     id: 'http-methods',
-    name: 'HTTP方法',
+    name: 'HTTPmethod',
     type: ParameterTemplateType.DROPDOWN,
-    description: 'HTTP请求方法选择',
+    description: 'HTTPRequest method selection',
     options: [
-      { label: 'GET', value: 'GET', description: '获取数据' },
-      { label: 'POST', value: 'POST', description: '提交数据' },
-      { label: 'PUT', value: 'PUT', description: '更新数据' },
-      { label: 'DELETE', value: 'DELETE', description: '删除数据' },
-      { label: 'PATCH', value: 'PATCH', description: '部分更新' }
+      { label: 'GET', value: 'GET', description: 'Get data' },
+      { label: 'POST', value: 'POST', description: 'Submit data' },
+      { label: 'PUT', value: 'PUT', description: 'Update data' },
+      { label: 'DELETE', value: 'DELETE', description: 'Delete data' },
+      { label: 'PATCH', value: 'PATCH', description: 'Partial update' }
     ],
     defaultValue: 'GET'
   },
   {
     id: 'content-types',
-    name: '内容类型',
+    name: 'Content type',
     type: ParameterTemplateType.DROPDOWN,
-    description: '常用的Content-Type值',
+    description: 'Commonly usedContent-Typevalue',
     options: [
       { label: 'application/json', value: 'application/json' },
       { label: 'application/x-www-form-urlencoded', value: 'application/x-www-form-urlencoded' },
@@ -99,9 +99,9 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'auth-types',
-    name: '认证类型',
+    name: 'Certification type',
     type: ParameterTemplateType.DROPDOWN,
-    description: '常用的Authorization类型',
+    description: 'Commonly usedAuthorizationtype',
     options: [
       { label: 'Bearer Token', value: 'Bearer ' },
       { label: 'Basic Auth', value: 'Basic ' },
@@ -113,12 +113,12 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'boolean-values',
-    name: '布尔值',
+    name: 'Boolean value',
     type: ParameterTemplateType.DROPDOWN,
-    description: '真假值选择',
+    description: 'True or false value selection',
     options: [
-      { label: '是 (true)', value: 'true' },
-      { label: '否 (false)', value: 'false' },
+      { label: 'yes (true)', value: 'true' },
+      { label: 'no (false)', value: 'false' },
       { label: '1', value: '1' },
       { label: '0', value: '0' }
     ],
@@ -126,23 +126,23 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'property-binding',
-    name: '属性绑定',
+    name: 'Property binding',
     type: ParameterTemplateType.PROPERTY,
-    description: '绑定到动态属性（运行时获取值）',
+    description: 'Bind to dynamic properties（Get value at runtime）',
     defaultValue: ''
   },
-  // 🔥 新增：组件属性绑定模板
+  // 🔥 New：Component property binding template
   {
     id: 'component-property-binding',
-    name: '组件属性绑定',
+    name: 'Component property binding',
     type: ParameterTemplateType.COMPONENT,
-    description: '绑定到编辑器中已加载组件的属性',
+    description: 'Bind to a property of a loaded component in the editor',
     defaultValue: '',
     componentConfig: {
       component: 'ComponentPropertySelector',
       props: {
-        placeholder: '选择要绑定的组件属性',
-        // 🔥 关键修复：启用自动检测当前组件ID
+        placeholder: 'Select the component properties to bind',
+        // 🔥 critical fix：Enable automatic detection of current componentsID
         autoDetectComponentId: true
       },
       events: {
@@ -155,12 +155,12 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
       }
     }
   },
-  // 🔥 新增：组件模板
+  // 🔥 New：component template
   {
     id: 'device-metrics-selector',
-    name: '设备配置',
+    name: 'Device configuration',
     type: ParameterTemplateType.COMPONENT,
-    description: '选择设备和对应的指标数据',
+    description: 'Select equipment and corresponding indicator data',
     defaultValue: '',
     componentConfig: {
       component: 'DeviceMetricsSelector',
@@ -180,9 +180,9 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'device-dispatch-selector',
-    name: '设备分发选择器',
+    name: 'Device distribution selector',
     type: ParameterTemplateType.COMPONENT,
-    description: '设备分发选择器组件',
+    description: 'Device distribution selector component',
     defaultValue: '',
     componentConfig: {
       component: 'DeviceDispatchSelector',
@@ -202,9 +202,9 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'icon-selector',
-    name: '图标选择器',
+    name: 'Icon selector',
     type: ParameterTemplateType.COMPONENT,
-    description: '图标选择器组件',
+    description: 'Icon picker component',
     defaultValue: '',
     componentConfig: {
       component: 'IconSelector',
@@ -223,18 +223,18 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
   },
   {
     id: 'interface-template',
-    name: '接口模板',
+    name: 'interface template',
     type: ParameterTemplateType.DROPDOWN,
-    description: '使用内部接口的常用参数模板',
+    description: 'Use common parameter templates for internal interfaces',
     options: [
-      { label: '设备ID', value: '{device_id}', description: '设备标识符' },
-      { label: '用户ID', value: '{user_id}', description: '用户标识符' },
-      { label: '租户ID', value: '{tenant_id}', description: '租户标识符' },
-      { label: '面板ID', value: '{board_id}', description: '面板标识符' },
-      { label: '分组ID', value: '{group_id}', description: '分组标识符' },
-      { label: '时间戳', value: '{timestamp}', description: '当前时间戳' },
-      { label: '页码', value: '1', description: '分页页码' },
-      { label: '页大小', value: '10', description: '分页大小' }
+      { label: 'equipmentID', value: '{device_id}', description: 'device identifier' },
+      { label: 'userID', value: '{user_id}', description: 'user标识符' },
+      { label: 'tenantID', value: '{tenant_id}', description: 'Tenant identifier' },
+      { label: 'panelID', value: '{board_id}', description: 'panel identifier' },
+      { label: 'GroupID', value: '{group_id}', description: 'group identifier' },
+      { label: 'Timestamp', value: '{timestamp}', description: '当前Timestamp' },
+      { label: 'page number', value: '1', description: '分页page number' },
+      { label: 'page size', value: '10', description: 'paging size' }
     ],
     defaultValue: '{device_id}',
     allowCustom: true
@@ -242,39 +242,39 @@ export const PARAMETER_TEMPLATES: ParameterTemplate[] = [
 ]
 
 /**
- * 🔥 修改：根据参数类型获取推荐模板（3个选项）
- * 返回：手动输入、组件属性绑定、设备配置
- * 注意：外面有统一设备配置选择器（批量），里面有单个参数的设备配置选择
+ * 🔥 Revise：Get recommended templates based on parameter type（3options）
+ * return：Manual entry、Component property binding、Device configuration
+ * Notice：There is a unified device configuration selector out there（batch），There are device configuration options for individual parameters.
  */
 export function getRecommendedTemplates(parameterType: 'header' | 'query' | 'path'): ParameterTemplate[] {
   return [
-    // 1. 手动输入
+    // 1. Manual entry
     PARAMETER_TEMPLATES.find(t => t.id === 'manual')!,
 
-    // 2. 组件属性绑定
+    // 2. Component property binding
     PARAMETER_TEMPLATES.find(t => t.id === 'component-property-binding')!,
 
-    // 3. 设备配置（单个参数的设备配置）
+    // 3. Device configuration（Device configuration for individual parameters）
     PARAMETER_TEMPLATES.find(t => t.id === 'device-metrics-selector')!
   ]
 }
 
 /**
- * 获取所有组件模板
+ * Get all component templates
  */
 export function getComponentTemplates(): ParameterTemplate[] {
   return PARAMETER_TEMPLATES.filter(t => t.type === ParameterTemplateType.COMPONENT)
 }
 
 /**
- * 检查模板是否为组件类型
+ * Check if template is component type
  */
 export function isComponentTemplate(template: ParameterTemplate): boolean {
   return template.type === ParameterTemplateType.COMPONENT
 }
 
 /**
- * 获取模板by ID
+ * Get templateby ID
  */
 export function getTemplateById(id: string): ParameterTemplate | undefined {
   return PARAMETER_TEMPLATES.find(t => t.id === id)

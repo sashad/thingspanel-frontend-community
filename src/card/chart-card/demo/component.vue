@@ -5,7 +5,7 @@ import { getAttributeDataSet, telemetryDataCurrentKeys } from '@/service/api/dev
 import { createLogger } from '@/utils/logger'
 import { icons as iconOptions } from './icons'
 
-// 正式环境可根据api获取
+// The formal environment can be based onapiGet
 const detail = ref<string>('')
 const unit = ref<string>('')
 const props = defineProps<{
@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 const fontSize = ref('14px')
 const logger = createLogger('Component')
-const myCard = ref<any | null>(null) // 创建一个ref来引用NCard
+const myCard = ref<any | null>(null) // Create arefto quoteNCard
 let resizeObserver: ResizeObserver | null = null
 
 defineExpose({
@@ -60,8 +60,8 @@ const setSeries: (dataSource) => void = async dataSource => {
 
 const handleResize = entries => {
   for (const entry of entries) {
-    // 根据卡片宽度动态调整字体大小，这里仅为示例逻辑，实际应用中需按需调整
-    let dFontSize = `${entry.contentRect.width / 20}px` // 假设字体大小与宽度成反比，20为比例系数
+    // Dynamically adjust font size based on card width，This is just an example logic，Need to be adjusted as needed in actual applications
+    let dFontSize = `${entry.contentRect.width / 20}px` // Assume font size is inversely proportional to width，20is the proportional coefficient
     if (entry.contentRect.width / entry.contentRect.height > 3) {
       dFontSize = `${(entry.contentRect.width + (entry.contentRect.height * entry.contentRect.width) / entry.contentRect.height / 2) / 20 / (1 + entry.contentRect.width / entry.contentRect.height / 2)}px`
     }
@@ -81,7 +81,7 @@ watch(
 
 onMounted(() => {
   setSeries(props?.card?.dataSource)
-  // 确保DOM已经挂载后再初始化ResizeObserver
+  // make sureDOMInitialize after mountingResizeObserver
   if (myCard.value) {
     resizeObserver = new ResizeObserver(handleResize)
     resizeObserver.observe(myCard.value)
@@ -89,7 +89,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  // 组件卸载前清除观察器
+  // Clear observer before component uninstallation
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null

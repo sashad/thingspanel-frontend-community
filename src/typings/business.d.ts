@@ -1,64 +1,64 @@
-/** 自定义路由类型 用于权限管理模块 */
+/** Custom route type Used for permission management module */
 declare namespace CustomRoute {
   interface Route extends Api.Route.MenuRoute {}
 
   /**
-   * 清理类型
+   * Cleanup type
    *
-   * - 1: 菜单
-   * - 2: 目录
-   * - 3: 路由
-   * - 4: 按钮
+   * - 1: menu
+   * - 2: Table of contents
+   * - 3: routing
+   * - 4: button
    */
   type routerTypeKey = NonNullable<Route['element_type']>
 
   /**
-   * 类型
+   * type
    *
-   * - SYS_ADMIN: 系统管理员
-   * - TENANT_USER: 租户用户
-   * - TENANT_ADMIN: 租户管理员
+   * - SYS_ADMIN: system administrator
+   * - TENANT_USER: Tenant user
+   * - TENANT_ADMIN: Tenant Administrator
    */
   type routerSysFlagKey = string
 }
-/** 应用管理-服务管理模块 */
+/** Application management-Service management module */
 declare namespace ServiceManagement {
   interface Service extends Api.ApiApplyManagement.Service {}
-  /** 设备类型 */
+  /** Device type */
   type DeviceTypeKey = NonNullable<Service['device_type']>
-  /** 协议类型 */
+  /** protocol type */
   type ProtocolTypeKey = NonNullable<Service['protocol_type']>
 }
 
-/** 规则引擎模块 */
+/** Rule engine module */
 declare namespace RuleEngine {
   interface Rule extends Api.RuleEngine.Rule {
-    /** 序号 */
+    /** serial number */
     index: number
   }
 
   /**
-   * 规则引擎状态
+   * Rule engine status
    *
-   * - 1: 已启用
-   * - 2: 已暂停
+   * - 1: Enabled
+   * - 2: Suspended
    */
   type StatusKey = NonNullable<Rule['status']>
 }
 
-/** 数据服务模块 */
+/** Data service module */
 declare namespace DataService {
   interface Data extends Api.DataService.Data {
-    /** 序号 */
+    /** serial number */
     index: number
     /** SQL */
     SQL: string | null
-    /** SQL编写辅助 */
+    /** SQLwriting aid */
     SQLWritingAid: string | null
   }
 
   /**
-   * 签名方式
+   * Signature method
    *
    * - 1: MD5
    * - 2: HAS256
@@ -66,39 +66,39 @@ declare namespace DataService {
   type SignModeKey = NonNullable<Data['signMode']>
 
   /**
-   * 接口支持标志
+   * Interface support flag
    *
-   * - 1: http接口
-   * - 2: http和ws接口
+   * - 1: httpinterface
+   * - 2: httpandwsinterface
    */
   type FlagKey = NonNullable<Data['flag']>
 
   /**
-   * 规则引擎状态
+   * Rule engine status
    *
-   * - 1: 已启用
-   * - 2: 已停止
+   * - 1: Enabled
+   * - 2: Stopped
    */
   type StatusKey = NonNullable<Data['status']>
 }
 
-/** 常规设置 */
+/** General settings */
 declare namespace GeneralSetting {
   interface ThemeSetting extends Api.GeneralSetting.ThemeSetting {}
   interface DataClearSetting extends Api.GeneralSetting.DataClearSetting {}
 
   /**
-   * 清理类型
+   * Cleanup type
    *
-   * - 1: 操作日志
-   * - 2: 设备数据
+   * - 1: Operation log
+   * - 2: Device data
    */
   type CleanupTypeKey = NonNullable<DataClearSetting['data_type']>
   /**
-   * 是否启用
+   * Whether to enable
    *
-   * - 1: 启用
-   * - 2: 停用
+   * - 1: enable
+   * - 2: deactivate
    */
   type EnabledTypeKey = NonNullable<DataClearSetting['enabled']>
 }
@@ -108,10 +108,10 @@ declare namespace NotificationServices {
   interface PushNotification extends Api.NotificationServices.PushNotification {}
 
   /**
-   * 开启/关闭 服务
+   * turn on/closure Serve
    *
-   * - OPEN-开启
-   * - CLOSE-关闭
+   * - OPEN-turn on
+   * - CLOSE-closure
    */
   type StatusKey = NonNullable<Email['status']>
 }
@@ -122,23 +122,23 @@ declare namespace UserManagement {
   interface UserKey extends Api.UserManagement.UserKey {}
 
   /**
-   * 用户性别
+   * User gender
    *
-   * - 0: 女
-   * - 1: 男
+   * - 0: female
+   * - 1: male
    */
   type GenderKey = NonNullable<User['gender']>
 
   /**
-   * 用户状态
+   * User status
    *
-   * - N: 正常
-   * - F: 冻结
+   * - N: normal
+   * - F: freeze
    */
   type UserStatusKey = NonNullable<User['status']>
 }
 
-// 设备信息
+// Device information
 declare namespace AddDeviceModel {
   interface Device extends Api.device.addDeviceModel {}
 }

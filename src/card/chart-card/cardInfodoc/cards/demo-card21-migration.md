@@ -1,57 +1,57 @@
-# Demo 组件 Card 2.1 迁移配置文档
+# Demo components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-**组件ID**: `chart-demo`  
-**组件类型**: `chart`  
-**组件名称**: 演示数字指示器  
-**功能描述**: 带图标的数字指示器演示组件，支持设备遥测和属性数据显示，具有响应式字体大小调整功能
+**componentsID**: `chart-demo`  
+**Component type**: `chart`  
+**Component name**: Presentation digital indicator  
+**Function description**: Digital indicator presentation component with icons，Support device telemetry and attribute data display，Features responsive font sizing
 
-## 当前实现分析
+## Current implementation analysis
 
-### 1. 组件结构
+### 1. Component structure
 ```
 demo/
-├── index.ts              # 组件定义配置
-├── component.vue         # 主组件实现
-├── card-config.vue       # 配置表单
-├── poster.png           # 组件预览图
-└── icons.ts             # 图标配置
+├── index.ts              # Component definition configuration
+├── component.vue         # Main component implementation
+├── card-config.vue       # Configuration form
+├── poster.png           # Component preview
+└── icons.ts             # Icon configuration
 ```
 
-### 2. 核心特性
-- **单数据源**: 支持 1 个设备数据源
-- **数据类型**: 支持遥测数据和属性数据
-- **图标系统**: 集成 Fluent UI 图标库，100+ 图标可选
-- **响应式设计**: 根据容器大小自动调整字体大小
-- **实时更新**: 支持 WebSocket 实时数据更新
-- **自定义配置**: 支持图标、颜色、单位自定义
+### 2. Core features
+- **single data source**: support 1 device data sources
+- **data type**: Supports telemetry and attribute data
+- **icon system**: integrated Fluent UI Icon library，100+ Icon optional
+- **Responsive design**: Automatically adjust font size based on container size
+- **real time updates**: support WebSocket Real-time data updates
+- **Custom configuration**: support icon、color、Unit customization
 
-### 3. 技术实现
-- **图标库**: @vicons/fluent (Fluent UI 图标)
-- **响应式**: ResizeObserver API 监听容器变化
-- **数据获取**: 支持遥测和属性两种数据类型
-- **样式布局**: 绝对定位布局，支持响应式调整
+### 3. Technical implementation
+- **Icon library**: @vicons/fluent (Fluent UI icon)
+- **Responsive**: ResizeObserver API Listen for container changes
+- **data acquisition**: Supports two data types: telemetry and attributes
+- **style layout**: Absolutely positioned layout，Support responsive adjustment
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 1. 组件定义 (ComponentDefinition)
+### 1. Component definition (ComponentDefinition)
 
 ```typescript
 import { ComponentDefinition } from '@/card2.1/types'
 
 export const demoDefinition: ComponentDefinition = {
-  // 基础信息
+  // Basic information
   id: 'chart-demo',
   name: 'demo.digitalIndicator',
   type: 'chart',
   category: 'demo',
   
-  // 组件配置
+  // Component configuration
   component: () => import('./component.vue'),
   configComponent: () => import('./config.vue'),
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 5, height: 3 },
     minSize: { width: 2, height: 1 },
@@ -59,7 +59,7 @@ export const demoDefinition: ComponentDefinition = {
     resizable: true
   },
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     multiple: false,
@@ -73,11 +73,11 @@ export const demoDefinition: ComponentDefinition = {
     }
   },
   
-  // 配置模式
+  // configuration mode
   configSchema: {
     type: 'object',
     properties: {
-      // 显示配置
+      // show configuration
       display: {
         type: 'object',
         properties: {
@@ -88,7 +88,7 @@ export const demoDefinition: ComponentDefinition = {
         }
       },
       
-      // 样式配置
+      // Style configuration
       style: {
         type: 'object',
         properties: {
@@ -102,7 +102,7 @@ export const demoDefinition: ComponentDefinition = {
               'Heart20Regular', 'Home20Regular', 'Info20Regular',
               'Location20Regular', 'Mail20Regular', 'Person20Regular',
               'Phone20Regular', 'Settings20Regular', 'Star20Regular'
-              // ... 更多图标选项
+              // ... More icon options
             ],
             default: 'ClipboardCode20Regular' 
           },
@@ -132,7 +132,7 @@ export const demoDefinition: ComponentDefinition = {
         }
       },
       
-      // 数据配置
+      // Data configuration
       data: {
         type: 'object',
         properties: {
@@ -160,7 +160,7 @@ export const demoDefinition: ComponentDefinition = {
         }
       },
       
-      // 布局配置
+      // layout configuration
       layout: {
         type: 'object',
         properties: {
@@ -196,35 +196,35 @@ export const demoDefinition: ComponentDefinition = {
 }
 ```
 
-### 2. 数据源映射
+### 2. Data source mapping
 
 ```typescript
-// 原始数据源结构 -> Card 2.1 数据源结构
+// Original data source structure -> Card 2.1 Data source structure
 const dataSourceMapping = {
-  // 设备数据源
+  // Device data source
   deviceSource: {
     type: 'device',
     config: {
-      deviceId: 'string',      // 设备ID
-      metricKey: 'string',     // 指标键名
-      metricName: 'string',    // 指标显示名称
-      metricType: 'string',    // 指标类型: 'telemetry' | 'attribute'
-      unit: 'string'           // 单位
+      deviceId: 'string',      // equipmentID
+      metricKey: 'string',     // Indicator key name
+      metricName: 'string',    // Indicator display name
+      metricType: 'string',    // Indicator type: 'telemetry' | 'attribute'
+      unit: 'string'           // unit
     }
   }
 }
 ```
 
-### 3. 实现要点
+### 3. Implementation points
 
-#### 数据获取逻辑
+#### Data acquisition logic
 ```typescript
-// 数据获取函数
+// Data acquisition function
 const fetchData = async (dataSource: DataSourceConfig) => {
   const { deviceId, metricKey, metricType } = dataSource
   
   if (metricType === 'telemetry') {
-    // 获取遥测数据
+    // Get telemetry data
     const response = await telemetryDataCurrentKeys({
       device_id: deviceId,
       keys: metricKey
@@ -237,7 +237,7 @@ const fetchData = async (dataSource: DataSourceConfig) => {
       }
     }
   } else if (metricType === 'attribute') {
-    // 获取属性数据
+    // Get attribute data
     const response = await getAttributeDataSet({ 
       device_id: deviceId 
     })
@@ -254,44 +254,44 @@ const fetchData = async (dataSource: DataSourceConfig) => {
   return { value: null, unit: '' }
 }
 
-// 实时数据更新
+// Real-time data updates
 const updateData = (deviceId: string, metricKey: string, data: any) => {
   if (!metricKey || data[metricKey] === undefined || data[metricKey] === null || data[metricKey] === '') {
     logger.warn(`No data returned from websocket for ${metricKey}`)
     return
   }
   
-  // 更新显示值
+  // Update display value
   displayValue.value = data[metricKey]
 }
 ```
 
-#### 响应式字体大小
+#### Responsive font size
 ```typescript
-// 响应式字体大小计算
+// Responsive font size calculation
 const calculateFontSize = (containerWidth: number, containerHeight: number, config: StyleConfig) => {
   if (!config.fontSize.auto) {
     return `${config.fontSize.base}px`
   }
   
-  let fontSize = containerWidth / 20 // 基础计算
+  let fontSize = containerWidth / 20 // basic calculations
   
-  // 宽高比调整
+  // Aspect ratio adjustment
   const aspectRatio = containerWidth / containerHeight
   if (aspectRatio > 3) {
     fontSize = (containerWidth + (containerHeight * containerWidth) / containerHeight / 2) / 20 / (1 + aspectRatio / 2)
   }
   
-  // 应用比例系数
+  // Apply scaling factor
   fontSize *= config.fontSize.ratio
   
-  // 限制最小最大值
+  // limit minmax
   fontSize = Math.max(8, Math.min(72, fontSize))
   
   return `${fontSize}px`
 }
 
-// ResizeObserver 监听
+// ResizeObserver monitor
 const setupResizeObserver = () => {
   if (!containerRef.value) return
   
@@ -306,18 +306,18 @@ const setupResizeObserver = () => {
 }
 ```
 
-#### 图标系统集成
+#### Icon system integration
 ```typescript
-// 图标配置
+// Icon configuration
 import { icons } from './icons'
 
-// 动态图标组件
+// Dynamic icon component
 const IconComponent = computed(() => {
   const iconName = props.card.config.style.iconName || 'ClipboardCode20Regular'
   return icons[iconName] || icons.ClipboardCode20Regular
 })
 
-// 图标样式
+// icon style
 const iconStyle = computed(() => ({
   color: props.card.config.style.iconColor || '#000000',
   position: 'absolute',
@@ -325,9 +325,9 @@ const iconStyle = computed(() => ({
 }))
 ```
 
-#### 数据格式化
+#### Data formatting
 ```typescript
-// 数据格式化函数
+// Data formatting functions
 const formatValue = (value: any, config: DataConfig) => {
   if (value === null || value === undefined || value === '') {
     return config.defaultValue || '8'
@@ -349,7 +349,7 @@ const formatValue = (value: any, config: DataConfig) => {
       return `${format.prefix}${formatted}${format.suffix}`
       
     case 'boolean':
-      return value ? '是' : '否'
+      return value ? 'yes' : 'no'
       
     case 'text':
     default:
@@ -358,93 +358,93 @@ const formatValue = (value: any, config: DataConfig) => {
 }
 ```
 
-## 迁移检查清单
+## Migration checklist
 
-### 功能迁移
-- [ ] 单数据源支持
-- [ ] 遥测数据获取
-- [ ] 属性数据获取
-- [ ] 实时数据更新
-- [ ] 图标显示功能
-- [ ] 响应式字体调整
-- [ ] 数据格式化显示
+### Function migration
+- [ ] Single data source support
+- [ ] Telemetry data acquisition
+- [ ] Attribute data acquisition
+- [ ] Real-time data updates
+- [ ] Icon display function
+- [ ] Responsive font adjustment
+- [ ] Data format display
 
-### 配置迁移
-- [ ] 图标选择配置
-- [ ] 颜色配置
-- [ ] 字体大小配置
-- [ ] 单位配置
-- [ ] 布局位置配置
-- [ ] 数据格式配置
+### Configuration migration
+- [ ] Icon selection configuration
+- [ ] Color configuration
+- [ ] Font size configuration
+- [ ] unit configuration
+- [ ] Layout location configuration
+- [ ] Data format configuration
 
-### 性能优化
-- [ ] ResizeObserver 内存管理
-- [ ] 图标懒加载
-- [ ] 数据更新防抖
-- [ ] 组件卸载清理
+### Performance optimization
+- [ ] ResizeObserver Memory management
+- [ ] Icon lazy loading
+- [ ] Data update anti-shake
+- [ ] Component uninstall and cleanup
 
-## 迁移步骤
+## Migration steps
 
-### 1. 创建组件定义
+### 1. Create component definition
 ```bash
-# 创建组件目录
+# Create component directory
 mkdir -p src/card2.1/components/demo/digital-indicator
 
-# 创建必要文件
+# Create necessary files
 touch src/card2.1/components/demo/digital-indicator/definition.ts
 touch src/card2.1/components/demo/digital-indicator/component.vue
 touch src/card2.1/components/demo/digital-indicator/config.vue
 touch src/card2.1/components/demo/digital-indicator/icons.ts
 ```
 
-### 2. 实现核心组件
-- 迁移 `component.vue` 主组件逻辑
-- 迁移图标系统和响应式逻辑
-- 适配 Card 2.1 数据源接口
-- 实现配置表单组件
+### 2. Implement core components
+- migrate `component.vue` main component logic
+- Migrate icon system and responsive logic
+- adaptation Card 2.1 Data source interface
+- Implement configuration form components
 
-### 3. 配置验证
-- 测试数据源配置
-- 验证图标显示功能
-- 测试响应式调整
-- 检查实时更新效果
+### 3. Configuration verification
+- Test data source configuration
+- Verify icon display function
+- Test responsive adjustments
+- Check the real-time update effect
 
-### 4. 性能测试
-- 响应式性能测试
-- 内存泄漏检查
-- 图标加载性能
+### 4. Performance testing
+- Responsive performance testing
+- Memory leak check
+- Icon loading performance
 
-## 图标系统
+## icon system
 
-### 可用图标列表
+### List of available icons
 ```typescript
-// 常用图标分类
+// Common icon categories
 const iconCategories = {
-  // 基础图标
+  // Basic icon
   basic: [
     'Add20Regular', 'Delete20Regular', 'Edit20Regular', 'Save20Regular',
     'Copy20Regular', 'Cut20Regular', 'Search20Regular', 'Filter20Regular'
   ],
   
-  // 状态图标
+  // status icon
   status: [
     'Alert20Regular', 'ErrorCircle20Regular', 'Checkmark20Regular',
     'CircleOff20Regular', 'Info20Regular', 'Prohibited20Regular'
   ],
   
-  // 设备图标
+  // device icon
   device: [
     'Camera20Regular', 'Phone20Regular', 'Laptop20Regular',
     'Tv20Regular', 'Video20Regular', 'WifiOff20Regular'
   ],
   
-  // 导航图标
+  // Navigation icon
   navigation: [
     'Home20Regular', 'Location20Regular', 'Map20Regular',
     'ArrowUp20Regular', 'ArrowDown20Regular', 'Target20Regular'
   ],
   
-  // 通信图标
+  // communication icon
   communication: [
     'Mail20Regular', 'Chat20Regular', 'Call20Regular',
     'Share20Regular', 'Link20Regular', 'Globe20Regular'
@@ -452,13 +452,13 @@ const iconCategories = {
 }
 ```
 
-## 配置示例
+## Configuration example
 
-### 基础配置
+### Basic configuration
 ```json
 {
   "display": {
-    "title": "温度传感器",
+    "title": "temperature sensor",
     "showIcon": true,
     "showUnit": true,
     "showName": true
@@ -485,11 +485,11 @@ const iconCategories = {
 }
 ```
 
-### 高级配置
+### Advanced configuration
 ```json
 {
   "display": {
-    "title": "设备状态",
+    "title": "Device status",
     "showIcon": true,
     "showUnit": false,
     "showName": true
@@ -506,10 +506,10 @@ const iconCategories = {
   },
   "data": {
     "precision": 0,
-    "defaultValue": "离线",
+    "defaultValue": "Offline",
     "format": {
       "type": "text",
-      "prefix": "状态: ",
+      "prefix": "state: ",
       "suffix": ""
     }
   },
@@ -529,27 +529,27 @@ const iconCategories = {
 }
 ```
 
-## 使用场景
+## Usage scenarios
 
-### 1. 设备状态监控
-- 设备在线状态显示
-- 关键指标实时监控
-- 告警状态提示
+### 1. Equipment status monitoring
+- Device online status display
+- Real-time monitoring of key indicators
+- Alarm status prompt
 
-### 2. 数据大屏展示
-- KPI 指标展示
-- 实时数据监控
-- 状态概览面板
+### 2. Big screen display of data
+- KPI Indicator display
+- Real-time data monitoring
+- Status overview panel
 
-### 3. 演示和教学
-- 组件功能演示
-- 开发示例参考
-- 快速原型构建
+### 3. Demonstration and Teaching
+- Component function demonstration
+- Development example reference
+- rapid prototyping
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture.md)
-- [数据源配置指南](../data-source-guide.md)
-- [组件开发规范](../component-development.md)
-- [图标系统文档](../icon-system.md)
-- [响应式设计指南](../responsive-design.md)
+- [Card 2.1 Architecture documentation](../architecture.md)
+- [Data source configuration guide](../data-source-guide.md)
+- [Component Development Specifications](../component-development.md)
+- [Icon system documentation](../icon-system.md)
+- [Responsive Design Guidelines](../responsive-design.md)

@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 -->
+    <!-- card title bar -->
     <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-cyan-100 dark:bg-cyan-900 rounded-lg">
@@ -11,7 +11,7 @@
         </h3>
       </div>
 
-      <!-- 在线率显示 -->
+      <!-- Online rate display -->
       <div class="flex items-center space-x-2 bg-white dark:bg-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600">
         <img :src="onlineRateIcon" alt="Online Rate" class="w-4 h-4" />
         <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <!-- 图表容器 -->
+    <!-- chart container -->
     <div class="flex-1 p-4 min-h-0">
       <div class="h-full relative">
         <VChart
@@ -35,8 +35,8 @@
 
 <script setup lang="ts">
 /**
- * 设备在线趋势组件
- * 显示设备在线/离线数量趋势图表和在线率统计
+ * Device online trend component
+ * Display device online/Offline quantity trend chart and online rate statistics
  */
 import { computed, onMounted, reactive, ref } from 'vue'
 import VChart from 'vue-echarts'
@@ -52,7 +52,7 @@ import type {
 import { getOnlineDeviceTrend } from '@/service/api/system-data'
 import { $t } from '@/locales'
 
-// 导入图标资源
+// Import icon resources
 import onlineRateIcon from './online-rate.png'
 import wifiIcon from './wifi.png'
 
@@ -60,14 +60,14 @@ type EChartsOption = ComposeOption<
   TooltipComponentOption | LegendComponentOption | ToolboxComponentOption | GridComponentOption | LineSeriesOption
 >
 
-// 图表数据
+// chart data
 const chartData = reactive({
   loading: false,
   online: [] as [number, number][],
   offline: [] as [number, number][]
 })
 
-// 图表配置
+// Chart configuration
 const chartOption = ref<EChartsOption>({
   tooltip: {
     trigger: 'axis',
@@ -191,7 +191,7 @@ const chartOption = ref<EChartsOption>({
 })
 
 /**
- * 计算在线率百分比
+ * Calculate online rate percentage
  */
 const onlineRate = computed(() => {
   const latestDataPoint = chartData.online[chartData.online.length - 1]
@@ -207,21 +207,21 @@ const onlineRate = computed(() => {
 })
 
 /**
- * 在线率文本
+ * Online rate text
  */
 const onlineRateText = computed(() => {
   return `${$t('dashboard_panel.cardName.onlineRate')} ${onlineRate.value}%`
 })
 
 /**
- * 获取趋势数据
+ * Get trend data
  */
 const fetchData = async () => {
   chartData.loading = true
   try {
     const response = await getOnlineDeviceTrend()
     if (response && response.data && response.data.points) {
-      // 转换数据格式为 ECharts 期望的格式
+      // Convert data format to ECharts expected format
       chartData.online = response.data.points.map((point: any) => {
         const timestamp = new Date(point.timestamp).getTime()
         return [timestamp, point.device_online]
@@ -232,14 +232,14 @@ const fetchData = async () => {
         return [timestamp, point.device_offline]
       })
 
-      // 更新图表系列数据
+      // Update chart series data
       if (chartOption.value.series) {
         chartOption.value.series[0].data = chartData.online
         chartOption.value.series[1].data = chartData.offline
       }
     }
   } catch (error) {
-    console.error('获取设备趋势数据失败:', error)
+    console.error('Failed to obtain device trend data:', error)
   } finally {
     chartData.loading = false
   }
@@ -255,18 +255,18 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 确保图表响应式 */
+/* Make sure charts are responsive */
 :deep(.echarts) {
   min-height: 200px;
 }
 
-/* 图标样式 */
+/* icon style */
 img {
   object-fit: contain;
   user-select: none;
 }
 
-/* 深色模式适配 */
+/* Dark mode adaptation */
 :deep(.dark) {
   .echarts {
     color-scheme: dark;

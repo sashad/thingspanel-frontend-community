@@ -1,6 +1,6 @@
 /**
- * Card2.1 组件交互接口标准化
- * 定义所有支持交互的Card2组件必须实现的接口
+ * Card2.1 Component interaction interface standardization
+ * Define all interactiveCard2The interface that the component must implement
  */
 
 import type {
@@ -11,77 +11,77 @@ import type {
 } from '../core/interaction-types'
 
 /**
- * 交互能力组件接口
- * 所有支持交互的Card2组件都应该实现此接口
+ * Interaction capability component interface
+ * All interactiveCard2Components should all implement this interface
  */
 export interface InteractionCapableComponent {
   /**
-   * 组件唯一标识符
+   * component unique identifier
    */
   componentId: string
 
   /**
-   * 是否允许外部控制
-   * 当为false时，组件拒绝所有外部交互
+   * Whether to allow external control
+   * asfalsehour，Component refuses all external interaction
    */
   allowExternalControl?: boolean
 
   /**
-   * 交互白名单
-   * 只允许列表中的组件对本组件进行交互
+   * Interaction whitelist
+   * Only allow components in the list to interact with this component
    */
   interactionWhitelist?: string[]
 
   /**
-   * 交互黑名单
-   * 拒绝列表中的组件对本组件进行交互
+   * interactive blacklist
+   * Deny components in the list from interacting with this component
    */
   interactionBlacklist?: string[]
 
   /**
-   * 支持的事件类型
-   * 组件声明自己支持哪些交互事件
+   * Supported event types
+   * The component declares which interactive events it supports
    */
   supportedEvents?: InteractionEventType[]
 
   /**
-   * 当前交互状态
+   * Current interaction status
    */
   interactionState?: ComponentInteractionState
 
   /**
-   * 交互配置列表
+   * Interactive configuration list
    */
   interactionConfigs?: InteractionConfig[]
 
   /**
-   * 是否显示交互指示器
+   * Whether to display interaction indicators
    */
   showInteractionIndicator?: boolean
 }
 
 /**
- * 交互组件标准Props
- * 所有交互组件都应该接受这些props
+ * Interactive component standardsProps
+ * All interactive components should accept theseprops
  */
 export interface InteractionProps {
   /**
-   * 组件ID - 由Visual Editor传入
+   * componentsID - Depend onVisual Editorincoming
    */
   componentId?: string
 
   /**
-   * 交互配置列表 - 从配置系统传入
+   * Interactive configuration list - Passed in from the configuration system
    */
   interactionConfigs?: InteractionConfig[]
 
   /**
-   * 是否允许外部控制
+   * Whether to allow external control
    */
   allowExternalControl?: boolean
 
   /**
-   * 交互权限配置
+   * Interaction permission configuration
    */
   interactionPermissions?: {
     whitelist?: string[]
@@ -90,44 +90,44 @@ export interface InteractionProps {
   }
 
   /**
-   * 是否显示交互指示器
+   * Whether to display interaction indicators
    */
   showInteractionIndicator?: boolean
 
   /**
-   * 是否在预览模式
-   * 预览模式下激活交互，编辑模式下禁用
+   * Whether in preview mode
+   * Activate interaction in preview mode，Disabled in edit mode
    */
   previewMode?: boolean
 }
 
 /**
- * 交互组件标准事件
- * 所有交互组件都应该发出这些事件
+ * Interactive component standard events
+ * All interactive components should emit these events
  */
 export interface InteractionEmits {
   /**
-   * 交互状态变化
+   * Interactive state changes
    */
   (e: 'interaction-state-change', state: ComponentInteractionState): void
 
   /**
-   * 交互事件触发
+   * Interaction event trigger
    */
   (e: 'interaction-event', eventType: InteractionEventType, data?: any): void
 
   /**
-   * 交互执行结果
+   * Interactive execution results
    */
   (e: 'interaction-result', result: InteractionResponseResult): void
 
   /**
-   * 交互错误
+   * Interaction error
    */
   (e: 'interaction-error', error: { message: string; code?: string; details?: any }): void
 
   /**
-   * 交互被拒绝
+   * Interaction rejected
    */
   (
     e: 'interaction-rejected',
@@ -141,71 +141,71 @@ export interface InteractionEmits {
 }
 
 /**
- * 交互权限检查结果
+ * Interaction permission check results
  */
 export interface InteractionPermissionCheck {
   /**
-   * 是否允许交互
+   * Whether to allow interaction
    */
   allowed: boolean
 
   /**
-   * 拒绝原因
+   * Reason for rejection
    */
   reason?: string
 
   /**
-   * 拒绝代码
+   * reject code
    */
   code?: 'EXTERNAL_CONTROL_DISABLED' | 'COMPONENT_BLACKLISTED' | 'COMPONENT_NOT_WHITELISTED' | 'EVENT_NOT_SUPPORTED'
 }
 
 /**
- * 交互上下文信息
+ * interactive context information
  */
 export interface InteractionContext {
   /**
-   * 源组件ID（触发交互的组件）
+   * source componentID（The component that triggers the interaction）
    */
   sourceComponentId?: string
 
   /**
-   * 目标组件ID（接收交互的组件）
+   * target componentID（Components that receive interactions）
    */
   targetComponentId: string
 
   /**
-   * 事件类型
+   * event type
    */
   eventType: InteractionEventType
 
   /**
-   * 事件数据
+   * event data
    */
   eventData?: any
 
   /**
-   * 时间戳
+   * Timestamp
    */
   timestamp: number
 
   /**
-   * 是否为用户直接操作
+   * Whether it is directly operated by the user
    */
   isUserAction: boolean
 }
 
 /**
- * 交互能力组件配置
+ * Interaction capability component configuration
  */
 export interface InteractionCapabilityConfig {
   /**
-   * 是否启用交互能力
+   * Whether to enable interactivity
    */
   enabled: boolean
 
   /**
-   * 默认权限设置
+   * Default permission settings
    */
   defaultPermissions: {
     allowExternalControl: boolean
@@ -213,32 +213,32 @@ export interface InteractionCapabilityConfig {
   }
 
   /**
-   * 是否启用交互调试
+   * Whether to enable interactive debugging
    */
   enableDebug: boolean
 
   /**
-   * 性能配置
+   * Performance configuration
    */
   performance: {
     /**
-     * 事件防抖时间（毫秒）
+     * Event anti-shake time（millisecond）
      */
     debounceTime: number
 
     /**
-     * 最大同时执行的交互数量
+     * Maximum number of simultaneous interactions
      */
     maxConcurrentInteractions: number
   }
 }
 
 /**
- * 交互组件工厂配置
+ * Interactive component factory configuration
  */
 export interface InteractionComponentFactory {
   /**
-   * 创建交互能力的组件包装器
+   * Create interactive component wrappers
    */
   createInteractionWrapper<T extends Record<string, any>>(
     component: T,
@@ -246,12 +246,12 @@ export interface InteractionComponentFactory {
   ): T & InteractionCapableComponent
 
   /**
-   * 验证组件是否支持交互
+   * Verify whether the component supports interaction
    */
   validateInteractionSupport(component: any): boolean
 
   /**
-   * 获取组件支持的事件类型
+   * Get the event types supported by the component
    */
   getSupportedEvents(component: any): InteractionEventType[]
 }

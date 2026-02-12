@@ -1,6 +1,6 @@
 /**
- * Data Adapter - 数据适配器
- * 用于将编辑器组件数据适配到PanelV2的BaseCanvasItem结构
+ * Data Adapter - data adapter
+ * Used to adapt editor component data toPanelV2ofBaseCanvasItemstructure
  */
 
 import type { BaseCanvasItem, Position } from '@/components/panelv2/types/core'
@@ -9,13 +9,13 @@ import { generateId } from '@/components/panelv2/utils/id'
 import type { WidgetType, TextWidgetConfig, ImageWidgetConfig } from '@/components/visual-editor/types'
 
 /**
- * 生成默认的组件配置
+ * Generate default component configuration
  */
 export const getDefaultWidgetConfig = (type: WidgetType): Record<string, any> => {
   switch (type) {
     case 'text':
       return {
-        content: '文本内容',
+        content: 'text content',
         fontSize: 14,
         color: 'var(--n-text-color)',
         textAlign: 'left',
@@ -25,7 +25,7 @@ export const getDefaultWidgetConfig = (type: WidgetType): Record<string, any> =>
     case 'image':
       return {
         src: '',
-        alt: '图片',
+        alt: 'picture',
         objectFit: 'cover'
       } as ImageWidgetConfig
 
@@ -35,7 +35,7 @@ export const getDefaultWidgetConfig = (type: WidgetType): Record<string, any> =>
 }
 
 /**
- * 从组件类型创建BaseCanvasItem
+ * Create from component typeBaseCanvasItem
  */
 export const createCanvasItemFromWidget = (
   type: WidgetType,
@@ -45,7 +45,7 @@ export const createCanvasItemFromWidget = (
   const defaultConfig = getDefaultWidgetConfig(type)
   const config = { ...defaultConfig, ...customConfig }
 
-  // 根据类型设置默认尺寸
+  // Set default size based on type
   const getDefaultSize = (widgetType: WidgetType) => {
     switch (widgetType) {
       case 'text':
@@ -72,12 +72,12 @@ export const createCanvasItemFromWidget = (
     locked: false,
     cardData: {
       cardId: type,
-      title: `${type === 'text' ? '文本' : '图片'}组件`,
+      title: `${type === 'text' ? 'text' : 'picture'}components`,
       type: 'chart',
       config
     },
     rendererData: {
-      // 编辑器特有数据可以存储在这里
+      // Editor-specific data can be stored here
       editorType: 'visual-editor',
       widgetType: type
     },
@@ -90,7 +90,7 @@ export const createCanvasItemFromWidget = (
 }
 
 /**
- * 更新组件配置
+ * Update component configuration
  */
 export const updateItemConfig = (item: BaseCanvasItem, configUpdates: Record<string, any>): BaseCanvasItem => {
   return {
@@ -110,14 +110,14 @@ export const updateItemConfig = (item: BaseCanvasItem, configUpdates: Record<str
 }
 
 /**
- * 检查是否为编辑器创建的组件
+ * Check if the component was created for the editor
  */
 export const isEditorItem = (item: BaseCanvasItem): boolean => {
   return item.rendererData?.editorType === 'visual-editor'
 }
 
 /**
- * 获取组件类型
+ * Get component type
  */
 export const getWidgetType = (item: BaseCanvasItem): WidgetType | null => {
   if (isEditorItem(item)) {

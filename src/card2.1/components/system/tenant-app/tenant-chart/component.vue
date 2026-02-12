@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 -->
+    <!-- card title bar -->
     <div class="flex items-center p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
@@ -12,36 +12,36 @@
       </div>
     </div>
 
-    <!-- 内容区域 -->
+    <!-- content area -->
     <div class="flex-1 p-4 min-h-0">
       <n-spin :show="loading">
         <div class="h-full flex gap-4">
-          <!-- 左侧统计数据 -->
+          <!-- Statistics on the left -->
           <div class="w-1/3 flex flex-col justify-around py-2 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 pr-4 space-y-4">
-            <!-- 总用户数 -->
+            <!-- Total number of users -->
             <div class="text-center bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
               <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                {{ $t('card.tenantChart.totalUsers', '总用户数') }}
+                {{ $t('card.tenantChart.totalUsers', 'Total number of users') }}
               </div>
               <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 <NNumberAnimation :from="0" :to="stats.user_total" />
               </div>
             </div>
 
-            <!-- 本月新增 -->
+            <!-- New this month -->
             <div class="text-center bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
               <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                {{ $t('card.tenantChart.addedMonth', '本月新增') }}
+                {{ $t('card.tenantChart.addedMonth', 'New this month') }}
               </div>
               <div class="text-2xl font-bold text-green-600 dark:text-green-400">
                 <NNumberAnimation :from="0" :to="stats.user_added_month" />
               </div>
             </div>
 
-            <!-- 昨日新增 -->
+            <!-- Added yesterday -->
             <div class="text-center bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
               <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                {{ $t('card.tenantChart.addedYesterday', '昨日新增') }}
+                {{ $t('card.tenantChart.addedYesterday', 'Added yesterday') }}
               </div>
               <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">
                 <NNumberAnimation :from="0" :to="stats.user_added_yesterday" />
@@ -49,9 +49,9 @@
             </div>
           </div>
 
-          <!-- 右侧图表 -->
+          <!-- Right chart -->
           <div class="flex-1 min-w-0">
-            <!-- 错误状态 -->
+            <!-- error status -->
             <div v-if="!loading && errorMsg" class="h-full flex flex-col items-center justify-center text-center">
               <div class="p-4 bg-red-100 dark:bg-red-900 rounded-full mb-3">
                 <Icon icon="mdi:alert-circle-outline" class="w-8 h-8 text-red-500 dark:text-red-400" />
@@ -61,7 +61,7 @@
               </div>
             </div>
 
-            <!-- 无数据状态 -->
+            <!-- No data status -->
             <div v-else-if="!loading && isEmpty" class="h-full flex flex-col items-center justify-center text-center">
               <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
                 <Icon icon="mdi:chart-bar" class="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -71,7 +71,7 @@
               </div>
             </div>
 
-            <!-- 图表 -->
+            <!-- chart -->
             <v-chart
               v-else-if="!loading"
               ref="chartRef"
@@ -88,8 +88,8 @@
 
 <script setup lang="ts">
 /**
- * 租户图表组件
- * 显示租户用户统计数据和月度新增用户趋势图表
+ * Tenant chart component
+ * Display tenant user statistics and monthly new user trend charts
  */
 import { ref, onMounted, computed, provide } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -108,7 +108,7 @@ import { useThemeStore } from '@/store/modules/theme'
 import { tenant } from '@/service/api/system-data'
 import { $t } from '@/locales'
 
-// ECharts 组件注册
+// ECharts Component registration
 use([
   CanvasRenderer,
   BarChart,
@@ -125,28 +125,28 @@ const isEmpty = ref(false)
 const chartOption = ref({})
 const chartRef = ref<any>(null)
 
-// 统计数据
+// Statistics
 const stats = ref({
   user_total: 0,
   user_added_yesterday: 0,
   user_added_month: 0
 })
 
-// 提供 ECharts 主题
+// supply ECharts theme
 provide(
   THEME_KEY,
   computed(() => themeStore.naiveThemeName)
 )
 
 /**
- * 获取月份标签
+ * Get month label
  */
 const getMonthLabel = (monthNumber: number): string => {
   return String(monthNumber)
 }
 
 /**
- * 处理图表数据
+ * Process chart data
  */
 const processData = (
   userListMonth: { mon: number; num: number }[]
@@ -167,13 +167,13 @@ const processData = (
 }
 
 /**
- * 更新图表配置
+ * Update chart configuration
  */
 const updateChartOption = (processedData: { monthLabels: string[]; userCounts: number[] }) => {
   const { monthLabels, userCounts } = processedData
-  const seriesName = $t('card.tenantChart.seriesName', '新增用户')
+  const seriesName = $t('card.tenantChart.seriesName', 'Add new user')
 
-  // 柱状图颜色配置
+  // Bar chart color configuration
   const barColor = themeStore.isDark ? '#36a2eb' : '#4bc0c0'
   const hoverColor = themeStore.isDark ? '#4cb1ef' : '#5cd1d1'
 
@@ -193,7 +193,7 @@ const updateChartOption = (processedData: { monthLabels: string[]; userCounts: n
       formatter: (params: any) => {
         if (!params || params.length === 0) return ''
         const p = params[0]
-        return `${p.name}月<br/>${p.marker}${p.seriesName}: <b>${p.value}</b>`
+        return `${p.name}moon<br/>${p.marker}${p.seriesName}: <b>${p.value}</b>`
       }
     },
     grid: {
@@ -244,7 +244,7 @@ const updateChartOption = (processedData: { monthLabels: string[]; userCounts: n
 }
 
 /**
- * 获取租户数据
+ * Get tenant data
  */
 const fetchData = async () => {
   loading.value = true
@@ -256,14 +256,14 @@ const fetchData = async () => {
     const responseData = response?.data
 
     if (responseData) {
-      // 存储统计数据
+      // Store statistics
       stats.value = {
         user_total: responseData.user_total || 0,
         user_added_yesterday: responseData.user_added_yesterday || 0,
         user_added_month: responseData.user_added_month || 0
       }
 
-      // 处理图表数据
+      // Process chart data
       const userListMonth = responseData.user_list_month
       if (userListMonth) {
         const processed = processData(userListMonth)
@@ -295,18 +295,18 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 确保图表响应式 */
+/* Make sure charts are responsive */
 :deep(.echarts) {
   min-height: 180px;
 }
 
-/* 数字动画样式优化 */
+/* Digital animation style optimization */
 :deep(.n-number-animation) {
   font-family: 'Inter', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
-/* 深色模式适配 */
+/* Dark mode adaptation */
 :deep(.dark) {
   .echarts {
     color-scheme: dark;

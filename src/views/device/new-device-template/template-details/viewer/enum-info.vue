@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 枚举信息编辑组件
- * 从 src/views/device/template/components/step/enum-info.vue 复制
+ * Enumerate information editing components
+ * from src/views/device/template/components/step/enum-info.vue copy
  */
 
 import type { PropType } from 'vue'

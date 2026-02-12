@@ -1,6 +1,6 @@
 /**
- * Grid Layout Plus Hook V2 - 重构版本
- * 采用模块化架构，集成所有网格功能
+ * Grid Layout Plus Hook V2 - Refactored version
+ * Adopt modular architecture，Integrate all grid functions
  */
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
@@ -16,34 +16,34 @@ import { useGridPerformance, type UseGridPerformanceOptions } from './useGridPer
 import { useGridResponsive, type UseGridResponsiveOptions } from './useGridResponsive'
 
 export interface UseGridLayoutPlusV2Options {
-  /** 初始布局 */
+  /** initial layout */
   initialLayout?: GridLayoutPlusItem[]
-  /** 网格配置 */
+  /** Grid configuration */
   config?: Partial<GridLayoutPlusConfig>
-  /** 核心配置 */
+  /** Core configuration */
   core?: UseGridCoreOptions
-  /** 历史记录配置 */
+  /** History configuration */
   history?: UseGridHistoryOptions
-  /** 性能配置 */
+  /** Performance configuration */
   performance?: UseGridPerformanceOptions
-  /** 响应式配置 */
+  /** Responsive configuration */
   responsive?: UseGridResponsiveOptions
-  /** 是否启用自动保存 */
+  /** Whether to enable auto-save */
   autoSave?: boolean
-  /** 自动保存延迟 */
+  /** Autosave delay */
   autoSaveDelay?: number
-  /** 保存回调 */
+  /** save callback */
   onSave?: (layout: GridLayoutPlusItem[]) => void
-  /** 布局变化回调 */
+  /** Layout change callback */
   onLayoutChange?: (layout: GridLayoutPlusItem[]) => void
 }
 
 /**
  * Grid Layout Plus V2 Hook
- * 集成所有网格功能的主Hook
+ * Master that integrates all grid functionsHook
  */
 export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
-  // 初始化子模块
+  // Initialize submodule
   const gridCore = useGridCore({
     initialLayout: options.initialLayout,
     config: options.config,
@@ -75,10 +75,10 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     ...options.responsive
   })
 
-  // 自动保存定时器
+  // Auto save timer
   let autoSaveTimer: NodeJS.Timeout | null = null
 
-  // 综合计算属性
+  // Comprehensive computed properties
   const layoutInfo = computed(() => ({
     items: gridCore.layout.value,
     stats: gridCore.layoutStats.value,
@@ -107,16 +107,16 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     }
   }))
 
-  // 布局操作（集成历史记录）
+  // Layout operations（Integration history）
   const updateLayoutWithHistory = (newLayout: GridLayoutPlusItem[]) => {
     const result = gridCore.updateLayout(newLayout)
     if (result.success) {
       gridHistory.saveToHistory(newLayout)
 
-      // 估算性能影响
+      // Estimate performance impact
       gridPerformance.estimateMemoryUsage(newLayout)
 
-      // 触发回调
+      // trigger callback
       if (options.onLayoutChange) {
         options.onLayoutChange(newLayout)
       }
@@ -150,7 +150,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     return result
   }
 
-  // 历史操作（集成性能监控）
+  // Historical operations（Integrated performance monitoring）
   const undoWithPerformanceMonitoring = async () => {
     const previousLayout = gridHistory.undo()
     if (previousLayout) {
@@ -173,7 +173,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     return null
   }
 
-  // 响应式操作
+  // Responsive operations
   const handleContainerResize = (element: HTMLElement) => {
     gridResponsive.observeContainer(element)
   }
@@ -186,7 +186,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     return newLayout
   }
 
-  // 性能优化操作
+  // Performance optimization operations
   const optimizePerformance = () => {
     const wasOptimized = gridPerformance.applyAutoOptimizations()
     if (wasOptimized) {
@@ -200,35 +200,35 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     return await gridPerformance.measureRenderTime(operation)
   }
 
-  // 批量操作（优化性能）
+  // Batch operations（Optimize performance）
   const batchUpdate = async (operations: (() => void)[]) => {
-    // 暂停历史记录和性能监控
+    // Pause history and performance monitoring
     gridHistory.pauseRecording()
     gridPerformance.stopMonitoring()
 
     try {
-      // 执行所有操作
+      // perform all operations
       for (const operation of operations) {
         operation()
       }
 
-      // 统一保存到历史记录
+      // Save to history
       gridHistory.resumeRecording()
       gridHistory.saveToHistory(gridCore.layout.value)
 
-      // 重新开始性能监控
+      // Restart performance monitoring
       gridPerformance.startMonitoring()
       gridPerformance.estimateMemoryUsage(gridCore.layout.value)
     } catch (error) {
       console.error('[GridLayoutPlusV2] Batch update failed:', error)
 
-      // 恢复监控
+      // Resume monitoring
       gridHistory.resumeRecording()
       gridPerformance.startMonitoring()
     }
   }
 
-  // 自动保存功能
+  // Auto save function
   const startAutoSave = () => {
     if (!options.autoSave || autoSaveTimer) return
 
@@ -250,7 +250,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     }
   }
 
-  // 完整的重置功能
+  // Full reset functionality
   const resetAll = () => {
     gridCore.clearLayout()
     gridHistory.clearHistory()
@@ -266,7 +266,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     }
   }
 
-  // 监听布局变化以更新性能指标
+  // Listen for layout changes to update performance metrics
   watch(
     () => gridCore.layout.value,
     newLayout => {
@@ -276,14 +276,14 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     { immediate: true }
   )
 
-  // 初始化
+  // initialization
   onMounted(() => {
-    // 初始化历史记录
+    // Initialize history
     if (gridCore.layout.value.length > 0) {
       gridHistory.initHistory(gridCore.layout.value)
     }
 
-    // 启动自动保存
+    // Start autosave
     if (options.autoSave) {
       startAutoSave()
     }
@@ -292,7 +292,7 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
     }
   })
 
-  // 清理
+  // clean up
   onUnmounted(() => {
     stopAutoSave()
     gridPerformance.stopMonitoring()
@@ -302,43 +302,43 @@ export function useGridLayoutPlusV2(options: UseGridLayoutPlusV2Options = {}) {
   })
 
   return {
-    // 子模块引用
+    // submodule reference
     core: gridCore,
     history: gridHistory,
     performance: gridPerformance,
     responsive: gridResponsive,
 
-    // 综合状态
+    // Comprehensive status
     layoutInfo,
     systemStatus,
 
-    // 主要操作方法
+    // Main methods of operation
     updateLayout: updateLayoutWithHistory,
     addItem: addItemWithHistory,
     removeItem: removeItemWithHistory,
     updateItem: updateItemWithHistory,
 
-    // 历史操作
+    // Historical operations
     undo: undoWithPerformanceMonitoring,
     redo: redoWithPerformanceMonitoring,
 
-    // 响应式操作
+    // Responsive operations
     handleContainerResize,
     switchBreakpoint,
 
-    // 性能操作
+    // Performance operations
     optimizePerformance,
     measureLayoutPerformance,
 
-    // 批量操作
+    // Batch operations
     batchUpdate,
 
-    // 系统控制
+    // System control
     startAutoSave,
     stopAutoSave,
     resetAll,
 
-    // 便捷访问（向后兼容）
+    // Easy access（backwards compatible）
     layout: gridCore.layout,
     selectedItems: gridCore.selectedItems,
     config: gridCore.config,

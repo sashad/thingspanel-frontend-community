@@ -1,6 +1,6 @@
 /**
- * 主题系统集成
- * 集成原始面板系统的主题功能到 Visual Editor 中，提供统一的主题管理
+ * Theme system integration
+ * Integrate the theme functions of the original panel system into Visual Editor middle，Provide unified theme management
  */
 
 import { ref, reactive, computed, watch, nextTick } from 'vue'
@@ -10,7 +10,7 @@ import type { LayoutContainer, LayoutItem } from '@/components/visual-editor/typ
 
 const logger = createLogger('ThemeIntegration')
 
-// ====== 主题类型定义 ======
+// ====== Topic type definition ======
 
 export interface ThemeColors {
   primary: string
@@ -103,23 +103,23 @@ export interface PanelTheme {
   category: 'light' | 'dark' | 'auto'
   isBuiltIn: boolean
 
-  // 颜色系统
+  // color system
   colors: ThemeColors
   gradients: ThemeGradients
 
-  // 排版系统
+  // Typesetting system
   typography: ThemeTypography
 
-  // 空间系统
+  // space system
   spacing: ThemeSpacing
 
-  // 圆角系统
+  // fillet system
   borderRadius: ThemeBorderRadius
 
-  // 阴影系统
+  // shadow system
   shadows: ThemeShadows
 
-  // 组件特定样式
+  // Component specific styles
   components?: {
     card?: Record<string, any>
     button?: Record<string, any>
@@ -128,10 +128,10 @@ export interface PanelTheme {
     [key: string]: Record<string, any> | undefined
   }
 
-  // 自定义 CSS 变量
+  // Customize CSS variable
   customVars?: Record<string, string>
 
-  // 元数据
+  // metadata
   meta?: {
     version: string
     author?: string
@@ -140,14 +140,14 @@ export interface PanelTheme {
   }
 }
 
-// ====== 内置主题定义 ======
+// ====== Built-in theme definition ======
 
 const BUILT_IN_THEMES: PanelTheme[] = [
   {
     id: 'default',
     name: 'default',
-    displayName: '默认主题',
-    description: '系统默认的浅色主题',
+    displayName: 'default theme',
+    description: 'System default light theme',
     category: 'light',
     isBuiltIn: true,
     colors: {
@@ -231,8 +231,8 @@ const BUILT_IN_THEMES: PanelTheme[] = [
   {
     id: 'dark',
     name: 'dark',
-    displayName: '深色主题',
-    description: '深色模式主题',
+    displayName: 'dark theme',
+    description: 'dark mode theme',
     category: 'dark',
     isBuiltIn: true,
     colors: {
@@ -315,7 +315,7 @@ const BUILT_IN_THEMES: PanelTheme[] = [
   }
 ]
 
-// ====== 主题管理器 ======
+// ====== theme manager ======
 
 export class ThemeIntegrationManager {
   private themes = new Map<string, PanelTheme>()
@@ -329,27 +329,27 @@ export class ThemeIntegrationManager {
     this.setupCSSVariables()
   }
 
-  // ====== 初始化 ======
+  // ====== initialization ======
 
   /**
-   * 初始化内置主题
+   * Initialize built-in theme
    */
   private initializeBuiltInThemes(): void {
     BUILT_IN_THEMES.forEach(theme => {
       this.themes.set(theme.id, theme)
     })
 
-    // 设置默认主题
+    // Set default theme
     this.currentTheme.value = this.themes.get('default') || null
 
-    logger.info(`初始化 ${BUILT_IN_THEMES.length} 个内置主题`)
+    logger.info(`initialization ${BUILT_IN_THEMES.length} built-in themes`)
   }
 
   /**
-   * 与全局主题存储同步
+   * Sync with global topic store
    */
   private syncWithThemeStore(): void {
-    // 监听全局主题变化
+    // Monitor global theme changes
     watch(
       () => this.themeStore.themeScheme,
       newScheme => {
@@ -360,7 +360,7 @@ export class ThemeIntegrationManager {
   }
 
   /**
-   * 设置 CSS 变量
+   * set up CSS variable
    */
   private setupCSSVariables(): void {
     watch(
@@ -374,31 +374,31 @@ export class ThemeIntegrationManager {
     )
   }
 
-  // ====== 主题管理 ======
+  // ====== Topic management ======
 
   /**
-   * 切换到指定主题
+   * Switch to the specified theme
    */
   switchToTheme(themeId: string): boolean {
     const theme = this.themes.get(themeId)
     if (!theme) {
-      logger.warn(`主题不存在: ${themeId}`)
+      logger.warn(`Topic does not exist: ${themeId}`)
       return false
     }
 
     this.currentTheme.value = theme
-    logger.info(`切换到主题: ${theme.displayName}`)
+    logger.info(`switch to topic: ${theme.displayName}`)
     return true
   }
 
   /**
-   * 切换到指定主题方案
+   * Switch to the specified theme plan
    */
   switchToScheme(scheme: 'light' | 'dark' | 'auto'): void {
     let targetTheme: PanelTheme | undefined
 
     if (scheme === 'auto') {
-      // 根据系统偏好选择主题
+      // Choose a theme based on system preferences
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       targetTheme = this.getThemesByCategory(prefersDark ? 'dark' : 'light')[0]
     } else {
@@ -411,42 +411,42 @@ export class ThemeIntegrationManager {
   }
 
   /**
-   * 获取当前主题
+   * Get the current topic
    */
   getCurrentTheme(): PanelTheme | null {
     return this.currentTheme.value
   }
 
   /**
-   * 获取所有主题
+   * Get all topics
    */
   getAllThemes(): PanelTheme[] {
     return Array.from(this.themes.values())
   }
 
   /**
-   * 根据类别获取主题
+   * Get topics based on category
    */
   getThemesByCategory(category: 'light' | 'dark' | 'auto'): PanelTheme[] {
     return Array.from(this.themes.values()).filter(theme => theme.category === category)
   }
 
   /**
-   * 获取主题
+   * Get topic
    */
   getTheme(themeId: string): PanelTheme | undefined {
     return this.themes.get(themeId)
   }
 
-  // ====== 自定义主题 ======
+  // ====== Custom theme ======
 
   /**
-   * 创建自定义主题
+   * Create a custom theme
    */
   createCustomTheme(baseThemeId: string, customizations: Partial<PanelTheme>): PanelTheme | null {
     const baseTheme = this.themes.get(baseThemeId)
     if (!baseTheme) {
-      logger.error(`基础主题不存在: ${baseThemeId}`)
+      logger.error(`The base theme does not exist: ${baseThemeId}`)
       return null
     }
 
@@ -465,17 +465,17 @@ export class ThemeIntegrationManager {
     this.themes.set(customTheme.id, customTheme)
     this.customThemes[customTheme.id] = customTheme
 
-    logger.info(`创建自定义主题: ${customTheme.displayName}`)
+    logger.info(`Create a custom theme: ${customTheme.displayName}`)
     return customTheme
   }
 
   /**
-   * 更新自定义主题
+   * Update custom theme
    */
   updateCustomTheme(themeId: string, updates: Partial<PanelTheme>): boolean {
     const theme = this.themes.get(themeId)
     if (!theme || theme.isBuiltIn) {
-      logger.warn(`无法更新主题: ${themeId}`)
+      logger.warn(`Unable to update theme: ${themeId}`)
       return false
     }
 
@@ -491,56 +491,56 @@ export class ThemeIntegrationManager {
     this.themes.set(themeId, updatedTheme)
     this.customThemes[themeId] = updatedTheme
 
-    // 如果是当前主题，立即应用更新
+    // If it is the current topic，Apply updates now
     if (this.currentTheme.value?.id === themeId) {
       this.currentTheme.value = updatedTheme
     }
 
-    logger.info(`更新自定义主题: ${themeId}`)
+    logger.info(`Update custom theme: ${themeId}`)
     return true
   }
 
   /**
-   * 删除自定义主题
+   * Delete custom theme
    */
   deleteCustomTheme(themeId: string): boolean {
     const theme = this.themes.get(themeId)
     if (!theme || theme.isBuiltIn) {
-      logger.warn(`无法删除主题: ${themeId}`)
+      logger.warn(`Unable to delete topic: ${themeId}`)
       return false
     }
 
     this.themes.delete(themeId)
     delete this.customThemes[themeId]
 
-    // 如果删除的是当前主题，切换到默认主题
+    // If the current topic is deleted，Switch to default theme
     if (this.currentTheme.value?.id === themeId) {
       this.switchToTheme('default')
     }
 
-    logger.info(`删除自定义主题: ${themeId}`)
+    logger.info(`Delete custom theme: ${themeId}`)
     return true
   }
 
-  // ====== CSS 变量应用 ======
+  // ====== CSS Variable application ======
 
   /**
-   * 应用主题 CSS 变量
+   * Apply theme CSS variable
    */
   private applyCSSVariables(theme: PanelTheme): void {
     const root = document.documentElement
 
-    // 应用颜色变量
+    // Apply color variables
     Object.entries(theme.colors).forEach(([key, value]) => {
       root.style.setProperty(`--theme-color-${key}`, value)
     })
 
-    // 应用渐变变量
+    // Apply gradient variable
     Object.entries(theme.gradients).forEach(([key, value]) => {
       root.style.setProperty(`--theme-gradient-${key}`, value)
     })
 
-    // 应用字体变量
+    // Apply font variables
     root.style.setProperty('--theme-font-family', theme.typography.fontFamily)
     Object.entries(theme.typography.fontSize).forEach(([key, value]) => {
       root.style.setProperty(`--theme-font-size-${key}`, value)
@@ -552,42 +552,42 @@ export class ThemeIntegrationManager {
       root.style.setProperty(`--theme-line-height-${key}`, String(value))
     })
 
-    // 应用空间变量
+    // Apply spatial variables
     Object.entries(theme.spacing).forEach(([key, value]) => {
       root.style.setProperty(`--theme-spacing-${key}`, value)
     })
 
-    // 应用圆角变量
+    // Apply rounded variables
     Object.entries(theme.borderRadius).forEach(([key, value]) => {
       root.style.setProperty(`--theme-border-radius-${key}`, value)
     })
 
-    // 应用阴影变量
+    // Apply shadow variable
     Object.entries(theme.shadows).forEach(([key, value]) => {
       root.style.setProperty(`--theme-shadow-${key}`, value)
     })
 
-    // 应用自定义变量
+    // Apply custom variables
     if (theme.customVars) {
       Object.entries(theme.customVars).forEach(([key, value]) => {
         root.style.setProperty(`--theme-${key}`, value)
       })
     }
 
-    logger.debug(`应用主题 CSS 变量: ${theme.displayName}`)
+    logger.debug(`Apply theme CSS variable: ${theme.displayName}`)
   }
 
-  // ====== 主题应用到布局 ======
+  // ====== Theme applied to layout ======
 
   /**
-   * 将主题应用到布局容器
+   * Apply a theme to a layout container
    */
   applyThemeToContainer(container: LayoutContainer): void {
     if (!this.currentTheme.value) return
 
     const theme = this.currentTheme.value
 
-    // 更新容器主题配置
+    // Update container theme configuration
     container.theme = theme.id
     container.customTheme = {
       colors: theme.colors,
@@ -598,7 +598,7 @@ export class ThemeIntegrationManager {
       shadows: theme.shadows
     }
 
-    // 如果容器有背景配置，应用主题颜色
+    // If the container has background configuration，Apply theme colors
     if (container.background) {
       if (!container.background.color) {
         container.background.color = theme.colors.background
@@ -609,11 +609,11 @@ export class ThemeIntegrationManager {
       }
     }
 
-    logger.debug(`应用主题到容器: ${container.name}`)
+    logger.debug(`Apply theme to container: ${container.name}`)
   }
 
   /**
-   * 将主题应用到布局项
+   * Apply a theme to a layout item
    */
   applyThemeToItems(items: LayoutItem[]): void {
     if (!this.currentTheme.value) return
@@ -621,12 +621,12 @@ export class ThemeIntegrationManager {
     const theme = this.currentTheme.value
 
     items.forEach(item => {
-      // 应用主题样式
+      // Apply theme styles
       if (!item.style) {
         item.style = {}
       }
 
-      // 应用默认样式（如果没有自定义样式）
+      // Apply default style（If there is no custom style）
       if (!item.style.backgroundColor) {
         item.style.backgroundColor = theme.colors.surface
       }
@@ -637,7 +637,7 @@ export class ThemeIntegrationManager {
         item.style.borderRadius = parseInt(theme.borderRadius.md)
       }
 
-      // 组件特定样式
+      // Component specific styles
       if (theme.components && item.type) {
         const componentStyles = theme.components[item.type]
         if (componentStyles) {
@@ -646,59 +646,59 @@ export class ThemeIntegrationManager {
       }
     })
 
-    logger.debug(`应用主题到 ${items.length} 个布局项`)
+    logger.debug(`Apply theme to ${items.length} layout items`)
   }
 
-  // ====== 主题导入导出 ======
+  // ====== Theme import and export ======
 
   /**
-   * 导出主题
+   * Export theme
    */
   exportTheme(themeId: string): string | null {
     const theme = this.themes.get(themeId)
     if (!theme) {
-      logger.error(`主题不存在: ${themeId}`)
+      logger.error(`Topic does not exist: ${themeId}`)
       return null
     }
 
     try {
       return JSON.stringify(theme, null, 2)
     } catch (error) {
-      logger.error('导出主题失败:', error)
+      logger.error('Failed to export topic:', error)
       return null
     }
   }
 
   /**
-   * 导入主题
+   * Import theme
    */
   importTheme(themeData: string): PanelTheme | null {
     try {
       const theme: PanelTheme = JSON.parse(themeData)
 
-      // 验证主题数据
+      // Validate subject data
       if (!this.validateTheme(theme)) {
-        logger.error('主题数据无效')
+        logger.error('Topic data is invalid')
         return null
       }
 
-      // 确保是自定义主题
+      // Make sure it’s a custom theme
       theme.isBuiltIn = false
       theme.id = theme.id || `imported-${Date.now()}`
 
       this.themes.set(theme.id, theme)
       this.customThemes[theme.id] = theme
 
-      logger.info(`导入主题: ${theme.displayName}`)
+      logger.info(`Import theme: ${theme.displayName}`)
       return theme
     } catch (error) {
-      logger.error('导入主题失败:', error)
+      logger.error('Importing theme failed:', error)
       return null
     }
   }
 
   /**
-   * 验证主题数据
+   * Validate subject data
    */
   private validateTheme(theme: any): theme is PanelTheme {
     return (
@@ -714,33 +714,33 @@ export class ThemeIntegrationManager {
     )
   }
 
-  // ====== 响应式数据 ======
+  // ====== Responsive data ======
 
   /**
-   * 当前主题的响应式引用
+   * Responsive references to the current theme
    */
   get currentThemeRef() {
     return computed(() => this.currentTheme.value)
   }
 
   /**
-   * 所有主题的响应式引用
+   * Responsive quotes for all themes
    */
   get allThemesRef() {
     return computed(() => Array.from(this.themes.values()))
   }
 
   /**
-   * 自定义主题的响应式引用
+   * Responsive quotes for custom themes
    */
   get customThemesRef() {
     return computed(() => Object.values(this.customThemes))
   }
 
-  // ====== 清理资源 ======
+  // ====== Clean up resources ======
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   dispose(): void {
     this.themes.clear()
@@ -751,12 +751,12 @@ export class ThemeIntegrationManager {
   }
 }
 
-// ====== 组合式函数 ======
+// ====== Combined functions ======
 
 let themeManager: ThemeIntegrationManager | null = null
 
 /**
- * 使用主题集成
+ * Use theme integration
  */
 export function useThemeIntegration() {
   if (!themeManager) {
@@ -764,12 +764,12 @@ export function useThemeIntegration() {
   }
 
   return {
-    // 状态
+    // state
     currentTheme: themeManager.currentThemeRef,
     allThemes: themeManager.allThemesRef,
     customThemes: themeManager.customThemesRef,
 
-    // 方法
+    // method
     switchToTheme: themeManager.switchToTheme.bind(themeManager),
     switchToScheme: themeManager.switchToScheme.bind(themeManager),
     getCurrentTheme: themeManager.getCurrentTheme.bind(themeManager),
@@ -777,26 +777,26 @@ export function useThemeIntegration() {
     getThemesByCategory: themeManager.getThemesByCategory.bind(themeManager),
     getTheme: themeManager.getTheme.bind(themeManager),
 
-    // 自定义主题
+    // Custom theme
     createCustomTheme: themeManager.createCustomTheme.bind(themeManager),
     updateCustomTheme: themeManager.updateCustomTheme.bind(themeManager),
     deleteCustomTheme: themeManager.deleteCustomTheme.bind(themeManager),
 
-    // 应用主题
+    // Apply theme
     applyThemeToContainer: themeManager.applyThemeToContainer.bind(themeManager),
     applyThemeToItems: themeManager.applyThemeToItems.bind(themeManager),
 
-    // 导入导出
+    // Import and export
     exportTheme: themeManager.exportTheme.bind(themeManager),
     importTheme: themeManager.importTheme.bind(themeManager),
 
-    // 清理
+    // clean up
     dispose: themeManager.dispose.bind(themeManager)
   }
 }
 
 /**
- * 重置主题管理器
+ * Reset theme manager
  */
 export function resetThemeIntegration(): void {
   if (themeManager) {

@@ -19,34 +19,34 @@ const defaultForm = {
   service_plugin_id: '',
   voucher: {},
   vouchers: {},
-  auth_type: 'manual' // 添加模式字段，默认为手动
+  auth_type: 'manual' // Add schema field，Default is manual
 }
 const form = ref<any>({ ...defaultForm })
 const rules = ref<any>({
   name: {
     required: true,
     trigger: ['blur', 'input'],
-    message: '请输入接入点名称'
+    message: 'Please enter access point name'
   },
   auth_type: {
     required: true,
     trigger: ['change'],
-    message: '请选择模式'
+    message: 'Please select mode'
   }
 })
 const openModal: (id: any, row?: any) => void = async (id, row) => {
   if (row) {
-    // 编辑模式：设置 isEdit 为 true 并填充表单数据
+    // edit mode：set up isEdit for true and populate the form data
     isEdit.value = true
     Object.assign(form.value, row)
     const voucherData = JSON.parse(row.voucher)
     Object.assign(form.value.vouchers, voucherData)
-    // 从 voucher 解析的数据中回显 auth_type 到选择模式字段
+    // from voucher echo in the parsed data auth_type to select mode field
     if (voucherData.auth_type) {
       form.value.auth_type = voucherData.auth_type
     }
   } else {
-    // 新增模式：重置 isEdit 为 false
+    // New mode：reset isEdit for false
     isEdit.value = false
   }
   service_plugin_id.value = id
@@ -64,7 +64,7 @@ const close: () => void = () => {
   form.value = { ...defaultForm }
   form.value.vouchers = {}
   currentStep.value = 1
-  // 重置编辑状态
+  // Reset editing status
   isEdit.value = false
 }
 
@@ -72,19 +72,19 @@ const submitSevice: () => void = async () => {
   formRef.value?.validate(async errors => {
     if (errors) return
 
-    // 无论是手动还是自动模式，都先调用接口创建/更新服务
-    // 在 vouchers 中添加 auth_type 字段
+    // Whether in manual or automatic mode，First call the interface to create/Update service
+    // exist vouchers Add in auth_type Field
     form.value.vouchers.auth_type = form.value.auth_type
     form.value.voucher = JSON.stringify(form.value.vouchers)
     const data: any = isEdit.value ? await putServiceDrop(form.value) : await createServiceDrop(form.value)
     serviceModals.value = false
 
     if (form.value.auth_type === 'auto') {
-      // 自动模式，调用设备列表接口（与手动模式一样）
+      // automatic mode，Call the device list interface（Same as manual mode）
       try {
         await getServiceListDrop({
           voucher: form.value.voucher,
-          service_type: '', // 可能需要根据实际情况调整
+          service_type: '', // May need to be adjusted according to actual conditions
           page: 1,
           page_size: 10
         })
@@ -93,7 +93,7 @@ const submitSevice: () => void = async () => {
         }
       }
       
-      // 关闭当前弹窗，并打开配置弹窗
+      // Close the current pop-up window，and open the configuration pop-up window
       const id = isEdit.value ? form.value.id : data.data.id
       emit(
         'isEdit',
@@ -106,12 +106,12 @@ const submitSevice: () => void = async () => {
         true
       )
     } else {
-      // 手动模式处理
+      // Manual mode handling
       const id = isEdit.value ? form.value.id : data.data.id
       emit('isEdit', form.value.voucher, id, isEdit.value)
     }
 
-    // 重置表单
+    // Reset form
     form.value = { ...defaultForm }
     form.value.vouchers = {}
   })
@@ -137,7 +137,7 @@ defineExpose({ openModal })
       require-mark-placement="right-hanging"
     >
       <n-form-item :label="$t('card.accessPointName')" path="name">
-        <n-input v-model:value="form.name" placeholder="请输入接入点名称" />
+        <n-input v-model:value="form.name" placeholder="Please enter access point name" />
       </n-form-item>
       <n-form-item :label="$t('common.selectionMode')" path="auth_type">
         <n-radio-group v-model:value="form.auth_type">

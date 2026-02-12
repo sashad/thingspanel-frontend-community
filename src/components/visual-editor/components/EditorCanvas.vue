@@ -1,9 +1,9 @@
 <template>
   <div class="editor-canvas" @click="handleCanvasClick">
-    <!-- 画布网格背景 -->
+    <!-- Canvas grid background -->
     <div v-if="canvasStore.config.showGrid" class="canvas-grid" :style="gridStyle" />
 
-    <!-- 渲染所有编辑器组件 -->
+    <!-- Render all editor components -->
     <div
       v-for="item in editorItems"
       :key="item.id"
@@ -16,15 +16,15 @@
       @click.stop="handleItemClick(item.id, $event)"
       @mousedown="handleItemMouseDown(item.id, $event)"
     >
-      <!-- 组件渲染 -->
+      <!-- Component rendering -->
       <component :is="getWidgetComponent(item)" v-bind="item.cardData.config" class="widget-content" />
 
-      <!-- 选中状态指示器 -->
+      <!-- Check status indicator -->
       <div v-if="selectedIds.includes(item.id)" class="selection-indicator">
-        <!-- 选中边框 -->
+        <!-- Select border -->
         <div class="selection-border" />
 
-        <!-- 尺寸调整手柄 -->
+        <!-- Size adjustment handle -->
         <div
           v-for="handle in resizeHandles"
           :key="handle"
@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <!-- 多选框 -->
+    <!-- checkbox -->
     <div v-if="selectionBox" class="selection-box" :style="selectionBoxStyle" />
   </div>
 </template>
@@ -47,20 +47,20 @@ import { TextWidget, ImageWidget } from '@/components/visual-editor/widgets'
 import { isEditorItem, getWidgetType } from '@/components/visual-editor/utils/adapter'
 import type { BaseCanvasItem } from '@/components/panelv2/types/core'
 
-// 使用canvas store
+// usecanvas store
 const canvasStore = useCanvasStore()
 const { selectedIds } = storeToRefs(canvasStore)
 
-// 组件映射
+// component mapping
 const widgetComponents = {
   text: TextWidget,
   image: ImageWidget
 }
 
-// 调整手柄
+// Adjust the handle
 const resizeHandles = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']
 
-// 多选框状态
+// Checkbox state
 const selectionBox = ref<{
   startX: number
   startY: number
@@ -68,7 +68,7 @@ const selectionBox = ref<{
   currentY: number
 } | null>(null)
 
-// 拖拽状态
+// drag state
 const dragState = ref<{
   isDragging: boolean
   startX: number
@@ -76,7 +76,7 @@ const dragState = ref<{
   startItemPosition: { x: number; y: number }
 } | null>(null)
 
-// 计算属性
+// Computed properties
 const editorItems = computed(() => canvasStore.items.filter(isEditorItem))
 
 const gridStyle = computed(() => {
@@ -107,7 +107,7 @@ const selectionBoxStyle = computed(() => {
   }
 })
 
-// 获取组件样式
+// Get component style
 const getItemStyle = (item: BaseCanvasItem) => ({
   position: 'absolute' as const,
   left: item.position.x + 'px',
@@ -119,39 +119,39 @@ const getItemStyle = (item: BaseCanvasItem) => ({
   cursor: item.locked ? 'not-allowed' : 'move'
 })
 
-// 获取组件实例
+// Get component instance
 const getWidgetComponent = (item: BaseCanvasItem) => {
   const widgetType = getWidgetType(item)
   return widgetType ? widgetComponents[widgetType] : null
 }
 
-// 事件处理
+// event handling
 const handleCanvasClick = () => {
   canvasStore.clearSelection()
 }
 
 const handleItemClick = (id: string, event: MouseEvent) => {
   if (event.ctrlKey || event.metaKey) {
-    // Ctrl/Cmd + 点击：切换选择
+    // Ctrl/Cmd + Click：Toggle selection
     canvasStore.toggleSelection(id)
   } else {
-    // 普通点击：单选
+    // Normal click：Single choice
     canvasStore.selectItems([id])
   }
 }
 
 const handleItemMouseDown = (id: string, event: MouseEvent) => {
-  if (event.button !== 0) return // 只处理左键
+  if (event.button !== 0) return // Only handle left click
 
   const item = canvasStore.getItem(id)
   if (!item || item.locked) return
 
-  // 如果点击的项目未被选中，先选中它
+  // If the clicked item is not selected，Select it first
   if (!selectedIds.value.includes(id)) {
     canvasStore.selectItems([id])
   }
 
-  // 开始拖拽
+  // Start dragging
   dragState.value = {
     isDragging: false,
     startX: event.clientX,
@@ -159,7 +159,7 @@ const handleItemMouseDown = (id: string, event: MouseEvent) => {
     startItemPosition: { ...item.position }
   }
 
-  // 监听鼠标移动和释放
+  // Monitor mouse movement and release
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
 }
@@ -170,13 +170,13 @@ const handleMouseMove = (event: MouseEvent) => {
   const deltaX = event.clientX - dragState.value.startX
   const deltaY = event.clientY - dragState.value.startY
 
-  // 如果移动距离足够大，开始拖拽
+  // If the moving distance is large enough，Start dragging
   if (!dragState.value.isDragging && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
     dragState.value.isDragging = true
   }
 
   if (dragState.value.isDragging) {
-    // 更新所有选中项目的位置
+    // Update the position of all selected items
     const updates = selectedIds.value
       .map(id => {
         const item = canvasStore.getItem(id)
@@ -208,7 +208,7 @@ const handleMouseUp = () => {
 
 const handleResizeStart = (id: string, handle: string, event: MouseEvent) => {
   event.stopPropagation()
-  // TODO: 实现尺寸调整逻辑
+  // TODO: Implement resizing logic
 }
 </script>
 

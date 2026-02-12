@@ -25,7 +25,7 @@ import {
 import { createProxyPattern } from '~/env.config'
 import ProvinceCityDistrictSelector from '@/components/common/ProvinceCityDistrictSelector.vue'
 
-// 开发环境使用代理路径，生产环境使用完整URL
+// Development environment uses proxy path，Complete production environment useURL
 const isHttpProxy = import.meta.env.VITE_HTTP_PROXY === 'Y'
 const uploadUrl = isHttpProxy ? createProxyPattern() : getDemoServerUrl()
 const url = ref(uploadUrl)
@@ -34,37 +34,37 @@ const editType = ref(false)
 const header = ref(false)
 const headUrl = ref('')
 
-// 时区选项
+// Time zone options
 const timezoneOptions = [
-  { label: 'Asia/Shanghai (北京时间)', value: 'Asia/Shanghai' },
-  { label: 'Asia/Tokyo (东京时间)', value: 'Asia/Tokyo' },
-  { label: 'Asia/Seoul (首尔时间)', value: 'Asia/Seoul' },
-  { label: 'Asia/Singapore (新加坡时间)', value: 'Asia/Singapore' },
-  { label: 'Asia/Hong_Kong (香港时间)', value: 'Asia/Hong_Kong' },
-  { label: 'Asia/Bangkok (曼谷时间)', value: 'Asia/Bangkok' },
-  { label: 'Asia/Dubai (迪拜时间)', value: 'Asia/Dubai' },
-  { label: 'Asia/Kolkata (印度时间)', value: 'Asia/Kolkata' },
-  { label: 'Europe/London (伦敦时间)', value: 'Europe/London' },
-  { label: 'Europe/Paris (巴黎时间)', value: 'Europe/Paris' },
-  { label: 'Europe/Berlin (柏林时间)', value: 'Europe/Berlin' },
-  { label: 'Europe/Moscow (莫斯科时间)', value: 'Europe/Moscow' },
-  { label: 'America/New_York (纽约时间)', value: 'America/New_York' },
-  { label: 'America/Los_Angeles (洛杉矶时间)', value: 'America/Los_Angeles' },
-  { label: 'America/Chicago (芝加哥时间)', value: 'America/Chicago' },
-  { label: 'America/Toronto (多伦多时间)', value: 'America/Toronto' },
-  { label: 'Australia/Sydney (悉尼时间)', value: 'Australia/Sydney' },
-  { label: 'Australia/Melbourne (墨尔本时间)', value: 'Australia/Melbourne' },
-  { label: 'Pacific/Auckland (奥克兰时间)', value: 'Pacific/Auckland' },
-  { label: 'UTC (协调世界时)', value: 'UTC' }
+  { label: 'Asia/Shanghai (Beijing time)', value: 'Asia/Shanghai' },
+  { label: 'Asia/Tokyo (Tokyo time)', value: 'Asia/Tokyo' },
+  { label: 'Asia/Seoul (Seoul time)', value: 'Asia/Seoul' },
+  { label: 'Asia/Singapore (Singapore time)', value: 'Asia/Singapore' },
+  { label: 'Asia/Hong_Kong (Hong Kong time)', value: 'Asia/Hong_Kong' },
+  { label: 'Asia/Bangkok (Bangkok time)', value: 'Asia/Bangkok' },
+  { label: 'Asia/Dubai (dubai time)', value: 'Asia/Dubai' },
+  { label: 'Asia/Kolkata (indian time)', value: 'Asia/Kolkata' },
+  { label: 'Europe/London (london time)', value: 'Europe/London' },
+  { label: 'Europe/Paris (paris time)', value: 'Europe/Paris' },
+  { label: 'Europe/Berlin (Berlin time)', value: 'Europe/Berlin' },
+  { label: 'Europe/Moscow (Moscow time)', value: 'Europe/Moscow' },
+  { label: 'America/New_York (new york time)', value: 'America/New_York' },
+  { label: 'America/Los_Angeles (Los Angeles time)', value: 'America/Los_Angeles' },
+  { label: 'America/Chicago (chicago time)', value: 'America/Chicago' },
+  { label: 'America/Toronto (toronto time)', value: 'America/Toronto' },
+  { label: 'Australia/Sydney (Sydney time)', value: 'Australia/Sydney' },
+  { label: 'Australia/Melbourne (Melbourne time)', value: 'Australia/Melbourne' },
+  { label: 'Pacific/Auckland (Auckland time)', value: 'Pacific/Auckland' },
+  { label: 'UTC (coordinated universal time)', value: 'UTC' }
 ]
 
-// 语言选项
+// Language options
 const languageOptions = [
-  { label: '中文', value: 'zh-CN' },
+  { label: 'Chinese', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
 ]
 
-// 国家区号选项
+// Country code options
 const countryCodeOptions = [
   { label: '+86', value: '+86' },
   { label: '+1', value: '+1' },
@@ -111,7 +111,7 @@ const countryCodeOptions = [
   { label: '+886', value: '+886' }
 ]
 
-// 处理省市区选择变化
+// Handling province and city selection changes
 const handleAddressChange = (value: { province: string; city: string; district: string }) => {
   userInfoData.value.address.province = value.province
   userInfoData.value.address.city = value.city
@@ -122,19 +122,19 @@ const userInfoData = ref({
   additional_info: '',
   name: '',
   email: '',
-  phone_number: '', // 完整手机号
+  phone_number: '', // Complete mobile number
   country_code: '+86',
   phone_only: '',
   authority: '',
-  organization: '', // 组织
-  timezone: '', // 时区
-  default_language: '', // 默认语言
-  avatar_url: '', // 头像
+  organization: '', // organize
+  timezone: '', // time zone
+  default_language: '', // Default language
+  avatar_url: '', // avatar
   address: {
-    province: '', // 省份
-    city: '', // 城市
-    district: '', // 区县
-    detailed_address: '' // 详细地址
+    province: '', // province
+    city: '', // City
+    district: '', // Districts and counties
+    detailed_address: '' // Detailed address
   }
 })
 
@@ -181,7 +181,7 @@ const getSubmitUserInfoData = () => {
     phone_number: fullPhoneNumber.value
   }
 }
-/** 初始from数据 */
+/** initialfromdata */
 const formData = ref({
   name: '',
   old_password: '',
@@ -269,13 +269,13 @@ function editName() {
   // setModalType('amend');
 }
 
-/** 取消编辑模式 */
+/** Cancel edit mode */
 function closeEdit() {
   editType.value = false
 }
 
-// 移除标签页切换逻辑，新设计不再需要
-/** 更新用户信息 */
+// Remove tab switching logic，New designs no longer needed
+/** Update user information */
 async function updataUserInfo() {
   if (process.env.NODE_ENV === 'development') {
   }
@@ -283,16 +283,16 @@ async function updataUserInfo() {
   const { error } = await changeInformation(getSubmitUserInfoData())
   if (!error) {
     window.$message?.success($t('custom.grouping_details.operationSuccess'))
-    closeEdit() // 成功后退出编辑模式
+    closeEdit() // Exit edit mode after success
   }
 }
-/** 重置密码 */
+/** reset password */
 const resetPass = async () => {
   formData.value.old_password = ''
   formData.value.passwords = ''
   formData.value.password = ''
 }
-/** 修改密码 */
+/** Change password */
 const submitPass = async () => {
   await validate()
   const cacheStr = localStorage.getItem('enableZcAndYzm')
@@ -316,7 +316,7 @@ const submitPass = async () => {
 
 async function handleFinish({ event }: { event?: ProgressEvent }) {
   const response = JSON.parse((event?.target as XMLHttpRequest).response)
-  // 字符串转成对象，兼容两种字段名
+  // Convert string to object，Compatible with both field names
   const additionalInfoStr = userInfoData.value.additional_info || '{}'
   const obj = JSON.parse(additionalInfoStr)
   obj.user_icon = response.data.path
@@ -324,28 +324,28 @@ async function handleFinish({ event }: { event?: ProgressEvent }) {
   userInfoData.value.additional_info = info
   userInfoData.value.avatar_url = response.data.path
 
-  // 调用用户信息更新接口,更新成功，刷新页面头像显示
+  // Call the user information update interface,Update successful，Refresh page avatar display
   const { error } = await changeInformation(getSubmitUserInfoData())
   if (!error) {
-    // 显示头像时使用服务器域名，去掉 /api/v1 路径
+    // Use server domain name when displaying avatar，remove /api/v1 path
     const serverUrl = getDemoServerUrl().replace('/api/v1', '')
     headUrl.value = serverUrl + response.data.path.substring(1)
     // header.value = true
 
-    // 重新获取最新的用户信息，确保本地数据与服务器数据保持同步
+    // Retrieve the latest user information，Ensure local data is in sync with server data
     const { data } = await fetchUserInfo()
     const basePhone = data.phone_num || data.phone_number || ''
     const { country_code, phone_only } = parsePhoneNumber(basePhone)
     userInfoData.value = {
       ...data,
-      // 处理电话号码字段的兼容性映射
+      // Handle compatibility mapping for phone number fields
       phone_number: basePhone,
       country_code,
       phone_only,
       authority: data.authority || '',
-      // 处理附加信息字段的兼容性映射
+      // Handle compatibility mapping for additional information fields
       additional_info: data.additional_info || data.additionalInfo || '{}',
-      // 确保新增字段有默认值
+      // Make sure new fields have default values
       organization: data.organization || '',
       timezone: data.timezone || '',
       default_language: data.default_language || '',
@@ -370,14 +370,14 @@ onMounted(async () => {
   const { country_code, phone_only } = parsePhoneNumber(basePhone)
   userInfoData.value = {
     ...data,
-    // 将 phone_num 映射为 phone_number
+    // Will phone_num mapped to phone_number
     phone_number: basePhone,
     country_code,
     phone_only,
     authority: data.authority || '',
-    // 兼容 additional_info 和 additionalInfo 字段
+    // compatible additional_info and additionalInfo Field
     additional_info: data.additional_info || data.additionalInfo || '{}',
-    // 确保新字段有默认值
+    // Make sure new fields have default values
     organization: data.organization || '',
     timezone: data.timezone || '',
     default_language: data.default_language || '',
@@ -389,7 +389,7 @@ onMounted(async () => {
     }
   }
 
-  // 兼容两种字段名的头像显示逻辑
+  // Avatar display logic compatible with both field names
   const additionalInfoStr = userInfoData.value.additional_info || '{}'
   if (additionalInfoStr === '{}' || !additionalInfoStr) {
     header.value = false
@@ -398,12 +398,12 @@ onMounted(async () => {
     try {
       const obj = JSON.parse(additionalInfoStr)
       if (obj.user_icon) {
-        // 显示头像时使用服务器域名，去掉 /api/v1 路径
+        // Use server domain name when displaying avatar，remove /api/v1 path
         const serverUrl = getDemoServerUrl().replace('/api/v1', '')
         headUrl.value = serverUrl + obj.user_icon.substring(1)
       }
     } catch (error) {
-      console.error('解析用户头像信息失败:', error)
+      console.error('Failed to parse user avatar information:', error)
       header.value = false
     }
   }
@@ -443,12 +443,12 @@ onMounted(async () => {
         </div>
         <div class="text-24px text-#1a1a1a font-600 mb-8px dark:text-#E0E0E0">{{ userInfoData.name }}</div>
         <div>
-          <!--        扩展说明：去国际化文件src/locales/langs/en-us/generate.ts  src/locales/langs/zh-cn/generate.ts 增加对应角色的key即可-->
+          <!--        Extended description：De-internationalize filessrc/locales/langs/en-us/generate.ts  src/locales/langs/zh-cn/generate.ts Add corresponding roleskeyThat’s it-->
           {{ userInfoData.authority && $t(`generate.${userInfoData.authority}`) }}
         </div>
       </div>
       <n-divider />
-      <!-- 基本信息 -->
+      <!-- Basic information -->
       <div>
         <div>
           <div class="flex justify-between mb-20px">
@@ -471,7 +471,7 @@ onMounted(async () => {
             </NButton>
           </div>
           <div class="mt--4">
-            <!-- 显示模式 -->
+            <!-- display mode -->
             <div v-if="!editType" class="mb-32px">
               <div class="flex justify-start">
                 <div class="w-120px text-14px text-#666 dark:text-gray-600">{{ $t('generate.last-name') }}</div>
@@ -525,7 +525,7 @@ onMounted(async () => {
               <n-divider style="margin: 12px 0" />
             </div>
 
-            <!-- 编辑模式 -->
+            <!-- edit mode -->
             <div v-if="editType" class="mb-32px">
               <NForm
                 class="bg-#f8fafc p-18px pb-0 dark:bg-[#1E293B]"
@@ -536,7 +536,7 @@ onMounted(async () => {
                 :model="userInfoData"
               >
                 <NFormItem path="name" :label="$t('generate.last-name')">
-                  <NInput v-model:value="userInfoData.name" placeholder="请输入姓名" />
+                  <NInput v-model:value="userInfoData.name" placeholder="Please enter name" />
                 </NFormItem>
 
                 <NFormItem path="phone_number" :label="$t('generate.phoneNumber')">
@@ -545,18 +545,18 @@ onMounted(async () => {
                       v-model:value="userInfoData.country_code"
                       class="w-24"
                       :options="countryCodeOptions"
-                      :placeholder="'区号'"
+                      :placeholder="'area code'"
                     />
                     <NInput
                       v-model:value="userInfoData.phone_only"
                       class="flex-1"
-                      placeholder="请输入手机号码"
+                      placeholder="Please enter mobile phone number"
                     />
                   </div>
                 </NFormItem>
 
                 <NFormItem path="email" :label="$t('generate.email-address')">
-                  <NInput v-model:value="userInfoData.email" placeholder="请输入邮箱地址" />
+                  <NInput v-model:value="userInfoData.email" placeholder="Please enter your email address" />
                 </NFormItem>
 
                 <NFormItem path="organization" :label="$t('page.manage.user.organization')">
@@ -602,7 +602,7 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- 密码修改 -->
+        <!-- Password change -->
         <div>
           <div class="flex text-16px font-600 mb-20px items-center gap-6px">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

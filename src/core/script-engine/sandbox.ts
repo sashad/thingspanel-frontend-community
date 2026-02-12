@@ -1,13 +1,13 @@
 /**
- * 脚本安全沙箱实现
- * 提供安全的代码执行环境，防止恶意代码攻击
+ * Script security sandbox implementation
+ * Provide a secure code execution environment，Prevent malicious code attacks
  */
 
 import type { IScriptSandbox, SandboxConfig } from '@/core/script-engine/types'
 import { smartDeepClone } from '@/utils/deep-clone'
 
 /**
- * 脚本沙箱实现类
+ * Script sandbox implementation class
  */
 export class ScriptSandbox implements IScriptSandbox {
   private config: SandboxConfig
@@ -17,12 +17,12 @@ export class ScriptSandbox implements IScriptSandbox {
   }
 
   /**
-   * 创建沙箱环境
+   * Create a sandbox environment
    */
   createSandbox(config: SandboxConfig): any {
     const sandbox: any = {}
 
-    // 添加允许的全局对象
+    // Add allowed global objects
     config.allowedGlobals.forEach(global => {
       switch (global) {
         case 'Math':
@@ -55,11 +55,11 @@ export class ScriptSandbox implements IScriptSandbox {
           }
           break
         case 'console':
-          // 提供安全的console实现
+          // provide safeconsoleaccomplish
           sandbox.console = this.createSafeConsole()
           break
         default:
-          // 其他安全的全局对象
+          // Other safe global objects
           if (typeof window !== 'undefined' && global in window) {
             const value = (window as any)[global]
             if (typeof value !== 'function' || this.isSafeFunction(global)) {
@@ -69,29 +69,29 @@ export class ScriptSandbox implements IScriptSandbox {
       }
     })
 
-    // 添加安全的内置工具
+    // Add secure built-in tools
     sandbox._utils = this.createBuiltinUtils()
 
     return sandbox
   }
 
   /**
-   * 在沙箱中执行代码
+   * Execute code in a sandbox
    */
   async executeInSandbox(code: string, sandbox: any, timeout: number = 5000): Promise<any> {
-    // 检查代码安全性
+    // Check code security
     const securityCheck = this.checkCodeSecurity(code)
     if (!securityCheck.safe) {
-      throw new Error(`代码安全检查失败: ${securityCheck.issues.join(', ')}`)
+      throw new Error(`Code security check failed: ${securityCheck.issues.join(', ')}`)
     }
 
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
-        reject(new Error('脚本执行超时'))
+        reject(new Error('Script execution timeout'))
       }, timeout)
 
       try {
-        // 创建安全的执行函数
+        // Create safe execution functions
         const wrappedCode = this.wrapCodeForExecution(code)
         const executor = new Function(
           'sandbox',
@@ -104,7 +104,7 @@ export class ScriptSandbox implements IScriptSandbox {
         `
         )
 
-        // 执行代码
+        // Execute code
         const result = executor(sandbox)
 
         if (result instanceof Promise) {
@@ -129,10 +129,10 @@ export class ScriptSandbox implements IScriptSandbox {
   }
 
   /**
-   * 销毁沙箱
+   * Destroy sandbox
    */
   destroySandbox(sandbox: any): void {
-    // 清理沙箱中的定时器
+    // Clean up timers in sandbox
     if (sandbox._timers) {
       sandbox._timers.forEach((timer: any) => {
         if (timer.type === 'timeout') {
@@ -144,19 +144,19 @@ export class ScriptSandbox implements IScriptSandbox {
       sandbox._timers = []
     }
 
-    // 清空沙箱对象
+    // Clear sandbox objects
     Object.keys(sandbox).forEach(key => {
       delete sandbox[key]
     })
   }
 
   /**
-   * 检查代码安全性
+   * Check code security
    */
   checkCodeSecurity(code: string): { safe: boolean; issues: string[] } {
     const issues: string[] = []
 
-    // 检查是否包含危险关键字
+    // Check for dangerous keywords
     const dangerousPatterns = [
       /eval\s*\(/,
       /Function\s*\(/,
@@ -177,29 +177,29 @@ export class ScriptSandbox implements IScriptSandbox {
     dangerousPatterns.forEach((pattern, index) => {
       if (pattern.test(code)) {
         const patternNames = [
-          'eval函数调用',
-          'Function构造器',
+          'evalfunction call',
+          'FunctionConstructor',
           'new Function',
-          '动态import',
-          'require调用',
-          'process对象访问',
-          'global对象访问',
-          'window对象访问',
-          'document对象访问',
-          'location对象访问',
-          'navigator对象访问',
-          '__proto__属性访问',
-          'constructor属性访问',
-          'prototype属性访问'
+          'dynamicimport',
+          'requirecall',
+          'processobject access',
+          'globalobject access',
+          'windowobject access',
+          'documentobject access',
+          'locationobject access',
+          'navigatorobject access',
+          '__proto__Property access',
+          'constructorProperty access',
+          'prototypeProperty access'
         ]
-        issues.push(`检测到危险代码模式: ${patternNames[index]}`)
+        issues.push(`Dangerous code pattern detected: ${patternNames[index]}`)
       }
     })
 
-    // 检查自定义安全策略
+    // Check custom security policy
     if (this.config.customSecurityPolicy) {
       if (!this.config.customSecurityPolicy(code)) {
-        issues.push('自定义安全策略检查失败')
+        issues.push('Custom security policy check failed')
       }
     }
 
@@ -210,24 +210,24 @@ export class ScriptSandbox implements IScriptSandbox {
   }
 
   /**
-   * 包装代码以便安全执行
+   * Wrap code for safe execution
    */
   private wrapCodeForExecution(code: string): string {
-    // 在代码前后添加安全包装
+    // Add security wrappers before and after code
     return `
-      // 重定义危险函数
+      // Redefine dangerous functions
       const eval = undefined;
       const Function = undefined;
       const require = undefined;
-      // 注意：不能定义 import 变量，因为它是保留字
+      // Notice：cannot be defined import variable，Because it is a reserved word
       
-      // 用户代码
+      // user code
       ${code}
     `
   }
 
   /**
-   * 创建安全的console实现
+   * Create a secureconsoleaccomplish
    */
   private createSafeConsole() {
     const logs: any[] = []
@@ -253,11 +253,11 @@ export class ScriptSandbox implements IScriptSandbox {
   }
 
   /**
-   * 创建内置工具函数
+   * Create built-in utility functions
    */
   private createBuiltinUtils() {
     return {
-      // 数据生成工具
+      // Data generation tools
       mockData: {
         randomNumber: (min = 0, max = 100) => Math.random() * (max - min) + min,
         randomString: (length = 10) =>
@@ -292,7 +292,7 @@ export class ScriptSandbox implements IScriptSandbox {
         }
       },
 
-      // 数据处理工具
+      // data processing tools
       dataUtils: {
         deepClone: <T>(obj: T): T => smartDeepClone(obj),
         merge: (...objects: any[]) => Object.assign({}, ...objects),
@@ -337,7 +337,7 @@ export class ScriptSandbox implements IScriptSandbox {
         }
       },
 
-      // 时间工具
+      // time tool
       timeUtils: {
         now: () => Date.now(),
         format: (date: Date | number, format: string = 'YYYY-MM-DD HH:mm:ss') => {
@@ -381,7 +381,7 @@ export class ScriptSandbox implements IScriptSandbox {
   }
 
   /**
-   * 检查函数是否安全
+   * Check if function is safe
    */
   private isSafeFunction(funcName: string): boolean {
     const safeFunctions = [
@@ -399,7 +399,7 @@ export class ScriptSandbox implements IScriptSandbox {
 }
 
 /**
- * 默认沙箱配置
+ * Default sandbox configuration
  */
 export const defaultSandboxConfig: SandboxConfig = {
   enabled: true,

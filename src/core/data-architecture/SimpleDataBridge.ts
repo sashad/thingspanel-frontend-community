@@ -1,138 +1,138 @@
 /**
- * 简化数据桥接器 (SimpleDataBridge)
- * 替代复杂的ComponentExecutorManager，提供轻量级的配置→数据转换
+ * Simplified data bridge (SimpleDataBridge)
+ * replace complexComponentExecutorManager，Provide lightweight configuration→data conversion
  *
- * 🔥 Task 2.1 修正：集成 MultiLayerExecutorChain，符合需求文档的三层架构
+ * 🔥 Task 2.1 Correction：integrated MultiLayerExecutorChain，Three-tier architecture in line with requirements documents
  *
- * 设计原则：
- * 1. 职责单一：只做配置格式转换和执行协调
- * 2. 无状态管理：不跟踪执行历史、统计信息
- * 3. 架构合规：使用符合需求文档的多层执行器链
- * 4. 事件驱动：通过回调函数与外部系统通信
- * 5. 执行器委托：使用MultiLayerExecutorChain进行完整的数据处理管道
+ * design principles：
+ * 1. Single responsibility：Only perform configuration format conversion and execution coordination
+ * 2. Stateless management：Do not track execution history、Statistics
+ * 3. Architecture compliance：Use multi-layered executor chains consistent with requirements documentation
+ * 4. event driven：Communicate with external systems through callback functions
+ * 5. executor delegate：useMultiLayerExecutorChainConduct a complete data processing pipeline
  */
 
-// 🔥 Task 2.1 修正: 导入多层执行器链（符合需求文档的三层架构）
+// 🔥 Task 2.1 Correction: Import multi-layer executor chain（Three-tier architecture in line with requirements documents）
 import {
   MultiLayerExecutorChain,
   type DataSourceConfiguration,
   type ExecutionResult
 } from './executors/MultiLayerExecutorChain'
 
-// 🆕 SUBTASK-003: 导入增强数据仓库
+// 🆕 SUBTASK-003: Import enhanced data warehouse
 import { dataWarehouse, type EnhancedDataWarehouse } from '@/core/data-architecture/DataWarehouse'
 
 /**
- * 简化的数据源配置
+ * Simplified data source configuration
  */
 export interface SimpleDataSourceConfig {
-  /** 数据源ID */
+  /** data sourceID */
   id: string
-  /** 数据源类型 */
+  /** Data source type */
   type: 'static' | 'http' | 'json' | 'websocket' | 'file' | 'data-source-bindings'
-  /** 配置选项 */
+  /** Configuration options */
   config: {
-    // 静态数据
+    // static data
     data?: any
-    // HTTP配置
+    // HTTPConfiguration
     url?: string
     method?: 'GET' | 'POST'
     headers?: Record<string, string>
     timeout?: number
     [key: string]: any
   }
-  /** 🔥 新增：过滤路径（JSONPath 语法） */
+  /** 🔥 New：filter path（JSONPath grammar） */
   filterPath?: string
-  /** 🔥 新增：自定义处理脚本 */
+  /** 🔥 New：Custom processing script */
   processScript?: string
 }
 
 /**
- * 数据执行结果
+ * Data execution results
  */
 export interface DataResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 数据内容 */
+  /** Data content */
   data?: any
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 执行时间戳 */
+  /** Execution timestamp */
   timestamp: number
 }
 
 /**
- * 组件数据需求
+ * Component data requirements
  */
 export interface ComponentDataRequirement {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 数据源配置列表 */
+  /** Data source configuration list */
   dataSources: SimpleDataSourceConfig[]
 }
 
 /**
- * 数据更新回调类型
+ * Data update callback type
  */
 export type DataUpdateCallback = (componentId: string, data: Record<string, any>) => void
 
 /**
- * 简化数据桥接器类
- * 只提供最基本的配置→数据转换功能
+ * Simplified data bridge class
+ * Only the most basic configuration is provided→Data conversion function
  */
 export class SimpleDataBridge {
-  /** ✅ 简化：移除复杂的调用计数和去重缓存 */
-  /** 数据更新回调列表 */
+  /** ✅ simplify：Remove complex call counting and deduplication caching */
+  /** Data update callback list */
   private callbacks = new Set<DataUpdateCallback>()
 
-  /** 数据仓库实例 */
+  /** Data warehouse example */
   private warehouse: EnhancedDataWarehouse = dataWarehouse
 
-  /** 🔥 多层执行器链实例（符合需求文档架构） */
+  /** 🔥 Multi-layer executor chain example（Comply with the requirements document structure） */
   private executorChain = new MultiLayerExecutorChain()
 
   /**
-   * 执行组件数据获取
-   * 🔥 重构: 使用 MultiLayerExecutorChain 替代分散的执行逻辑
-   * @param requirement 组件数据需求
-   * @returns 执行结果
+   * Execution component data acquisition
+   * 🔥 Refactor: use MultiLayerExecutorChain Replace decentralized execution logic
+   * @param requirement Component data requirements
+   * @returns Execution result
    */
   async executeComponent(requirement: ComponentDataRequirement): Promise<DataResult> {
-    // ✅ 简化：直接执行，移除复杂的去重和计数逻辑
+    // ✅ simplify：Direct execution，Remove complex deduplication and counting logic
     return await this.doExecuteComponent(requirement, Date.now(), 'direct-call')
   }
 
   /**
-   * 实际的组件执行逻辑（从executeComponent中提取）
+   * The actual component execution logic（fromexecuteComponentextracted from）
    */
   private async doExecuteComponent(requirement: ComponentDataRequirement, startTime: number, callerInfo: string): Promise<DataResult> {
     const executionId = `${requirement.componentId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
     try {
-      // 🔥 关键修复：强制跳过缓存，确保每次都获取最新配置和数据
-      // 配置修改后必须重新执行数据源，不能依赖旧缓存
+      // 🔥 critical fix：Force cache skip，Make sure you get the latest configuration and data every time
+      // The data source must be re-executed after the configuration is modified.，Can't rely on old cache
       this.warehouse.clearComponentCache(requirement.componentId)
 
-      // 🔥 关键修复：确保获取最新的配置快照
+      // 🔥 critical fix：Make sure to get the latest configuration snapshot
       const configSnapshot = await this.captureConfigurationSnapshot(requirement.componentId, executionId)
       if (configSnapshot) {
-        // 使用最新配置重构数据需求
+        // Reconstruct data requirements using the latest configuration
         requirement = this.reconstructRequirementFromSnapshot(requirement, configSnapshot)
       }
 
-      // 🔥 检查数据格式：如果已经是 DataSourceConfiguration 格式，直接使用
+      // 🔥 Check data format：if it is already DataSourceConfiguration Format，Use directly
       let dataSourceConfig: DataSourceConfiguration
 
-      // 🎯 用户要求的打印这几个字 - 调试：检查格式判断过程
+      // 🎯 Print these words as requested by the user - debug：Check format judgment process
       const isDataSourceConfigFormat = this.isDataSourceConfiguration(requirement)
 
       if (isDataSourceConfigFormat) {
         dataSourceConfig = requirement as any
       } else {
 
-        // 🔥 修复：检查是否是双层嵌套结构
+        // 🔥 repair：Check whether it is a double-level nested structure
         if (requirement.dataSources?.[0]?.dataSources) {
-          // 双层嵌套：取内层的真正配置
+          // Double nesting：Get the real configuration of the inner layer
           const innerConfig = requirement.dataSources[0] as any
           dataSourceConfig = {
             componentId: requirement.componentId,
@@ -145,13 +145,13 @@ export class SimpleDataBridge {
         }
       }
 
-      // 🎯 用户要求的打印这几个字 - 调试：最终传给MultiLayerExecutorChain的配置
+      // 🎯 Print these words as requested by the user - debug：finally passed toMultiLayerExecutorChainconfiguration
       const enhancedDataSourceConfig = {
         ...dataSourceConfig,
         configHash: this.calculateConfigHash(dataSourceConfig)
       }
 
-      // 🔥 使用多层执行器链执行完整的数据处理管道
+      // 🔥 Execute a complete data processing pipeline using a multi-layer executor chain
 
 
       const executionResult: ExecutionResult = await this.executorChain.executeDataProcessingChain(
@@ -161,16 +161,16 @@ export class SimpleDataBridge {
 
       if (executionResult.success && executionResult.componentData) {
 
-        // 🎯 用户要求的打印这几个字 - 阶段1：SimpleDataBridge数据执行完成
+        // 🎯 Print these words as requested by the user - stage1：SimpleDataBridgeData execution completed
 
-        // 🔥 修复：为每个数据源分别存储数据，并存储合并后的完整数据
+        // 🔥 repair：Store data separately for each data source，and store the merged complete data
         if (executionResult.componentData && typeof executionResult.componentData === 'object') {
-          // 🔥 关键修复：带执行ID的原子性数据存储
+          // 🔥 critical fix：with executionIDatomic data storage
 
-          // 先清除旧数据，再存储新数据（原子性操作）
+          // Clear old data first，Store new data（Atomic operations）
           this.warehouse.clearComponentCache(requirement.componentId)
 
-          // 存储各个数据源的数据
+          // Store data from various data sources
           Object.entries(executionResult.componentData).forEach(([sourceId, sourceData]) => {
             this.warehouse.storeComponentData(
               requirement.componentId,
@@ -180,7 +180,7 @@ export class SimpleDataBridge {
             )
           })
 
-          // 同时存储完整的合并数据作为备份
+          // Also stores the complete merged data as a backup
           this.warehouse.storeComponentData(
             requirement.componentId,
             'complete',
@@ -189,7 +189,7 @@ export class SimpleDataBridge {
           )
         }
 
-        // 通知数据更新
+        // Notify data updates
         this.notifyDataUpdate(requirement.componentId, executionResult.componentData)
         return {
           success: true,
@@ -199,7 +199,7 @@ export class SimpleDataBridge {
       } else {
         return {
           success: false,
-          error: executionResult.error || '执行失败',
+          error: executionResult.error || 'Execution failed',
           timestamp: Date.now()
         }
       }
@@ -214,9 +214,9 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 检查是否为 DataSourceConfiguration 格式
-   * @param data 待检查的数据
-   * @returns 是否为 DataSourceConfiguration 格式
+   * 🔥 Check if it is DataSourceConfiguration Format
+   * @param data Data to be checked
+   * @returns Is it DataSourceConfiguration Format
    */
   private isDataSourceConfiguration(data: any): boolean {
     return (
@@ -233,10 +233,10 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 新增：转换为 DataSourceConfiguration 格式
-   * 将 SimpleDataBridge 的配置格式转换为 MultiLayerExecutorChain 所需的格式
-   * @param requirement 组件数据需求
-   * @returns DataSourceConfiguration 格式的配置
+   * 🔥 New：Convert to DataSourceConfiguration Format
+   * Will SimpleDataBridge The configuration format is converted to MultiLayerExecutorChain required format
+   * @param requirement Component data requirements
+   * @returns DataSourceConfiguration Format configuration
    */
   private convertToDataSourceConfiguration(requirement: ComponentDataRequirement): DataSourceConfiguration {
     const dataSources = requirement.dataSources.map(dataSource => ({
@@ -254,7 +254,7 @@ export class SimpleDataBridge {
           }
         }
       ],
-      mergeStrategy: 'object' as const // 默认使用对象合并策略
+      mergeStrategy: 'object' as const // Use object merging strategy by default
     }))
 
     return {
@@ -265,23 +265,23 @@ export class SimpleDataBridge {
     }
   }
 
-  // 🗑️ Task 2.1: 移除重复的执行器实现
-  // executeStaticDataSource 和 executeHttpDataSource 已由 UnifiedDataExecutor 统一处理
+  // 🗑️ Task 2.1: Remove duplicate executor implementations
+  // executeStaticDataSource and executeHttpDataSource Already UnifiedDataExecutor Unified processing
 
   /**
-   * 检查配置是否包含有效的数据项
-   * @param requirement 数据需求配置
-   * @returns 是否有有效数据项
+   * Check that the configuration contains valid data items
+   * @param requirement Data requirements configuration
+   * @returns Is there a valid data item?
    */
   private hasValidDataItems(requirement: ComponentDataRequirement): boolean {
     try {
-      // 如果是 DataSourceConfiguration 格式
+      // in the case of DataSourceConfiguration Format
       if (this.isDataSourceConfiguration(requirement)) {
         const config = requirement as any as DataSourceConfiguration
         return config.dataSources?.some(dataSource => dataSource.dataItems && dataSource.dataItems.length > 0) || false
       }
 
-      // 如果是其他格式，检查是否有数据源配置
+      // If it is other format，Check if there is data source configuration
       const hasDataSources =
         requirement.dataSources &&
         Object.values(requirement.dataSources).some(
@@ -290,14 +290,14 @@ export class SimpleDataBridge {
 
       return hasDataSources || false
     } catch (error) {
-      return true // 发生错误时保守地返回 true，避免误删缓存
+      return true // Return conservatively on error true，Avoid accidentally deleting cache
     }
   }
 
   /**
-   * 通知数据更新
-   * @param componentId 组件ID
-   * @param data 数据
+   * Notify data updates
+   * @param componentId componentsID
+   * @param data data
    */
   private notifyDataUpdate(componentId: string, data: Record<string, any>): void {
     this.callbacks.forEach(callback => {
@@ -308,9 +308,9 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 注册数据更新回调
-   * @param callback 回调函数
-   * @returns 取消注册的函数
+   * Register data update callback
+   * @param callback callback function
+   * @returns Unregister function
    */
   onDataUpdate(callback: DataUpdateCallback): () => void {
     this.callbacks.add(callback)
@@ -321,54 +321,54 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🆕 SUBTASK-003: 获取组件数据（缓存接口）
-   * @param componentId 组件ID
-   * @returns 组件数据或null
+   * 🆕 SUBTASK-003: Get component data（cache interface）
+   * @param componentId componentsID
+   * @returns component data ornull
    */
   getComponentData(componentId: string): Record<string, any> | null {
     return this.warehouse.getComponentData(componentId)
   }
 
   /**
-   * 🆕 SUBTASK-003: 清除组件缓存
-   * @param componentId 组件ID
+   * 🆕 SUBTASK-003: Clear component cache
+   * @param componentId componentsID
    */
   clearComponentCache(componentId: string): void {
     this.warehouse.clearComponentCache(componentId)
   }
 
   /**
-   * 🆕 SUBTASK-003: 清除所有缓存
+   * 🆕 SUBTASK-003: clear all cache
    */
   clearAllCache(): void {
     this.warehouse.clearAllCache()
   }
 
   /**
-   * 🆕 SUBTASK-003: 设置缓存过期时间
-   * @param milliseconds 过期时间（毫秒）
+   * 🆕 SUBTASK-003: Set cache expiration time
+   * @param milliseconds Expiration time（millisecond）
    */
   setCacheExpiry(milliseconds: number): void {
     this.warehouse.setCacheExpiry(milliseconds)
   }
 
   /**
-   * 🆕 SUBTASK-003: 获取数据仓库性能指标
+   * 🆕 SUBTASK-003: Get data warehouse performance metrics
    */
   getWarehouseMetrics() {
     return this.warehouse.getPerformanceMetrics()
   }
 
   /**
-   * 🆕 SUBTASK-003: 获取存储统计信息
+   * 🆕 SUBTASK-003: Get storage statistics
    */
   getStorageStats() {
     return this.warehouse.getStorageStats()
   }
 
   /**
-   * 获取简单统计信息
-   * 🆕 SUBTASK-003: 增强统计信息，包含数据仓库数据
+   * Get simple statistics
+   * 🆕 SUBTASK-003: Enhance statistics，Contains data warehouse data
    */
   getStats() {
     const warehouseStats = this.warehouse.getStorageStats()
@@ -384,7 +384,7 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 新增：在执行前验证配置完整性，特别检查HTTP参数绑定路径
+   * 🔥 New：Verify configuration integrity before execution，special inspectionHTTPParameter binding path
    */
   private validateConfigBeforeExecution(config: DataSourceConfiguration): void {
 
@@ -393,11 +393,11 @@ export class SimpleDataBridge {
       dataSource.dataItems.forEach((dataItem, itemIndex) => {
         const { item } = dataItem
 
-        // 🚨 特别检查HTTP类型的参数
+        // 🚨 special inspectionHTTPtype parameters
         if (item.type === 'http' && item.config) {
           const httpConfig = item.config
 
-          // 检查所有参数源
+          // Check all parameter sources
           const allParams = [
             ...(httpConfig.params || []).map(p => ({ source: 'params', param: p })),
             ...(httpConfig.parameters || []).map(p => ({ source: 'parameters', param: p })),
@@ -406,21 +406,21 @@ export class SimpleDataBridge {
 
           allParams.forEach(({ source, param }, paramIndex) => {
 
-            // 🚨 检测损坏的绑定路径
+            // 🚨 Detecting broken binding paths
             if (param.value && typeof param.value === 'string') {
               const isSuspiciousPath = !param.value.includes('.') && param.value.length < 10 && param.variableName
 
               if (isSuspiciousPath) {
-                console.error(`🚨 [SimpleDataBridge] 在传递给MultiLayerExecutorChain前发现损坏的绑定路径!`, {
-                  数据源索引: dsIndex,
-                  数据项索引: itemIndex,
-                  参数源: source,
-                  参数索引: paramIndex,
-                  参数key: param.key,
-                  损坏的value: param.value,
+                console.error(`🚨 [SimpleDataBridge] passing toMultiLayerExecutorChainCorrupted binding path found before!`, {
+                  dataSourceIndex: dsIndex,
+                  dataItemIndex: itemIndex,
+                  parameterSource: source,
+                  parameterIndex: paramIndex,
+                  parameterKey: param.key,
+                  damagedValue: param.value,
                   variableName: param.variableName,
-                  检测时间戳: Date.now(),
-                  堆栈跟踪: new Error().stack
+                  detectionTimestamp: Date.now(),
+                  stackTrace: new Error().stack
                 })
               } else {
               }
@@ -433,36 +433,36 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 新增：捕获配置快照，确保执行时使用一致的配置
+   * 🔥 New：Capture configuration snapshot，Ensure execution with consistent configuration
    */
   private async captureConfigurationSnapshot(componentId: string, executionId: string): Promise<{ config: any; timestamp: number } | null> {
     try {
-      // 🔥 修复：使用动态导入替代require
+      // 🔥 repair：Use dynamic import insteadrequire
       const { configurationIntegrationBridge } = await import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
       const config = configurationIntegrationBridge.getConfiguration(componentId)
 
       if (config) {
         const snapshot = {
-          config: JSON.parse(JSON.stringify(config)), // 深拷贝
+          config: JSON.parse(JSON.stringify(config)), // deep copy
           timestamp: Date.now()
         }
         return snapshot
       }
       return null
     } catch (error) {
-      console.error(`❌ [SimpleDataBridge] [${executionId}] 配置快照捕获失败:`, error)
+      console.error(`❌ [SimpleDataBridge] [${executionId}] Configuration snapshot capture failed:`, error)
       return null
     }
   }
 
   /**
-   * 🔥 新增：基于配置快照重构数据需求
+   * 🔥 New：Reconstruct data requirements based on configuration snapshots
    */
   private reconstructRequirementFromSnapshot(
     originalRequirement: ComponentDataRequirement,
     snapshot: { config: any; timestamp: number }
   ): ComponentDataRequirement {
-    // 如果快照包含完整的数据源配置，使用快照重构
+    // If the snapshot contains the complete data source configuration，Refactor using snapshots
     if (snapshot.config.dataSource) {
       return {
         ...originalRequirement,
@@ -473,10 +473,10 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 新增：将配置快照转换为数据源格式
+   * 🔥 New：Convert configuration snapshot to data source format
    */
   private convertSnapshotToDataSources(config: any): any[] {
-    // 根据配置结构转换为标准数据源格式
+    // Convert to standard data source format according to configuration structure
     if (config.dataSource && config.dataSource.dataSources) {
       return config.dataSource.dataSources
     }
@@ -484,7 +484,7 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 🔥 新增：计算配置哈希值，用于检测配置变化
+   * 🔥 New：Calculate configuration hash，Used to detect configuration changes
    */
   private calculateConfigHash(config: any): string {
     try {
@@ -493,7 +493,7 @@ export class SimpleDataBridge {
       for (let i = 0; i < configString.length; i++) {
         const char = configString.charCodeAt(i)
         hash = ((hash << 5) - hash) + char
-        hash = hash & hash // 转换为32位整数
+        hash = hash & hash // Convert to32bit integer
       }
       return Math.abs(hash).toString(36)
     } catch (error) {
@@ -502,8 +502,8 @@ export class SimpleDataBridge {
   }
 
   /**
-   * 清理资源
-   * 🆕 SUBTASK-003: 同时销毁数据仓库
+   * Clean up resources
+   * 🆕 SUBTASK-003: Also destroy the data warehouse
    */
   destroy(): void {
     this.callbacks.clear()
@@ -512,18 +512,18 @@ export class SimpleDataBridge {
 }
 
 /**
- * 导出全局单例实例
+ * Export global singleton instance
  */
 export const simpleDataBridge = new SimpleDataBridge()
 
 /**
- * 创建新的数据桥接器实例
+ * Create a new data bridge instance
  */
 export function createSimpleDataBridge(): SimpleDataBridge {
   return new SimpleDataBridge()
 }
 
 /**
- * 开发环境自动验证
- * 在控制台输出 Phase 2 架构状态信息
+ * Development environment automatic verification
+ * Output in console Phase 2 Architecture status information
  */

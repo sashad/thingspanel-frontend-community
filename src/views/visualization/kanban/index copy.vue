@@ -17,7 +17,7 @@ import {
   NPagination,
   NSelect
 } from 'naive-ui'
-import type { LastLevelRouteKey } from '@elegant-router/types' // 假设您已经定义好了这些API
+import type { LastLevelRouteKey } from '@elegant-router/types' // Assuming you have defined theseAPI
 import { DelBoard, PostBoard, PutBoard, getBoardList } from '@/service/api/index'
 import { useRouterPush } from '@/hooks/common/router'
 import { $t } from '@/locales'
@@ -26,12 +26,12 @@ const { routerPushByKey } = useRouterPush()
 const message = useMessage()
 const nameSearch = ref('')
 const currentPage = ref(1)
-const pageSize = ref(12) // 或根据你的实际需求来设置
+const pageSize = ref(12) // Or set it according to your actual needs
 const total = ref(0)
 const boards = ref<Panel.Board[]>([])
 const showModal = ref<boolean>(false)
 const isEditMode = ref(false)
-// 初始化表单数据
+// Initialize form data
 const formData = reactive({
   id: '',
   name: '',
@@ -39,12 +39,12 @@ const formData = reactive({
   description: ''
 })
 
-// 设置表单数据
+// Set form data
 const setFormData = data => {
   Object.assign(formData, data)
 }
 
-// 清除表单数据
+// Clear form data
 const clearFormData = () => {
   setFormData({ id: '', name: '', home_flag: 'N', description: '' })
   isEditMode.value = false
@@ -53,7 +53,7 @@ const clearFormData = () => {
 const setupData = v => {
   boards.value = v
 }
-// 获取看板列表
+// Get the Kanban list
 const fetchBoards = async () => {
   const { data } = await getBoardList({ page: currentPage.value, page_size: pageSize.value, name: nameSearch.value })
   if (data && data.list) {
@@ -62,7 +62,7 @@ const fetchBoards = async () => {
   }
 }
 
-// 提交表单
+// Submit form
 const submitForm = async () => {
   if (!formData.name) {
     message.error($t('custom.home.kanbanNameNull'))
@@ -70,9 +70,9 @@ const submitForm = async () => {
   }
 
   if (isEditMode.value) {
-    await PutBoard(formData) // 编辑看板
+    await PutBoard(formData) // Edit Kanban
   } else {
-    await PostBoard(formData) // 新建看板
+    await PostBoard(formData) // Create a new Kanban board
   }
 
   showModal.value = false
@@ -86,13 +86,13 @@ const editBoard = board => {
   showModal.value = true
 }
 
-// 删除看板
+// Delete Kanban board
 const deleteBoard = async (id: string) => {
-  await DelBoard(id) // 假设DelBoard接收看板的id
-  await fetchBoards() // 刷新看板列表
+  await DelBoard(id) // hypothesisDelBoardreceiving kanbanid
+  await fetchBoards() // Refresh the board list
 }
 
-// 页面跳转
+// Page jump
 const goRouter = (name: LastLevelRouteKey, id: string) => {
   routerPushByKey(name, { query: { id } })
 }
@@ -107,11 +107,11 @@ onMounted(fetchBoards)
   <div>
     <NCard>
       <div class="m-b-20px flex flex-wrap items-center gap-15px">
-        <!-- 新建按钮 -->
+        <!-- New button -->
         <div class="flex-1">
           <NButton type="primary" @click="showModal = true">+{{ $t('dashboard_panel.addKanBan') }}</NButton>
         </div>
-        <!-- 搜索部分 -->
+        <!-- Search section -->
         <div class="flex items-center gap-20px">
           <NInput
             v-model:value="nameSearch"
@@ -128,7 +128,7 @@ onMounted(fetchBoards)
           <NButton type="primary" @click="fetchBoards">{{ $t('common.search') }}</NButton>
         </div>
       </div>
-      <!-- 看板列表 -->
+      <!-- Kanban list -->
       <NGrid x-gap="24" y-gap="16" cols="1 s:2 m:3 l:4" responsive="screen">
         <NGridItem
           v-for="board in boards"
@@ -151,7 +151,7 @@ onMounted(fetchBoards)
                 {{ $t('generate.first') }}
               </div>
             </div>
-            <!-- 使用NTooltip组件 -->
+            <!-- useNTooltipcomponents -->
             <NTooltip
               trigger="hover"
               :disabled="!board.description || !board.description.trim()"
@@ -169,7 +169,7 @@ onMounted(fetchBoards)
                   <icon-material-symbols:contract-edit-outline class="text-24px text-blue" />
                 </template>
               </NButton>
-              <!-- 使用 Vue 模板语法的 NPopconfirm -->
+              <!-- use Vue template syntax NPopconfirm -->
               <NPopconfirm @positive-click="deleteBoard(board.id as string)">
                 <template #trigger>
                   <NButton strong secondary circle @click.stop>
@@ -184,7 +184,7 @@ onMounted(fetchBoards)
           </NCard>
         </NGridItem>
       </NGrid>
-      <!-- 看板列表后面添加分页器 -->
+      <!-- Add a paginator after the Kanban list -->
       <div class="mt-4 h-60px w-full">
         <NFlex justify="end">
           <NPagination
@@ -196,7 +196,7 @@ onMounted(fetchBoards)
         </NFlex>
       </div>
     </NCard>
-    <!-- 新建和编辑看板的模态框 -->
+    <!-- Create and edit modal boxes for Kanban boards -->
     <NModal
       v-model:show="showModal"
       :title="isEditMode ? $t('dashboard_panel.editKanban') : $t('dashboard_panel.addKanBan')"
@@ -258,7 +258,7 @@ onMounted(fetchBoards)
   display: block;
   text-wrap: wrap;
   flex: 1;
-  /* 确保这是一个块级元素 */
+  /* Make sure this is a block level element */
   max-width: 100%;
   color: #666;
 }

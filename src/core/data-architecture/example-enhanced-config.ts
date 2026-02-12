@@ -1,6 +1,6 @@
 /**
- * 增强版配置类型示例数据
- * 展示完整的v2.0配置结构和使用方式
+ * Enhanced configuration type sample data
+ * show completev2.0Configuration structure and usage
  */
 
 import type {
@@ -13,10 +13,10 @@ import type {
 
 import { DEFAULT_ENHANCED_FEATURES } from '@/core/data-architecture/types/enhanced-types'
 
-// ==================== JSON数据项示例 ====================
+// ==================== JSONData item example ====================
 
 /**
- * JSON数据项配置示例
+ * JSONData item configuration example
  */
 export const jsonDataItemExample: DataItemConfig<EnhancedJsonDataItemConfig> = {
   type: 'json',
@@ -28,7 +28,7 @@ export const jsonDataItemExample: DataItemConfig<EnhancedJsonDataItemConfig> = {
         humidity: 68.3,
         pressure: 1013.25,
         location: {
-          building: 'A座',
+          building: 'Aseat',
           floor: 3,
           room: '301'
         },
@@ -63,19 +63,19 @@ export const jsonDataItemExample: DataItemConfig<EnhancedJsonDataItemConfig> = {
     transform: 'number'
   },
   metadata: {
-    displayName: '传感器数据源',
-    description: '办公楼A座3楼温湿度传感器数据',
+    displayName: 'Sensor data source',
+    description: 'office buildingAseat3Floor temperature and humidity sensor data',
     createdAt: 1705312200000,
     lastUpdated: 1705312200000,
     enabled: true,
-    tags: ['温度', '湿度', '传感器', 'A座']
+    tags: ['temperature', 'humidity', 'sensor', 'Aseat']
   }
 }
 
-// ==================== HTTP数据项示例 ====================
+// ==================== HTTPData item example ====================
 
 /**
- * HTTP数据项配置示例
+ * HTTPData item configuration example
  */
 export const httpDataItemExample: DataItemConfig<EnhancedHttpDataItemConfig> = {
   type: 'http',
@@ -146,22 +146,22 @@ export const httpDataItemExample: DataItemConfig<EnhancedHttpDataItemConfig> = {
     },
     timeout: 10000,
     preRequestScript: `
-      // 预请求脚本示例
+      // Pre-request script example
       const timestamp = Date.now();
       const requestId = 'req_' + timestamp + '_' + Math.random().toString(36).substr(2, 9);
       
-      // 设置动态参数
+      // Set dynamic parameters
       setDynamicParam('timestamp', timestamp);
       setDynamicParam('requestId', requestId);
     `,
     responseScript: `
-      // 响应后脚本示例
+      // Post-response script example
       if (response.status === 200) {
         const data = response.data;
         if (process.env.NODE_ENV === 'development') {
         };
         
-        // 提取关键数据
+        // Extract key data
         const weather = {
           temperature: data.current?.temperature,
           condition: data.current?.condition,
@@ -170,7 +170,7 @@ export const httpDataItemExample: DataItemConfig<EnhancedHttpDataItemConfig> = {
         
         return weather;
       } else {
-        console.error('API调用失败', response.status, response.statusText);
+        console.error('APIcall failed', response.status, response.statusText);
         return null;
       }
     `,
@@ -185,19 +185,19 @@ export const httpDataItemExample: DataItemConfig<EnhancedHttpDataItemConfig> = {
     transform: 'object'
   },
   metadata: {
-    displayName: '天气API数据源',
-    description: '获取实时天气数据的HTTP接口',
+    displayName: 'weatherAPIdata source',
+    description: 'Get real-time weather dataHTTPinterface',
     createdAt: 1705312200000,
     lastUpdated: 1705312800000,
     enabled: true,
-    tags: ['天气', 'API', 'HTTP', '实时数据']
+    tags: ['weather', 'API', 'HTTP', 'real time data']
   }
 }
 
-// ==================== 动态参数示例 ====================
+// ==================== Dynamic parameter example ====================
 
 /**
- * 动态参数配置示例
+ * Dynamic parameter configuration example
  */
 export const dynamicParamsExample: DynamicParam[] = [
   {
@@ -205,7 +205,7 @@ export const dynamicParamsExample: DynamicParam[] = [
     type: 'string',
     currentValue: 'your-api-token-here',
     exampleValue: 'sk-1234567890abcdef',
-    description: '天气API访问令牌',
+    description: 'weatherAPIaccess token',
     required: true,
     validation: {
       pattern: '^[a-zA-Z0-9\\-_]+$',
@@ -218,7 +218,7 @@ export const dynamicParamsExample: DynamicParam[] = [
     type: 'string',
     currentValue: 'Beijing',
     exampleValue: 'Shanghai',
-    description: '查询天气的城市名称',
+    description: 'City name to check weather',
     required: true,
     validation: {
       enum: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Hangzhou']
@@ -229,7 +229,7 @@ export const dynamicParamsExample: DynamicParam[] = [
     type: 'string',
     currentValue: 'metric',
     exampleValue: 'imperial',
-    description: '温度单位（摄氏度/华氏度）',
+    description: 'temperature unit（degrees celsius/Fahrenheit）',
     required: false,
     validation: {
       enum: ['metric', 'imperial', 'kelvin']
@@ -240,11 +240,11 @@ export const dynamicParamsExample: DynamicParam[] = [
     type: 'number',
     currentValue: 300000,
     exampleValue: 600000,
-    description: '数据刷新间隔（毫秒）',
+    description: 'Data refresh interval（millisecond）',
     required: false,
     validation: {
-      min: 60000, // 最小1分钟
-      max: 3600000 // 最大1小时
+      min: 60000, // smallest1minute
+      max: 3600000 // maximum1Hour
     }
   },
   {
@@ -252,22 +252,22 @@ export const dynamicParamsExample: DynamicParam[] = [
     type: 'boolean',
     currentValue: true,
     exampleValue: false,
-    description: '是否启用数据缓存',
+    description: 'Whether to enable data caching',
     required: false
   }
 ]
 
-// ==================== 完整配置示例 ====================
+// ==================== Complete configuration example ====================
 
 /**
- * 完整的增强版数据源配置示例
+ * Complete enhanced data source configuration example
  */
 export const completeEnhancedConfigExample: EnhancedDataSourceConfiguration = {
-  // 基础配置
+  // Basic configuration
   componentId: 'dashboard_weather_panel_001',
   version: '2.0.0',
 
-  // 数据源配置
+  // Data source configuration
   dataSources: [
     {
       sourceId: 'local_sensor_data',
@@ -303,64 +303,64 @@ export const completeEnhancedConfigExample: EnhancedDataSourceConfiguration = {
     }
   ],
 
-  // 动态参数配置
+  // Dynamic parameter configuration
   dynamicParams: dynamicParamsExample,
 
-  // 增强功能开关
+  // Enhanced function switch
   enhancedFeatures: {
     ...DEFAULT_ENHANCED_FEATURES,
     dynamicParameterSupport: true,
     performanceMonitoring: true
   },
 
-  // 配置元数据
+  // Configuration metadata
   metadata: {
-    name: '天气监控面板配置',
-    description: '结合本地传感器和外部天气API的综合监控面板',
+    name: 'Weather monitoring panel configuration',
+    description: 'Combine local sensors and external weatherAPIcomprehensive monitoring panel',
     author: 'system-admin',
     versionHistory: [
       {
         version: '1.0.0',
         timestamp: 1705225800000,
-        changelog: '初始配置创建',
+        changelog: 'Initial configuration creation',
         author: 'system-admin'
       },
       {
         version: '2.0.0',
         timestamp: 1705312200000,
-        changelog: '升级到增强版配置格式，添加动态参数支持',
+        changelog: 'Upgrade to enhanced configuration format，Add dynamic parameter support',
         author: 'ConfigurationAdapter'
       }
     ],
-    tags: ['天气', '传感器', '监控面板', '实时数据']
+    tags: ['weather', 'sensor', 'Monitoring panel', 'real time data']
   },
 
-  // 时间戳
+  // Timestamp
   createdAt: 1705225800000,
   updatedAt: 1705312200000
 }
 
-// ==================== 使用示例 ====================
+// ==================== Usage example ====================
 
 /**
- * 展示如何使用配置适配器
+ * Shows how to use configuration adapters
  */
 export function demonstrateConfigUsage() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 1. 基础配置信息
+  // 1. Basic configuration information
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 2. JSON数据项信息
+  // 2. JSONData item information
   const jsonItem = completeEnhancedConfigExample.dataSources[0].dataItems[0].item
   if (process.env.NODE_ENV === 'development') {
   }
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 3. HTTP数据项信息
+  // 3. HTTPData item information
   const httpItem = completeEnhancedConfigExample.dataSources[1].dataItems[0].item
   if (process.env.NODE_ENV === 'development') {
   }
@@ -369,13 +369,13 @@ export function demonstrateConfigUsage() {
   if (process.env.NODE_ENV === 'development') {
   }
 
-  // 4. 动态参数信息
+  // 4. Dynamic parameter information
   completeEnhancedConfigExample.dynamicParams?.forEach(param => {
     if (process.env.NODE_ENV === 'development') {
     }
   })
 
-  // 5. 增强功能信息
+  // 5. Enhancement information
   const features = completeEnhancedConfigExample.enhancedFeatures
   if (features) {
     if (process.env.NODE_ENV === 'development') {

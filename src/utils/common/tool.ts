@@ -60,11 +60,11 @@ export const getWebsocketServerUrl = (): string => {
 }
 
 export function deepClone(data: any): any {
-  // 获取传入拷贝函数的数据类型
+  // Get the data type passed into the copy function
   const type = typeOf(data)
-  // 定义一个返回any类型的数据
+  // define a returnanytype of data
   let reData: any
-  // 递归遍历一个array类型数据，
+  // Recursively traverse aarraytype data，
   if (type === 'array') {
     reData = []
     // eslint-disable-next-line no-plusplus
@@ -72,17 +72,17 @@ export function deepClone(data: any): any {
       reData.push(deepClone(data[i]))
     }
   } else if (type === 'object') {
-    // 递归遍历一个object类型数据
+    // Recursively traverse aobjecttype data
     reData = {}
     // eslint-disable-next-line guard-for-in
     for (const i in data) {
       reData[i] = deepClone(data[i])
     }
   } else {
-    // 返回基本数据类型
+    // Return basic data type
     return data
   }
-  // 将any类型的数据return出去，作为deepClone的结果
+  // Willanytype of datareturngo out，asdeepClonethe result
   return reData
 }
 
@@ -117,7 +117,7 @@ export function isJSON(str: string): boolean {
   return false
 }
 
-// 校验密码强度
+// Check password strength
 export function validPassword(str: string): boolean {
   if (str.length < 8) {
     return false
@@ -144,12 +144,12 @@ export function generateRandomHexString(length) {
   return hexString
 }
 
-// RSA 公钥加密
+// RSA public key encryption
 export function encryptDataByRsa(data): string {
   const pubKey = rsaPublicKey
   const encrypt = new JSEncrypt()
   encrypt.setPublicKey(pubKey)
-  // 使用公钥进行加密
+  // Encryption using public key
   try {
     return encrypt.encrypt(data) || ''
   } catch (e) {
@@ -157,7 +157,7 @@ export function encryptDataByRsa(data): string {
   }
 }
 
-// RSA 私钥解密
+// RSA Private key decryption
 export function decryptDataByRsa(data): string {
   //   const priKey = `-----BEGIN RSA PRIVATE KEY-----
   // MIIEowIBAAKCAQEA35ATUHHwTvEHxaOKG/8xTETHq7+syHqEkDXSuKf2irYZefaK
@@ -191,7 +191,7 @@ export function decryptDataByRsa(data): string {
   const encrypt = new JSEncrypt()
   encrypt.setPublicKey(priKey)
 
-  // 使用公钥进行加密
+  // Encryption using public key
   return encrypt.decrypt(data) || ''
 }
 
@@ -214,7 +214,7 @@ export function validPasswordByExp(str) {
     return false
   }
 
-  // 检查是否包含小写字母
+  // Check if it contains lowercase letters
   if (!/[a-z]/.test(str)) {
     return false
   }

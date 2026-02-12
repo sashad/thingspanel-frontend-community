@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 -->
+    <!-- card title bar -->
     <div class="flex items-center p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
@@ -12,11 +12,11 @@
       </div>
     </div>
 
-    <!-- 图表容器 -->
+    <!-- chart container -->
     <div class="flex-1 p-4 min-h-0">
       <n-spin :show="loading">
         <div class="h-full relative">
-          <!-- 错误状态 -->
+          <!-- error status -->
           <div v-if="!loading && errorMsg" class="h-full flex flex-col items-center justify-center text-center">
             <div class="p-4 bg-red-100 dark:bg-red-900 rounded-full mb-3">
               <Icon icon="mdi:alert-circle-outline" class="w-8 h-8 text-red-500 dark:text-red-400" />
@@ -26,7 +26,7 @@
             </div>
           </div>
 
-          <!-- 无数据状态 -->
+          <!-- No data status -->
           <div v-else-if="!loading && isEmpty" class="h-full flex flex-col items-center justify-center text-center">
             <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
               <Icon icon="mdi:chart-line-variant" class="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <!-- 图表 -->
+          <!-- chart -->
           <v-chart
             v-else-if="!loading"
             ref="chartRef"
@@ -52,8 +52,8 @@
 
 <script setup lang="ts">
 /**
- * 系统指标历史组件
- * 显示系统CPU、内存、磁盘使用率的历史趋势图表
+ * System indicator history component
+ * display systemCPU、Memory、Historical trend chart of disk usage
  */
 import { ref, onMounted, computed, provide } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -75,7 +75,7 @@ import { getSystemMetricsHistory } from '@/service/api/system-data'
 import { $t } from '@/locales'
 import dayjs from 'dayjs'
 
-// ECharts 组件注册
+// ECharts Component registration
 use([
   CanvasRenderer,
   LineChart,
@@ -94,14 +94,14 @@ const isEmpty = ref(false)
 const chartOption = ref({})
 const chartRef = ref<any>(null)
 
-// 提供 ECharts 主题
+// supply ECharts theme
 provide(
   THEME_KEY,
   computed(() => themeStore.naiveThemeName)
 )
 
 /**
- * 处理API数据
+ * deal withAPIdata
  */
 const processData = (
   apiData: any
@@ -131,7 +131,7 @@ const processData = (
 }
 
 /**
- * 更新图表配置
+ * Update chart configuration
  */
 const updateChartOption = (processedData: {
   timeAxis: string[]
@@ -146,10 +146,10 @@ const updateChartOption = (processedData: {
   const memLabel = $t('card.memoryUsage', 'Memory')
   const diskLabel = $t('card.diskUsage', 'Disk')
 
-  // 颜色配置
+  // Color configuration
   const colors = ['#5470c6', '#91cc75', '#fac858']
 
-  // 渐变填充色配置
+  // Gradient fill color configuration
   const areaColors = [
     {
       type: 'linear',
@@ -310,7 +310,7 @@ const updateChartOption = (processedData: {
 }
 
 /**
- * 获取系统指标数据
+ * Get system indicator data
  */
 const fetchData = async () => {
   loading.value = true
@@ -347,12 +347,12 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 确保图表响应式 */
+/* Make sure charts are responsive */
 :deep(.echarts) {
   min-height: 200px;
 }
 
-/* 深色模式适配 */
+/* Dark mode adaptation */
 :deep(.dark) {
   .echarts {
     color-scheme: dark;

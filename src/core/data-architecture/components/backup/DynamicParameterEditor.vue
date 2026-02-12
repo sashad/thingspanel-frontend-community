@@ -1,15 +1,15 @@
 <!--
-  动态参数编辑器组件 v3.0
-  采用主行-详情分离的设计，优化了UI布局和交互体验
+  Dynamic parameter editor component v3.0
+  Take main row-Detailed design，OptimizedUILayout and interactive experience
 -->
 <script setup lang="ts">
 /**
- * DynamicParameterEditor - 智能参数编辑器 v3.0
+ * DynamicParameterEditor - Smart parameter editor v3.0
  *
- * 设计理念：
- * - 主行/详情分离：主列表保持简洁，仅显示核心信息，点击“配置”展开详细面板。
- * - 模式化编辑：通过“模板”切换不同的值输入模式（手动、下拉、属性、组件）。
- * - 交互优化：对于复杂的组件模板，使用抽屉（Drawer）进行编辑，避免破坏布局。
+ * design concept：
+ * - Main row/Separation of details：Keep the master list simple，Show only core information，Click“Configuration”Expand details panel。
+ * - Modal editing：pass“template”Switch between different value input modes（Manual、drop down、property、components）。
+ * - Interactive optimization：For complex component templates，Use drawers（Drawer）Make edits，Avoid breaking the layout。
  */
 
 import { ref, computed, watch, nextTick } from 'vue'
@@ -32,16 +32,16 @@ import { type EnhancedParameter } from '@/core/data-architecture/types/parameter
 import { generateVariableName } from '@/core/data-architecture/types/http-config'
 import { getRecommendedTemplates, getTemplateById, ParameterTemplateType } from '@/core/data-architecture/components/common/templates/index'
 
-// 导入组件模板使用的组件（简化版）
+// Import components used by component templates（Simplified version）
 import DeviceMetricsSelector from '@/components/device-selectors/DeviceMetricsSelector.vue'
 import DeviceDispatchSelector from '@/components/device-selectors/DeviceDispatchSelector.vue'
 import ComponentPropertySelector from '@/core/data-architecture/components/common/ComponentPropertySelector.vue'
 import AddParameterFromDevice from '@/core/data-architecture/components/common/AddParameterFromDevice.vue'
-// 导入新的统一设备配置选择器
+// Import new unified device configuration selector
 import UnifiedDeviceConfigSelector from '@/core/data-architecture/components/device-selectors/UnifiedDeviceConfigSelector.vue'
-// 导入设备参数选择器
+// Import device parameter selector
 import DeviceParameterSelector from '@/core/data-architecture/components/device-selectors/DeviceParameterSelector.vue'
-// 导入参数组管理工具
+// Import parameter group management tool
 import { globalParameterGroupManager } from '@/core/data-architecture/utils/device-parameter-generator'
 import {
   Sparkles as SparkleIcon,
@@ -52,14 +52,14 @@ import {
   TrashOutline
 } from '@vicons/ionicons5'
 
-// 组件映射表（简化版）
+// component mapping table（Simplified version）
 const componentMap = {
   DeviceMetricsSelector,
   DeviceDispatchSelector,
   ComponentPropertySelector
 }
 
-// Props接口
+// Propsinterface
 interface Props {
   modelValue: EnhancedParameter[]
   parameterType: 'header' | 'query' | 'path'
@@ -70,21 +70,21 @@ interface Props {
   showDataType?: boolean
   showEnabled?: boolean
   customClass?: string
-  maxParameters?: number // 最大参数数量限制
-  currentApiInfo?: any // 当前选择的内部接口信息，用于接口模板功能
-  currentComponentId?: string // 🔥 新增：当前组件ID，用于属性绑定
+  maxParameters?: number // Maximum number of parameters
+  currentApiInfo?: any // Currently selected internal interface information，Used for interface template functions
+  currentComponentId?: string // 🔥 New：current componentID，for property binding
 }
 
-// Emits接口
+// Emitsinterface
 interface Emits {
   (e: 'update:modelValue', value: EnhancedParameter[]): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: '参数配置',
-  addButtonText: '添加参数',
-  keyPlaceholder: '参数名',
-  valuePlaceholder: '参数值',
+  title: 'Parameter configuration',
+  addButtonText: 'Add parameters',
+  keyPlaceholder: 'Parameter name',
+  valuePlaceholder: 'Parameter value',
   showDataType: true,
   showEnabled: true,
   customClass: ''
@@ -93,21 +93,21 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 const { t } = useI18n()
 
-// 当前正在编辑的参数索引，-1表示没有参数处于编辑状态
+// Index of the parameter currently being edited，-1Indicates that no parameters are in editing state
 const editingIndex = ref(-1)
-// 控制组件模板编辑抽屉的显示
+// Controlling the display of the component template editing drawer
 const isDrawerVisible = ref(false)
-// 控制从设备添加参数抽屉的显示
+// Control the display of the add parameters drawer from the device
 const isAddFromDeviceDrawerVisible = ref(false)
-// 控制统一设备配置选择器显示
+// Controlling unified device configuration selector display
 const isUnifiedDeviceConfigVisible = ref(false)
 const isEditingDeviceConfig = ref(false)
 
-// 控制新的设备参数选择器显示（保留兼容）
+// Control new device parameter selector display（Keep compatible）
 const isDeviceParameterSelectorVisible = ref(false)
-// 当前在抽屉中编辑的参数的临时状态
+// Temporary state of parameters currently being edited in the drawer
 const drawerParam = ref<EnhancedParameter | null>(null)
-// 编辑中的参数组信息
+// Parameter group information being edited
 const editingGroupInfo = ref<{
   groupId: string
   preSelectedDevice?: any
@@ -116,66 +116,66 @@ const editingGroupInfo = ref<{
 } | null>(null)
 
 /**
- * 🔥 修改：参数添加选项 - 支持接口模板导入
+ * 🔥 Revise：Parameter addition options - Support interface template import
  */
 const addParameterOptions = computed(() => {
-  console.log('🔍 [addParameterOptions] computed 被执行')
+  console.log('🔍 [addParameterOptions] computed be executed')
   console.log('🔍 [addParameterOptions] props.currentApiInfo:', props.currentApiInfo)
 
   const baseOptions = [
     {
-      label: '手动输入',
+      label: 'Manual entry',
       key: 'manual',
-      description: '直接输入固定参数值'
+      description: 'Directly enter fixed parameter values'
     },
     {
-      label: '组件属性绑定',
+      label: 'Component property binding',
       key: 'property',
-      description: '绑定到组件属性（运行时获取值）'
+      description: 'Bind to component properties（Get value at runtime）'
     },
     {
-      label: '设备配置',
+      label: 'Device configuration',
       key: 'device',
-      description: '选择设备和对应的指标数据'
+      description: 'Select equipment and corresponding indicator data'
     }
   ]
 
-  // 如果有内部接口信息且有预制参数，添加"应用接口模板"选项
+  // If there is internal interface information and prefabricated parameters，Add to"Application interface template"Options
   if (props.currentApiInfo && props.currentApiInfo.commonParams && props.currentApiInfo.commonParams.length > 0) {
-    console.log('✨ [addParameterOptions] 检测到 commonParams，添加接口模板选项')
-    console.log('✨ [addParameterOptions] commonParams 数量:', props.currentApiInfo.commonParams.length)
+    console.log('✨ [addParameterOptions] detected commonParams，Add interface template option')
+    console.log('✨ [addParameterOptions] commonParams quantity:', props.currentApiInfo.commonParams.length)
     baseOptions.unshift({
-      label: `✨ 应用接口模板 (${props.currentApiInfo.commonParams.length}个参数)`,
+      label: `✨ Application interface template (${props.currentApiInfo.commonParams.length}parameters)`,
       key: 'api-template',
-      description: '自动导入内部接口的预制参数'
+      description: 'Automatically import prefabricated parameters of internal interfaces'
     })
   } else {
-    console.log('⚠️ [addParameterOptions] 未检测到 commonParams，不添加接口模板选项')
+    console.log('⚠️ [addParameterOptions] not detected commonParams，Do not add interface template option')
   }
 
-  console.log('🔍 [addParameterOptions] 最终选项:', baseOptions)
+  console.log('🔍 [addParameterOptions] final option:', baseOptions)
   return baseOptions
 })
 
 /**
- * 数据类型选项
+ * Data type options
  */
 const dataTypeOptions = [
-  { label: '字符串', value: 'string' },
-  { label: '数字', value: 'number' },
-  { label: '布尔值', value: 'boolean' },
+  { label: 'string', value: 'string' },
+  { label: 'number', value: 'number' },
+  { label: 'Boolean value', value: 'boolean' },
   { label: 'JSON', value: 'json' }
 ]
 
 /**
- * 获取推荐的模板列表
+ * Get a list of recommended templates
  */
 const recommendedTemplates = computed(() => {
   return getRecommendedTemplates(props.parameterType)
 })
 
 /**
- * 是否可以添加更多参数
+ * Is it possible to add more parameters
  */
 const canAddMoreParameters = computed(() => {
   if (props.maxParameters === undefined) return true
@@ -183,62 +183,62 @@ const canAddMoreParameters = computed(() => {
 })
 
 /**
- * 🔥 新增：确保所有参数都有稳定ID的计算属性
- * 用于修复历史参数的兼容性问题并防止焦点丢失
+ * 🔥 New：Make sure all parameters are stableIDComputed properties of
+ * Used to fix compatibility issues with history parameters and prevent focus loss
  */
 const parametersWithStableIds = computed(() => {
   return props.modelValue.map((param, index) => ensureParameterHasId(param, index))
 })
 
 /**
- * 创建默认参数 - 添加唯一ID确保Vue追踪
+ * Create default parameters - add uniqueIDmake sureVuetrack
  */
 const createDefaultParameter = (): EnhancedParameter => ({
   key: '',
   value: '',
   enabled: true,
-  isDynamic: false, // 🔥 新增：默认为静态参数
+  isDynamic: false, // 🔥 New：Defaults to static parameters
   valueMode: ParameterTemplateType.MANUAL,
   selectedTemplate: 'manual',
   dataType: 'string',
   variableName: '',
   description: '',
-  // 🔥 添加唯一ID确保Vue正确追踪
+  // 🔥 add uniqueIDmake sureVueCorrect tracking
   _id: `param_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 })
 
 /**
- * 添加新参数 - 强制响应式更新
+ * Add new parameters - Force responsive updates
  */
 const addParameter = () => {
   const newParam = createDefaultParameter()
   const updatedParams = [...props.modelValue, newParam]
 
-  // 立即发射更新事件
+  // Immediately fire an update event
   emit('update:modelValue', updatedParams)
 
-  // 强制刷新组件状态
+  // Force refresh of component state
   nextTick(() => {
-    // 自动展开新添加的参数进行编辑
+    // Automatically expand newly added parameters for editing
     editingIndex.value = updatedParams.length - 1
   })
 }
 
 /**
- * 处理添加参数的下拉选项 - 支持接口模板导入
+ * Handling drop-down options for adding parameters - Support interface template import
  */
 const handleSelectAddOption = (key: string) => {
-  console.log('🔍 [DynamicParameterEditor] handleSelectAddOption 被调用，key:', key)
+  console.log('🔍 [DynamicParameterEditor] handleSelectAddOption called，key:', key)
   console.log('🔍 [DynamicParameterEditor] currentApiInfo:', props.currentApiInfo)
 
-  // 🔥 新增：处理接口模板导入
+  // 🔥 New：Handle interface template import
   if (key === 'api-template') {
-    console.log('✨ [DynamicParameterEditor] 触发接口模板导入')
+    console.log('✨ [DynamicParameterEditor] Trigger interface template import')
     handleTemplateImport()
     return
   }
 
-  // 检查参数数量限制
+  // Check parameter limit
   if (!canAddMoreParameters.value) {
     return
   }
@@ -247,76 +247,76 @@ const handleSelectAddOption = (key: string) => {
 
   switch (key) {
     case 'manual':
-      // 手动输入：使用默认的手动输入模板
+      // Manual entry：Use default manual entry template
       newParam.selectedTemplate = 'manual'
       newParam.valueMode = ParameterTemplateType.MANUAL
       break
 
     case 'property':
-      // 🔥 修复：属性绑定 - 立即显示面板
+      // 🔥 repair：Property binding - Show panel now
       newParam.selectedTemplate = 'component-property-binding'
       newParam.valueMode = ParameterTemplateType.COMPONENT
-      newParam.isDynamic = true // 🔥 关键修复：设置为动态参数
+      newParam.isDynamic = true // 🔥 critical fix：Set as dynamic parameter
 
-      // 添加参数
+      // Add parameters
       const updatedParams = [...props.modelValue, newParam]
       emit('update:modelValue', updatedParams)
 
-      // 立即设置编辑状态并打开抽屉
+      // Set editing status and open drawer now
       const newParamIndex = updatedParams.length - 1
       editingIndex.value = newParamIndex
 
       nextTick(() => {
-        // 直接打开组件属性选择抽屉
+        // Directly open the component property selection drawer
         openComponentDrawer(newParam)
       })
-      return // 提前返回，避免重复处理
+      return // Return early，Avoid duplication of processing
 
     case 'device':
-      // 🔥 修复：设备配置 - 打开统一设备配置选择器
+      // 🔥 repair：Device configuration - Open the unified device configuration selector
       isUnifiedDeviceConfigVisible.value = true
-      isEditingDeviceConfig.value = false // 新建模式
-      return // 提前返回，避免重复处理
+      isEditingDeviceConfig.value = false // New mode
+      return // Return early，Avoid duplication of processing
 
     default:
-      // 默认使用手动输入
+      // Use manual input by default
       newParam.selectedTemplate = 'manual'
       newParam.valueMode = ParameterTemplateType.MANUAL
   }
 
-  // 添加参数并自动展开编辑
+  // Add parameters and automatically expand editing
   const updatedParams = [...props.modelValue, newParam]
   emit('update:modelValue', updatedParams)
 
-  // 使用 nextTick 确保DOM更新后再设置编辑状态
+  // use nextTick make sureDOMSet editing status after updating
   nextTick(() => {
     editingIndex.value = updatedParams.length - 1
   })
 }
 
 /**
- * 处理接口模板导入 - 根据当前选择的接口生成参数 - 强制响应式更新
+ * Handle interface template import - Generate parameters based on the currently selected interface - Force responsive updates
  */
 const handleTemplateImport = () => {
-  console.log('📥 [handleTemplateImport] 开始执行')
+  console.log('📥 [handleTemplateImport] Start execution')
   console.log('📥 [handleTemplateImport] currentApiInfo:', props.currentApiInfo)
   console.log('📥 [handleTemplateImport] modelValue:', props.modelValue)
 
   if (!props.currentApiInfo) {
-    console.warn('⚠️ [handleTemplateImport] currentApiInfo 为空，使用默认参数')
-    // 提供默认的deviceId参数作为占位
+    console.warn('⚠️ [handleTemplateImport] currentApiInfo is empty，Use default parameters')
+    // provide defaultdeviceIdParameters as placeholders
     const defaultParam = createDefaultParameter()
     defaultParam.key = 'deviceId'
-    defaultParam.description = '设备ID（通用参数）'
+    defaultParam.description = 'equipmentID（Common parameters）'
     defaultParam.selectedTemplate = 'manual'
     defaultParam.valueMode = ParameterTemplateType.MANUAL
 
     const updatedParams = [...props.modelValue, defaultParam]
 
-    // 🔥 立即发射更新事件
+    // 🔥 Immediately fire an update event
     emit('update:modelValue', updatedParams)
 
-    // 🔥 强制刷新组件状态
+    // 🔥 Force refresh of component state
     nextTick(() => {
       editingIndex.value = updatedParams.length - 1
     })
@@ -324,38 +324,38 @@ const handleTemplateImport = () => {
     return
   }
 
-  // 根据接口信息生成参数
+  // Generate parameters based on interface information
   const apiInfo = props.currentApiInfo
   let templateParams: EnhancedParameter[] = []
 
   console.log('📥 [handleTemplateImport] apiInfo.commonParams:', apiInfo.commonParams)
   console.log('📥 [handleTemplateImport] apiInfo.pathParamNames:', apiInfo.pathParamNames)
 
-  // 从commonParams生成参数
+  // fromcommonParamsGenerate parameters
   if (apiInfo.commonParams && apiInfo.commonParams.length > 0) {
     const pathParamNames = apiInfo.pathParamNames || []
     let filteredParams = apiInfo.commonParams
 
-    // 🔥 关键修复：根据 parameterType 决定过滤规则
+    // 🔥 critical fix：according to parameterType Decide on filtering rules
     if (props.parameterType === 'query') {
-      // 查询参数：过滤掉路径参数
+      // query parameters：Filter out path parameters
       filteredParams = apiInfo.commonParams.filter(param => !pathParamNames.includes(param.name))
-      console.log('📥 [handleTemplateImport] 查询参数模式，过滤掉路径参数')
+      console.log('📥 [handleTemplateImport] Query parameter mode，Filter out path parameters')
     } else if (props.parameterType === 'path') {
-      // 路径参数：只保留路径参数
+      // path parameters：Only keep path parameters
       filteredParams = apiInfo.commonParams.filter(param => pathParamNames.includes(param.name))
-      console.log('📥 [handleTemplateImport] 路径参数模式，只保留路径参数')
+      console.log('📥 [handleTemplateImport] path parameter mode，Only keep path parameters')
     } else {
-      // header 等其他类型：保留所有参数
-      console.log('📥 [handleTemplateImport] 其他参数模式，保留所有参数')
+      // header and other types：keep all parameters
+      console.log('📥 [handleTemplateImport] Other parameter modes，keep all parameters')
     }
 
-    console.log('📥 [handleTemplateImport] filteredParams（过滤后）:', filteredParams)
+    console.log('📥 [handleTemplateImport] filteredParams（After filtering）:', filteredParams)
 
     templateParams = filteredParams.map(param => {
       const enhancedParam = createDefaultParameter()
       enhancedParam.key = param.name
-      enhancedParam.description = param.description || `${param.name}参数`
+      enhancedParam.description = param.description || `${param.name}parameter`
       enhancedParam.dataType =
         param.type === 'string'
           ? 'string'
@@ -364,32 +364,32 @@ const handleTemplateImport = () => {
             : param.type === 'boolean'
               ? 'boolean'
               : param.type === 'object'
-                ? 'string' // object类型转为string
+                ? 'string' // objectType conversion tostring
                 : 'string'
       enhancedParam.selectedTemplate = 'manual'
       enhancedParam.valueMode = ParameterTemplateType.MANUAL
-      // 🔥 新增：使用example作为初始值
+      // 🔥 New：useexampleas initial value
       enhancedParam.value = param.example || ''
       enhancedParam.defaultValue = param.example
       return enhancedParam
     })
   } else {
-    console.log('📥 [handleTemplateImport] 无 commonParams，使用默认参数')
-    // 根据接口类型提供合理的默认参数
+    console.log('📥 [handleTemplateImport] none commonParams，Use default parameters')
+    // Provide reasonable default parameters based on the interface type
     const defaultParam = createDefaultParameter()
 
     if (apiInfo.url.includes('device')) {
       defaultParam.key = 'deviceId'
-      defaultParam.description = '设备ID'
+      defaultParam.description = 'equipmentID'
     } else if (apiInfo.url.includes('group')) {
       defaultParam.key = 'groupId'
-      defaultParam.description = '分组ID'
+      defaultParam.description = 'GroupID'
     } else if (apiInfo.url.includes('user')) {
       defaultParam.key = 'userId'
-      defaultParam.description = '用户ID'
+      defaultParam.description = 'userID'
     } else {
       defaultParam.key = 'id'
-      defaultParam.description = '标识符'
+      defaultParam.description = 'identifier'
     }
 
     defaultParam.selectedTemplate = 'manual'
@@ -397,38 +397,38 @@ const handleTemplateImport = () => {
     templateParams = [defaultParam]
   }
 
-  console.log('📥 [handleTemplateImport] 生成的 templateParams:', templateParams)
+  console.log('📥 [handleTemplateImport] generated templateParams:', templateParams)
 
-  // 合并到现有参数列表
+  // Merge into existing parameter list
   const updatedParams = [...props.modelValue, ...templateParams]
 
-  console.log('📥 [handleTemplateImport] 合并后的 updatedParams:', updatedParams)
+  console.log('📥 [handleTemplateImport] After the merger updatedParams:', updatedParams)
 
-  // 🔥 立即发射更新事件
+  // 🔥 Immediately fire an update event
   emit('update:modelValue', updatedParams)
 
-  // 🔥 强制刷新组件状态
+  // 🔥 Force refresh of component state
   nextTick(() => {
-    // 自动展开最新添加的参数进行编辑
+    // Automatically expand the latest added parameters for editing
     if (templateParams.length > 0) {
       editingIndex.value = updatedParams.length - templateParams.length
     }
-    console.log('✅ [handleTemplateImport] 完成，editingIndex 设置为:', editingIndex.value)
+    console.log('✅ [handleTemplateImport] Finish，editingIndex set to:', editingIndex.value)
   })
 }
 
 /**
- * 删除参数 - 强制响应式更新
+ * Delete parameters - Force responsive updates
  */
 const removeParameter = (index: number) => {
   const updatedParams = props.modelValue.filter((_, i) => i !== index)
 
-  // 🔥 立即发射更新事件
+  // 🔥 Immediately fire an update event
   emit('update:modelValue', updatedParams)
 
-  // 🔥 强制刷新组件状态
+  // 🔥 Force refresh of component state
   nextTick(() => {
-    // 如果删除的是正在编辑的项，则关闭编辑状态
+    // If you are deleting an item you are editing，then close the editing state
     if (editingIndex.value === index) {
       editingIndex.value = -1
     }
@@ -436,11 +436,11 @@ const removeParameter = (index: number) => {
 }
 
 /**
- * 处理从设备添加的参数
+ * Handling parameters added from the device
  */
 const handleAddFromDevice = (params: any[]) => {
   if (params && params.length > 0) {
-    // 检查参数数量限制
+    // Check parameter limit
     const currentCount = props.modelValue.length
     const availableSlots = props.maxParameters ? props.maxParameters - currentCount : Infinity
 
@@ -448,7 +448,7 @@ const handleAddFromDevice = (params: any[]) => {
       return
     }
 
-    // 转换设备参数为标准参数格式
+    // Convert device parameters to standard parameter format
     const newParams = params.slice(0, availableSlots).map(param => ({
       key: param.key || param.metricsId || '',
       value: param.source ? `${param.source.deviceName}.${param.source.metricsName}` : param.value || '',
@@ -457,14 +457,14 @@ const handleAddFromDevice = (params: any[]) => {
       selectedTemplate: 'device-dispatch-selector',
       dataType: 'string',
       variableName: param.source ? generateVariableName(param.key || param.metricsId || '') : '',
-      description: param.source ? `设备: ${param.source.deviceName}, 指标: ${param.source.metricsName}` : ''
+      description: param.source ? `equipment: ${param.source.deviceName}, index: ${param.source.metricsName}` : ''
     }))
 
-    // 合并到现有参数列表
+    // Merge into existing parameter list
     const updatedParams = [...props.modelValue, ...newParams]
     emit('update:modelValue', updatedParams)
 
-    // 自动展开最新添加的参数进行编辑
+    // Automatically expand the latest added parameters for editing
     if (newParams.length > 0) {
       nextTick(() => {
         editingIndex.value = updatedParams.length - 1
@@ -476,57 +476,57 @@ const handleAddFromDevice = (params: any[]) => {
 }
 
 /**
- * 🔥 新增：处理新的设备参数选择器完成事件
+ * 🔥 New：Handle new device parameter selector completion event
  */
 const handleDeviceParametersSelected = (parameters: EnhancedParameter[]) => {
-  // 合并到现有参数列表
+  // Merge into existing parameter list
   const updatedParams = [...props.modelValue, ...parameters]
   emit('update:modelValue', updatedParams)
 
-  // 自动展开第一个新添加的参数进行编辑
+  // Automatically expand the first newly added parameter for editing
   if (parameters.length > 0) {
     nextTick(() => {
       editingIndex.value = updatedParams.length - parameters.length
     })
   }
 
-  // 关闭选择器
+  // Close selector
   isDeviceParameterSelectorVisible.value = false
 }
 
 /**
- * 🔥 新增：处理统一设备配置生成的参数 - 强制响应式更新
+ * 🔥 New：Processing parameters generated by unified device configuration - Force responsive updates
  */
 const handleUnifiedDeviceConfigGenerated = (parameters: EnhancedParameter[]) => {
   let finalParams: EnhancedParameter[]
 
   if (isEditingDeviceConfig.value) {
-    // 编辑模式：先移除现有的设备相关参数，再添加新的参数
+    // edit mode：First remove existing device related parameters，Add new parameters
     const updatedParams = removeDeviceRelatedParameters()
     finalParams = [...updatedParams, ...parameters]
   } else {
-    // 新建模式：合并参数，自动去重
+    // New mode：Merge parameters，Automatically remove duplicates
     finalParams = mergeParametersWithDeduplication(parameters)
   }
 
-  // 🔥 立即发射更新事件
+  // 🔥 Immediately fire an update event
   emit('update:modelValue', finalParams)
 
-  // 🔥 强制刷新组件状态
+  // 🔥 Force refresh of component state
   nextTick(() => {
-    // 自动展开第一个新添加的参数进行编辑
+    // Automatically expand the first newly added parameter for editing
     if (parameters.length > 0) {
       editingIndex.value = finalParams.length - parameters.length
     }
   })
 
-  // 关闭选择器
+  // Close selector
   isUnifiedDeviceConfigVisible.value = false
   isEditingDeviceConfig.value = false
 }
 
 /**
- * 🔥 移除现有的设备相关参数
+ * 🔥 Remove existing device related parameters
  */
 const removeDeviceRelatedParameters = () => {
   const deviceRelatedKeys = ['deviceId', 'metric', 'deviceLocation', 'deviceStatus']
@@ -534,22 +534,22 @@ const removeDeviceRelatedParameters = () => {
 }
 
 /**
- * 🔥 合并参数并去重（同键参数只保留新的） - 强制响应式更新
+ * 🔥 Merge parameters and remove duplicates（Only new parameters with the same key are retained） - Force responsive updates
  */
 const mergeParametersWithDeduplication = (newParameters: EnhancedParameter[]) => {
   const newParamKeys = new Set(newParameters.map(p => p.key))
 
-  // 移除现有参数中与新参数同键的参数
+  // Remove existing parameters with the same key as the new parameter
   const filteredExisting = props.modelValue.filter(param => !newParamKeys.has(param.key))
 
-  // 合并
+  // merge
   const mergedParams = [...filteredExisting, ...newParameters]
 
   return mergedParams
 }
 
 /**
- * 🔥 检测是否已存在设备相关参数
+ * 🔥 Check whether device related parameters already exist
  */
 const getExistingDeviceParameters = () => {
   const deviceRelatedKeys = ['deviceId', 'metric', 'deviceLocation', 'deviceStatus']
@@ -557,7 +557,7 @@ const getExistingDeviceParameters = () => {
 }
 
 /**
- * 🔥 处理设备配置编辑/新建
+ * 🔥 Handle device configuration editing/New
  */
 const editDeviceConfig = () => {
   const existingParams = getExistingDeviceParameters()
@@ -570,39 +570,39 @@ const editDeviceConfig = () => {
 }
 
 /**
- * 🔥 新增：处理参数组更新事件（编辑模式）
+ * 🔥 New：Handling parameter group update events（edit mode）
  */
 const handleParametersUpdated = (data: { groupId: string; parameters: EnhancedParameter[] }) => {
-  // 找到原参数组的参数并替换
+  // Find the parameters of the original parameter group and replace them
   const groupParams = globalParameterGroupManager.getGroupParameters(data.groupId, props.modelValue)
   const groupParamIds = groupParams.map(p => p._id)
 
-  // 移除原参数组的参数
+  // Remove parameters from the original parameter group
   let updatedParams = props.modelValue.filter(param => !groupParamIds.includes(param._id))
 
-  // 添加新的参数
+  // Add new parameters
   updatedParams = [...updatedParams, ...data.parameters]
 
   emit('update:modelValue', updatedParams)
 
-  // 关闭选择器
+  // Close selector
   isDeviceParameterSelectorVisible.value = false
   editingGroupInfo.value = null
 }
 
 /**
- * 🔥 新增：检查参数是否属于设备参数组
+ * 🔥 New：Check if the parameter belongs to the device parameter group
  */
 const isDeviceParameterGroup = (param: EnhancedParameter): boolean => {
   return param.parameterGroup?.groupId !== undefined && param.deviceContext?.sourceType === 'device-selection'
 }
 
 /**
- * 🔥 新增：获取参数的显示标签（带参数组信息）
+ * 🔥 New：Get the display label of a parameter（With parameter group information）
  */
 const getParameterDisplayLabel = (param: EnhancedParameter): string => {
   if (!isDeviceParameterGroup(param)) {
-    return param.key || '未命名参数'
+    return param.key || 'unnamed parameter'
   }
 
   const role = param.parameterGroup?.role
@@ -612,27 +612,27 @@ const getParameterDisplayLabel = (param: EnhancedParameter): string => {
   let prefix = ''
   switch (sourceType) {
     case 'device-id':
-      prefix = '📱 设备'
+      prefix = '📱 equipment'
       break
     case 'device-metric':
-      prefix = '📊 指标'
+      prefix = '📊 index'
       break
     case 'telemetry':
-      prefix = '📡 遥测'
+      prefix = '📡 telemetry'
       break
     default:
-      prefix = '🔧 参数'
+      prefix = '🔧 parameter'
   }
 
   let suffix = ''
-  if (role === 'primary') suffix = ' (主)'
-  else if (role === 'secondary') suffix = ' (次)'
+  if (role === 'primary') suffix = ' (host)'
+  else if (role === 'secondary') suffix = ' (Second-rate)'
 
   return `${prefix}: ${param.key}${suffix}`
 }
 
 /**
- * 🔥 新增：处理参数组编辑
+ * 🔥 New：Process parameter group editing
  */
 const editParameterGroup = (param: EnhancedParameter) => {
   if (!isDeviceParameterGroup(param)) return
@@ -644,7 +644,7 @@ const editParameterGroup = (param: EnhancedParameter) => {
     return
   }
 
-  // 准备编辑信息
+  // Prepare to edit information
   editingGroupInfo.value = {
     groupId,
     preSelectedDevice: groupInfo.sourceConfig.selectedDevice,
@@ -652,12 +652,12 @@ const editParameterGroup = (param: EnhancedParameter) => {
     preSelectedMode: groupInfo.sourceType
   }
 
-  // 打开设备参数选择器
+  // Open the device parameter selector
   isDeviceParameterSelectorVisible.value = true
 }
 
 /**
- * 🔥 新增：删除整个参数组
+ * 🔥 New：Delete entire parameter group
  */
 const deleteParameterGroup = (param: EnhancedParameter) => {
   if (!isDeviceParameterGroup(param)) return
@@ -666,26 +666,26 @@ const deleteParameterGroup = (param: EnhancedParameter) => {
   const groupParams = globalParameterGroupManager.getGroupParameters(groupId, props.modelValue)
   const groupParamIds = groupParams.map(p => p._id)
 
-  // 移除所有相关参数
+  // Remove all relevant parameters
   const updatedParams = props.modelValue.filter(param => !groupParamIds.includes(param._id))
   emit('update:modelValue', updatedParams)
 
-  // 清理参数组管理器
+  // Clean up parameter group manager
   globalParameterGroupManager.removeGroup(groupId)
 }
 
 /**
- * 切换参数的编辑状态
+ * Switch the editing status of parameters
  */
 const toggleEditMode = (index: number) => {
   editingIndex.value = editingIndex.value === index ? -1 : index
 }
 
-// 🔥 新增：防抖定时器用于延迟更新参数key
+// 🔥 New：Anti-shake timer is used to delay updating parameterskey
 const updateKeyTimers = new Map<string, NodeJS.Timeout>()
 
 /**
- * 更新指定索引的参数
+ * Update the parameters of the specified index
  */
 const updateParameter = (param: EnhancedParameter, index: number) => {
   const updatedParams = [...props.modelValue]
@@ -696,16 +696,16 @@ const updateParameter = (param: EnhancedParameter, index: number) => {
 }
 
 /**
- * 🔥 新增：更新参数key的防抖处理
- * 避免每次输入都触发重新渲染导致焦点丢失
+ * 🔥 New：Update parameterskeyanti-shake processing
+ * Avoid triggering re-rendering every time input causes focus loss
  */
 const updateParameterKey = (param: EnhancedParameter, index: number, newKey: string) => {
-  // 立即更新本地显示，避免输入延迟
+  // Update local display now，Avoid input lag
   const updatedParams = [...props.modelValue]
   updatedParams[index] = { ...param, key: newKey }
   emit('update:modelValue', updatedParams)
 
-  // 清除之前的定时器
+  // Clear previous timer
   const timerId = param._id || `param-${index}`
   if (updateKeyTimers.has(timerId)) {
     clearTimeout(updateKeyTimers.get(timerId)!)
@@ -714,11 +714,11 @@ const updateParameterKey = (param: EnhancedParameter, index: number, newKey: str
 }
 
 /**
- * 🔥 新增：确保参数key不为空，失去焦点时检查
- * 如果为空则恢复到合理的默认值，而不是覆盖用户输入
+ * 🔥 New：Make sure parameterskeyNot empty，Check when focus is lost
+ * If empty reverts to sensible defaults，Instead of overwriting user input
  */
 const ensureParameterKeyNotEmpty = (param: EnhancedParameter, index: number) => {
-  // 只有当key完全为空时才设置默认值，避免覆盖用户的输入
+  // only ifkeySet default value only when it is completely empty，Avoid overwriting user input
   if (!param.key || param.key.trim() === '') {
     const defaultKey = `param${index + 1}`
     updateParameter({ ...param, key: defaultKey }, index)
@@ -726,30 +726,30 @@ const ensureParameterKeyNotEmpty = (param: EnhancedParameter, index: number) => 
 }
 
 /**
- * 🔥 新增：更新参数value的防抖处理
- * 立即更新显示，避免输入延迟
+ * 🔥 New：Update parametersvalueanti-shake processing
+ * Update display now，Avoid input lag
  */
 const updateParameterValue = (param: EnhancedParameter, index: number, newValue: string) => {
-  // 立即更新显示，保持输入的流畅性
+  // Update display now，Keep input flowing
   const updatedParams = [...props.modelValue]
   updatedParams[index] = { ...param, value: newValue }
   emit('update:modelValue', updatedParams)
 }
 
 /**
- * 🔥 新增：确保所有参数都有稳定的_id
- * 用于兼容没有_id的历史参数
+ * 🔥 New：Ensure that all parameters have stable_id
+ * For compatibility with no_idhistorical parameters
  */
 const ensureParameterHasId = (param: EnhancedParameter, index: number): EnhancedParameter => {
   if (!param._id) {
     return {
       ...param,
-      // 🔥 关键修复：确保isDynamic字段有正确的值
+      // 🔥 critical fix：make sureisDynamicField has correct value
       isDynamic: param.isDynamic !== undefined
         ? param.isDynamic
         : (param.valueMode === 'component' ||
            param.selectedTemplate === 'component-property-binding' ||
-           // 检测绑定路径格式
+           // Detect binding path format
            (typeof param.value === 'string' &&
             param.value.includes('.') &&
             param.value.split('.').length >= 3 &&
@@ -761,41 +761,41 @@ const ensureParameterHasId = (param: EnhancedParameter, index: number): Enhanced
 }
 
 /**
- * 处理模板变化
+ * Handle template changes
  */
 const onTemplateChange = (param: EnhancedParameter, index: number, templateId: string) => {
   const template = getTemplateById(templateId)
   if (!template) return
 
-  // 🔥 修复：如果选择的是设备配置模板，打开统一设备配置选择器
+  // 🔥 repair：If you select a device configuration template，Open the unified device configuration selector
   if (templateId === 'device-metrics-selector') {
-    // 关闭当前参数编辑
+    // Close current parameter editing
     editingIndex.value = -1
 
-    // 打开统一设备配置选择器，设置为编辑模式
+    // Open the unified device configuration selector，Set to edit mode
     isUnifiedDeviceConfigVisible.value = true
     isEditingDeviceConfig.value = true
 
-    return // 不继续普通的模板切换逻辑
+    return // Do not continue with ordinary template switching logic
   }
 
   const updatedParam = { ...param }
   updatedParam.selectedTemplate = templateId
   updatedParam.valueMode = template.type
 
-  // 🔥 修复：区分value和defaultValue，避免错误赋值导致字符串拼接问题
+  // 🔥 repair：distinguishvalueanddefaultValue，Avoid string splicing problems caused by incorrect assignments
   if (template.type === ParameterTemplateType.COMPONENT) {
-    // 组件属性绑定：不修改现有的value（用户输入的绑定路径）
-    // 只有在value为空时才使用模板默认值作为初始值
+    // Component property binding：Do not modify existingvalue（Binding path entered by user）
+    // only invalueUse the template default value as the initial value when it is empty.
     if (!updatedParam.value && template.defaultValue !== undefined) {
       updatedParam.value = template.defaultValue
     }
-    // 确保defaultValue字段正确设置
+    // make suredefaultValueFields set correctly
     if (template.defaultValue !== undefined && !updatedParam.defaultValue) {
       updatedParam.defaultValue = template.defaultValue
     }
   } else {
-    // 其他模板类型：直接使用模板默认值
+    // Other template types：Use template defaults directly
     if (template.defaultValue !== undefined) {
       updatedParam.value = template.defaultValue
     }
@@ -804,33 +804,33 @@ const onTemplateChange = (param: EnhancedParameter, index: number, templateId: s
   if (template.type === ParameterTemplateType.PROPERTY) {
     if (param.key) {
       updatedParam.variableName = generateVariableName(param.key)
-      updatedParam.description = updatedParam.description || `${getTypeDisplayName()}参数：${param.key}`
+      updatedParam.description = updatedParam.description || `${getTypeDisplayName()}parameter：${param.key}`
     }
-    updatedParam.isDynamic = true // 🔥 关键修复：设置为动态参数
+    updatedParam.isDynamic = true // 🔥 critical fix：Set as dynamic parameter
   } else if (template.type === ParameterTemplateType.COMPONENT) {
-    // 🔥 修复：属性绑定模板 - 确保编辑状态和抽屉立即显示
-    updatedParam.isDynamic = true // 🔥 关键修复：设置为动态参数
+    // 🔥 repair：Property binding template - Make sure editing status and drawers show up immediately
+    updatedParam.isDynamic = true // 🔥 critical fix：Set as dynamic parameter
     editingIndex.value = index
 
-    // 先更新参数
+    // Update parameters first
     updateParameter(updatedParam, index)
 
-    // 立即打开抽屉，不依赖 nextTick
+    // Open drawer now，not dependent on nextTick
     nextTick(() => {
       openComponentDrawer(updatedParam)
     })
-    return // 提前返回，避免重复调用 updateParameter
+    return // Return early，Avoid repeated calls updateParameter
   } else {
     updatedParam.variableName = ''
     updatedParam.description = ''
-    updatedParam.isDynamic = false // 🔥 关键修复：其他模板为静态参数
+    updatedParam.isDynamic = false // 🔥 critical fix：Other templates are static parameters
   }
 
   updateParameter(updatedParam, index)
 }
 
 /**
- * 打开组件编辑抽屉
+ * Open the component edit drawer
  */
 const openComponentDrawer = (param: EnhancedParameter) => {
   drawerParam.value = { ...param }
@@ -838,42 +838,42 @@ const openComponentDrawer = (param: EnhancedParameter) => {
 }
 
 /**
- * 处理组件属性选择变更
- * 当用户在组件属性选择器中选择了属性时调用
+ * Handle component property selection changes
+ * Called when the user selects a property in the component property selector
  */
 const handleComponentPropertyChange = (bindingPath: string, propertyInfo?: any) => {
 
   if (!drawerParam.value) {
-    console.warn(`⚠️ [DynamicParameterEditor] drawerParam 为空，忽略属性变更`)
+    console.warn(`⚠️ [DynamicParameterEditor] drawerParam is empty，Ignore property changes`)
     return
   }
 
-  // 🔥 增强的绑定路径验证：更严格的格式检查
+  // 🔥 Enhanced binding path validation：Stricter format checking
   const isValidBindingPath = bindingPath === '' || (
     typeof bindingPath === 'string' &&
     bindingPath.includes('.') &&
-    bindingPath.split('.').length >= 3 && // 至少包含组件ID.layer.property
-    bindingPath.length > 10 && // 绑定路径通常较长
-    !/^\d{1,4}$/.test(bindingPath) && // 拒绝短数字字符串（如"12"、"789"）
-    !bindingPath.includes('undefined') && // 拒绝包含undefined的路径
-    !bindingPath.includes('null') && // 拒绝包含null的路径
-    /^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/.test(bindingPath) // 基本格式验证
+    bindingPath.split('.').length >= 3 && // Contains at least componentsID.layer.property
+    bindingPath.length > 10 && // Binding paths are usually longer
+    !/^\d{1,4}$/.test(bindingPath) && // Reject short numeric strings（like"12"、"789"）
+    !bindingPath.includes('undefined') && // refuse to includeundefinedpath
+    !bindingPath.includes('null') && // refuse to includenullpath
+    /^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+$/.test(bindingPath) // Basic format validation
   )
 
   if (!isValidBindingPath && bindingPath !== '') {
-    console.error(`❌ [DynamicParameterEditor] 检测到无效的bindingPath格式，执行自动恢复:`, {
-      输入值: bindingPath,
-      值类型: typeof bindingPath,
-      值长度: typeof bindingPath === 'string' ? bindingPath.length : '非字符串',
-      预期格式: 'componentId.layer.propertyName',
-      当前参数: {
+    console.error(`❌ [DynamicParameterEditor] Invalid detectedbindingPathFormat，Perform automatic recovery:`, {
+      enterValue: bindingPath,
+      valueType: typeof bindingPath,
+      valueLength: typeof bindingPath === 'string' ? bindingPath.length : 'non-string',
+      expectedFormat: 'componentId.layer.propertyName',
+      currentParameters: {
         key: drawerParam.value.key,
-        当前value: drawerParam.value.value,
+        currentValue: drawerParam.value.value,
         variableName: drawerParam.value.variableName
       }
     })
 
-    // 🔥 自动恢复机制：尝试从variableName重建正确的绑定路径
+    // 🔥 automatic recovery mechanism：try to start fromvariableNameRebuild the correct binding path
     if (drawerParam.value.variableName && drawerParam.value.variableName.includes('_')) {
       const lastUnderscoreIndex = drawerParam.value.variableName.lastIndexOf('_')
       if (lastUnderscoreIndex > 0) {
@@ -882,32 +882,32 @@ const handleComponentPropertyChange = (bindingPath: string, propertyInfo?: any) 
         const recoveredPath = `${componentId}.base.${propertyName}`
 
 
-        // 使用恢复的路径替代错误的输入
+        // Replace incorrect input with recovered path
         bindingPath = recoveredPath
       } else {
-        console.error(`❌ [DynamicParameterEditor] 无法从variableName恢复绑定路径，拒绝更新`)
+        console.error(`❌ [DynamicParameterEditor] Unable to access fromvariableNamerestore binding path，Reject updates`)
         return
       }
     } else {
-      // 无法恢复，保持当前值不变
-      console.error(`❌ [DynamicParameterEditor] 无变量名可用于恢复，拒绝设置无效绑定路径`)
+      // Unable to recover，Keep current value unchanged
+      console.error(`❌ [DynamicParameterEditor] No variable name available for recovery，Refuse to set invalid binding path`)
       return
     }
   }
 
-  // 记录值的变更历史，便于调试
+  // Record value change history，Easy to debug
   const oldValue = drawerParam.value.value
 
-  // 更新抽屉中参数的绑定值
+  // Update the bound value of a parameter in the drawer
   drawerParam.value.value = bindingPath
 
-  // 更新参数描述和变量名
+  // Update parameter descriptions and variable names
   if (propertyInfo && bindingPath) {
-    drawerParam.value.description = `绑定到组件属性: ${propertyInfo.componentName} -> ${propertyInfo.propertyLabel}`
+    drawerParam.value.description = `Bind to component properties: ${propertyInfo.componentName} -> ${propertyInfo.propertyLabel}`
     drawerParam.value.variableName = `${propertyInfo.componentId}_${propertyInfo.propertyName}`
 
   } else if (bindingPath === '') {
-    // 清空绑定时，也清理相关字段
+    // When clearing bindings，Also clean related fields
     drawerParam.value.description = ''
     drawerParam.value.variableName = ''
   }
@@ -915,7 +915,7 @@ const handleComponentPropertyChange = (bindingPath: string, propertyInfo?: any) 
 }
 
 /**
- * 保存从抽屉中所做的更改
+ * Save changes made from drawer
  */
 const saveDrawerChanges = () => {
   if (drawerParam.value && editingIndex.value !== -1) {
@@ -927,15 +927,15 @@ const saveDrawerChanges = () => {
 }
 
 /**
- * 获取参数类型显示名称
+ * Get parameter type display name
  */
 const getTypeDisplayName = () => {
-  const names = { header: '请求头', query: '查询', path: '路径' }
+  const names = { header: 'Request header', query: 'Query', path: 'path' }
   return names[props.parameterType]
 }
 
 /**
- * 获取当前模板的下拉选项
+ * Get the drop-down options of the current template
  */
 const getCurrentTemplateOptions = (param: EnhancedParameter) => {
   if (param.valueMode !== ParameterTemplateType.DROPDOWN || !param.selectedTemplate) return []
@@ -944,7 +944,7 @@ const getCurrentTemplateOptions = (param: EnhancedParameter) => {
 }
 
 /**
- * 检查模板是否允许自定义输入
+ * Check if the template allows custom input
  */
 const isCustomInputAllowed = (param: EnhancedParameter) => {
   if (param.valueMode !== ParameterTemplateType.DROPDOWN || !param.selectedTemplate) return false
@@ -953,8 +953,8 @@ const isCustomInputAllowed = (param: EnhancedParameter) => {
 }
 
 /**
- * 获取组件模板配置
- * 🔥 修复：动态注入currentComponentId到ComponentPropertySelector
+ * Get component template configuration
+ * 🔥 repair：dynamic injectioncurrentComponentIdarriveComponentPropertySelector
  */
 const getComponentTemplate = (param: EnhancedParameter | null) => {
   if (!param || !param.selectedTemplate) return null
@@ -967,15 +967,15 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
       ? componentMap[config.component as keyof typeof componentMap]
       : config.component
 
-  // 🔥 关键修复：为ComponentPropertySelector动态注入currentComponentId
+  // 🔥 critical fix：forComponentPropertySelectordynamic injectioncurrentComponentId
   let enhancedProps = { ...config.props }
 
   if (config.component === 'ComponentPropertySelector' ||
       (typeof config.component === 'string' && config.component === 'ComponentPropertySelector')) {
     enhancedProps = {
       ...enhancedProps,
-      currentComponentId: props.currentComponentId, // 🔥 传递当前组件ID
-      autoDetectComponentId: true // 🔥 保持自动检测功能
+      currentComponentId: props.currentComponentId, // 🔥 Pass the current componentID
+      autoDetectComponentId: true // 🔥 Keep auto-detection function
     }
 
   }
@@ -983,22 +983,22 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   return {
     ...config,
     component,
-    props: enhancedProps // 🔥 使用增强后的props
+    props: enhancedProps // 🔥 Use the enhancedprops
   }
 }
 
-// 🔥 移除循环更新的watch监听器，避免值被错误覆盖
-// 原因：这个watch会监听drawerParam.value.value的变化，然后重新设置自己，可能导致数据损坏
-// ComponentPropertySelector通过v-model:value和@change事件已经正确处理了数据更新
+// 🔥 Remove recurring updateswatchlistener，Avoid values ​​being overwritten by errors
+// reason：thiswatchWill listendrawerParam.value.valuechanges，then reset yourself，May cause data corruption
+// ComponentPropertySelectorpassv-model:valueand@changeEvents have correctly handled data updates
 </script>
 
 <template>
   <div :class="['dynamic-parameter-editor-v3', customClass]">
-    <!-- 标题和添加按钮 -->
+    <!-- Title and add button -->
     <div class="editor-header">
       <span v-if="title" class="editor-title">{{ title }}</span>
       <n-space>
-        <!-- 设备配置按钮（主要操作） -->
+        <!-- Device configuration button（Main operations） -->
         <n-button
           size="small"
           :type="getExistingDeviceParameters().length > 0 ? 'warning' : 'info'"
@@ -1008,11 +1008,11 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
             <n-icon><DeviceIcon /></n-icon>
           </template>
           {{
-            getExistingDeviceParameters().length > 0 ? `设备配置 (${getExistingDeviceParameters().length})` : '设备配置'
+            getExistingDeviceParameters().length > 0 ? `Device configuration (${getExistingDeviceParameters().length})` : 'Device configuration'
           }}
         </n-button>
 
-        <!-- 添加参数按钮 -->
+        <!-- Add parameter button -->
         <n-dropdown
           trigger="click"
           :options="addParameterOptions"
@@ -1032,13 +1032,13 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
       </n-space>
     </div>
 
-    <!-- 设备参数提示（如果存在设备相关参数） -->
+    <!-- Equipment parameter prompts（If there are device related parameters） -->
     <div v-if="getExistingDeviceParameters().length > 0" class="device-config-info">
       <n-alert type="info" size="small" :show-icon="false">
         <template #header>
           <n-space align="center">
             <n-icon size="16"><DeviceIcon /></n-icon>
-            <span>当前设备配置</span>
+            <span>Current device configuration</span>
           </n-space>
         </template>
         <n-space>
@@ -1047,12 +1047,12 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
           </n-tag>
         </n-space>
         <template #action>
-          <n-button size="small" text type="primary" @click="editDeviceConfig">重新配置</n-button>
+          <n-button size="small" text type="primary" @click="editDeviceConfig">Reconfigure</n-button>
         </template>
       </n-alert>
     </div>
 
-    <!-- 参数列表 -->
+    <!-- Parameter list -->
     <div v-if="parametersWithStableIds.length > 0" class="parameter-list">
       <div
         v-for="(param, index) in parametersWithStableIds"
@@ -1065,9 +1065,9 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
           'is-secondary-param': isDeviceParameterGroup(param) && param.parameterGroup!.role !== 'primary'
         }"
       >
-        <!-- 主行 -->
+        <!-- Main row -->
         <div class="parameter-row">
-          <!-- 参数组标识（如果是参数组的参数） -->
+          <!-- Parameter group identifier（If it is a parameter of the parameter group） -->
           <div v-if="isDeviceParameterGroup(param)" class="param-group-indicator">
             <n-icon size="14" color="#2080f0">
               <PhonePortraitOutline />
@@ -1089,60 +1089,60 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
             @blur="() => ensureParameterKeyNotEmpty(param, index)"
           />
 
-          <!-- 参数值显示（增强版，包含参数组信息） -->
+          <!-- Parameter value display（Enhanced version，Contains parameter group information） -->
           <div class="param-value-display">
             <n-text class="param-value-summary" depth="3">
               {{ getParameterDisplayLabel(param) }}
             </n-text>
-            <!-- 参数组角色标识 -->
+            <!-- Parameter group role ID -->
             <n-tag
               v-if="isDeviceParameterGroup(param)"
               size="small"
               :type="param.parameterGroup!.role === 'primary' ? 'primary' : 'info'"
               class="param-role-tag"
             >
-              {{ param.parameterGroup!.role === 'primary' ? '主参数' : '子参数' }}
+              {{ param.parameterGroup!.role === 'primary' ? 'Main parameters' : 'Subparameters' }}
             </n-tag>
           </div>
 
-          <!-- 操作按钮（区分参数组和普通参数） -->
+          <!-- Action button（Distinguish between parameter groups and ordinary parameters） -->
           <n-space class="param-actions">
-            <!-- 普通参数操作 -->
+            <!-- Common parameter operations -->
             <template v-if="!isDeviceParameterGroup(param)">
               <n-button size="small" @click="toggleEditMode(index)">
-                {{ editingIndex === index ? '收起' : '配置' }}
+                {{ editingIndex === index ? 'close' : 'Configuration' }}
               </n-button>
-              <n-button size="small" type="error" ghost @click="removeParameter(index)">删除</n-button>
+              <n-button size="small" type="error" ghost @click="removeParameter(index)">delete</n-button>
             </template>
 
-            <!-- 参数组操作（只在主参数上显示） -->
+            <!-- Parameter group operations（Only displayed on main parameters） -->
             <template v-else-if="param.parameterGroup!.role === 'primary'">
               <n-button size="small" type="info" ghost @click="editParameterGroup(param)">
                 <template #icon>
                   <n-icon><EditOutline /></n-icon>
                 </template>
-                编辑组
+                Editing group
               </n-button>
               <n-button size="small" type="error" ghost @click="deleteParameterGroup(param)">
                 <template #icon>
                   <n-icon><TrashOutline /></n-icon>
                 </template>
-                删除组
+                Delete group
               </n-button>
             </template>
 
-            <!-- 子参数操作（简化版） -->
+            <!-- Subparameter operation（Simplified version） -->
             <template v-else>
-              <n-text depth="3" style="font-size: 12px; font-style: italic">从属于设备参数组</n-text>
+              <n-text depth="3" style="font-size: 12px; font-style: italic">Belongs to the device parameter group</n-text>
             </template>
           </n-space>
         </div>
 
-        <!-- 详细配置面板 (可折叠) -->
+        <!-- Detailed configuration panel (Foldable) -->
         <div v-if="editingIndex === index" class="details-panel">
-          <!-- 模板选择（简化版：只显示最常用的选项） -->
+          <!-- Template selection（Simplified version：Show only the most commonly used options） -->
           <div class="detail-row">
-            <n-text class="detail-label">类型</n-text>
+            <n-text class="detail-label">type</n-text>
             <n-select
               :value="param.selectedTemplate"
               :options="
@@ -1157,10 +1157,10 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
             />
           </div>
 
-          <!-- 值输入（简化版） -->
+          <!-- Value input（Simplified version） -->
           <div class="detail-row">
-            <n-text class="detail-label">值</n-text>
-            <!-- 手动输入 -->
+            <n-text class="detail-label">value</n-text>
+            <!-- Manual entry -->
             <n-input
               v-if="param.valueMode === 'manual'"
               :value="param.value"
@@ -1168,7 +1168,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
               size="small"
               @input="value => updateParameterValue(param, index, value)"
             />
-            <!-- 下拉选择 -->
+            <!-- drop down selection -->
             <n-select
               v-else-if="param.valueMode === 'dropdown'"
               :value="param.value"
@@ -1176,62 +1176,62 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
               :filterable="isCustomInputAllowed(param)"
               :tag="isCustomInputAllowed(param)"
               size="small"
-              placeholder="选择或输入值"
+              placeholder="Select or enter a value"
               @update:value="value => updateParameter({ ...param, value: value }, index)"
             />
-            <!-- 属性绑定（简化显示） -->
+            <!-- Property binding（Simplified display） -->
             <div v-else-if="param.valueMode === 'property'" class="property-input-simple">
               <n-input
                 :value="param.value"
-                placeholder="示例值 (运行时替换)"
+                placeholder="Example value (Runtime replacement)"
                 size="small"
                 @input="value => updateParameterValue(param, index, value)"
               />
             </div>
-            <!-- 组件属性绑定（简化显示） -->
+            <!-- Component property binding（Simplified display） -->
             <div v-else-if="param.valueMode === 'component'" class="component-simple">
               <n-space>
                 <n-tag size="small" type="success">
-                  {{ param.selectedTemplate === 'component-property-binding' ? '属性绑定' : '设备参数' }}
+                  {{ param.selectedTemplate === 'component-property-binding' ? 'Property binding' : 'Equipment parameters' }}
                 </n-tag>
-                <n-text depth="3">{{ param.value || '未设置' }}</n-text>
-                <!-- 🔥 添加重新配置按钮 -->
-                <n-button size="tiny" type="primary" text @click="openComponentDrawer(param)">重新配置</n-button>
+                <n-text depth="3">{{ param.value || 'not set' }}</n-text>
+                <!-- 🔥 Add reconfiguration button -->
+                <n-button size="tiny" type="primary" text @click="openComponentDrawer(param)">Reconfigure</n-button>
               </n-space>
             </div>
           </div>
 
-          <!-- 属性绑定简化提示 -->
+          <!-- Property binding simplified tips -->
           <div v-if="param.valueMode === 'property'" class="property-binding-tip">
             <n-alert size="small" type="info" :show-icon="false">
               <template #header>
                 <n-icon style="margin-right: 4px"><SparkleIcon /></n-icon>
-                属性绑定
+                Property binding
               </template>
-              运行时将从组件属性中获取实际值
+              The runtime will get the actual value from the component property
             </n-alert>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 空状态 -->
+    <!-- Empty state -->
     <div v-else class="empty-state">
-      <n-text depth="3">暂无参数，点击"{{ addButtonText }}"添加</n-text>
+      <n-text depth="3">No parameters yet，Click"{{ addButtonText }}"Add to</n-text>
     </div>
 
-    <!-- 从设备添加参数抽屉 -->
+    <!-- Add parameter drawer from device -->
     <n-drawer v-model:show="isAddFromDeviceDrawerVisible" :width="500">
-      <n-drawer-content title="从设备添加参数" closable>
+      <n-drawer-content title="Add parameters from device" closable>
         <AddParameterFromDevice @add="handleAddFromDevice" @cancel="isAddFromDeviceDrawerVisible = false" />
       </n-drawer-content>
     </n-drawer>
 
-    <!-- 组件编辑抽屉 -->
+    <!-- Component edit drawer -->
     <n-drawer v-model:show="isDrawerVisible" :width="500" :on-after-leave="() => (drawerParam = null)">
-      <n-drawer-content :title="`编辑 ${getComponentTemplate(drawerParam)?.name || '参数'}`" closable>
+      <n-drawer-content :title="`edit ${getComponentTemplate(drawerParam)?.name || 'parameter'}`" closable>
         <template v-if="drawerParam">
-          <!-- 组件属性选择器 -->
+          <!-- Component attribute selector -->
           <component
             :is="getComponentTemplate(drawerParam)?.component"
             v-if="getComponentTemplate(drawerParam)?.component"
@@ -1239,31 +1239,31 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
             v-bind="getComponentTemplate(drawerParam)?.props || {}"
             @change="handleComponentPropertyChange"
           />
-          <div v-else>组件加载失败</div>
+          <div v-else>Component loading failed</div>
 
-          <!-- 默认值输入框 -->
+          <!-- Default value input box -->
           <div v-if="drawerParam.selectedTemplate === 'component-property-binding'" style="margin-top: 16px">
             <n-divider />
             <div style="margin-bottom: 8px">
-              <n-text strong>默认值设置</n-text>
-              <n-text depth="3" style="font-size: 12px; margin-left: 8px">当绑定的组件属性为空时使用</n-text>
+              <n-text strong>Default value settings</n-text>
+              <n-text depth="3" style="font-size: 12px; margin-left: 8px">Used when the bound component property is empty</n-text>
             </div>
-            <n-input v-model:value="drawerParam.defaultValue" placeholder="请输入默认值（可选）" clearable />
+            <n-input v-model:value="drawerParam.defaultValue" placeholder="Please enter default value（Optional）" clearable />
             <n-text depth="3" style="font-size: 12px; margin-top: 4px; display: block">
-              💡 提示：如果组件属性值为空（null、undefined或空字符串），将使用此默认值
+              💡 hint：If the component property value is empty（null、undefinedor empty string），This default value will be used
             </n-text>
           </div>
         </template>
         <template #footer>
-          <n-button @click="isDrawerVisible = false">取消</n-button>
-          <n-button type="primary" @click="saveDrawerChanges">确定</n-button>
+          <n-button @click="isDrawerVisible = false">Cancel</n-button>
+          <n-button type="primary" @click="saveDrawerChanges">Sure</n-button>
         </template>
       </n-drawer-content>
     </n-drawer>
 
-    <!-- 🔥 统一设备配置选择器 -->
+    <!-- 🔥 Unified device configuration selector -->
     <n-drawer v-model:show="isUnifiedDeviceConfigVisible" width="650" placement="right">
-      <n-drawer-content title="设备配置" closable>
+      <n-drawer-content title="Device configuration" closable>
         <UnifiedDeviceConfigSelector
           :existing-parameters="getExistingDeviceParameters()"
           :edit-mode="isEditingDeviceConfig"
@@ -1278,7 +1278,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
       </n-drawer-content>
     </n-drawer>
 
-    <!-- 🔥 新的设备参数选择器（保留兼容） -->
+    <!-- 🔥 New device parameter selector（Keep compatible） -->
     <DeviceParameterSelector
       :visible="isDeviceParameterSelectorVisible"
       :editing-group-id="editingGroupInfo?.groupId"
@@ -1310,7 +1310,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   font-weight: 500;
 }
 
-/* 🔥 设备配置信息区域 */
+/* 🔥 Device configuration information area */
 .device-config-info {
   margin-bottom: 16px;
 }
@@ -1333,7 +1333,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   box-shadow: 0 0 0 1px var(--primary-color-suppl);
 }
 
-/* 🔥 参数组样式增强 */
+/* 🔥 Parameter group style enhancement */
 .parameter-item.is-device-param-group {
   border-left: 3px solid var(--primary-color);
   background: linear-gradient(90deg, var(--primary-color-suppl) 0%, var(--card-color) 30%);
@@ -1372,7 +1372,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   width: 150px;
 }
 
-/* 🔥 参数组指示器样式 */
+/* 🔥 Parameter group indicator style */
 .param-group-indicator {
   display: flex;
   align-items: center;
@@ -1384,7 +1384,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   flex-shrink: 0;
 }
 
-/* 参数值显示区域增强 */
+/* Enhanced parameter value display area */
 .param-value-display {
   flex: 1;
   display: flex;
@@ -1401,7 +1401,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   color: var(--text-color-3);
 }
 
-/* 参数角色标识 */
+/* Parameter role identifier */
 .param-role-tag {
   flex-shrink: 0;
   font-size: 10px;
@@ -1444,7 +1444,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   width: 100%;
 }
 
-/* 简化版的属性绑定提示样式 */
+/* Simplified version of property binding prompt style */
 .property-binding-tip {
   margin-top: 8px;
 }
@@ -1460,7 +1460,7 @@ const getComponentTemplate = (param: EnhancedParameter | null) => {
   font-weight: 500;
 }
 
-/* 简化版样式 */
+/* Simplified style */
 .property-input-simple {
   width: 100%;
 }

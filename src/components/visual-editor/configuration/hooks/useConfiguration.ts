@@ -1,6 +1,6 @@
 /**
- * 配置系统 Hook
- * 提供便捷的配置管理功能
+ * Configure the system Hook
+ * Provide convenient configuration management functions
  */
 
 import { ref, computed, watch, onUnmounted } from 'vue'
@@ -8,33 +8,33 @@ import { configurationIntegrationBridge as configurationManager } from '@/compon
 import type { WidgetConfiguration, ValidationResult } from '@/components/visual-editor/configuration/types'
 
 export interface UseConfigurationOptions {
-  /** 组件ID */
+  /** componentsID */
   widgetId?: string
-  /** 是否自动初始化 */
+  /** Whether to automatically initialize */
   autoInit?: boolean
-  /** 是否启用自动保存 */
+  /** Whether to enable auto-save */
   autoSave?: boolean
-  /** 自动保存延迟(ms) */
+  /** Autosave delay(ms) */
   autoSaveDelay?: number
 }
 
 export function useConfiguration(options: UseConfigurationOptions = {}) {
   const { widgetId, autoInit = true, autoSave = true, autoSaveDelay = 300 } = options
 
-  // 状态
+  // state
   const currentWidgetId = ref<string | null>(widgetId || null)
   const configuration = ref<WidgetConfiguration | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const validationResult = ref<ValidationResult | null>(null)
 
-  // 配置变更监听器清理函数
+  // Configure change listener cleanup function
   let configChangeCleanup: (() => void) | null = null
 
-  // 自动保存定时器
+  // Auto save timer
   let autoSaveTimer: NodeJS.Timeout | null = null
 
-  // 计算属性
+  // Computed properties
   const hasConfiguration = computed(() => {
     return configuration.value !== null
   })
@@ -43,7 +43,7 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
     return validationResult.value?.valid !== false
   })
 
-  // 初始化配置
+  // Initial configuration
   const initialize = async (targetWidgetId?: string) => {
     const id = targetWidgetId || currentWidgetId.value
     if (!id) return
@@ -52,13 +52,13 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
       isLoading.value = true
       error.value = null
 
-      // 清理旧的监听器
+      // Clean up old listeners
       if (configChangeCleanup) {
         configChangeCleanup()
         configChangeCleanup = null
       }
 
-      // 获取或创建配置
+      // Get or create configuration
       let config = configurationManager.getConfiguration(id)
       if (!config) {
         configurationManager.initializeConfiguration(id)
@@ -68,22 +68,22 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
       configuration.value = config
       currentWidgetId.value = id
 
-      // 设置配置变更监听
+      // Set up configuration change monitoring
       configChangeCleanup = configurationManager.onConfigurationChange(id, newConfig => {
         configuration.value = newConfig
         validateConfiguration()
       })
 
-      // 初始验证
+      // Initial verification
       validateConfiguration()
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '初始化失败'
+      error.value = err instanceof Error ? err.message : 'Initialization failed'
     } finally {
       isLoading.value = false
     }
   }
 
-  // 更新配置
+  // Update configuration
   const updateConfiguration = <K extends keyof WidgetConfiguration>(section: K, config: WidgetConfiguration[K]) => {
     if (!currentWidgetId.value) {
       return
@@ -96,11 +96,11 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
         scheduleAutoSave()
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '更新失败'
+      error.value = err instanceof Error ? err.message : 'Update failed'
     }
   }
 
-  // 设置完整配置
+  // Set up complete configuration
   const setConfiguration = (config: WidgetConfiguration) => {
     if (!currentWidgetId.value) {
       return
@@ -113,22 +113,22 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
         scheduleAutoSave()
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '设置失败'
+      error.value = err instanceof Error ? err.message : 'Setup failed'
     }
   }
 
-  // 重置配置
+  // Reset configuration
   const resetConfiguration = () => {
     if (!currentWidgetId.value) return
 
     try {
       configurationManager.resetConfiguration(currentWidgetId.value)
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '重置失败'
+      error.value = err instanceof Error ? err.message : 'Reset failed'
     }
   }
 
-  // 验证配置
+  // Verify configuration
   const validateConfiguration = () => {
     if (!configuration.value) return
 
@@ -137,60 +137,60 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
       validationResult.value = result
       return result
     } catch (err) {
-      return { valid: false, errors: [{ field: 'global', message: '验证失败' }] }
+      return { valid: false, errors: [{ field: 'global', message: 'Authentication failed' }] }
     }
   }
 
-  // 导出配置
+  // Export configuration
   const exportConfiguration = (): string | null => {
     if (!currentWidgetId.value) return null
 
     try {
       return configurationManager.exportConfiguration(currentWidgetId.value)
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '导出失败'
+      error.value = err instanceof Error ? err.message : 'Export failed'
       return null
     }
   }
 
-  // 导入配置
+  // Import configuration
   const importConfiguration = (configData: string): boolean => {
     if (!currentWidgetId.value) return false
 
     try {
       const success = configurationManager.importConfiguration(currentWidgetId.value, configData)
       if (!success) {
-        error.value = '配置格式无效'
+        error.value = 'Invalid configuration format'
       }
       return success
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '导入失败'
+      error.value = err instanceof Error ? err.message : 'Import failed'
       return false
     }
   }
 
-  // 应用预设
+  // Apply preset
   const applyPreset = (presetName: string): boolean => {
     if (!currentWidgetId.value) return false
 
     try {
       const success = configurationManager.applyPreset(currentWidgetId.value, presetName)
       if (!success) {
-        error.value = `预设 ${presetName} 不存在`
+        error.value = `Default ${presetName} does not exist`
       }
       return success
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '应用预设失败'
+      error.value = err instanceof Error ? err.message : 'Applying preset failed'
       return false
     }
   }
 
-  // 获取可用预设
+  // Get available presets
   const getAvailablePresets = (componentType?: string) => {
     return configurationManager.getPresets(componentType)
   }
 
-  // 计划自动保存
+  // Plan auto-save
   const scheduleAutoSave = () => {
     if (autoSaveTimer) {
       clearTimeout(autoSaveTimer)
@@ -198,19 +198,19 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
 
     autoSaveTimer = setTimeout(() => {
       if (currentWidgetId.value && configuration.value) {
-        // 这里可以添加实际的保存逻辑，比如保存到服务器
+        // Here you can add the actual saving logic，For example, save to the server
       }
     }, autoSaveDelay)
   }
 
-  // 切换组件
+  // Switch components
   const switchWidget = (newWidgetId: string) => {
     if (newWidgetId !== currentWidgetId.value) {
       initialize(newWidgetId)
     }
   }
 
-  // 清理资源
+  // Clean up resources
   const cleanup = () => {
     if (configChangeCleanup) {
       configChangeCleanup()
@@ -223,7 +223,7 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
     }
   }
 
-  // 监听 widgetId 变化
+  // monitor widgetId change
   watch(
     () => currentWidgetId.value,
     (newId, oldId) => {
@@ -234,24 +234,24 @@ export function useConfiguration(options: UseConfigurationOptions = {}) {
     { immediate: autoInit }
   )
 
-  // 清理
+  // clean up
   onUnmounted(() => {
     cleanup()
   })
 
   return {
-    // 状态
+    // state
     currentWidgetId,
     configuration,
     isLoading,
     error,
     validationResult,
 
-    // 计算属性
+    // Computed properties
     hasConfiguration,
     isValid,
 
-    // 方法
+    // method
     initialize,
     updateConfiguration,
     setConfiguration,

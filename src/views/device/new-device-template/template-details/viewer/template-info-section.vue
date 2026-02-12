@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 模板信息展示区块 - 优化布局
+ * Template information display block - Optimize layout
  */
 
 import { inject, computed } from 'vue'
@@ -33,16 +33,16 @@ const tags = computed(() => {
     </div>
 
     <div v-else class="info-container">
-      <!-- 顶部卡片：模板概览 -->
+      <!-- top card：Template overview -->
       <NCard :bordered="false" class="overview-card">
         <div class="overview-content">
-          <!-- 左侧图标 -->
+          <!-- left icon -->
           <div class="icon-container">
             <img v-if="getIconPath" :src="getIconPath" alt="template icon" class="template-icon" />
             <SvgIcon v-else local-icon="default-template" :size="120" />
           </div>
 
-          <!-- 右侧信息 -->
+          <!-- Information on the right -->
           <div class="info-content">
             <h2 class="template-title">{{ templateData.name || '--' }}</h2>
             <p class="template-description">{{ templateData.description || $t('device_template.noDescription') }}</p>

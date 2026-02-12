@@ -1,6 +1,6 @@
 /**
- * Card2.1 类型工具函数集合
- * 提供类型操作、转换和辅助功能
+ * Card2.1 Collection of type utility functions
+ * Provide type operations、Transformations and Accessibility
  */
 
 import type {
@@ -18,12 +18,12 @@ import type {
   InteractionActionType
 } from './index'
 
-// ============ 类型转换工具 ============
+// ============ Type conversion tools ============
 
 /**
- * 从设置项列表生成默认配置对象
- * @param settings 设置项列表
- * @returns 默认配置对象
+ * Generate a default configuration object from a list of settings
+ * @param settings Setting list
+ * @returns Default configuration object
  */
 export function generateDefaultConfigFromSettings<T = Record<string, any>>(settings: Setting[]): T {
   const config = {} as T
@@ -32,7 +32,7 @@ export function generateDefaultConfigFromSettings<T = Record<string, any>>(setti
     const keys = setting.field.split('.')
     let current = config as any
     
-    // 处理嵌套字段路径，如 'customize.title'
+    // Handling nested field paths，like 'customize.title'
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i]
       if (!current[key]) {
@@ -49,15 +49,15 @@ export function generateDefaultConfigFromSettings<T = Record<string, any>>(setti
 }
 
 /**
- * 将设置项按分组组织
- * @param settings 设置项列表
- * @returns 按分组组织的设置项
+ * Organize setting items into groups
+ * @param settings Setting list
+ * @returns Settings organized into groups
  */
 export function groupSettingsByGroup(settings: Setting[]): Record<string, Setting[]> {
   const groups: Record<string, Setting[]> = {}
   
   settings.forEach(setting => {
-    const group = setting.group || '默认分组'
+    const group = setting.group || 'Default grouping'
     if (!groups[group]) {
       groups[group] = []
     }
@@ -68,9 +68,9 @@ export function groupSettingsByGroup(settings: Setting[]): Record<string, Settin
 }
 
 /**
- * 根据控件类型推断TypeScript类型
- * @param controlType 控件类型
- * @returns TypeScript类型字符串
+ * Inferred based on control typeTypeScripttype
+ * @param controlType Control type
+ * @returns TypeScripttype string
  */
 export function inferTSTypeFromControlType(controlType: SettingControlType | string): string {
   switch (controlType) {
@@ -104,9 +104,9 @@ export function inferTSTypeFromControlType(controlType: SettingControlType | str
 }
 
 /**
- * 从数据字段类型推断默认值
- * @param fieldType 数据字段类型
- * @returns 默认值
+ * Infer default value from data field type
+ * @param fieldType Data field type
+ * @returns default value
  */
 export function getDefaultValueForFieldType(fieldType: DataFieldType): any {
   switch (fieldType) {
@@ -129,13 +129,13 @@ export function getDefaultValueForFieldType(fieldType: DataFieldType): any {
   }
 }
 
-// ============ 配置对象操作工具 ============
+// ============ Configuration object manipulation tools ============
 
 /**
- * 深度合并配置对象
- * @param target 目标配置对象
- * @param source 源配置对象
- * @returns 合并后的配置对象
+ * Deep merge configuration objects
+ * @param target target configuration object
+ * @param source source configuration object
+ * @returns Merged configuration object
  */
 export function deepMergeConfig<T extends Record<string, any>>(target: T, source: Partial<T>): T {
   const result = { ...target }
@@ -158,10 +158,10 @@ export function deepMergeConfig<T extends Record<string, any>>(target: T, source
 }
 
 /**
- * 从配置对象中提取字段值
- * @param config 配置对象
- * @param fieldPath 字段路径，如 'customize.title'
- * @returns 字段值
+ * Extract field values ​​from configuration object
+ * @param config Configuration object
+ * @param fieldPath field path，like 'customize.title'
+ * @returns field value
  */
 export function extractFieldValue(config: any, fieldPath: string): any {
   const keys = fieldPath.split('.')
@@ -179,11 +179,11 @@ export function extractFieldValue(config: any, fieldPath: string): any {
 }
 
 /**
- * 向配置对象设置字段值
- * @param config 配置对象
- * @param fieldPath 字段路径，如 'customize.title'
- * @param value 要设置的值
- * @returns 更新后的配置对象
+ * Set field value to configuration object
+ * @param config Configuration object
+ * @param fieldPath field path，like 'customize.title'
+ * @param value value to set
+ * @returns Updated configuration object
  */
 export function setFieldValue<T extends Record<string, any>>(config: T, fieldPath: string, value: any): T {
   const keys = fieldPath.split('.')
@@ -206,13 +206,13 @@ export function setFieldValue<T extends Record<string, any>>(config: T, fieldPat
   return result
 }
 
-// ============ 组件定义操作工具 ============
+// ============ Component definition operation tool ============
 
 /**
- * 创建组件配置模板
- * @param componentType 组件类型
- * @param settings 设置项列表
- * @returns 组件设置配置
+ * Create component configuration template
+ * @param componentType Component type
+ * @param settings Setting list
+ * @returns Component settings configuration
  */
 export function createComponentSettingConfig<T = Record<string, any>>(
   componentType: string,
@@ -238,28 +238,28 @@ export function createComponentSettingConfig<T = Record<string, any>>(
 }
 
 /**
- * 提取组件的数据源需求
- * @param definition 组件定义
- * @returns 数据源需求列表
+ * Extract the data source requirements of the component
+ * @param definition Component definition
+ * @returns Data source requirements list
  */
 export function extractDataSourceRequirements(definition: ComponentDefinition): DataSourceRequirement[] {
   return definition.dataSources || []
 }
 
 /**
- * 提取组件的静态参数需求
- * @param definition 组件定义
- * @returns 静态参数需求列表
+ * Extract the static parameter requirements of the component
+ * @param definition Component definition
+ * @returns Static parameter requirement list
  */
 export function extractStaticParamRequirements(definition: ComponentDefinition): StaticParamRequirement[] {
   return definition.staticParams || []
 }
 
 /**
- * 检查组件是否支持特定数据源类型
- * @param definition 组件定义
- * @param dataSourceType 数据源类型
- * @returns 是否支持
+ * Check if a component supports a specific data source type
+ * @param definition Component definition
+ * @param dataSourceType Data source type
+ * @returns Whether to support
  */
 export function supportsDataSourceType(
   definition: ComponentDefinition,
@@ -269,15 +269,15 @@ export function supportsDataSourceType(
   return dataSources.some(ds => ds.supportedTypes.includes(dataSourceType))
 }
 
-// ============ 数据源和字段映射工具 ============
+// ============ Data source and field mapping tools ============
 
 /**
- * 创建字段映射配置
- * @param sourceField 源字段名
- * @param targetField 目标字段名
- * @param fieldType 字段类型
- * @param options 可选配置
- * @returns 字段映射配置
+ * Create field mapping configuration
+ * @param sourceField Source field name
+ * @param targetField Target field name
+ * @param fieldType Field type
+ * @param options Optional configuration
+ * @returns Field mapping configuration
  */
 export function createFieldMapping(
   sourceField: string,
@@ -301,21 +301,21 @@ export function createFieldMapping(
 }
 
 /**
- * 合并多个字段映射配置
- * @param mappings 字段映射配置数组
- * @returns 合并后的字段映射配置
+ * Merge multiple field mapping configurations
+ * @param mappings Field mapping configuration array
+ * @returns Merged field mapping configuration
  */
 export function mergeFieldMappings(...mappings: Record<string, any>[]): Record<string, any> {
   return Object.assign({}, ...mappings)
 }
 
-// ============ 交互配置工具 ============
+// ============ Interactive configuration tool ============
 
 /**
- * 创建简单的点击跳转交互配置
- * @param url 跳转URL
- * @param external 是否外部链接
- * @returns 交互配置
+ * Create a simple click-to-jump interaction configuration
+ * @param url JumpURL
+ * @param external Is it an external link?
+ * @returns Interactive configuration
  */
 export function createClickJumpInteraction(url: string, external: boolean = true) {
   return {
@@ -334,11 +334,11 @@ export function createClickJumpInteraction(url: string, external: boolean = true
 }
 
 /**
- * 创建属性修改交互配置
- * @param targetComponentId 目标组件ID
- * @param targetProperty 目标属性
- * @param updateValue 更新值
- * @returns 交互配置
+ * Create attributes and modify interaction configurations
+ * @param targetComponentId target componentID
+ * @param targetProperty target attribute
+ * @param updateValue update value
+ * @returns Interactive configuration
  */
 export function createModifyInteraction(
   targetComponentId: string,
@@ -360,12 +360,12 @@ export function createModifyInteraction(
   }
 }
 
-// ============ 分组和分类工具 ============
+// ============ Grouping and classification tools ============
 
 /**
- * 根据文件路径推断组件分类
- * @param filePath 组件文件路径
- * @returns 分类信息
+ * Infer component classification based on file path
+ * @param filePath Component file path
+ * @returns Classified information
  */
 export function inferCategoryFromPath(filePath: string): {
   mainCategory: string
@@ -374,17 +374,17 @@ export function inferCategoryFromPath(filePath: string): {
 } {
   const pathParts = filePath.split('/').filter(part => part && part !== '.')
   
-  // 查找components目录后的路径部分
+  // FindcomponentsThe path part after the directory
   const componentsIndex = pathParts.findIndex(part => part === 'components')
   if (componentsIndex === -1 || componentsIndex >= pathParts.length - 1) {
     return {
-      mainCategory: '其他',
-      category: '其他'
+      mainCategory: 'other',
+      category: 'other'
     }
   }
   
   const categoryParts = pathParts.slice(componentsIndex + 1)
-  const mainCategory = categoryParts[0] || '其他'
+  const mainCategory = categoryParts[0] || 'other'
   const subCategory = categoryParts.length > 2 ? categoryParts[1] : undefined
   
   return {
@@ -395,12 +395,12 @@ export function inferCategoryFromPath(filePath: string): {
 }
 
 /**
- * 创建设置分组
- * @param name 分组名称
- * @param label 分组标签
- * @param fields 字段列表
- * @param options 可选配置
- * @returns 设置分组配置
+ * Create settings group
+ * @param name Group name
+ * @param label Group labels
+ * @param fields Field list
+ * @param options Optional configuration
+ * @returns Set group configuration
  */
 export function createSettingGroup(
   name: string,
@@ -422,12 +422,12 @@ export function createSettingGroup(
   }
 }
 
-// ============ 开发辅助工具 ============
+// ============ Development aids ============
 
 /**
- * 生成组件定义的TypeScript接口代码
- * @param definition 组件定义
- * @returns TypeScript接口代码字符串
+ * Generate component definitionTypeScriptInterface code
+ * @param definition Component definition
+ * @returns TypeScriptInterface code string
  */
 export function generateTSInterfaceFromDefinition(definition: ComponentDefinition): string {
   const interfaceName = `${pascalCase(definition.type)}Config`
@@ -436,7 +436,7 @@ export function generateTSInterfaceFromDefinition(definition: ComponentDefinitio
   
   let interfaceCode = `interface ${interfaceName} {\n`
   
-  // 生成静态参数字段
+  // Generate static parameter fields
   staticParams.forEach(param => {
     const tsType = param.type === 'array' ? 'any[]' : 
                    param.type === 'object' ? 'Record<string, any>' : param.type
@@ -444,7 +444,7 @@ export function generateTSInterfaceFromDefinition(definition: ComponentDefinitio
     interfaceCode += `  ${param.key}${param.required === false ? '?' : ''}: ${tsType}\n`
   })
   
-  // 生成数据源字段
+  // Generate data source fields
   dataSources.forEach(ds => {
     if (ds.fieldMappings) {
       Object.entries(ds.fieldMappings).forEach(([_, mapping]) => {
@@ -464,9 +464,9 @@ export function generateTSInterfaceFromDefinition(definition: ComponentDefinitio
 }
 
 /**
- * 将字符串转换为PascalCase
- * @param str 输入字符串
- * @returns PascalCase字符串
+ * Convert string toPascalCase
+ * @param str input string
+ * @returns PascalCasestring
  */
 function pascalCase(str: string): string {
   return str
@@ -476,10 +476,10 @@ function pascalCase(str: string): string {
 }
 
 /**
- * 验证组件配置的完整性
- * @param definition 组件定义
- * @param config 组件配置
- * @returns 验证结果
+ * Verify integrity of component configuration
+ * @param definition Component definition
+ * @param config Component configuration
+ * @returns Verification results
  */
 export function validateComponentConfig(
   definition: ComponentDefinition,
@@ -497,7 +497,7 @@ export function validateComponentConfig(
     warnings: [] as string[]
   }
   
-  // 检查静态参数
+  // Check static parameters
   const staticParams = definition.staticParams || []
   staticParams.forEach(param => {
     const value = extractFieldValue(config, param.key)
@@ -507,12 +507,12 @@ export function validateComponentConfig(
     }
     
     if (value !== undefined && value !== null) {
-      // 简单类型检查
+      // simple type checking
       const expectedType = param.type
       const actualType = Array.isArray(value) ? 'array' : typeof value
       
       if (expectedType !== actualType && expectedType !== 'object') {
-        result.invalidFields.push(`${param.key}: 期望 ${expectedType}, 实际 ${actualType}`)
+        result.invalidFields.push(`${param.key}: expect ${expectedType}, actual ${actualType}`)
       }
     }
   })
@@ -521,39 +521,39 @@ export function validateComponentConfig(
   return result
 }
 
-// ============ 导出所有工具函数 ============
+// ============ Export all utility functions ============
 
 export const TypeUtils = {
-  // 类型转换
+  // type conversion
   generateDefaultConfigFromSettings,
   groupSettingsByGroup,
   inferTSTypeFromControlType,
   getDefaultValueForFieldType,
   
-  // 配置操作
+  // Configuration operations
   deepMergeConfig,
   extractFieldValue,
   setFieldValue,
   
-  // 组件定义
+  // Component definition
   createComponentSettingConfig,
   extractDataSourceRequirements,
   extractStaticParamRequirements,
   supportsDataSourceType,
   
-  // 字段映射
+  // Field mapping
   createFieldMapping,
   mergeFieldMappings,
   
-  // 交互配置
+  // Interactive configuration
   createClickJumpInteraction,
   createModifyInteraction,
   
-  // 分组分类
+  // Group classification
   inferCategoryFromPath,
   createSettingGroup,
   
-  // 开发工具
+  // development tools
   generateTSInterfaceFromDefinition,
   validateComponentConfig
 }

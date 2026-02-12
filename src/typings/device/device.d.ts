@@ -13,10 +13,10 @@ declare namespace DeviceManagement {
 
   interface TreeNode {
     group: Group
-    children?: TreeNode[] // TreeNode类型的可选数组，用于描述子节点
+    children?: TreeNode[] // TreeNodeoptional array of types，Used to describe child nodes
   }
 
-  // 用于描述包含根节点和可能的子节点的整个树结构
+  // Used to describe the entire tree structure including the root node and possible child nodes
   type TreeStructure = TreeNode[]
 
   interface DetailData {
@@ -63,29 +63,29 @@ declare namespace DeviceManagement {
   interface DeviceDetail {
     id: string
     name: string
-    voucher: string // 凭证
+    voucher: string // certificate
     tenant_id: string
-    is_enabled: string // 启用/禁用 enabled-启用 disabled-禁用 默认禁用，激活后默认启用
-    activate_flag: string // 激活标志 inactive-未激活 active-已激活
+    is_enabled: string // enable/Disable enabled-enable disabled-Disable 默认Disable，激活后默认enable
+    activate_flag: string // activation flag inactive-Not activated active-Activated
     created_at: string
     update_at: string
-    device_number: string // 设备编号
-    product_id: string // 产品id
-    parent_id: string // 网关id
-    label: string // 标签 单标签，英文逗号隔开
-    location: string // 地理位置
-    sub_device_addr: string // 子设备地址
-    current_version: string // 固件版本
-    additional_info: string // 附件信息 json字符串
-    protocol_config: string // 协议插件设备配置 协议插件相关的设备配置
+    device_number: string // Device number
+    product_id: string // productid
+    parent_id: string // gatewayid
+    label: string // Label 单Label，separated by commas
+    location: string // geographical location
+    sub_device_addr: string // Sub-device address
+    current_version: string // Firmware version
+    additional_info: string // Attachment information jsonstring
+    protocol_config: string // Protocol plug-in device configuration Device configuration related to protocol plug-in
     device_config_name: string
     remark1: string
     remark2: string
     remark3: string
-    device_config_id: string // 设备配置id
-    batch_number: string // 批次号
-    activate_at: string // 激活时间
-    is_online: number // 是否在线
+    device_config_id: string // Device configurationid
+    batch_number: string // Batch number
+    activate_at: string // activation time
+    is_online: number // Is online
   }
 
   interface telemetryData {

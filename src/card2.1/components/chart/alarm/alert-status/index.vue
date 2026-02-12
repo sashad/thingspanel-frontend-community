@@ -1,38 +1,38 @@
 <template>
   <n-card class="alert-status" embedded>
     <div class="content">
-      <!-- 🔥 直接显示 props.data 转成的字符串 -->
+      <!-- 🔥 display directly props.data Converted string -->
       <div class="field-group">
-        <label class="field-label">🔥 数据源数据:</label>
+        <label class="field-label">🔥 Data source data:</label>
         <div class="field-value">{{ JSON.stringify(props.data) }}</div>
       </div>
 
-      <!-- 标题显示 -->
+      <!-- title display -->
       <div class="field-group">
-        <label class="field-label">标题:</label>
-        <div class="field-value">{{ getDisplayValue('title', '未设置') }}</div>
-        <n-button size="tiny" @click="changeTitle">修改标题</n-button>
+        <label class="field-label">title:</label>
+        <div class="field-value">{{ getDisplayValue('title', 'not set') }}</div>
+        <n-button size="tiny" @click="changeTitle">Modify title</n-button>
       </div>
 
-      <!-- 金额显示 -->
+      <!-- Amount display -->
       <div class="field-group">
-        <label class="field-label">金额:</label>
+        <label class="field-label">Amount:</label>
         <div class="field-value">{{ getDisplayValue('amount', 0) }}</div>
-        <n-button size="tiny" @click="changeAmount">修改金额</n-button>
+        <n-button size="tiny" @click="changeAmount">Modify amount</n-button>
       </div>
 
-      <!-- 简介显示 -->
+      <!-- Introduction display -->
       <div class="field-group">
-        <label class="field-label">简介:</label>
-        <div class="field-value">{{ getDisplayValue('description', '无描述') }}</div>
-        <n-button size="tiny" @click="changeDescription">修改简介</n-button>
+        <label class="field-label">Introduction:</label>
+        <div class="field-value">{{ getDisplayValue('description', 'No description') }}</div>
+        <n-button size="tiny" @click="changeDescription">Edit introduction</n-button>
       </div>
 
-      <!-- 数据源调试信息 -->
+      <!-- Data source debugging information -->
       <div class="debug-info">
-        <n-divider>🔍 调试信息</n-divider>
+        <n-divider>🔍 debugging information</n-divider>
         <div class="debug-section">
-          <span class="debug-label">统一配置值:</span>
+          <span class="debug-label">Unified configuration values:</span>
           <pre class="debug-value debug-scrollable">{{ JSON.stringify({
             title: unifiedConfig.component?.title,
             amount: unifiedConfig.component?.amount,
@@ -40,19 +40,19 @@
           }, null, 2) }}</pre>
         </div>
         <div class="debug-section">
-          <span class="debug-label">数据源值:</span>
+          <span class="debug-label">data source value:</span>
           <pre class="debug-value debug-scrollable">{{ JSON.stringify(props.data, null, 2) }}</pre>
         </div>
         <div class="debug-section">
-          <span class="debug-label">最终显示值（数据源优先）:</span>
+          <span class="debug-label">final displayed value（Data source first）:</span>
           <pre class="debug-value debug-scrollable">{{ JSON.stringify({
-            title: getDisplayValue('title', '未设置'),
+            title: getDisplayValue('title', 'not set'),
             amount: getDisplayValue('amount', 0),
-            description: getDisplayValue('description', '无描述')
+            description: getDisplayValue('description', 'No description')
           }, null, 2) }}</pre>
         </div>
         <div class="debug-section">
-          <span class="debug-label">数据来源分析:</span>
+          <span class="debug-label">Data source analysis:</span>
           <pre class="debug-value debug-scrollable">{{ JSON.stringify({
             title: getDataSource('title'),
             amount: getDataSource('amount'),
@@ -61,11 +61,11 @@
         </div>
       </div>
 
-      <!-- 测试按钮 -->
+      <!-- test button -->
       <div class="actions">
-        <n-button type="primary" size="small" @click="randomUpdate">随机更新所有值</n-button>
-        <n-button size="small" @click="resetToDefault">重置为默认值</n-button>
-        <n-button type="warning" size="small" @click="testDataSource">测试数据源</n-button>
+        <n-button type="primary" size="small" @click="randomUpdate">Randomly update all values</n-button>
+        <n-button size="small" @click="resetToDefault">reset to default</n-button>
+        <n-button type="warning" size="small" @click="testDataSource">Test data source</n-button>
       </div>
     </div>
   </n-card>
@@ -73,8 +73,8 @@
 
 <script setup lang="ts">
 /**
- * 告警状态组件 - 统一配置管理版本
- * 🔥 采用新的统一配置架构：所有配置归集到卡片级别
+ * Alarm status component - Unified configuration management version
+ * 🔥 Adopt a new unified configuration architecture：All configurations are collected at the card level
  */
 
 import { watch, onMounted, onUnmounted, ref } from 'vue'
@@ -82,17 +82,17 @@ import { NCard, NButton, useMessage } from 'naive-ui'
 import { useCard2Props, type UnifiedCard2Configuration } from '@/card2.1/hooks'
 import type { AlertStatusCustomize } from './settingConfig'
 
-// 组件属性接口 - 支持统一配置架构
+// Component property interface - Support unified configuration architecture
 interface Props {
-  config: AlertStatusCustomize  // 接收扁平的配置对象
+  config: AlertStatusCustomize  // Receives a flat configuration object
   data?: Record<string, unknown>
-  componentId?: string  // 🔥 新增：组件ID用于配置管理
+  componentId?: string  // 🔥 New：componentsIDfor configuration management
 }
 
-// 组件事件 - 用于通知配置变更
+// Component events - Used to notify configuration changes
 interface Emits {
   (e: 'update:config', config: AlertStatusCustomize): void
-  (e: 'update:unified-config', config: UnifiedCard2Configuration): void  // 🔥 新增：统一配置变更事件
+  (e: 'update:unified-config', config: UnifiedCard2Configuration): void  // 🔥 New：Unified configuration change events
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -101,105 +101,105 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 🔥 获取初始统一配置 - 从Card2Wrapper的统一配置架构获取
+// 🔥 Get initial unified configuration - fromCard2WrapperUnified configuration architecture acquisition
 function getInitialUnifiedConfig(): UnifiedCard2Configuration | undefined {
   if (!props.componentId) return undefined
 
 
   try {
-    // 通过DOM查找Card2Wrapper实例获取完整配置
+    // passDOMFindCard2WrapperInstance gets complete configuration
     const cardElement = document.querySelector(`[data-component-id="${props.componentId}"]`)
     if (cardElement && (cardElement as any)?.__vueParentComponent?.exposed?.getFullConfiguration) {
       const fullConfig = (cardElement as any).__vueParentComponent.exposed.getFullConfiguration()
 
-      // 🔥 关键调试：显示组件配置的具体内容
+      // 🔥 critical debugging：Show the specific content of the component configuration
       if (fullConfig?.component) {
       } else {
-        console.warn(`🔥 [alert-status] 初始配置中没有component节!`)
+        console.warn(`🔥 [alert-status] Not included in initial configurationcomponentFestival!`)
       }
 
       return fullConfig
     } else {
-      console.warn(`🔥 [alert-status] 未找到Card2Wrapper元素或暴露方法`)
+      console.warn(`🔥 [alert-status] not foundCard2Wrapperelement or exposure method`)
     }
   } catch (error) {
-    console.warn(`🔥 [alert-status] 获取初始配置失败:`, error)
+    console.warn(`🔥 [alert-status] Failed to obtain initial configuration:`, error)
   }
 
   return undefined
 }
 
-// 🔥 使用增强的 Card 2.1 数据绑定，支持统一配置管理
+// 🔥 Use enhanced Card 2.1 data binding，Support unified configuration management
 const {
   config,
   displayData,
   unifiedConfig,
-  updateConfig: updateCard2Config,   // 🔥 重命名避免冲突
-  updateUnifiedConfigWithSync,       // 🔥 使用增强版配置更新（自动同步）
+  updateConfig: updateCard2Config,   // 🔥 Rename to avoid conflicts
+  updateUnifiedConfigWithSync,       // 🔥 Update using enhanced configuration（Automatic synchronization）
   getFullConfiguration,
-  cleanupAutoSync,                   // 🔥 清理函数
-  // 🔥 新增：属性暴露功能（现在自动处理，但保留接口）
+  cleanupAutoSync,                   // 🔥 Cleanup function
+  // 🔥 New：Attribute exposure function（Now handled automatically，But keep the interface）
   exposeProperty,
   exposeProperties,
   exposePropertyWithWatch,
-  // 🔥 关键修复：添加缺失的 watchProperty 方法
+  // 🔥 critical fix：add missing watchProperty method
   watchProperty
 } = useCard2Props({
   config: props.config,
   data: props.data,
   componentId: props.componentId,
-  initialUnifiedConfig: getInitialUnifiedConfig()  // 🔥 传递初始统一配置
+  initialUnifiedConfig: getInitialUnifiedConfig()  // 🔥 Pass initial unified configuration
 })
 
 const message = useMessage()
 
-// 🔥 核心数据获取函数：修复为完全基于统一配置
+// 🔥 Core data acquisition function：Fixed to be completely based on unified configuration
 const getDisplayValue = (field: string, defaultValue: any) => {
 
-  // 🔥 关键修复：title, amount, description 是组件配置属性，优先从统一配置获取
+  // 🔥 critical fix：title, amount, description Is the component configuration property，Get it from unified configuration first
   if (['title', 'amount', 'description'].includes(field)) {
-    // 只从统一配置中的组件配置获取
+    // Get only from component configuration in unified configuration
     if (unifiedConfig.value.component && field in unifiedConfig.value.component && unifiedConfig.value.component[field] !== undefined) {
       const value = unifiedConfig.value.component[field]
       return String(value)
     }
 
-    // 使用默认值
+    // Use default value
     return String(defaultValue)
   }
 
-  // 🔥 其他字段可以继续使用原来的逻辑（先数据源，后配置，最后默认值）
-  // 1. 优先使用数据源数据（这是执行结果）
+  // 🔥 Other fields can continue to use the original logic（Data source first，post configuration，final default value）
+  // 1. Prioritize data source data（This is the execution result）
   if (props.data && typeof props.data === 'object' && field in props.data && props.data[field] !== undefined && props.data[field] !== null) {
     return String(props.data[field])
   }
 
-  // 2. 回退到统一配置中的组件配置
+  // 2. Fallback to component configuration in unified configuration
   if (unifiedConfig.value.component && field in unifiedConfig.value.component && unifiedConfig.value.component[field] !== undefined) {
     return String(unifiedConfig.value.component[field])
   }
 
-  // 3. 使用默认值
+  // 3. Use default value
   return String(defaultValue)
 }
 
-// 🔥 数据来源分析函数：判断数据来自哪里
+// 🔥 Data source analysis function：Determine where the data comes from
 const getDataSource = (field: string) => {
-  // 检查数据源数据
+  // Check data source data
   if (props.data && typeof props.data === 'object' && field in props.data && props.data[field] !== undefined && props.data[field] !== null) {
-    return `数据源: ${props.data[field]}`
+    return `data source: ${props.data[field]}`
   }
 
-  // 检查配置数据
+  // Check configuration data
   if (unifiedConfig.value.component && field in unifiedConfig.value.component && unifiedConfig.value.component[field] !== undefined) {
-    return `配置: ${unifiedConfig.value.component[field]}`
+    return `Configuration: ${unifiedConfig.value.component[field]}`
   }
 
-  // 默认值
-  return '使用默认值'
+  // default value
+  return 'Use default value'
 }
 
-// 🔥 修复递归更新：深度比较函数，替代JSON.stringify避免proxy序列化问题
+// 🔥 Fix recursive updates：Deep comparison function，substituteJSON.stringifyavoidproxySerialization problem
 const isConfigEqual = (a: any, b: any): boolean => {
   if (a === b) return true
   if (a == null || b == null) return false
@@ -222,16 +222,16 @@ const isConfigEqual = (a: any, b: any): boolean => {
   return false
 }
 
-// 🔥 监听统一配置变化 - 现在属性暴露由 useCard2Props 自动处理
+// 🔥 Monitor unified configuration changes - Properties are now exposed by useCard2Props Automatic processing
 watch(
   () => unifiedConfig.value,
   (newUnifiedConfig) => {
-    // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+    // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
   },
   { deep: true, immediate: true }
 )
 
-// 🔥 监听数据源变化 - 现在属性暴露由 useCard2Props 自动处理
+// 🔥 Monitor data source changes - Properties are now exposed by useCard2Props Automatic processing
 watch(
   () => props.data,
   () => {
@@ -239,22 +239,22 @@ watch(
   { deep: true, immediate: true }
 )
 
-// 生命周期管理
+// life cycle management
 onMounted(() => {
 })
 
 onUnmounted(() => {
-  // 🔥 调用 Hook 提供的清理函数
+  // 🔥 call Hook Cleanup functions provided
   cleanupAutoSync()
 })
 
-// 🔥 简化的配置更新函数 - 直接使用统一配置管理
+// 🔥 Simplified configuration update function - Use unified configuration management directly
 const updateConfig = (partialCustomize: Partial<AlertStatusCustomize>) => {
 
-  // 🔥 关键修复：直接使用 updateCard2Config 更新组件配置层
+  // 🔥 critical fix：Use directly updateCard2Config Update component configuration layer
   updateCard2Config('component', partialCustomize)
 
-  // 🔥 新增：同步到配置管理器，确保配置表单同步
+  // 🔥 New：Sync to configuration manager，Ensure configuration forms are synchronized
   if (props.componentId) {
     import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
       .then(({ configurationIntegrationBridge }) => {
@@ -266,94 +266,94 @@ const updateConfig = (partialCustomize: Partial<AlertStatusCustomize>) => {
         )
       })
       .catch(error => {
-        console.error(`❌ [alert-status] 同步配置到管理器失败:`, error)
+        console.error(`❌ [alert-status] Synchronizing configuration to manager failed:`, error)
       })
   }
 
-  // 🔥 发出更新事件
+  // 🔥 Issue an update event
   emit('update:config', partialCustomize)
 
 }
 
-// 修改标题
+// Modify title
 const changeTitle = () => {
-  // 🔥 关键修复：使用统一配置中的实际值，而不是config.value
-  const currentTitle = unifiedConfig.value.component?.title || '告警状态'
-  const newTitle = currentTitle === '告警状态' ? '新的标题' : '告警状态'
+  // 🔥 critical fix：Use actual values ​​from unified configuration，instead ofconfig.value
+  const currentTitle = unifiedConfig.value.component?.title || 'Alarm status'
+  const newTitle = currentTitle === 'Alarm status' ? 'new title' : 'Alarm status'
   updateConfig({ title: newTitle })
 
-  // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+  // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
 
-  message.success(`标题已更改为: ${newTitle}`)
+  message.success(`The title has been changed to: ${newTitle}`)
 }
 
-// 修改金额
+// Modify amount
 const changeAmount = () => {
-  // 🔥 关键修复：使用统一配置中的实际值，而不是config.value
+  // 🔥 critical fix：Use actual values ​​from unified configuration，instead ofconfig.value
   const currentAmount = unifiedConfig.value.component?.amount || 0
   const newAmount = currentAmount === 0 ? Math.floor(Math.random() * 10000) : 0
   updateConfig({ amount: newAmount })
 
-  // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+  // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
 
-  message.success(`金额已更改为: ${newAmount}`)
+  message.success(`The amount has been changed to: ${newAmount}`)
 }
 
-// 修改简介
+// Edit introduction
 const changeDescription = () => {
-  const descriptions = ['系统运行正常', '数据更新中', '监控中...', '状态良好']
-  // 🔥 关键修复：使用统一配置中的实际值，而不是config.value
-  const currentDescription = unifiedConfig.value.component?.description || '系统运行正常'
+  const descriptions = ['The system is running normally', 'Data is being updated', 'Monitoring...', 'in good condition']
+  // 🔥 critical fix：Use actual values ​​from unified configuration，instead ofconfig.value
+  const currentDescription = unifiedConfig.value.component?.description || 'The system is running normally'
   const currentIndex = descriptions.indexOf(currentDescription)
   const newDescription = descriptions[(currentIndex + 1) % descriptions.length]
   updateConfig({ description: newDescription })
 
-  // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+  // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
 
-  message.success(`简介已更改为: ${newDescription}`)
+  message.success(`Introduction has been changed to: ${newDescription}`)
 }
 
-// 随机更新所有值
+// Randomly update all values
 const randomUpdate = () => {
   const newConfig = {
-    title: `随机标题 ${Math.floor(Math.random() * 100)}`,
+    title: `random title ${Math.floor(Math.random() * 100)}`,
     amount: Math.floor(Math.random() * 50000),
-    description: `随机描述 ${new Date().toLocaleTimeString()}`
+    description: `random description ${new Date().toLocaleTimeString()}`
   }
 
   updateConfig(newConfig)
 
-  // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+  // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
 
-  message.success('所有配置已随机更新')
+  message.success('All configurations have been randomly updated')
 }
 
-// 重置为默认值
+// reset to default
 const resetToDefault = () => {
   const defaultConfig = {
-    title: '告警状态',
+    title: 'Alarm status',
     amount: 0,
-    description: '系统运行正常'
+    description: 'The system is running normally'
   }
 
   updateConfig(defaultConfig)
 
-  // 🔥 属性暴露现在由 useCard2Props 自动处理，无需手动调用
+  // 🔥 Property exposure is now represented by useCard2Props Automatic processing，No need to call manually
 
-  message.info('已重置为默认值')
+  message.info('Reset to default')
 }
 
-// 测试数据源
+// Test data source
 const testDataSource = () => {
 
-  message.info('数据源测试信息已输出到控制台，请按F12查看')
+  message.info('Data source test information has been output to the console，Please pressF12Check')
 }
 
-// 🔥 简化的外部接口，大部分功能已由 useCard2Props 自动处理
+// 🔥 Simplified external interface，Most features have been useCard2Props Automatic processing
 const expose = {
   getFullConfiguration,
-  updateConfig,  // 使用简化的本地更新函数
-  // 🔥 保留：属性监听接口，供交互引擎使用
+  updateConfig,  // Use simplified local update functions
+  // 🔥 reserve：Property listening interface，For use by interaction engines
   watchProperty: (propertyName: string, callback: (newValue: any, oldValue: any) => void) => {
     return watchProperty(propertyName, callback)
   }
@@ -363,13 +363,13 @@ defineExpose(expose)
 </script>
 
 <style scoped>
-/* 主容器样式 */
+/* Main container style */
 .alert-status {
   height: 100%;
   padding: 16px;
 }
 
-/* 内容区域 */
+/* content area */
 .content {
   display: flex;
   flex-direction: column;
@@ -377,7 +377,7 @@ defineExpose(expose)
   height: 100%;
 }
 
-/* 字段组样式 */
+/* Field group style */
 .field-group {
   display: flex;
   align-items: center;
@@ -409,7 +409,7 @@ defineExpose(expose)
   word-break: break-all;
 }
 
-/* 调试信息区域 */
+/* Debug information area */
 .debug-info {
   margin: 16px 0;
   padding: 12px;
@@ -437,19 +437,19 @@ defineExpose(expose)
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 10px;
   line-height: 1.4;
-  /* 🔥 增强滚动显示效果 */
+  /* 🔥 Enhance scrolling display effect */
   max-height: 120px;
   overflow-y: auto;
   overflow-x: auto;
   color: var(--text-color-1);
   white-space: pre-wrap;
   word-break: break-all;
-  /* 🔥 美化滚动条 */
+  /* 🔥 Beautify scroll bar */
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-color) transparent;
 }
 
-/* 🔥 WebKit 浏览器滚动条美化 */
+/* 🔥 WebKit Browser scroll bar beautification */
 .debug-value::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -470,12 +470,12 @@ defineExpose(expose)
   background: var(--primary-color);
 }
 
-/* 🔥 焦点状态下的滚动条增强 */
+/* 🔥 Scroll bar enhancement in focus state */
 .debug-value:focus-within::-webkit-scrollbar-thumb {
   background: var(--primary-color-hover);
 }
 
-/* 操作按钮区域 */
+/* Operation button area */
 .actions {
   display: flex;
   gap: 6px;
@@ -490,7 +490,7 @@ defineExpose(expose)
   min-width: 80px;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 480px) {
   .alert-status {
     padding: 12px;

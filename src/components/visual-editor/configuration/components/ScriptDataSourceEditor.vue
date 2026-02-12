@@ -1,11 +1,11 @@
 <template>
   <div class="script-data-source-editor">
     <n-space vertical size="medium">
-      <!-- 脚本编辑器 -->
-      <n-form-item label="JavaScript 脚本" size="small">
+      <!-- Script editor -->
+      <n-form-item label="JavaScript script" size="small">
         <template #label>
           <n-space align="center" size="small">
-            <span>JavaScript 脚本</span>
+            <span>JavaScript script</span>
             <n-tooltip>
               <template #trigger>
                 <n-icon size="14" style="cursor: help">
@@ -13,11 +13,11 @@
                 </n-icon>
               </template>
               <div style="max-width: 300px; font-size: 12px">
-                <div><strong>脚本说明:</strong></div>
-                <div>• 使用 return 语句返回数据</div>
-                <div>• 可使用 _utils 内置工具函数</div>
-                <div>• 支持 async/await 异步操作</div>
-                <div>• 自动提供安全沙箱环境</div>
+                <div><strong>Script description:</strong></div>
+                <div>• use return Statement returns data</div>
+                <div>• Available _utils Built-in utility functions</div>
+                <div>• support async/await Asynchronous operations</div>
+                <div>• Automatically provide a secure sandbox environment</div>
               </div>
             </n-tooltip>
           </n-space>
@@ -26,42 +26,42 @@
           v-model:value="scriptCode"
           type="textarea"
           :rows="12"
-          placeholder="请输入JavaScript脚本代码..."
+          placeholder="Please enterJavaScriptscript code..."
           @update:value="onScriptChange"
         />
       </n-form-item>
 
-      <!-- 快速模板 -->
-      <n-form-item label="快速模板" size="small">
+      <!-- quick template -->
+      <n-form-item label="quick template" size="small">
         <n-space>
-          <n-button size="small" @click="loadTemplate('basic')">基础数据</n-button>
-          <n-button size="small" @click="loadTemplate('random')">随机数据</n-button>
-          <n-button size="small" @click="loadTemplate('time-series')">时间序列</n-button>
-          <n-button size="small" @click="loadTemplate('api-mock')">API模拟</n-button>
+          <n-button size="small" @click="loadTemplate('basic')">Basic data</n-button>
+          <n-button size="small" @click="loadTemplate('random')">random data</n-button>
+          <n-button size="small" @click="loadTemplate('time-series')">time series</n-button>
+          <n-button size="small" @click="loadTemplate('api-mock')">APIsimulation</n-button>
         </n-space>
       </n-form-item>
 
-      <!-- 执行配置 -->
-      <n-form-item label="执行配置" size="small">
+      <!-- Execute configuration -->
+      <n-form-item label="Execute configuration" size="small">
         <n-space align="center">
-          <n-form-item label="超时时间" size="small" style="margin: 0">
+          <n-form-item label="timeout" size="small" style="margin: 0">
             <n-input-number
               v-model:value="timeout"
               :min="1000"
               :max="30000"
               :step="1000"
-              placeholder="毫秒"
+              placeholder="millisecond"
               style="width: 100px"
               @update:value="onConfigChange"
             />
           </n-form-item>
-          <n-form-item label="刷新间隔" size="small" style="margin: 0">
+          <n-form-item label="refresh interval" size="small" style="margin: 0">
             <n-input-number
               v-model:value="refreshInterval"
               :min="0"
               :max="300000"
               :step="5000"
-              placeholder="毫秒(0=不自动刷新)"
+              placeholder="millisecond(0=No automatic refresh)"
               style="width: 150px"
               @update:value="onConfigChange"
             />
@@ -69,13 +69,13 @@
         </n-space>
       </n-form-item>
 
-      <!-- 脚本验证 -->
+      <!-- Script verification -->
       <n-card v-if="validationResult" size="small" embedded>
         <template #header>
           <n-space align="center">
-            <span>脚本验证</span>
+            <span>Script verification</span>
             <n-tag :type="validationResult.valid ? 'success' : 'error'" size="small">
-              {{ validationResult.valid ? '通过' : '失败' }}
+              {{ validationResult.valid ? 'pass' : 'fail' }}
             </n-tag>
           </n-space>
         </template>
@@ -87,45 +87,45 @@
         </div>
 
         <div v-if="validationResult.valid">
-          <n-text type="success" size="small">✅ 脚本语法正确，可以安全执行</n-text>
+          <n-text type="success" size="small">✅ The script syntax is correct，can be performed safely</n-text>
         </div>
       </n-card>
 
-      <!-- 测试执行 -->
+      <!-- test execution -->
       <n-space>
         <n-button :disabled="!scriptCode.trim()" @click="validateScript">
           <template #icon>
             <n-icon><CheckmarkCircleOutline /></n-icon>
           </template>
-          验证脚本
+          Validation script
         </n-button>
         <n-button type="primary" :loading="testing" :disabled="!scriptCode.trim()" @click="testScript">
           <template #icon>
             <n-icon><PlayOutline /></n-icon>
           </template>
-          测试执行
+          test execution
         </n-button>
-        <n-button @click="clearScript">清空</n-button>
+        <n-button @click="clearScript">Clear</n-button>
       </n-space>
 
-      <!-- 测试结果 -->
-      <n-card v-if="testResult" size="small" title="测试结果" embedded>
+      <!-- Test results -->
+      <n-card v-if="testResult" size="small" title="Test results" embedded>
         <template #header-extra>
           <n-tag :type="testResult.success ? 'success' : 'error'" size="small">
-            {{ testResult.success ? '成功' : '失败' }}
+            {{ testResult.success ? 'success' : 'fail' }}
           </n-tag>
         </template>
 
         <n-space vertical size="small">
           <n-descriptions :column="2" size="small">
-            <n-descriptions-item label="执行时间">{{ testResult.executionTime }}ms</n-descriptions-item>
-            <n-descriptions-item label="日志数量">
+            <n-descriptions-item label="Execution time">{{ testResult.executionTime }}ms</n-descriptions-item>
+            <n-descriptions-item label="Number of logs">
               {{ testResult.logs.length }}
             </n-descriptions-item>
           </n-descriptions>
 
           <div v-if="testResult.success && testResult.data !== undefined">
-            <n-text strong>执行结果:</n-text>
+            <n-text strong>Execution result:</n-text>
             <n-code
               :code="formatResult(testResult.data)"
               language="json"
@@ -135,7 +135,7 @@
           </div>
 
           <div v-if="!testResult.success && testResult.error">
-            <n-text strong type="error">错误信息:</n-text>
+            <n-text strong type="error">error message:</n-text>
             <n-alert type="error" style="margin-top: 8px">
               {{ testResult.error.message }}
             </n-alert>
@@ -148,8 +148,8 @@
 
 <script setup lang="ts">
 /**
- * 脚本数据源编辑器组件
- * 专门用于Visual Editor的脚本数据源配置
+ * Script data source editor component
+ * dedicated toVisual EditorScript data source configuration
  */
 
 import { ref, watch, onMounted } from 'vue'
@@ -175,37 +175,37 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const message = useMessage()
 
-// 表单数据
+// form data
 const scriptCode = ref('')
 const timeout = ref(5000)
 const refreshInterval = ref(0)
 
-// 状态
+// state
 const testing = ref(false)
 const validationResult = ref<{ valid: boolean; error?: string } | null>(null)
 const testResult = ref<ScriptExecutionResult | null>(null)
 
 /**
- * 脚本模板
+ * script template
  */
 const templates = {
-  basic: `// 基础数据生成示例
+  basic: `// Basic data generation example
 const data = {
   timestamp: new Date().toISOString(),
   value: _utils.mockData.randomNumber(0, 100),
   status: _utils.mockData.randomBoolean() ? 'active' : 'inactive',
-  message: '数据更新成功'
+  message: 'Data updated successfully'
 };
 return data;`,
 
-  random: `// 随机数据集生成
+  random: `// Random data set generation
 const count = 10;
 const items = [];
 
 for (let i = 0; i < count; i++) {
   items.push({
     id: i + 1,
-    name: \`项目\${i + 1}\`,
+    name: \`project\${i + 1}\`,
     value: _utils.mockData.randomNumber(10, 100),
     category: ['A', 'B', 'C'][i % 3],
     enabled: _utils.mockData.randomBoolean(),
@@ -221,10 +221,10 @@ return {
   }
 };`,
 
-  'time-series': `// 时间序列数据生成
+  'time-series': `// Time series data generation
 const now = Date.now();
-const interval = 5 * 60 * 1000; // 5分钟间隔
-const count = 12; // 最近1小时数据
+const interval = 5 * 60 * 1000; // 5minute interval
+const count = 12; // recent1hourly data
 
 const series = [];
 for (let i = count - 1; i >= 0; i--) {
@@ -245,12 +245,12 @@ return {
   latest: series[series.length - 1]
 };`,
 
-  'api-mock': `// API数据模拟
-// 模拟设备状态数据
+  'api-mock': `// APIData simulation
+// Simulate device status data
 const devices = [
-  { id: 'temp-001', name: '温度传感器1', type: 'sensor' },
-  { id: 'hum-001', name: '湿度传感器1', type: 'sensor' },
-  { id: 'gate-001', name: '智能网关1', type: 'gateway' }
+  { id: 'temp-001', name: 'temperature sensor1', type: 'sensor' },
+  { id: 'hum-001', name: 'humidity sensor1', type: 'sensor' },
+  { id: 'gate-001', name: 'Smart gateway1', type: 'gateway' }
 ];
 
 const deviceData = devices.map(device => ({
@@ -276,35 +276,35 @@ return {
 }
 
 /**
- * 加载模板
+ * Load template
  */
 const loadTemplate = (templateName: keyof typeof templates) => {
   scriptCode.value = templates[templateName]
   validationResult.value = null
   testResult.value = null
   onScriptChange()
-  message.success(`已加载${templateName}模板`)
+  message.success(`Loaded${templateName}template`)
 }
 
 /**
- * 脚本内容变化
+ * Script content changes
  */
 const onScriptChange = () => {
   emitUpdate()
-  // 清除之前的验证结果
+  // Clear previous verification results
   validationResult.value = null
   testResult.value = null
 }
 
 /**
- * 配置变化
+ * Configuration changes
  */
 const onConfigChange = () => {
   emitUpdate()
 }
 
 /**
- * 发送更新事件
+ * Send update event
  */
 const emitUpdate = () => {
   emit('update:modelValue', {
@@ -316,11 +316,11 @@ const emitUpdate = () => {
 }
 
 /**
- * 验证脚本
+ * Validation script
  */
 const validateScript = () => {
   if (!scriptCode.value.trim()) {
-    message.error('请输入脚本代码')
+    message.error('Please enter script code')
     return
   }
 
@@ -329,22 +329,22 @@ const validateScript = () => {
     validationResult.value = result
 
     if (result.valid) {
-      message.success('脚本语法验证通过')
+      message.success('Script syntax verification passed')
     } else {
-      message.error(`脚本语法错误: ${result.error}`)
+      message.error(`Script syntax error: ${result.error}`)
     }
   } catch (error) {
     validationResult.value = { valid: false, error: (error as Error).message }
-    message.error(`验证失败: ${(error as Error).message}`)
+    message.error(`Authentication failed: ${(error as Error).message}`)
   }
 }
 
 /**
- * 测试脚本执行
+ * Test script execution
  */
 const testScript = async () => {
   if (!scriptCode.value.trim()) {
-    message.error('请输入脚本代码')
+    message.error('Please enter script code')
     return
   }
 
@@ -355,30 +355,30 @@ const testScript = async () => {
     testResult.value = result
 
     if (result.success) {
-      message.success(`脚本执行成功 (${result.executionTime}ms)`)
+      message.success(`Script executed successfully (${result.executionTime}ms)`)
     } else {
-      message.error(`脚本执行失败: ${result.error?.message}`)
+      message.error(`Script execution failed: ${result.error?.message}`)
     }
   } catch (error) {
-    message.error(`脚本测试失败: ${(error as Error).message}`)
+    message.error(`Script test failed: ${(error as Error).message}`)
   } finally {
     testing.value = false
   }
 }
 
 /**
- * 清空脚本
+ * clear script
  */
 const clearScript = () => {
   scriptCode.value = ''
   validationResult.value = null
   testResult.value = null
   onScriptChange()
-  message.info('已清空脚本内容')
+  message.info('Script content cleared')
 }
 
 /**
- * 格式化结果
+ * Format results
  */
 const formatResult = (data: any): string => {
   try {
@@ -389,7 +389,7 @@ const formatResult = (data: any): string => {
 }
 
 /**
- * 初始化数据
+ * initialization data
  */
 const initializeData = () => {
   if (props.modelValue) {
@@ -399,7 +399,7 @@ const initializeData = () => {
   }
 }
 
-// 监听props变化
+// monitorpropschange
 watch(
   () => props.modelValue,
   () => {
@@ -408,7 +408,7 @@ watch(
   { immediate: true }
 )
 
-// 组件挂载时初始化
+// Initialized when component is mounted
 onMounted(() => {
   initializeData()
 })

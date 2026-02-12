@@ -1,17 +1,17 @@
 /**
- * Card 2.0 核心类型定义
- * 基于可视化编辑器架构设计的统一数据节点协议
+ * Card 2.0 core type definition
+ * Unified data node protocol based on visual editor architecture design
  */
 
-// 统一数据节点协议 (Unified Data Node Protocol)
+// Unified Data Node Protocol (Unified Data Node Protocol)
 export interface IDataNode {
-  /** 节点唯一标识 */
+  /** Node unique identifier */
   id: string
-  /** 组件类型 */
+  /** Component type */
   type: string
-  /** 适配的渲染器列表 */
+  /** Adapted renderer list */
   renderer: RendererType[]
-  /** 布局信息 */
+  /** layout information */
   layout: {
     x: number
     y: number
@@ -20,113 +20,113 @@ export interface IDataNode {
     minWidth?: number
     minHeight?: number
   }
-  /** 数据绑定配置 */
+  /** Data binding configuration */
   dataBinding: {
-    /** 数据源ID */
+    /** data sourceID */
     sourceId: string
-    /** 数据转换管道 */
+    /** Data transformation pipeline */
     transform?: IDataTransform[]
   }
-  /** 组件属性配置 */
+  /** Component property configuration */
   properties: Record<string, any>
-  /** 基础设置 */
+  /** Basic settings */
   basicSettings?: {
     showTitle?: boolean
     title?: string
   }
 }
 
-// 数据转换接口
+// data conversion interface
 export interface IDataTransform {
-  /** 转换类型 */
+  /** conversion type */
   type: 'filter' | 'aggregate' | 'map' | 'sort' | 'limit'
-  /** 转换参数 */
+  /** Conversion parameters */
   params: Record<string, any>
 }
 
-// 渲染器类型
+// Renderer type
 export type RendererType = 'dom' | 'canvas' | 'webgl' | 'svg'
 
-// 组件生命周期状态
+// Component life cycle status
 export type ComponentLifecycleState = 'init' | 'mounted' | 'updated' | 'destroyed'
 
-// 数据源配置
+// Data source configuration
 export interface IDataSource {
-  /** 数据源ID */
+  /** data sourceID */
   id: string
-  /** 数据源类型 */
+  /** Data source type */
   type: 'api' | 'websocket' | 'mock' | 'static'
-  /** 数据源配置 */
+  /** Data source configuration */
   config: Record<string, any>
-  /** 缓存配置 */
+  /** Cache configuration */
   cache?: {
     enabled: boolean
-    ttl?: number // 缓存时间(秒)
+    ttl?: number // Cache time(Second)
   }
 }
 
-// 组件元数据
+// Component metadata
 export interface IComponentMeta {
-  /** 组件ID */
+  /** componentsID */
   id: string
-  /** 组件名称 */
+  /** Component name */
   name: string
-  /** 组件类型 */
+  /** Component type */
   type: string
-  /** 组件版本 */
+  /** Component version */
   version: string
-  /** 支持的渲染器 */
+  /** Supported renderers */
   supportedRenderers: RendererType[]
-  /** 组件描述 */
+  /** Component description */
   description?: string
-  /** 组件图标 */
+  /** component icon */
   icon?: string
-  /** 组件预览图 */
+  /** Component preview */
   poster?: string
-  /** 默认属性 */
+  /** Default properties */
   defaultProps?: Record<string, any>
-  /** 属性配置表单 */
+  /** Property configuration form */
   configSchema?: any
 }
 
-// 组件实例接口
+// Component instance interface
 export interface IComponentInstance {
-  /** 组件ID */
+  /** componentsID */
   id: string
-  /** 组件元数据 */
+  /** Component metadata */
   meta: IComponentMeta
-  /** 数据节点 */
+  /** data node */
   dataNode: IDataNode
-  /** 生命周期状态 */
+  /** life cycle status */
   state: ComponentLifecycleState
-  /** 初始化 */
+  /** initialization */
   init(): Promise<void>
-  /** 更新数据 */
+  /** Update data */
   updateData(data: any): void
-  /** 更新属性 */
+  /** Update properties */
   updateProps(props: Record<string, any>): void
-  /** 销毁 */
+  /** destroy */
   destroy(): void
 }
 
-// 事件类型
+// event type
 export interface IComponentEvent {
-  /** 事件类型 */
+  /** event type */
   type: string
-  /** 事件数据 */
+  /** event data */
   data?: any
-  /** 事件源组件ID */
+  /** event source componentID */
   sourceId: string
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
-// 组件通信接口
+// Component communication interface
 export interface IComponentCommunication {
-  /** 发送事件 */
+  /** Send event */
   emit(event: IComponentEvent): void
-  /** 监听事件 */
+  /** Listen for events */
   on(eventType: string, handler: (event: IComponentEvent) => void): void
-  /** 取消监听 */
+  /** Cancel monitoring */
   off(eventType: string, handler?: (event: IComponentEvent) => void): void
 }

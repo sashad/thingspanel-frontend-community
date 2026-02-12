@@ -1,13 +1,13 @@
 /**
- * 脚本模板管理器
- * 管理脚本模板的创建、更新、删除和代码生成
+ * Script Template Manager
+ * Creation of management script templates、renew、Deletion and code generation
  */
 
 import type { IScriptTemplateManager, ScriptTemplate, ScriptTemplateParameter, TemplateCategory } from '@/core/script-engine/types'
 import { nanoid } from 'nanoid'
 
 /**
- * 脚本模板管理器实现类
+ * Script template manager implementation class
  */
 export class ScriptTemplateManager implements IScriptTemplateManager {
   private templates: Map<string, ScriptTemplate>
@@ -18,28 +18,28 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
   }
 
   /**
-   * 获取所有模板
+   * Get all templates
    */
   getAllTemplates(): ScriptTemplate[] {
     return Array.from(this.templates.values())
   }
 
   /**
-   * 根据分类获取模板
+   * Get templates by category
    */
   getTemplatesByCategory(category: string): ScriptTemplate[] {
     return Array.from(this.templates.values()).filter(template => template.category === category)
   }
 
   /**
-   * 获取指定模板
+   * Get the specified template
    */
   getTemplate(id: string): ScriptTemplate | null {
     return this.templates.get(id) || null
   }
 
   /**
-   * 创建模板
+   * Create template
    */
   createTemplate(template: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt'>): ScriptTemplate {
     const now = Date.now()
@@ -55,7 +55,7 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
   }
 
   /**
-   * 更新模板
+   * Update template
    */
   updateTemplate(id: string, updates: Partial<ScriptTemplate>): boolean {
     const template = this.templates.get(id)
@@ -66,7 +66,7 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
     const updatedTemplate: ScriptTemplate = {
       ...template,
       ...updates,
-      id, // 确保ID不被修改
+      id, // make sureIDnot be modified
       updatedAt: Date.now()
     }
 
@@ -75,41 +75,41 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
   }
 
   /**
-   * 删除模板
+   * Delete template
    */
   deleteTemplate(id: string): boolean {
     const template = this.templates.get(id)
     if (!template || template.isSystem) {
-      return false // 不能删除系统模板
+      return false // Cannot delete system template
     }
 
     return this.templates.delete(id)
   }
 
   /**
-   * 根据模板生成代码
+   * Generate code based on template
    */
   generateCode(templateId: string, parameters: Record<string, any>): string {
     const template = this.templates.get(templateId)
     if (!template) {
-      throw new Error(`模板不存在: ${templateId}`)
+      throw new Error(`Template does not exist: ${templateId}`)
     }
 
     let code = template.code
 
-    // 替换模板参数
+    // Replace template parameters
     template.parameters.forEach(param => {
       const value = parameters[param.name]
       const actualValue = value !== undefined ? value : param.defaultValue
 
       if (param.required && actualValue === undefined) {
-        throw new Error(`缺少必需参数: ${param.name}`)
+        throw new Error(`Missing required parameter: ${param.name}`)
       }
 
-      // 验证参数
+      // Validation parameters
       this.validateParameter(param, actualValue)
 
-      // 替换代码中的占位符
+      // Replace placeholders in code
       const placeholder = new RegExp(`\\{\\{${param.name}\\}\\}`, 'g')
       const replacement = this.formatParameterValue(actualValue, param.type)
       code = code.replace(placeholder, replacement)
@@ -119,78 +119,78 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
   }
 
   /**
-   * 验证参数值
+   * Validate parameter values
    */
   private validateParameter(param: ScriptTemplateParameter, value: any): void {
     if (value === undefined && !param.required) {
       return
     }
 
-    // 类型检查
+    // type checking
     switch (param.type) {
       case 'string':
         if (typeof value !== 'string') {
-          throw new Error(`参数 ${param.name} 必须是字符串类型`)
+          throw new Error(`parameter ${param.name} Must be of type string`)
         }
         break
       case 'number':
         if (typeof value !== 'number') {
-          throw new Error(`参数 ${param.name} 必须是数字类型`)
+          throw new Error(`parameter ${param.name} Must be of numeric type`)
         }
         break
       case 'boolean':
         if (typeof value !== 'boolean') {
-          throw new Error(`参数 ${param.name} 必须是布尔类型`)
+          throw new Error(`parameter ${param.name} Must be of type boolean`)
         }
         break
       case 'object':
         if (typeof value !== 'object' || value === null) {
-          throw new Error(`参数 ${param.name} 必须是对象类型`)
+          throw new Error(`parameter ${param.name} Must be of object type`)
         }
         break
       case 'array':
         if (!Array.isArray(value)) {
-          throw new Error(`参数 ${param.name} 必须是数组类型`)
+          throw new Error(`parameter ${param.name} Must be an array type`)
         }
         break
     }
 
-    // 验证规则检查
+    // Validation rule checks
     if (param.validation) {
       const validation = param.validation
 
-      // 数值范围检查
+      // Numeric range check
       if (typeof value === 'number') {
         if (validation.min !== undefined && value < validation.min) {
-          throw new Error(`参数 ${param.name} 不能小于 ${validation.min}`)
+          throw new Error(`parameter ${param.name} cannot be less than ${validation.min}`)
         }
         if (validation.max !== undefined && value > validation.max) {
-          throw new Error(`参数 ${param.name} 不能大于 ${validation.max}`)
+          throw new Error(`parameter ${param.name} cannot be greater than ${validation.max}`)
         }
       }
 
-      // 字符串长度检查
+      // String length check
       if (typeof value === 'string') {
         if (validation.min !== undefined && value.length < validation.min) {
-          throw new Error(`参数 ${param.name} 长度不能小于 ${validation.min}`)
+          throw new Error(`parameter ${param.name} The length cannot be less than ${validation.min}`)
         }
         if (validation.max !== undefined && value.length > validation.max) {
-          throw new Error(`参数 ${param.name} 长度不能大于 ${validation.max}`)
+          throw new Error(`parameter ${param.name} The length cannot be greater than ${validation.max}`)
         }
         if (validation.pattern && !new RegExp(validation.pattern).test(value)) {
-          throw new Error(`参数 ${param.name} 格式不正确`)
+          throw new Error(`parameter ${param.name} Incorrect format`)
         }
       }
 
-      // 枚举值检查
+      // Enumeration value checking
       if (validation.enum && !validation.enum.includes(value)) {
-        throw new Error(`参数 ${param.name} 必须是以下值之一: ${validation.enum.join(', ')}`)
+        throw new Error(`parameter ${param.name} Must be one of the following values: ${validation.enum.join(', ')}`)
       }
     }
   }
 
   /**
-   * 格式化参数值
+   * Format parameter value
    */
   private formatParameterValue(value: any, type: ScriptTemplateParameter['type']): string {
     switch (type) {
@@ -210,16 +210,16 @@ export class ScriptTemplateManager implements IScriptTemplateManager {
   }
 
   /**
-   * 初始化系统模板
+   * Initialize system template
    */
   private initializeSystemTemplates(): void {
-    // 数据生成模板
+    // Data generation template
     this.createSystemTemplate({
-      name: '随机数据生成器',
+      name: 'random data generator',
       category: 'data-generation',
-      description: '生成指定数量的随机数据',
+      description: 'Generate a specified amount of random data',
       code: `
-// 生成随机数据
+// Generate random data
 const count = {{count}};
 const fields = {{fields}};
 
@@ -253,7 +253,7 @@ return result;
         {
           name: 'count',
           type: 'number',
-          description: '生成数据的数量',
+          description: 'The amount of data generated',
           required: true,
           defaultValue: 10,
           validation: { min: 1, max: 1000 }
@@ -261,7 +261,7 @@ return result;
         {
           name: 'fields',
           type: 'array',
-          description: '字段配置数组',
+          description: 'Field configuration array',
           required: true,
           defaultValue: [
             { name: 'id', type: 'number' },
@@ -272,13 +272,13 @@ return result;
       ]
     })
 
-    // 数据处理模板
+    // Data processing template
     this.createSystemTemplate({
-      name: '数据聚合器',
+      name: 'data aggregator',
       category: 'data-processing',
-      description: '对数据进行分组和聚合计算',
+      description: 'Group and aggregate data',
       code: `
-// 数据聚合处理
+// Data aggregation processing
 const data = {{data}};
 const groupByField = {{groupByField}};
 const aggregateField = {{aggregateField}};
@@ -316,28 +316,28 @@ return result;
         {
           name: 'data',
           type: 'array',
-          description: '要处理的数据数组',
+          description: 'array of data to process',
           required: true,
           defaultValue: []
         },
         {
           name: 'groupByField',
           type: 'string',
-          description: '分组字段名',
+          description: 'Grouping field name',
           required: true,
           defaultValue: 'category'
         },
         {
           name: 'aggregateField',
           type: 'string',
-          description: '聚合字段名',
+          description: 'Aggregation field name',
           required: true,
           defaultValue: 'value'
         },
         {
           name: 'operation',
           type: 'string',
-          description: '聚合操作类型',
+          description: 'Aggregation operation type',
           required: true,
           defaultValue: 'sum',
           validation: { enum: ['sum', 'avg', 'count', 'max', 'min'] }
@@ -345,16 +345,16 @@ return result;
       ]
     })
 
-    // 时间序列数据模板
+    // Time series data template
     this.createSystemTemplate({
-      name: '时间序列数据生成器',
+      name: 'Time series data generator',
       category: 'time-series',
-      description: '生成时间序列数据',
+      description: 'Generate time series data',
       code: `
-// 生成时间序列数据
+// Generate time series data
 const startDate = new Date({{startDate}});
 const endDate = new Date({{endDate}});
-const interval = {{interval}}; // 分钟
+const interval = {{interval}}; // minute
 const baseValue = {{baseValue}};
 const variance = {{variance}};
 
@@ -378,21 +378,21 @@ return result;
         {
           name: 'startDate',
           type: 'string',
-          description: '开始日期 (ISO格式)',
+          description: 'start date (ISOFormat)',
           required: true,
           defaultValue: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'endDate',
           type: 'string',
-          description: '结束日期 (ISO格式)',
+          description: 'end date (ISOFormat)',
           required: true,
           defaultValue: new Date().toISOString()
         },
         {
           name: 'interval',
           type: 'number',
-          description: '时间间隔（分钟）',
+          description: 'time interval（minute）',
           required: true,
           defaultValue: 30,
           validation: { min: 1, max: 1440 }
@@ -400,14 +400,14 @@ return result;
         {
           name: 'baseValue',
           type: 'number',
-          description: '基准值',
+          description: 'base value',
           required: true,
           defaultValue: 50
         },
         {
           name: 'variance',
           type: 'number',
-          description: '变化幅度',
+          description: 'Range of change',
           required: true,
           defaultValue: 10,
           validation: { min: 0 }
@@ -415,13 +415,13 @@ return result;
       ]
     })
 
-    // API 集成模板
+    // API Integrated template
     this.createSystemTemplate({
-      name: 'HTTP API 调用器',
+      name: 'HTTP API caller',
       category: 'api-integration',
-      description: '调用HTTP API并处理响应',
+      description: 'callHTTP APIand handle the response',
       code: `
-// HTTP API 调用
+// HTTP API call
 const url = {{url}};
 const method = {{method}};
 const headers = {{headers}};
@@ -463,14 +463,14 @@ try {
         {
           name: 'url',
           type: 'string',
-          description: 'API URL地址',
+          description: 'API URLaddress',
           required: true,
           defaultValue: 'https://api.example.com/data'
         },
         {
           name: 'method',
           type: 'string',
-          description: 'HTTP方法',
+          description: 'HTTPmethod',
           required: true,
           defaultValue: 'GET',
           validation: { enum: ['GET', 'POST', 'PUT', 'DELETE'] }
@@ -478,14 +478,14 @@ try {
         {
           name: 'headers',
           type: 'object',
-          description: '请求头',
+          description: 'Request header',
           required: false,
           defaultValue: { 'Content-Type': 'application/json' }
         },
         {
           name: 'body',
           type: 'object',
-          description: '请求体',
+          description: 'Request body',
           required: false,
           defaultValue: null
         }
@@ -494,7 +494,7 @@ try {
   }
 
   /**
-   * 创建系统模板
+   * Create system template
    */
   private createSystemTemplate(template: Omit<ScriptTemplate, 'id' | 'createdAt' | 'updatedAt' | 'isSystem'>): void {
     const now = Date.now()

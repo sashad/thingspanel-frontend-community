@@ -1,15 +1,15 @@
 /**
- * Visual Editor 布局系统类型定义
- * 集成原始 Panel 系统的布局逻辑，提供统一的布局管理接口
+ * Visual Editor Layout system type definition
+ * Integrate original Panel System layout logic，Provide a unified layout management interface
  */
 
 import type { ICardView, ICardData } from '@/card2.1/core2/legacy'
 import type { IComponentDefinition } from '@/card2.1/core2'
 
-// ====== 基础布局类型 ======
+// ====== Basic layout type ======
 
 /**
- * 位置信息
+ * location information
  */
 export interface Position {
   x: number
@@ -17,7 +17,7 @@ export interface Position {
 }
 
 /**
- * 尺寸信息
+ * size information
  */
 export interface Size {
   width: number
@@ -25,7 +25,7 @@ export interface Size {
 }
 
 /**
- * 边界信息
+ * Boundary information
  */
 export interface Bounds {
   left: number
@@ -35,60 +35,60 @@ export interface Bounds {
 }
 
 /**
- * 网格配置
+ * Grid configuration
  */
 export interface GridConfig {
-  cols: number // 列数
-  rowHeight: number // 行高
-  margin: [number, number] // 间距 [x, y]
-  containerPadding: [number, number] // 容器内边距 [x, y]
-  breakpoints?: Record<string, number> // 断点配置
-  layouts?: Record<string, LayoutItem[]> // 响应式布局
+  cols: number // Number of columns
+  rowHeight: number // row height
+  margin: [number, number] // spacing [x, y]
+  containerPadding: [number, number] // Container padding [x, y]
+  breakpoints?: Record<string, number> // Breakpoint configuration
+  layouts?: Record<string, LayoutItem[]> // Responsive layout
 }
 
 /**
- * 布局约束
+ * layout constraints
  */
 export interface LayoutConstraints {
   minSize: Size
   maxSize?: Size
-  aspectRatio?: number // 宽高比
-  snapToGrid?: boolean // 是否对齐网格
-  resizable?: boolean // 是否可调整大小
-  draggable?: boolean // 是否可拖拽
+  aspectRatio?: number // aspect ratio
+  snapToGrid?: boolean // Whether to align to the grid
+  resizable?: boolean // Is it resizable?
+  draggable?: boolean // Whether it can be dragged
 }
 
-// ====== 布局项定义 ======
+// ====== Layout item definition ======
 
 /**
- * Visual Editor 布局项
+ * Visual Editor Layout items
  */
 export interface LayoutItem {
-  // 基础标识
+  // Basic identification
   id: string
-  type: string // 组件类型
+  type: string // Component type
 
-  // 位置和尺寸
+  // location and size
   position: Position
   size: Size
 
-  // 约束信息
+  // constraint information
   constraints: LayoutConstraints
 
-  // 层级和状态
+  // levels and status
   zIndex?: number
   visible?: boolean
   locked?: boolean
   selected?: boolean
 
-  // 组件配置
+  // Component configuration
   config?: Record<string, any>
   properties?: Record<string, any>
 
-  // 数据源配置
+  // Data source configuration
   dataSource?: any
 
-  // 样式配置
+  // Style configuration
   style?: {
     backgroundColor?: string
     borderColor?: string
@@ -98,7 +98,7 @@ export interface LayoutItem {
     transform?: string
   }
 
-  // 元数据
+  // metadata
   meta?: {
     name?: string
     description?: string
@@ -109,7 +109,7 @@ export interface LayoutItem {
     updatedAt?: Date
   }
 
-  // 兼容性字段（用于 Panel 系统兼容）
+  // Compatibility field（used for Panel System compatible）
   legacy?: {
     cardView?: ICardView
     cardData?: ICardData
@@ -118,7 +118,7 @@ export interface LayoutItem {
 }
 
 /**
- * 布局容器
+ * layout container
  */
 export interface LayoutContainer {
   id: string
@@ -126,7 +126,7 @@ export interface LayoutContainer {
   items: LayoutItem[]
   gridConfig: GridConfig
 
-  // 容器属性
+  // Container properties
   size: Size
   background?: {
     color?: string
@@ -136,11 +136,11 @@ export interface LayoutContainer {
     size?: string
   }
 
-  // 主题配置
+  // Theme configuration
   theme?: string
   customTheme?: Record<string, any>
 
-  // 交互配置
+  // Interactive configuration
   interaction?: {
     allowDrop?: boolean
     allowResize?: boolean
@@ -149,7 +149,7 @@ export interface LayoutContainer {
     snapToGrid?: boolean
   }
 
-  // 元数据
+  // metadata
   meta?: {
     version?: string
     description?: string
@@ -159,10 +159,10 @@ export interface LayoutContainer {
   }
 }
 
-// ====== 布局操作类型 ======
+// ====== Layout operation type ======
 
 /**
- * 布局操作类型
+ * Layout operation type
  */
 export type LayoutOperation =
   | 'add'
@@ -183,7 +183,7 @@ export type LayoutOperation =
   | 'distribute'
 
 /**
- * 布局变更事件
+ * Layout change event
  */
 export interface LayoutChangeEvent {
   type: LayoutOperation
@@ -194,7 +194,7 @@ export interface LayoutChangeEvent {
 }
 
 /**
- * 布局历史记录
+ * Layout history
  */
 export interface LayoutHistory {
   id: string
@@ -206,70 +206,70 @@ export interface LayoutHistory {
   description?: string
 }
 
-// ====== 布局管理器接口 ======
+// ====== layout manager interface ======
 
 /**
- * 布局管理器接口
+ * layout manager interface
  */
 export interface ILayoutManager {
-  // 容器管理
+  // Container management
   getContainer(): LayoutContainer
   updateContainer(updates: Partial<LayoutContainer>): void
 
-  // 项目管理
+  // project management
   getItems(): LayoutItem[]
   getItem(id: string): LayoutItem | undefined
   addItem(item: LayoutItem): void
   removeItem(id: string): void
   updateItem(id: string, updates: Partial<LayoutItem>): void
 
-  // 选择管理
+  // Select management
   getSelectedItems(): LayoutItem[]
   selectItem(id: string, multiple?: boolean): void
   deselectItem(id: string): void
   selectAll(): void
   deselectAll(): void
 
-  // 布局操作
+  // Layout operations
   moveItem(id: string, position: Position): void
   resizeItem(id: string, size: Size): void
   lockItem(id: string): void
   unlockItem(id: string): void
 
-  // 层级管理
+  // Hierarchical management
   bringToFront(id: string): void
   sendToBack(id: string): void
   bringForward(id: string): void
   sendBackward(id: string): void
 
-  // 对齐和分布
+  // Alignment and distribution
   alignItems(ids: string[], alignment: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'): void
   distributeItems(ids: string[], distribution: 'horizontal' | 'vertical'): void
 
-  // 复制和粘贴
+  // copy and paste
   copyItems(ids: string[]): void
   pasteItems(position?: Position): void
 
-  // 撤销和重做
+  // Undo and redo
   undo(): void
   redo(): void
   canUndo(): boolean
   canRedo(): boolean
 
-  // 历史记录
+  // History
   getHistory(): LayoutHistory[]
   clearHistory(): void
 
-  // 事件处理
+  // event handling
   on(event: string, handler: (event: LayoutChangeEvent) => void): void
   off(event: string, handler: (event: LayoutChangeEvent) => void): void
   emit(event: string, data: LayoutChangeEvent): void
 }
 
-// ====== 网格系统类型 ======
+// ====== Grid system type ======
 
 /**
- * 网格单元
+ * Grid unit
  */
 export interface GridCell {
   col: number
@@ -281,36 +281,36 @@ export interface GridCell {
 }
 
 /**
- * 网格布局引擎接口
+ * Grid layout engine interface
  */
 export interface IGridLayoutEngine {
-  // 网格配置
+  // Grid configuration
   getGridConfig(): GridConfig
   updateGridConfig(config: Partial<GridConfig>): void
 
-  // 位置计算
+  // Position calculation
   pixelToGrid(pixel: Position): { col: number; row: number }
   gridToPixel(grid: { col: number; row: number }): Position
 
-  // 碰撞检测
+  // Collision detection
   checkCollision(item: LayoutItem, position: Position, size: Size): boolean
   findAvailablePosition(size: Size): Position | null
 
-  // 自动布局
+  // autolayout
   autoLayout(items: LayoutItem[]): LayoutItem[]
   compactLayout(items: LayoutItem[]): LayoutItem[]
 
-  // 网格管理
+  // Grid management
   getOccupiedCells(): GridCell[]
   getAvailableCells(): GridCell[]
   markCellsOccupied(position: Position, size: Size, item: LayoutItem): void
   markCellsAvailable(position: Position, size: Size): void
 }
 
-// ====== 响应式布局类型 ======
+// ====== Responsive layout type ======
 
 /**
- * 断点定义
+ * breakpoint definition
  */
 export interface Breakpoint {
   name: string
@@ -322,7 +322,7 @@ export interface Breakpoint {
 }
 
 /**
- * 响应式布局配置
+ * Responsive layout configuration
  */
 export interface ResponsiveLayoutConfig {
   breakpoints: Breakpoint[]
@@ -332,62 +332,62 @@ export interface ResponsiveLayoutConfig {
 }
 
 /**
- * 响应式布局管理器接口
+ * Responsive layout manager interface
  */
 export interface IResponsiveLayoutManager extends ILayoutManager {
-  // 断点管理
+  // Breakpoint management
   getBreakpoints(): Breakpoint[]
   getCurrentBreakpoint(): Breakpoint
   switchBreakpoint(breakpointName: string): void
 
-  // 响应式操作
+  // Responsive operations
   getLayoutForBreakpoint(breakpointName: string): LayoutItem[]
   setLayoutForBreakpoint(breakpointName: string, items: LayoutItem[]): void
   syncLayoutAcrossBreakpoints(sourceBreakpoint: string): void
 
-  // 自适应
+  // Adaptive
   autoAdjustForBreakpoint(breakpointName: string): void
   previewBreakpoint(breakpointName: string): void
   resetBreakpointPreview(): void
 }
 
-// ====== 布局工具函数类型 ======
+// ====== Layout tool function type ======
 
 /**
- * 布局工具函数集合
+ * Layout tool function collection
  */
 export interface LayoutUtils {
-  // 几何计算
+  // Geometric calculations
   calculateBounds(items: LayoutItem[]): Bounds
   isPointInside(point: Position, item: LayoutItem): boolean
   getIntersection(item1: LayoutItem, item2: LayoutItem): Bounds | null
 
-  // 排序和查找
+  // Sort and search
   sortItemsByZIndex(items: LayoutItem[]): LayoutItem[]
   findItemsInArea(area: Bounds, items: LayoutItem[]): LayoutItem[]
   findItemAt(position: Position, items: LayoutItem[]): LayoutItem | null
 
-  // 对齐计算
+  // Alignment calculation
   calculateAlignmentOffset(items: LayoutItem[], alignment: string): Position[]
   calculateDistributionOffset(items: LayoutItem[], distribution: string): Position[]
 
-  // 尺寸计算
+  // Size calculation
   calculateOptimalSize(content: any, constraints: LayoutConstraints): Size
   maintainAspectRatio(currentSize: Size, newSize: Partial<Size>, aspectRatio: number): Size
 
-  // 网格计算
+  // grid computing
   snapToGrid(position: Position, gridSize: Size): Position
   calculateGridPosition(pixelPosition: Position, gridConfig: GridConfig): { col: number; row: number }
 
-  // 转换工具
+  // conversion tools
   convertPanelLayoutToEditor(panelLayout: ICardView[]): LayoutItem[]
   convertEditorLayoutToPanel(editorLayout: LayoutItem[]): ICardView[]
 }
 
-// ====== 导出类型定义 ======
+// ====== Export type definition ======
 
 /**
- * 布局序列化格式
+ * layout serialization format
  */
 export interface SerializedLayout {
   version: string
@@ -402,29 +402,29 @@ export interface SerializedLayout {
 }
 
 /**
- * 布局导入导出接口
+ * Layout import and export interface
  */
 export interface ILayoutSerializer {
-  // 序列化
+  // serialization
   serialize(container: LayoutContainer): SerializedLayout
   deserialize(data: SerializedLayout): LayoutContainer
 
-  // 格式转换
+  // format conversion
   convertFromPanelFormat(panelConfig: string): SerializedLayout
   convertToPanelFormat(layout: SerializedLayout): string
 
-  // 验证
+  // verify
   validate(data: SerializedLayout): { valid: boolean; errors: string[] }
 
-  // 版本处理
+  // Versioning
   migrate(data: SerializedLayout, targetVersion: string): SerializedLayout
   getCompatibleVersions(): string[]
 }
 
-// ====== 预设布局类型 ======
+// ====== Default layout type ======
 
 /**
- * 布局模板
+ * layout template
  */
 export interface LayoutTemplate {
   id: string
@@ -440,24 +440,24 @@ export interface LayoutTemplate {
 }
 
 /**
- * 布局模板管理器接口
+ * Layout template manager interface
  */
 export interface ILayoutTemplateManager {
-  // 模板管理
+  // Template management
   getTemplates(): LayoutTemplate[]
   getTemplate(id: string): LayoutTemplate | undefined
   saveTemplate(template: Omit<LayoutTemplate, 'id' | 'createdAt'>): LayoutTemplate
   deleteTemplate(id: string): boolean
 
-  // 模板应用
+  // Template application
   applyTemplate(templateId: string, container: LayoutContainer): boolean
   createTemplateFromLayout(name: string, description: string, layout: LayoutItem[]): LayoutTemplate
 
-  // 分类和搜索
+  // Sort and search
   getTemplatesByCategory(category: string): LayoutTemplate[]
   searchTemplates(query: string): LayoutTemplate[]
 
-  // 导入导出
+  // Import and export
   exportTemplate(templateId: string): string
   importTemplate(templateData: string): LayoutTemplate | null
 }

@@ -1,94 +1,94 @@
 /**
- * 🔥 数据格式标准化器
- * 解决系统中数据源配置格式不统一的根本问题
+ * 🔥 data format normalizer
+ * Solve the fundamental problem of inconsistent data source configuration formats in the system
  * 
- * 目标：所有数据源配置都必须转换为统一的标准格式
+ * Target：All data source configurations must be converted to a unified, standard format
  */
 
 /**
- * 标准数据项格式 - 系统唯一认可的格式
+ * Standard data item format - The only format recognized by the system
  */
 export interface StandardDataItem {
-  /** 数据项配置 */
+  /** Data item configuration */
   item: {
-    /** 数据源类型 */
+    /** Data source type */
     type: 'static' | 'http' | 'json' | 'websocket' | 'file' | 'data-source-bindings'
-    /** 配置内容 */
+    /** Configuration content */
     config: Record<string, any>
   }
-  /** 处理配置 */
+  /** Handle configuration */
   processing: {
-    /** 过滤路径 */
+    /** filter path */
     filterPath: string
-    /** 自定义脚本 */
+    /** custom script */
     customScript?: string
-    /** 默认值 */
+    /** default value */
     defaultValue?: any
   }
 }
 
 /**
- * 标准数据源配置格式
+ * Standard data source configuration format
  */
 export interface StandardDataSourceConfig {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 数据源列表 */
+  /** Data source list */
   dataSources: Array<{
-    /** 数据源ID */
+    /** data sourceID */
     sourceId: string
-    /** 数据项列表 */
+    /** List of data items */
     dataItems: StandardDataItem[]
-    /** 合并策略 */
+    /** merge strategy */
     mergeStrategy: { type: 'object' | 'array' | 'replace' }
   }>
-  /** 创建时间 */
+  /** creation time */
   createdAt: number
-  /** 更新时间 */
+  /** Update time */
   updatedAt: number
 }
 
 /**
- * 数据格式标准化器类
+ * Data format normalizer class
  */
 export class DataFormatNormalizer {
   
   /**
-   * 🔥 核心方法：将任意格式转换为标准格式
+   * 🔥 core methods：Convert any format to a standard format
    */
   static normalizeToStandard(data: any, componentId: string): StandardDataSourceConfig {
     
-    // 1. 如果已经是标准格式，直接返回
+    // 1. If it is already in standard format，Return directly
     if (this.isStandardFormat(data)) {
       return data as StandardDataSourceConfig
     }
     
-    // 2. 处理 SimpleConfigurationEditor 格式
+    // 2. deal with SimpleConfigurationEditor Format
     if (this.isSimpleConfigEditorFormat(data)) {
       return this.convertFromSimpleConfigEditor(data, componentId)
     }
     
-    // 3. 处理导入导出格式（原始 DataItem[]）
+    // 3. Handle import and export formats（original DataItem[]）
     if (this.isImportExportFormat(data)) {
       return this.convertFromImportExport(data, componentId)
     }
     
-    // 4. 处理 Card2.1 执行器格式
+    // 4. deal with Card2.1 Executor format
     if (this.isCard2ExecutorFormat(data)) {
       return this.convertFromCard2Executor(data, componentId)
     }
     
-    // 5. 处理 EditorDataSourceManager 格式
+    // 5. deal with EditorDataSourceManager Format
     if (this.isEditorManagerFormat(data)) {
       return this.convertFromEditorManager(data, componentId)
     }
     
-    // 6. 处理任意对象格式（兜底）
+    // 6. Handle arbitrary object formats（reveal all the details）
     return this.convertFromGenericObject(data, componentId)
   }
   
   /**
-   * 🔥 反向转换：从标准格式转换为目标格式
+   * 🔥 reverse conversion：Convert from standard format to target format
    */
   static convertFromStandard(standardData: StandardDataSourceConfig, targetFormat: 'simpleConfigEditor' | 'importExport' | 'card2Executor'): any {
     
@@ -104,7 +104,7 @@ export class DataFormatNormalizer {
     }
   }
   
-  // =================== 格式检测方法 ===================
+  // =================== Format detection method ===================
   
   private static isStandardFormat(data: any): boolean {
     return !!(
@@ -144,7 +144,7 @@ export class DataFormatNormalizer {
       'dataSourceConfig' in data &&
       data.dataSourceConfig?.dataItems &&
       Array.isArray(data.dataSourceConfig.dataItems) &&
-      // 检查是否为原始格式（没有 item/processing 包装）
+      // Check if it is in original format（No item/processing Package）
       data.dataSourceConfig.dataItems.some((item: any) => 
         item && !('item' in item && 'processing' in item)
       )
@@ -173,17 +173,17 @@ export class DataFormatNormalizer {
     )
   }
   
-  // =================== 转换方法 ===================
+  // =================== Conversion method ===================
   
   private static convertFromSimpleConfigEditor(data: any, componentId: string): StandardDataSourceConfig {
     const dataSources = (data.dataSources || []).map((ds: any) => ({
       sourceId: ds.sourceId || 'default',
       dataItems: (ds.dataItems || []).map((item: any): StandardDataItem => {
-        // 如果已经是标准格式
+        // If it is already in standard format
         if (item && 'item' in item && 'processing' in item) {
           return item as StandardDataItem
         }
-        // 如果是原始格式，需要包装
+        // If it is the original format，Need packaging
         return {
           item: {
             type: item.type || 'static',
@@ -303,13 +303,13 @@ export class DataFormatNormalizer {
     }
   }
   
-  // =================== 反向转换方法 ===================
+  // =================== reverse conversion method ===================
   
   private static convertToSimpleConfigEditor(standardData: StandardDataSourceConfig): any {
     return {
       dataSources: standardData.dataSources.map(ds => ({
         sourceId: ds.sourceId,
-        dataItems: ds.dataItems,  // 保持标准格式
+        dataItems: ds.dataItems,  // maintain standard format
         mergeStrategy: ds.mergeStrategy
       })),
       createdAt: standardData.createdAt,
@@ -319,7 +319,7 @@ export class DataFormatNormalizer {
   
   private static convertToImportExport(standardData: StandardDataSourceConfig): any {
     const dataItems = standardData.dataSources.flatMap(ds => 
-      ds.dataItems.map(item => item.item)  // 提取原始 item，去掉 processing 包装
+      ds.dataItems.map(item => item.item)  // Extract original item，remove processing Package
     )
     
     return {
@@ -351,14 +351,14 @@ export class DataFormatNormalizer {
   }
   
   /**
-   * 🔥 批量标准化方法
+   * 🔥 Batch normalization method
    */
   static normalizeMultiple(dataList: Array<{ data: any, componentId: string }>): StandardDataSourceConfig[] {
     return dataList.map(({ data, componentId }) => this.normalizeToStandard(data, componentId))
   }
   
   /**
-   * 🔥 验证标准格式完整性
+   * 🔥 Verify standard format integrity
    */
   static validateStandardFormat(data: StandardDataSourceConfig): { 
     valid: boolean, 
@@ -367,23 +367,23 @@ export class DataFormatNormalizer {
     const errors: string[] = []
     
     if (!data.componentId) {
-      errors.push('缺少 componentId')
+      errors.push('Lack componentId')
     }
     
     if (!Array.isArray(data.dataSources)) {
-      errors.push('dataSources 必须是数组')
+      errors.push('dataSources Must be an array')
     } else {
       data.dataSources.forEach((ds, dsIndex) => {
         if (!ds.sourceId) {
-          errors.push(`dataSources[${dsIndex}] 缺少 sourceId`)
+          errors.push(`dataSources[${dsIndex}] Lack sourceId`)
         }
         
         if (!Array.isArray(ds.dataItems)) {
-          errors.push(`dataSources[${dsIndex}] dataItems 必须是数组`)
+          errors.push(`dataSources[${dsIndex}] dataItems Must be an array`)
         } else {
           ds.dataItems.forEach((item, itemIndex) => {
             if (!item.item || !item.processing) {
-              errors.push(`dataSources[${dsIndex}].dataItems[${itemIndex}] 格式不正确`)
+              errors.push(`dataSources[${dsIndex}].dataItems[${itemIndex}] Incorrect format`)
             }
           })
         }

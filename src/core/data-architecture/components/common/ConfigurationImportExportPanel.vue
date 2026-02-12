@@ -1,10 +1,10 @@
 <!--
-配置导入导出面板组件
-独立的UI组件，提供配置的导入导出功能
+Configure import and export panel components
+independentUIcomponents，Provide configuration import and export functions
 -->
 <template>
   <n-space align="center">
-    <!-- 导出按钮组 -->
+    <!-- Export button group -->
     <n-dropdown :options="exportOptions" :disabled="isProcessing" @select="handleExportSelect">
       <n-button type="primary" size="small" :loading="isProcessing">
         <template #icon>
@@ -17,7 +17,7 @@
       </n-button>
     </n-dropdown>
 
-    <!-- 导入按钮 -->
+    <!-- import button -->
     <n-button type="info" size="small" :loading="isProcessing" @click="triggerFileInput">
       <template #icon>
         <n-icon><UploadOutlined /></n-icon>
@@ -25,10 +25,10 @@
       {{ $t('common.import') }}
     </n-button>
 
-    <!-- 隐藏的文件输入 -->
+    <!-- Hidden file input -->
     <input ref="fileInputRef" type="file" accept=".json" style="display: none" @change="handleImportFileSelect" />
 
-    <!-- 导入预览模态框 -->
+    <!-- Import preview modal box -->
     <n-modal
       v-model:show="showImportModal"
       preset="card"
@@ -39,7 +39,7 @@
       style="width: 90%; max-width: 800px"
     >
       <div v-if="importPreview" class="import-preview">
-        <!-- 基本信息 -->
+        <!-- Basic information -->
         <n-card size="small" :title="$t('configuration.import.basicInfo')">
           <n-descriptions :column="2" size="small">
             <n-descriptions-item :label="$t('configuration.import.version')">
@@ -57,7 +57,7 @@
           </n-descriptions>
         </n-card>
 
-        <!-- 配置统计 -->
+        <!-- Configuration statistics -->
         <n-card size="small" :title="$t('configuration.import.statistics')">
           <n-space>
             <n-tag type="info">
@@ -72,7 +72,7 @@
           </n-space>
         </n-card>
 
-        <!-- 依赖分析 -->
+        <!-- Dependency analysis -->
         <n-card
           v-if="importPreview.dependencies && importPreview.dependencies.length > 0"
           size="small"
@@ -88,7 +88,7 @@
           </n-space>
         </n-card>
 
-        <!-- 冲突检测 -->
+        <!-- Clash detection -->
         <n-alert
           v-if="importPreview.conflicts && importPreview.conflicts.length > 0"
           type="warning"
@@ -122,7 +122,7 @@
       </template>
     </n-modal>
 
-    <!-- 单数据源导出选择模态框 -->
+    <!-- Single data source export selection modal box -->
     <n-modal
       v-model:show="showSingleDataSourceModal"
       preset="card"
@@ -170,7 +170,7 @@
       </template>
     </n-modal>
 
-    <!-- 单数据源导入预览模态框 -->
+    <!-- Single data source import preview modal box -->
     <n-modal
       v-model:show="showSingleDataSourceImportModal"
       preset="dialog"
@@ -180,7 +180,7 @@
     >
       <div v-if="singleDataSourceImportPreview">
         <n-space vertical>
-          <!-- 源信息 -->
+          <!-- Source information -->
           <n-card :title="t('configuration.import.sourceInfo')" size="small">
             <n-descriptions :column="2" size="small">
               <n-descriptions-item :label="t('configuration.export.dataSource')">
@@ -198,7 +198,7 @@
             </n-descriptions>
           </n-card>
 
-          <!-- 目标信息 -->
+          <!-- target information -->
           <n-card :title="t('configuration.import.targetInfo')" size="small">
             <n-form-item :label="t('configuration.import.selectTargetSlot')">
               <n-select
@@ -225,7 +225,7 @@
               :title="t('configuration.import.slotOccupied')"
               style="margin-top: 8px"
             >
-              所选槽位已有数据，导入将会覆盖现有配置
+              The selected slot already has data，Importing will overwrite existing configuration
             </n-alert>
           </n-card>
         </n-space>
@@ -252,8 +252,8 @@
 
 <script setup lang="ts">
 /**
- * 配置导入导出面板组件
- * 提供独立的配置导入导出UI功能
+ * Configure import and export panel components
+ * Provide independent configuration import and exportUIFunction
  */
 
 import { ref, computed, h } from 'vue'
@@ -285,15 +285,15 @@ import {
 } from '../../utils/ConfigurationImportExport'
 import type { ImportPreview, SingleDataSourceImportPreview } from '@/core/data-architecture/utils/ConfigurationImportExport'
 
-// Props定义
+// Propsdefinition
 interface Props {
-  /** 当前配置数据 */
+  /** Current configuration data */
   configuration: Record<string, any>
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件类型（可选） */
+  /** Component type（Optional） */
   componentType?: string
-  /** 配置管理器实例 */
+  /** Configuration manager instance */
   configurationManager?: any
 }
 
@@ -302,20 +302,20 @@ const props = withDefaults(defineProps<Props>(), {
   configurationManager: undefined
 })
 
-// Emits定义
+// Emitsdefinition
 const emit = defineEmits<{
-  /** 导出成功事件 */
+  /** Export success event */
   exportSuccess: [data: any]
-  /** 导入成功事件 */
+  /** Import success event */
   importSuccess: [data: any]
-  /** 操作失败事件 */
+  /** Operation failure event */
   operationError: [error: Error]
 }>()
 
 const { t } = useI18n()
 const message = useMessage()
 
-// 响应式数据
+// Responsive data
 const isProcessing = ref(false)
 const showImportModal = ref(false)
 const showSingleDataSourceModal = ref(false)
@@ -342,7 +342,7 @@ const targetSlotOptions = ref<
 >([])
 const selectedTargetSlot = ref<string>('')
 
-// 导出选项
+// Export options
 const exportOptions = computed(() => [
   {
     label: t('configuration.export.fullConfiguration'),
@@ -357,7 +357,7 @@ const exportOptions = computed(() => [
 ])
 
 /**
- * 处理配置导出
+ * Handle configuration export
  */
 const handleExportConfiguration = async (): Promise<void> => {
   if (isProcessing.value) return
@@ -372,18 +372,18 @@ const handleExportConfiguration = async (): Promise<void> => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行导出
+    // Execute export
     const exportResult = await configurationExporter.exportConfiguration(
       props.componentId,
       props.configurationManager,
       props.componentType
     )
 
-    // 生成文件名
+    // Generate file name
     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, '')
     const fileName = `config_${props.componentId.substring(0, 8)}_${timestamp}.json`
 
-    // 下载文件
+    // Download file
     const blob = new Blob([JSON.stringify(exportResult, null, 2)], {
       type: 'application/json'
     })
@@ -401,7 +401,7 @@ const handleExportConfiguration = async (): Promise<void> => {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('❌ [ConfigurationExportPanel] 配置导出失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Configuration export failed:', error)
     message.error(`${t('configuration.export.error')}: ${errorMessage}`)
     emit('operationError', error instanceof Error ? error : new Error(errorMessage))
   } finally {
@@ -410,7 +410,7 @@ const handleExportConfiguration = async (): Promise<void> => {
 }
 
 /**
- * 处理导出选择
+ * Handle export selections
  */
 const handleExportSelect = (key: string): void => {
   if (key === 'full') {
@@ -421,7 +421,7 @@ const handleExportSelect = (key: string): void => {
 }
 
 /**
- * 显示单数据源导出选择
+ * Show single data source export selection
  */
 const handleShowSingleDataSourceExport = async (): Promise<void> => {
   if (!props.configurationManager) {
@@ -430,7 +430,7 @@ const handleShowSingleDataSourceExport = async (): Promise<void> => {
   }
 
   try {
-    // 获取可用的数据源列表
+    // Get a list of available data sources
     availableDataSources.value = singleDataSourceExporter.getAvailableDataSources(
       props.componentId,
       props.configurationManager
@@ -443,13 +443,13 @@ const handleShowSingleDataSourceExport = async (): Promise<void> => {
 
     showSingleDataSourceModal.value = true
   } catch (error) {
-    console.error('❌ [ConfigurationExportPanel] 获取数据源列表失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Failed to get data source list:', error)
     message.error(t('configuration.export.getDataSourcesError'))
   }
 }
 
 /**
- * 处理单数据源导出
+ * Process single data source export
  */
 const handleSingleDataSourceExport = async (sourceId: string): Promise<void> => {
   if (isProcessing.value) return
@@ -464,7 +464,7 @@ const handleSingleDataSourceExport = async (sourceId: string): Promise<void> => 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行单数据源导出
+    // Perform a single data source export
     const exportResult = await singleDataSourceExporter.exportSingleDataSource(
       props.componentId,
       sourceId,
@@ -472,11 +472,11 @@ const handleSingleDataSourceExport = async (sourceId: string): Promise<void> => 
       props.componentType
     )
 
-    // 生成文件名
+    // Generate file name
     const timestamp = new Date().toISOString().slice(0, 16).replace(/[:-]/g, '')
     const fileName = `datasource_${sourceId}_${timestamp}.json`
 
-    // 下载文件
+    // Download file
     const blob = new Blob([JSON.stringify(exportResult, null, 2)], {
       type: 'application/json'
     })
@@ -493,11 +493,11 @@ const handleSingleDataSourceExport = async (sourceId: string): Promise<void> => 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 关闭模态框
+    // Close modal box
     showSingleDataSourceModal.value = false
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('❌ [ConfigurationExportPanel] 单数据源导出失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Single data source export failed:', error)
     message.error(`${t('configuration.export.error')}: ${errorMessage}`)
     emit('operationError', error instanceof Error ? error : new Error(errorMessage))
   } finally {
@@ -506,14 +506,14 @@ const handleSingleDataSourceExport = async (sourceId: string): Promise<void> => 
 }
 
 /**
- * 触发文件选择
+ * Trigger file selection
  */
 const triggerFileInput = (): void => {
   fileInputRef.value?.click()
 }
 
 /**
- * 处理导入文件选择
+ * Handle import file selection
  */
 const handleImportFileSelect = (event: Event): void => {
   const target = event.target as HTMLInputElement
@@ -531,7 +531,7 @@ const handleImportFileSelect = (event: Event): void => {
 }
 
 /**
- * 处理导入预览
+ * Handle import preview
  */
 const handlePreviewImport = async (): Promise<void> => {
   if (!importFile.value) return
@@ -545,17 +545,17 @@ const handlePreviewImport = async (): Promise<void> => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 判断是否为单数据源文件
+    // Determine whether it is a single data source file
     if (importData.type === 'singleDataSource') {
-      // 处理单数据源导入
+      // Process single data source import
       await handleSingleDataSourceImportPreview(importData)
     } else {
-      // 处理完整配置导入
+      // Handle full configuration import
       await handleFullConfigurationImportPreview(importData)
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('❌ [ConfigurationExportPanel] 导入预览失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Import preview failed:', error)
     message.error(`${t('configuration.import.previewError')}: ${errorMessage}`)
     emit('operationError', error instanceof Error ? error : new Error(errorMessage))
   } finally {
@@ -564,10 +564,10 @@ const handlePreviewImport = async (): Promise<void> => {
 }
 
 /**
- * 处理完整配置导入预览
+ * Handle full configuration import preview
  */
 const handleFullConfigurationImportPreview = async (importData: any): Promise<void> => {
-  // 生成预览
+  // Generate preview
   importPreview.value = configurationImporter.generateImportPreview(
     importData,
     props.componentId,
@@ -579,28 +579,28 @@ const handleFullConfigurationImportPreview = async (importData: any): Promise<vo
 }
 
 /**
- * 处理单数据源导入预览
+ * Processing order data source import preview
  */
 const handleSingleDataSourceImportPreview = async (importData: any): Promise<void> => {
   if (!props.configurationManager) {
     throw new Error(t('configuration.export.noManagerError'))
   }
 
-  // 生成单数据源导入预览
+  // Generate single data source import preview
   singleDataSourceImportPreview.value = singleDataSourceImporter.generateImportPreview(
     importData,
     props.componentId,
     props.configurationManager
   )
 
-  // 获取目标组件的可用槽位
+  // Get the available slots of the target component
   await loadTargetSlotOptions()
 
   showSingleDataSourceImportModal.value = true
 }
 
 /**
- * 加载目标槽位选项
+ * Load target slot options
  */
 const loadTargetSlotOptions = async (): Promise<void> => {
   if (!props.configurationManager) {
@@ -608,7 +608,7 @@ const loadTargetSlotOptions = async (): Promise<void> => {
   }
 
   try {
-    // 获取当前组件的可用数据源槽位
+    // Get the available data source slots of the current component
     const availableSources = singleDataSourceExporter.getAvailableDataSources(
       props.componentId,
       props.configurationManager
@@ -621,12 +621,12 @@ const loadTargetSlotOptions = async (): Promise<void> => {
       occupied: source.hasData
     }))
   } catch (error) {
-    console.error('❌ [ConfigurationExportPanel] 加载槽位选项失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Loading slot options failed:', error)
   }
 }
 
 /**
- * 执行单数据源导入
+ * Perform a single data source import
  */
 const handleSingleDataSourceImport = async (): Promise<void> => {
   if (!importFile.value || !singleDataSourceImportPreview.value || !selectedTargetSlot.value) {
@@ -642,7 +642,7 @@ const handleSingleDataSourceImport = async (): Promise<void> => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行导入
+    // Execute import
     await singleDataSourceImporter.importSingleDataSource(
       importData,
       props.componentId,
@@ -656,12 +656,12 @@ const handleSingleDataSourceImport = async (): Promise<void> => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 关闭模态框
+    // Close modal box
     showSingleDataSourceImportModal.value = false
     resetImportState()
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('❌ [ConfigurationExportPanel] 单数据源导入失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Single data source import failed:', error)
     message.error(`${t('configuration.import.error')}: ${errorMessage}`)
     emit('operationError', error instanceof Error ? error : new Error(errorMessage))
   } finally {
@@ -670,7 +670,7 @@ const handleSingleDataSourceImport = async (): Promise<void> => {
 }
 
 /**
- * 重置导入状态
+ * Reset import status
  */
 const resetImportState = (): void => {
   importFile.value = null
@@ -681,7 +681,7 @@ const resetImportState = (): void => {
 }
 
 /**
- * 确认导入配置
+ * Confirm import configuration
  */
 const handleConfirmImport = async (): Promise<void> => {
   if (!importFile.value || !importPreview.value) return
@@ -695,7 +695,7 @@ const handleConfirmImport = async (): Promise<void> => {
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 执行导入
+    // Execute import
     const importResult = configurationImporter.importConfiguration(
       importData,
       props.componentId,
@@ -705,7 +705,7 @@ const handleConfirmImport = async (): Promise<void> => {
     message.success(t('configuration.import.success'))
     emit('importSuccess', importResult)
 
-    // 关闭模态框并清理
+    // Close the modal and clean it
     showImportModal.value = false
     importFile.value = null
     importPreview.value = null
@@ -714,7 +714,7 @@ const handleConfirmImport = async (): Promise<void> => {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('❌ [ConfigurationExportPanel] 配置导入失败:', error)
+    console.error('❌ [ConfigurationExportPanel] Configuration import failed:', error)
     message.error(`${t('configuration.import.error')}: ${errorMessage}`)
     emit('operationError', error instanceof Error ? error : new Error(errorMessage))
   } finally {
@@ -723,7 +723,7 @@ const handleConfirmImport = async (): Promise<void> => {
 }
 
 /**
- * 读取文件内容
+ * Read file contents
  */
 const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -735,7 +735,7 @@ const readFileAsText = (file: File): Promise<string> => {
 }
 
 /**
- * 格式化日期时间
+ * Format date time
  */
 const formatDateTime = (timestamp: number): string => {
   return new Date(timestamp).toLocaleString()
@@ -762,7 +762,7 @@ const formatDateTime = (timestamp: number): string => {
   gap: 8px;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .import-preview {
     max-height: 400px;

@@ -55,7 +55,7 @@ const handleRefresh = () => {
       :showAddButton="false"
       @refresh="handleRefresh"
     >
-      <!-- 卡片视图 -->
+      <!-- card view -->
       <template #card-view>
         <n-spin :show="loading">
           <n-grid cols="1 s:2 m:3 l:4 xl:5 2xl:8" x-gap="18" y-gap="18" responsive="screen">
@@ -63,11 +63,11 @@ const handleRefresh = () => {
               <DevCardItem
                 :isStatus="false"
                 :title="item.name"
-                :subtitle="item.description || '暂无描述'"
+                :subtitle="item.description || 'No description yet'"
                 :footer-text="item.version || '--'"
                 @click-card="clickDevice(item)"
               >
-                <!-- 左下角默认图标 -->
+                <!-- Default icon in the lower left corner -->
                 <template #footer-icon>
                   <div class="service-icon-container">
                     <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
@@ -99,7 +99,7 @@ const handleRefresh = () => {
         </n-spin>
       </template>
 
-      <!-- 底部分页 -->
+      <!-- bottom pagination -->
       <template #footer>
         <NPagination
           v-model:page="pagination.page"

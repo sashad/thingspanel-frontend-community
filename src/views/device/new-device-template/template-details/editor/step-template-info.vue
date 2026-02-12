@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 步骤1：模板基本信息
- * 点击"下一步"时立即保存到服务器，获得template_id
+ * step1：Template basic information
+ * Click"Next step"Save to server immediately，gettemplate_id
  */
 
 import { ref, watchEffect, nextTick } from 'vue'
@@ -34,7 +34,7 @@ const props = defineProps({
 const deviceTemplateId = ref(props.deviceTemplateId)
 const formRef = ref<any>(null)
 
-// 表单数据
+// form data
 interface FormData {
   name: string
   templateTage: string[]
@@ -56,7 +56,7 @@ const formData = ref<FormData>({
   label: ''
 })
 
-// 表单验证规则
+// form validation rules
 const formRules = {
   name: {
     required: true,
@@ -65,7 +65,7 @@ const formRules = {
   }
 }
 
-// 标签相关
+// tag related
 const tagInputVisible = ref(false)
 const tagInputValue = ref('')
 
@@ -85,8 +85,8 @@ const handleTagClose = (index: number) => {
   formData.value.templateTage.splice(index, 1)
 }
 
-// 图片上传
-// 开发环境使用代理路径，生产环境使用完整URL
+// Image upload
+// Development environment uses proxy path，Complete production environment useURL
 const isHttpProxy = import.meta.env.VITE_HTTP_PROXY === 'Y'
 const uploadUrl = isHttpProxy ? createProxyPattern() : getDemoServerUrl()
 const url = ref(uploadUrl)
@@ -100,7 +100,7 @@ const handleUploadFinish = ({ event }: { file: UploadFileInfo; event?: ProgressE
 
   if (response.data && response.data.path) {
     formData.value.path = response.data.path
-    // 显示图片时使用服务器域名，去掉 /api/v1 路径
+    // Use server domain name when displaying images，remove /api/v1 path
     const serverUrl = getDemoServerUrl().replace('/api/v1', '')
     iconPreviewUrl.value = serverUrl + response.data.path.substring(1)
   }
@@ -111,51 +111,51 @@ const uploadHeaders = {
 }
 
 /**
- * 下一步 - 保存基本信息到服务器
+ * Next step - Save basic information to the server
  */
 const handleNext = async () => {
   try {
     await formRef.value?.validate()
 
-    // 将templateTage数组转换为逗号分隔的字符串
+    // WilltemplateTageConvert array to comma separated string
     formData.value.label = formData.value.templateTage.join(',')
 
     let response: any
     if (formData.value.id) {
-      // 编辑模式 - 更新
+      // edit mode - renew
       response = await putTemplat(formData.value)
     } else {
-      // 新增模式 - 创建
+      // New mode - create
       response = await addTemplat(formData.value)
     }
 
     if (!response.error && response.data) {
-      // 保存成功，传递ID给父组件，进入下一步
+      // Saved successfully，transferIDto parent component，Go to next step
       emit('update:deviceTemplateId', response.data.id)
       emit('update:stepCurrent', 2)
     } else {
       window.$message?.error(response.error || $t('common.saveFailed'))
     }
   } catch (error) {
-    console.error('保存模板信息失败:', error)
+    console.error('Failed to save template information:', error)
   }
 }
 
 /**
- * 取消
+ * Cancel
  */
 const handleCancel = () => {
   emit('update:modalVisible', false)
 }
 
 /**
- * 监听deviceTemplateId变化，加载数据
+ * monitordeviceTemplateIdchange，Load data
  */
 watchEffect(async () => {
   deviceTemplateId.value = props.deviceTemplateId
 
   if (deviceTemplateId.value) {
-    // 编辑模式 - 加载现有数据
+    // edit mode - Load existing data
     const { data, error } = await getTemplat(deviceTemplateId.value)
     if (!error && data) {
       formData.value.name = data.name || ''
@@ -167,13 +167,13 @@ watchEffect(async () => {
       formData.value.templateTage = data.label && data.label.length > 0 ? data.label.split(',') : []
 
       if (data.path) {
-        // 显示图片时使用服务器域名，去掉 /api/v1 路径
+        // Use server domain name when displaying images，remove /api/v1 path
         const serverUrl = getDemoServerUrl().replace('/api/v1', '')
         iconPreviewUrl.value = serverUrl + data.path.substring(1)
       }
     }
   } else {
-    // 新增模式 - 清空表单
+    // New mode - Clear form
     formData.value = {
       name: '',
       templateTage: [],
@@ -198,12 +198,12 @@ watchEffect(async () => {
       label-width="120"
       require-mark-placement="right-hanging"
     >
-      <!-- 模板名称 -->
+      <!-- Template name -->
       <NFormItem :label="$t('device_template.templateName')" path="name">
         <NInput v-model:value="formData.name" :placeholder="$t('device_template.enterTemplateName')" />
       </NFormItem>
 
-      <!-- 标签 -->
+      <!-- Label -->
       <NFormItem :label="$t('device_template.templateTage')" class="tag-item">
         <NTag
           v-for="(item, index) in formData.templateTage"
@@ -231,7 +231,7 @@ watchEffect(async () => {
         />
       </NFormItem>
 
-      <!-- 图标上传 -->
+      <!-- Icon upload -->
       <NFormItem :label="$t('device_template.cover')">
         <NUpload
           :action="url + '/file/up'"
@@ -254,17 +254,17 @@ watchEffect(async () => {
         </NUpload>
       </NFormItem>
 
-      <!-- 作者 -->
+      <!-- author -->
       <NFormItem :label="$t('device_template.authorName')">
         <NInput v-model:value="formData.author" :placeholder="$t('device_template.enterAuthorName')" />
       </NFormItem>
 
-      <!-- 版本 -->
+      <!-- Version -->
       <NFormItem :label="$t('device_template.templateVersion')">
         <NInput v-model:value="formData.version" :placeholder="$t('device_template.entertemplateVersion')" />
       </NFormItem>
 
-      <!-- 说明 -->
+      <!-- illustrate -->
       <NFormItem :label="$t('device_template.illustrate')">
         <NInput
           v-model:value="formData.description"
@@ -274,7 +274,7 @@ watchEffect(async () => {
       </NFormItem>
     </NForm>
 
-    <!-- 底部按钮 -->
+    <!-- bottom button -->
     <div class="footer-actions">
       <NButton type="primary" @click="handleNext">{{ $t('device_template.nextStep') }}</NButton>
       <NButton @click="handleCancel">{{ $t('generate.cancel') }}</NButton>

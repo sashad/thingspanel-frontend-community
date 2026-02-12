@@ -1,10 +1,10 @@
 /**
- * 工具函数导出
+ * Tool function export
  */
 
 export * from './permission'
 export * from './validation'
 export * from './permission-watcher'
 
-// 默认导出
+// Default export
 export { permissionWatcher, triggerPermissionCheck, setupStorageListener } from './permission-watcher'

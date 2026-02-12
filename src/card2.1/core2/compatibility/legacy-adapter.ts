@@ -1,6 +1,6 @@
 /**
- * 向后兼容适配器
- * 确保新 core2 系统与现有 core 系统兼容
+ * backward compatible adapter
+ * ensure new core2 system and existing core System compatible
  */
 
 import { componentRegistry } from '../registry'
@@ -10,12 +10,12 @@ import { FormGenerator } from '../form'
 import { InteractionManager } from '../interaction'
 
 /**
- * 向后兼容适配器类
- * 提供从旧 core 系统到新 core2 系统的平滑过渡
+ * Backwards compatible adapter classes
+ * Provided from old core system to new core2 Smooth transition of the system
  */
 export class LegacyAdapter {
   /**
-   * 检查是否已迁移到 core2
+   * Check if it has been migrated to core2
    */
   static isMigrated(): boolean {
     try {
@@ -27,7 +27,7 @@ export class LegacyAdapter {
   }
 
   /**
-   * 获取迁移状态
+   * Get migration status
    */
   static getMigrationStatus(): {
     isMigrated: boolean
@@ -61,16 +61,16 @@ export class LegacyAdapter {
   }
 
   /**
-   * 提供兼容性警告
+   * Provide compatibility warnings
    */
   static getCompatibilityWarnings(): string[] {
     const warnings: string[] = []
 
-    // 检查是否使用了旧的核心系统
+    // Check if old core system is used
     if (typeof window !== 'undefined') {
       const oldCore = (window as any).__CARD2_CORE__
       if (oldCore) {
-        warnings.push('检测到旧版 core 系统，建议迁移到 core2')
+        warnings.push('Old version detected core system，It is recommended to migrate to core2')
       }
     }
 
@@ -78,7 +78,7 @@ export class LegacyAdapter {
   }
 
   /**
-   * 获取迁移建议
+   * Get migration advice
    */
   static getMigrationSuggestions(): {
     priority: 'high' | 'medium' | 'low'
@@ -91,21 +91,21 @@ export class LegacyAdapter {
       action?: string
     }[] = []
 
-    // 检查组件注册状态
+    // Check component registration status
     const stats = componentRegistry.getStats()
     if (stats.totalComponents === 0) {
       suggestions.push({
         priority: 'high',
-        suggestion: '没有注册任何组件，需要重新注册组件',
-        action: '调用组件注册函数注册组件'
+        suggestion: 'No components are registered，Need to re-register components',
+        action: 'Call the component registration function to register the component'
       })
     }
 
-    // 检查数据源映射
+    // Check data source mapping
     if (stats.multiDataSourceComponents === 0) {
       suggestions.push({
         priority: 'medium',
-        suggestion: '没有多数据源组件，可能需要配置数据源映射'
+        suggestion: 'No multiple data source component，You may need to configure data source mapping'
       })
     }
 
@@ -113,7 +113,7 @@ export class LegacyAdapter {
   }
 
   /**
-   * 执行迁移检查
+   * Perform migration check
    */
   static performMigrationCheck(): {
     status: 'ready' | 'needs-migration' | 'error'
@@ -127,7 +127,7 @@ export class LegacyAdapter {
     if (!migrationStatus.isMigrated) {
       return {
         status: 'needs-migration',
-        details: '系统未迁移到 core2，需要执行组件注册',
+        details: 'The system has not been migrated to core2，Required to perform component registration',
         suggestions: suggestions.map(s => s.suggestion)
       }
     }
@@ -135,27 +135,27 @@ export class LegacyAdapter {
     if (warnings.length > 0 || suggestions.length > 0) {
       return {
         status: 'needs-migration',
-        details: '系统已部分迁移，但需要进一步优化',
+        details: 'The system has been partially migrated，But further optimization is needed',
         suggestions: [...warnings, ...suggestions.map(s => s.suggestion)]
       }
     }
 
     return {
       status: 'ready',
-      details: '系统已完全迁移到 core2',
+      details: 'The system has been completely migrated to core2',
       suggestions: []
     }
   }
 
   /**
-   * 提供向后兼容的全局导出
+   * Provides backward-compatible global exports
    */
   static setupLegacyExports(): void {
     if (typeof window === 'undefined') return
 
     const win = window as any
 
-    // 提供向后兼容的全局对象
+    // Provides backward-compatible global objects
     if (!win.__CARD2_CORE2__) {
       win.__CARD2_CORE2__ = {
         componentRegistry,
@@ -169,11 +169,11 @@ export class LegacyAdapter {
       }
     }
 
-    // 如果旧系统存在，提供兼容性桥接
+    // If the old system exists，Provide compatibility bridge
     if (win.__CARD2_CORE__) {
-      console.warn('[LegacyAdapter] 检测到旧版 core 系统，建议迁移到 core2')
+      console.warn('[LegacyAdapter] Old version detected core system，It is recommended to migrate to core2')
 
-      // 提供兼容性桥接函数
+      // Provide compatibility bridging functions
       win.__CARD2_CORE2__.legacyBridge = {
         getComponent: (type: string) => componentRegistry.get(type),
         hasComponent: (type: string) => componentRegistry.has(type),
@@ -183,7 +183,7 @@ export class LegacyAdapter {
   }
 
   /**
-   * 初始化向后兼容性
+   * Initialize backwards compatibility
    */
   static initialize(): void {
     this.setupLegacyExports()
@@ -191,6 +191,6 @@ export class LegacyAdapter {
 }
 
 /**
- * 默认导出
+ * Default export
  */
 export default LegacyAdapter

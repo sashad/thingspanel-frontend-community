@@ -3,15 +3,15 @@ import type { ElegantConstRoute } from '@elegant-router/vue'
 import { getRouteName } from '@/router/elegant/transform'
 
 /**
- * 递归处理数据
+ * Process data recursively
  *
  * @param treeNode
  * @param depth
  */
 function processTree(treeNode: Api.Route.MenuRoute): void {
-  // 处理当前节点
+  // Process the current node
   treeNode.authority = treeNode.authority ? JSON.parse(treeNode.authority) : []
-  // 递归处理子节点
+  // Process child nodes recursively
   if (treeNode.children) {
     for (const childNode of treeNode.children) {
       processTree(childNode)
@@ -50,7 +50,7 @@ function transformLayoutAndPageToComponent(layout: string, page: any) {
   return ''
 }
 
-/** 递归处理数据 */
+/** Process data recursively */
 function replaceKeys(data: ElegantConstRoute[]): ElegantRoute[] {
   return data.map((item: any): ElegantRoute => {
     // if (!item.parent_id) {

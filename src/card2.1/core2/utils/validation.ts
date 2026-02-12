@@ -1,30 +1,30 @@
 /**
- * 验证工具函数
+ * Verification tool function
  */
 
 /**
- * 验证组件定义
+ * Verify component definition
  */
 export function validateComponentDefinition(definition: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
   if (!definition) {
-    errors.push('组件定义不能为空')
+    errors.push('Component definition cannot be empty')
     return { isValid: false, errors }
   }
 
   if (typeof definition.type !== 'string' || !definition.type.trim()) {
-    errors.push('组件类型 (type) 必须是非空字符串')
+    errors.push('Component type (type) Must be a non-empty string')
   }
 
   if (typeof definition.name !== 'string' || !definition.name.trim()) {
-    errors.push('组件名称 (name) 必须是非空字符串')
+    errors.push('Component name (name) Must be a non-empty string')
   }
 
   if (!definition.component) {
-    errors.push('组件实例 (component) 不能为空')
+    errors.push('Component instance (component) cannot be empty')
   } else if (typeof definition.component !== 'object' && typeof definition.component !== 'function') {
-    errors.push('组件实例 (component) 必须是有效的 Vue 组件')
+    errors.push('Component instance (component) must be valid Vue components')
   }
 
   return {
@@ -34,22 +34,22 @@ export function validateComponentDefinition(definition: any): { isValid: boolean
 }
 
 /**
- * 验证数据源需求
+ * Verify data source requirements
  */
 export function validateDataSourceRequirements(dataSources: any[]): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
   if (!Array.isArray(dataSources)) {
-    errors.push('数据源需求必须是数组')
+    errors.push('The data source requirement must be an array')
     return { isValid: false, errors }
   }
 
   dataSources.forEach((ds, index) => {
     if (!ds.key || typeof ds.key !== 'string') {
-      errors.push(`数据源 ${index} 缺少有效的 key 字段`)
+      errors.push(`data source ${index} Missing valid key Field`)
     }
     if (!ds.type || !['static', 'dynamic', 'websocket'].includes(ds.type)) {
-      errors.push(`数据源 ${index} 的 type 必须是 static、dynamic 或 websocket`)
+      errors.push(`data source ${index} of type must be static、dynamic or websocket`)
     }
   })
 
@@ -60,28 +60,28 @@ export function validateDataSourceRequirements(dataSources: any[]): { isValid: b
 }
 
 /**
- * 验证属性白名单
+ * Verify attribute whitelist
  */
 export function validatePropertyWhitelist(whitelist: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
   if (!whitelist || typeof whitelist !== 'object') {
-    errors.push('属性白名单必须是对象')
+    errors.push('Property whitelist must be an object')
     return { isValid: false, errors }
   }
 
   Object.entries(whitelist).forEach(([propName, config]) => {
     if (!config || typeof config !== 'object') {
-      errors.push(`属性 ${propName} 的配置必须是对象`)
+      errors.push(`property ${propName} The configuration must be an object`)
       return
     }
 
     if (!config.type || !['string', 'number', 'boolean', 'array', 'object'].includes(config.type)) {
-      errors.push(`属性 ${propName} 的 type 必须是有效的类型`)
+      errors.push(`property ${propName} of type Must be a valid type`)
     }
 
     if (!config.label || typeof config.label !== 'string') {
-      errors.push(`属性 ${propName} 的 label 必须是非空字符串`)
+      errors.push(`property ${propName} of label Must be a non-empty string`)
     }
   })
 

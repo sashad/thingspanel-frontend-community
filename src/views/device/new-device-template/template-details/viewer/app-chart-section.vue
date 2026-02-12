@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * App图表配置展示区块
- * 支持在预览时配置App端图表
+ * AppChart configuration display block
+ * Support configuration during previewAppend chart
  */
 
 import { inject } from 'vue'

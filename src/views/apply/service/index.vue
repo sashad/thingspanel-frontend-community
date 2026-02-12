@@ -173,7 +173,7 @@ function init() {
   getTableData()
 }
 
-// 初始化
+// initialization
 init()
 </script>
 

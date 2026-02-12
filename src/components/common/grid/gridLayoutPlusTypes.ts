@@ -1,169 +1,169 @@
 /**
- * Grid Layout Plus 类型定义
- * 基于 grid-layout-plus 库的 TypeScript 类型扩展
+ * Grid Layout Plus type definition
+ * based on grid-layout-plus library TypeScript type extension
  */
 
 import type { Component } from 'vue'
 
-// 基础网格项接口
+// Basic grid item interface
 export interface GridLayoutPlusItem {
-  /** 项目唯一标识符 */
+  /** Project unique identifier */
   i: string
-  /** X轴位置 (网格单位) */
+  /** Xaxis position (Grid units) */
   x: number
-  /** Y轴位置 (网格单位) */
+  /** Yaxis position (Grid units) */
   y: number
-  /** 宽度 (网格单位) */
+  /** width (Grid units) */
   w: number
-  /** 高度 (网格单位) */
+  /** high (Grid units) */
   h: number
 
-  // 约束配置
-  /** 最小宽度 */
+  // constraint configuration
+  /** minimum width */
   minW?: number
-  /** 最小高度 */
+  /** minimum height */
   minH?: number
-  /** 最大宽度 */
+  /** maximum width */
   maxW?: number
-  /** 最大高度 */
+  /** maximum height */
   maxH?: number
 
-  // 行为配置
-  /** 是否可拖拽 */
+  // behavior configuration
+  /** Whether it can be dragged */
   isDraggable?: boolean
-  /** 是否可调整大小 */
+  /** Is it resizable? */
   isResizable?: boolean
-  /** 是否为静态项目 */
+  /** Whether it is a static project */
   static?: boolean
 
-  // 拖拽配置
-  /** 拖拽忽略的选择器 */
+  // Drag and drop configuration
+  /** Drag and drop ignored selector */
   dragIgnoreFrom?: string
-  /** 拖拽允许的选择器 */
+  /** Drag-and-drop allowed selectors */
   dragAllowFrom?: string
-  /** 调整大小忽略的选择器 */
+  /** Selector ignored by resize */
   resizeIgnoreFrom?: string
-  /** 是否保持宽高比 */
+  /** Whether to maintain aspect ratio */
   preserveAspectRatio?: boolean
 
-  // 拖拽和调整大小选项
-  /** 拖拽选项 */
+  // Drag and resize options
+  /** Drag and drop options */
   dragOption?: DragOption
-  /** 调整大小选项 */
+  /** Resize options */
   resizeOption?: ResizeOption
 
-  // 业务数据
-  /** 组件类型 */
+  // business data
+  /** Component type */
   type?: string
-  /** 组件标题 */
+  /** Component title */
   title?: string
-  /** 渲染的组件 */
+  /** Rendered component */
   component?: Component
-  /** 组件属性 */
+  /** Component properties */
   props?: Record<string, any>
-  /** 组件数据 */
+  /** component data */
   data?: Record<string, any>
-  /** 自定义样式 */
+  /** Custom style */
   style?: Record<string, string | number>
-  /** 自定义类名 */
+  /** Custom class name */
   className?: string
-  /** 项目元数据 */
+  /** Project metadata */
   metadata?: Record<string, any>
 }
 
-// 拖拽选项
+// Drag and drop options
 export interface DragOption {
-  /** 拖拽手柄 */
+  /** Drag handle */
   handle?: string
-  /** 取消拖拽 */
+  /** Cancel drag */
   cancel?: string
-  /** 是否启用滚动 */
+  /** Whether to enable scrolling */
   scroll?: boolean
-  /** 滚动敏感度 */
+  /** scroll sensitivity */
   scrollSensitivity?: number
-  /** 滚动速度 */
+  /** scroll speed */
   scrollSpeed?: number
-  /** 拖拽透明度 */
+  /** Drag transparency */
   opacity?: number
-  /** 拖拽时的z-index */
+  /** When draggingz-index */
   zIndex?: number
-  /** 是否克隆拖拽 */
+  /** Whether to clone and drag */
   helper?: 'original' | 'clone' | ((event: Event) => HTMLElement)
-  /** 拖拽开始回调 */
+  /** Drag start callback */
   start?: (event: Event, ui: any) => void
-  /** 拖拽中回调 */
+  /** Callback during dragging */
   drag?: (event: Event, ui: any) => void
-  /** 拖拽结束回调 */
+  /** Drag end callback */
   stop?: (event: Event, ui: any) => void
 }
 
-// 调整大小选项
+// Resize options
 export interface ResizeOption {
-  /** 调整大小手柄 */
+  /** resize handle */
   handles?: string
-  /** 最小宽度 */
+  /** minimum width */
   minWidth?: number
-  /** 最小高度 */
+  /** minimum height */
   minHeight?: number
-  /** 最大宽度 */
+  /** maximum width */
   maxWidth?: number
-  /** 最大高度 */
+  /** maximum height */
   maxHeight?: number
-  /** 是否保持宽高比 */
+  /** Whether to maintain aspect ratio */
   aspectRatio?: boolean
-  /** 网格吸附 */
+  /** Grid adsorption */
   grid?: [number, number]
-  /** 调整大小开始回调 */
+  /** Resize start callback */
   start?: (event: Event, ui: any) => void
-  /** 调整大小中回调 */
+  /** Callback during resize */
   resize?: (event: Event, ui: any) => void
-  /** 调整大小结束回调 */
+  /** Resize end callback */
   stop?: (event: Event, ui: any) => void
 }
 
-// 网格布局配置
+// Grid layout configuration
 export interface GridLayoutPlusConfig {
-  /** 列数 */
+  /** Number of columns */
   colNum: number
-  /** 行高（像素），用于计算每行的高度 */
+  /** row height（Pixel），Used to calculate the height of each row */
   rowHeight: number
-  /** 最小行数（可选）：用于控制容器初始/最小高度 = minRows * rowHeight */
+  /** Minimum number of rows（Optional）：Used to control container initialization/minimum height = minRows * rowHeight */
   minRows?: number
-  /** 是否可拖拽 */
+  /** Whether it can be dragged */
   isDraggable: boolean
-  /** 是否可调整大小 */
+  /** Is it resizable? */
   isResizable: boolean
-  /** 是否镜像 */
+  /** Whether to mirror */
   isMirrored: boolean
-  /** 是否自动调整大小 */
+  /** Whether to automatically resize */
   autoSize: boolean
-  /** 是否垂直紧凑 */
+  /** Is it vertically compact? */
   verticalCompact: boolean
-  /** 边距 [x, y] - @deprecated 请使用 horizontalGap 和 verticalGap */
+  /** margin [x, y] - @deprecated Please use horizontalGap and verticalGap */
   margin: [number, number]
-  /** 组件水平间距（像素） */
+  /** Component horizontal spacing（Pixel） */
   horizontalGap?: number
-  /** 组件垂直间距（像素） */
+  /** Component vertical spacing（Pixel） */
   verticalGap?: number
-  /** 是否使用CSS变换 */
+  /** Whether to useCSStransform */
   useCssTransforms: boolean
-  /** 是否响应式 */
+  /** Is it responsive? */
   responsive: boolean
-  /** 响应式断点 */
+  /** Responsive breakpoints */
   breakpoints: Record<string, number>
-  /** 不同断点的列数 */
+  /** Number of columns for different breakpoints */
   cols: Record<string, number>
-  /** 是否防止碰撞 */
+  /** Whether to prevent collision */
   preventCollision: boolean
-  /** 是否使用样式光标 */
+  /** Whether to use style cursor */
   useStyleCursor: boolean
-  /** 拖拽时是否恢复 */
+  /** Whether to restore when dragging */
   restoreOnDrag: boolean
-  /** 是否为静态网格 */
+  /** Whether it is a static mesh */
   staticGrid?: boolean
 }
 
-// 默认配置
+// Default configuration
 export const DEFAULT_GRID_LAYOUT_PLUS_CONFIG: GridLayoutPlusConfig = {
   colNum: 12,
   rowHeight: 100,
@@ -172,7 +172,7 @@ export const DEFAULT_GRID_LAYOUT_PLUS_CONFIG: GridLayoutPlusConfig = {
   isMirrored: false,
   autoSize: true,
   verticalCompact: true,
-  // 默认无间距：由 [10, 10] 调整为 [0, 0]
+  // Default no spacing：Depend on [10, 10] Adjust to [0, 0]
   margin: [0, 0],
   useCssTransforms: true,
   responsive: false,
@@ -183,122 +183,122 @@ export const DEFAULT_GRID_LAYOUT_PLUS_CONFIG: GridLayoutPlusConfig = {
   restoreOnDrag: false
 }
 
-// 🔥 新增：超大网格配置（支持0-99列）
+// 🔥 New：Very large grid configuration（support0-99List）
 export const EXTENDED_GRID_LAYOUT_CONFIG: GridLayoutPlusConfig = {
-  colNum: 50, // 默认50列，平衡性能和灵活性
-  rowHeight: 40, // 减少行高以适应更多内容
+  colNum: 50, // default50List，Balance performance and flexibility
+  rowHeight: 40, // Reduce row height to fit more content
   isDraggable: true,
   isResizable: true,
   isMirrored: false,
   autoSize: true,
   verticalCompact: true,
-  margin: [5, 5], // 减少边距以节省空间
+  margin: [5, 5], // Reduce margins to save space
   useCssTransforms: true,
-  responsive: true, // 启用响应式以适应不同屏幕
+  responsive: true, // Enable responsiveness to adapt to different screens
   breakpoints: {
-    xxl: 2560, // 4K显示器
-    xl: 1920, // 大屏显示器
-    lg: 1200, // 桌面
-    md: 996, // 小桌面
-    sm: 768, // 平板
-    xs: 480, // 手机横屏
-    xxs: 0 // 手机竖屏
+    xxl: 2560, // 4Kmonitor
+    xl: 1920, // Large screen monitor
+    lg: 1200, // desktop
+    md: 996, // small desktop
+    sm: 768, // flat
+    xs: 480, // Mobile phone landscape
+    xxs: 0 // Mobile phone vertical screen
   },
   cols: {
-    xxl: 99, // 4K下支持最大99列
-    xl: 80, // 大屏80列
-    lg: 50, // 桌面50列
-    md: 30, // 小桌面30列
-    sm: 20, // 平板20列
-    xs: 10, // 手机横屏10列
-    xxs: 5 // 手机竖屏5列
+    xxl: 99, // 4KThe maximum support is99List
+    xl: 80, // Big screen80List
+    lg: 50, // desktop50List
+    md: 30, // small desktop30List
+    sm: 20, // flat20List
+    xs: 10, // Mobile phone landscape10List
+    xxs: 5 // Mobile phone vertical screen5List
   },
   preventCollision: false,
   useStyleCursor: true,
   restoreOnDrag: false
 }
 
-// 🔥 超大网格工具函数
+// 🔥 Extra Large Grid Tool Function
 export const GridSizePresets = {
-  MINI: { colNum: 12, rowHeight: 100, margin: [10, 10] }, // 12列 - 标准小网格
-  STANDARD: { colNum: 24, rowHeight: 60, margin: [8, 8] }, // 24列 - 标准网格
-  LARGE: { colNum: 50, rowHeight: 40, margin: [5, 5] }, // 50列 - 大网格
-  MEGA: { colNum: 99, rowHeight: 20, margin: [2, 2] }, // 99列 - 超大网格
+  MINI: { colNum: 12, rowHeight: 100, margin: [10, 10] }, // 12List - Standard small grid
+  STANDARD: { colNum: 24, rowHeight: 60, margin: [8, 8] }, // 24List - standard grid
+  LARGE: { colNum: 50, rowHeight: 40, margin: [5, 5] }, // 50List - large grid
+  MEGA: { colNum: 99, rowHeight: 20, margin: [2, 2] }, // 99List - Very large grid
   CUSTOM: (cols: number) => ({
-    // 自定义列数
-    colNum: Math.max(1, Math.min(99, cols)), // 限制1-99列
-    rowHeight: Math.max(20, 100 - cols), // 动态调整行高
-    margin: [Math.max(2, 10 - Math.floor(cols / 10)), Math.max(2, 10 - Math.floor(cols / 10))] // 动态调整边距
+    // Custom number of columns
+    colNum: Math.max(1, Math.min(99, cols)), // limit1-99List
+    rowHeight: Math.max(20, 100 - cols), // Dynamically adjust row height
+    margin: [Math.max(2, 10 - Math.floor(cols / 10)), Math.max(2, 10 - Math.floor(cols / 10))] // Dynamically adjust margins
   })
 }
 
-// 组件Props
+// componentsProps
 export interface GridLayoutPlusProps {
-  /** 布局数据 */
+  /** layout data */
   layout: GridLayoutPlusItem[]
-  /** 是否只读 */
+  /** Is it read-only? */
   readonly?: boolean
-  /** 是否显示网格线 */
+  /** Whether to display grid lines */
   showGrid?: boolean
-  /** 是否显示拖拽区域 */
+  /** Whether to display the drag area */
   showDropZone?: boolean
-  /** 是否显示标题栏 */
+  /** Whether to display the title bar */
   showTitle?: boolean
-  /** 网格配置 */
+  /** Grid configuration */
   config?: Partial<GridLayoutPlusConfig>
-  /** 容器样式 */
+  /** container style */
   containerStyle?: Record<string, string | number>
-  /** 容器类名 */
+  /** Container class name */
   containerClass?: string
-  /** 唯一键字段名（默认使用 'i'）。允许外部数据结构将主键字段重命名为任意名称（如 'id'），组件内部将自动归一化为 item.i */
+  /** Unique key field name（Used by default 'i'）。Allows external data structures to rename primary key fields to arbitrary names（like 'id'），The components will be automatically normalized internally to item.i */
   idKey?: string
 }
 
-// 组件Emits
+// componentsEmits
 export interface GridLayoutPlusEmits {
-  /** 布局创建 */
+  /** Layout creation */
   (e: 'layout-created', layout: GridLayoutPlusItem[]): void
-  /** 布局挂载前 */
+  /** Before layout is mounted */
   (e: 'layout-before-mount', layout: GridLayoutPlusItem[]): void
-  /** 布局已挂载 */
+  /** Layout is mounted */
   (e: 'layout-mounted', layout: GridLayoutPlusItem[]): void
-  /** 布局更新 */
+  /** layout update */
   (e: 'layout-updated', layout: GridLayoutPlusItem[]): void
-  /** 布局就绪 */
+  /** Layout ready */
   (e: 'layout-ready', layout: GridLayoutPlusItem[]): void
-  /** 布局变化 */
+  /** Layout changes */
   (e: 'layout-change', layout: GridLayoutPlusItem[]): void
-  /** 更新布局 */
+  /** Update layout */
   (e: 'update:layout', layout: GridLayoutPlusItem[]): void
-  /** 断点变化 */
+  /** Breakpoint changes */
   (e: 'breakpoint-changed', breakpoint: string, layout: GridLayoutPlusItem[]): void
-  /** 容器大小变化 */
+  /** Container size changes */
   (e: 'container-resized', i: string, newH: number, newW: number, newHPx: number, newWPx: number): void
-  /** 项目调整大小中 */
+  /** Project resizing */
   (e: 'item-resize', i: string, newH: number, newW: number, newHPx: number, newWPx: number): void
-  /** 项目调整大小完成 */
+  /** Project resizing completed */
   (e: 'item-resized', i: string, newH: number, newW: number, newHPx: number, newWPx: number): void
-  /** 项目移动中 */
+  /** Project is moving */
   (e: 'item-move', i: string, newX: number, newY: number): void
-  /** 项目移动完成 */
+  /** Project move completed */
   (e: 'item-moved', i: string, newX: number, newY: number): void
-  /** 项目容器大小变化 */
+  /** Project container size changes */
   (e: 'item-container-resized', i: string, newH: number, newW: number, newHPx: number, newWPx: number): void
 
-  // 业务事件
-  /** 项目添加 */
+  // business events
+  /** Item added */
   (e: 'item-add', item: GridLayoutPlusItem): void
-  /** 项目删除 */
+  /** Project deletion */
   (e: 'item-delete', itemId: string): void
-  /** 项目更新 */
+  /** Project updates */
   (e: 'item-update', itemId: string, updates: Partial<GridLayoutPlusItem>): void
-  /** 项目编辑 */
+  /** Project editor */
   (e: 'item-edit', item: GridLayoutPlusItem): void
-  /** 项目数据更新 */
+  /** Project data update */
   (e: 'item-data-update', itemId: string, data: any): void
 }
 
-// 响应式布局配置
+// Responsive layout configuration
 export interface ResponsiveLayout {
   lg?: GridLayoutPlusItem[]
   md?: GridLayoutPlusItem[]
@@ -307,7 +307,7 @@ export interface ResponsiveLayout {
   xxs?: GridLayoutPlusItem[]
 }
 
-// 布局操作结果
+// Layout operation results
 export interface LayoutOperationResult<T = any> {
   success: boolean
   data?: T
@@ -315,34 +315,34 @@ export interface LayoutOperationResult<T = any> {
   message?: string
 }
 
-// 工具函数类型
+// Utility function type
 export type LayoutValidator = (layout: GridLayoutPlusItem[]) => LayoutOperationResult<boolean>
 export type ItemValidator = (item: GridLayoutPlusItem) => LayoutOperationResult<boolean>
 export type PositionFinder = (w: number, h: number, layout: GridLayoutPlusItem[]) => { x: number; y: number }
 
-// 主题配置
+// Theme configuration
 export interface GridTheme {
-  /** 主背景色 */
+  /** Main background color */
   backgroundColor: string
-  /** 网格线颜色 */
+  /** grid line color */
   gridLineColor: string
-  /** 项目背景色 */
+  /** Project background color */
   itemBackgroundColor: string
-  /** 项目边框色 */
+  /** Item border color */
   itemBorderColor: string
-  /** 项目阴影 */
+  /** Project shadow */
   itemShadow: string
-  /** 项目悬停阴影 */
+  /** Item hover shadow */
   itemHoverShadow: string
-  /** 拖拽提示颜色 */
+  /** Drag prompt color */
   dragHintColor: string
-  /** 文本颜色 */
+  /** text color */
   textColor: string
-  /** 次要文本颜色 */
+  /** Secondary text color */
   secondaryTextColor: string
 }
 
-// 预定义主题
+// Predefined themes
 export const LIGHT_THEME: GridTheme = {
   backgroundColor: '#f8f9fa',
   gridLineColor: '#ddd',
@@ -367,19 +367,19 @@ export const DARK_THEME: GridTheme = {
   secondaryTextColor: '#b0b0b0'
 }
 
-// 性能配置
+// Performance configuration
 export interface PerformanceConfig {
-  /** 防抖延迟 */
+  /** Anti-shake delay */
   debounceDelay: number
-  /** 节流延迟 */
+  /** throttling delay */
   throttleDelay: number
-  /** 是否启用懒加载 */
+  /** Whether to enable lazy loading */
   enableLazyLoading: boolean
-  /** 懒加载缓冲区 */
+  /** Lazy loading buffer */
   lazyLoadingBuffer: number
 }
 
-// 导出所有类型
+// Export all types
 export type {
   GridLayoutPlusItem as GridItem,
   GridLayoutPlusConfig as GridConfig,

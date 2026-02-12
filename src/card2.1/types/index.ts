@@ -1,64 +1,64 @@
 /**
- * Card2.1 统一类型导出
- * 提供完整、一致的类型系统，支持组件开发和编辑器集成
+ * Card2.1 Unified type export
+ * Provide complete、consistent type system，Supports component development and editor integration
  * 
- * 使用方式：
+ * Usage：
  * import type { ComponentDefinition, Setting, DataSourceRequirement } from '@/card2.1/types'
  */
 
-// ============ 核心类型系统 ============
-// 从重构后的核心类型文件导入
+// ============ core type system ============
+// Import from refactored core type files
 export type {
-  // 基础类型
+  // base type
   ComponentPermission,
   Position,
   Size,
   MetricItem,
 
-  // 布局系统类型
+  // Layout system type
   LayoutItem,
   CanvasItem,
   RendererType,
 
-  // 数据源系统类型
+  // Data source system type
   DataFieldType,
   DataValidationRule,
   DataSourceRequirement,
   StaticParamRequirement,
 
-  // 组件定义系统
+  // component definition system
   ComponentDefinition,
   ComponentInstance,
   WidgetConfiguration,
   RendererConfig,
   PanelConfig,
 
-  // 数据系统类型
+  // Data system type
   DataSourceInfo,
   DataUpdateEvent,
   ComponentLifecycleHooks,
 
-  // 注册系统类型
+  // Registration system type
   IComponentRegistry,
   IConfigComponent,
   IComponentDefinition
 } from '../core/types'
 
-// ============ 设置配置类型系统 ============
+// ============ Set configuration type system ============
 export type {
-  // 设置项配置
+  // Setting item configuration
   Setting,
   CustomConfig,
   DataConfig,
   TargetComponent,
   ComponentSettingConfig,
 
-  // 控件类型和验证
+  // Control types and validation
   SettingValidationRule,
   EnhancedSetting,
   PropertyDataTypeFromSetting,
 
-  // 整合的配置系统（从config-types.ts合并）
+  // Integrated configuration system（fromconfig-types.tsmerge）
   ConfigMode,
   SettingGroup,
   TSConfig,
@@ -66,57 +66,57 @@ export type {
   EnhancedComponentSettingConfig
 } from './setting-config'
 
-// 导出枚举
+// Export enumeration
 export { SettingControlType } from '@/card2.1/types/setting-config'
 
-// 导出设置配置工具函数
+// Export settings configuration tool function
 export {
   createSetting,
   createCustomConfig,
   inferPropertyDataType
 } from './setting-config'
 
-// ============ 类型工具函数系统 ============
+// ============ type utility function system ============
 
 export {
-  // 类型转换工具
+  // Type conversion tools
   generateDefaultConfigFromSettings,
   groupSettingsByGroup,
   inferTSTypeFromControlType,
   getDefaultValueForFieldType,
   
-  // 配置对象操作工具
+  // Configuration object manipulation tools
   deepMergeConfig,
   extractFieldValue,
   setFieldValue,
   
-  // 组件定义操作工具
+  // Component definition operation tool
   createComponentSettingConfig,
   extractDataSourceRequirements,
   extractStaticParamRequirements,
   supportsDataSourceType,
   
-  // 数据源和字段映射工具
+  // Data source and field mapping tools
   createFieldMapping,
   mergeFieldMappings,
   
-  // 交互配置工具
+  // Interactive configuration tool
   createClickJumpInteraction,
   createModifyInteraction,
   
-  // 分组和分类工具
+  // Grouping and classification tools
   inferCategoryFromPath,
   createSettingGroup,
   
-  // 开发辅助工具
+  // Development aids
   generateTSInterfaceFromDefinition,
   validateComponentConfig,
   
-  // 工具函数集合
+  // Collection of utility functions
   TypeUtils
 } from './utils'
 
-// ============ 交互系统类型 ============
+// ============ Interactive system type ============
 export type {
   ComponentInteractionDefinition,
   InteractionCapability,
@@ -126,30 +126,30 @@ export type {
   InteractionContext
 } from '../core/interaction-types'
 
-// ============ 数据绑定类型（简化版） ============
-// 🔥 简化：数据绑定功能已简化，使用核心类型系统
+// ============ data binding type（Simplified version） ============
+// 🔥 simplify：数据绑定功能已simplify，Use the core type system
 
-// ============ 类型工具函数 ============
+// ============ type utility functions ============
 
 /**
- * 提取组件定义的配置类型
- * 用于类型安全地访问组件的配置对象
+ * Extract the configuration type defined by the component
+ * Configuration object for type-safe access to components
  */
 export type ExtractConfigType<T extends ComponentDefinition> = T extends ComponentDefinition<infer Config> 
   ? Config 
   : Record<string, unknown>
 
 /**
- * 提取自定义配置的 customize 类型
- * 用于类型安全地访问组件的自定义配置
+ * Extract custom configuration customize type
+ * Custom configuration for type-safe access to components
  */
 export type ExtractCustomizeType<T extends CustomConfig> = T extends CustomConfig<infer Customize>
   ? Customize
   : Record<string, unknown>
 
 /**
- * 组件设置配置的类型推导
- * 根据设置项配置推导出完整的组件配置类型
+ * Type inference for component settings configuration
+ * Derive the complete component configuration type based on the setting item configuration
  */
 export type InferConfigFromSettings<T extends readonly Setting[]> = {
   [K in T[number] as K['field']]: K['defaultValue'] extends infer V 
@@ -159,12 +159,12 @@ export type InferConfigFromSettings<T extends readonly Setting[]> = {
     : unknown
 }
 
-// ============ 类型断言工具 ============
+// ============ type assertion tool ============
 
 /**
- * 检查对象是否为有效的组件定义
- * @param obj 待检查的对象
- * @returns 是否为组件定义
+ * Check if the object is a valid component definition
+ * @param obj Object to be checked
+ * @returns Whether it is defined for the component
  */
 export function isComponentDefinition(obj: unknown): obj is ComponentDefinition {
   return obj && 
@@ -175,9 +175,9 @@ export function isComponentDefinition(obj: unknown): obj is ComponentDefinition 
 }
 
 /**
- * 检查对象是否为有效的设置项配置
- * @param obj 待检查的对象
- * @returns 是否为设置项配置
+ * Check whether the object is a valid setting item configuration
+ * @param obj Object to be checked
+ * @returns Whether to configure the setting item
  */
 export function isSetting(obj: unknown): obj is Setting {
   return obj &&
@@ -188,9 +188,9 @@ export function isSetting(obj: unknown): obj is Setting {
 }
 
 /**
- * 检查对象是否为有效的数据源需求
- * @param obj 待检查的对象
- * @returns 是否为数据源需求
+ * Check whether the object is a valid data source requirement
+ * @param obj Object to be checked
+ * @returns Whether it is a data source requirement
  */
 export function isDataSourceRequirement(obj: unknown): obj is DataSourceRequirement {
   return obj &&
@@ -201,85 +201,85 @@ export function isDataSourceRequirement(obj: unknown): obj is DataSourceRequirem
          Array.isArray(obj.supportedTypes)
 }
 
-// ============ 类型验证系统 ============
+// ============ type verification system ============
 
 export type {
   ValidationResult
 } from './validation'
 
 export {
-  // 基础类型验证
+  // Basic type validation
   isValidDataFieldType,
   validateDataValidationRule,
 
-  // 组件类型验证
+  // Component type validation
   validateDataSourceRequirement,
   validateStaticParamRequirement,
   validateSetting,
   validateComponentDefinition,
   validateComponentDefinitions,
 
-  // 类型断言工具
+  // type assertion tool
   isValidComponentDefinition,
   isValidDataSourceRequirement,
   isValidSetting,
 
-  // 开发工具
+  // development tools
   devModeValidationWarning
 } from './validation'
 
-// ============ 开发工具类型（保持向后兼容） ============
+// ============ Development tool type（Stay backwards compatible） ============
 
 /**
- * 开发模式下的组件定义验证结果
- * @deprecated 使用 ValidationResult 替代
+ * Component definition verification results in development mode
+ * @deprecated use ValidationResult substitute
  */
 export interface ComponentValidationResult {
-  /** 是否通过验证 */
+  /** Whether passed the verification */
   valid: boolean
-  /** 验证错误列表 */
+  /** Validation error list */
   errors: string[]
-  /** 警告列表 */
+  /** warning list */
   warnings: string[]
-  /** 组件类型 */
+  /** Component type */
   componentType: string
 }
 
 /**
- * 组件注册统计信息
+ * Component registration statistics
  */
 export interface ComponentRegistryStats {
-  /** 总组件数量 */
+  /** Total component quantity */
   total: number
-  /** 按分类分组的组件数量 */
+  /** Number of components grouped by category */
   byCategory: Record<string, number>
-  /** 按数据源类型分组的组件数量 */
+  /** Number of components grouped by data source type */
   byDataSource: Record<string, number>
-  /** 有效组件数量 */
+  /** Effective number of components */
   valid: number
-  /** 无效组件数量 */
+  /** Invalid component quantity */
   invalid: number
 }
 
 /**
- * Card2.1 类型系统版本
+ * Card2.1 type system version
  */
 export const CARD2_TYPES_VERSION = '2.1.0'
 
 /**
- * 类型系统特性
+ * Type system properties
  */
 export const CARD2_TYPE_FEATURES = {
-  /** 支持TypeScript严格模式 */
+  /** supportTypeScriptstrict mode */
   strictTypeScript: true,
-  /** 支持泛型组件配置 */
+  /** Support generic component configuration */
   genericConfig: true,
-  /** 支持多渲染器 */
+  /** Support multiple renderers */
   multiRenderer: true,
-  /** 支持交互系统 */
+  /** Support interactive system */
   interactionSystem: true,
-  /** 支持数据绑定 */
+  /** Support data binding */
   dataBinding: true,
-  /** 支持生命周期钩子 */
+  /** Support life cycle hooks */
   lifecycleHooks: true
 } as const

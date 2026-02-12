@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 
 /**
- * 将时间戳格式化为 YYYY-MM-DD HH:mm:ss 格式的字符串（24小时制）
+ * Format timestamp as YYYY-MM-DD HH:mm:ss format string（24hour clock）
  *
- * @param {string | null | undefined} ts - 时间戳
- * @returns {string | null} - 格式化后的时间字符串
+ * @param {string | null | undefined} ts - Timestamp
+ * @returns {string | null} - Formatted time string
  */
 export function formatDateTime(ts: string | null | undefined): string | null {
   return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm:ss') : null

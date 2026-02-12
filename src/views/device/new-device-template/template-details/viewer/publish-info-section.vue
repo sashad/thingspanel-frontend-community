@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 发布信息展示区块
- * 展示 web_chart_config 和 app_chart_config JSON 配置
+ * Publish information display block
+ * exhibit web_chart_config and app_chart_config JSON Configuration
  */
 
 import { inject, computed } from 'vue'
@@ -16,7 +16,7 @@ const templateData = inject<Ref<any>>('templateData')!
 const themeStore = useThemeStore()
 
 /**
- * 格式化 JSON 字符串
+ * format JSON string
  */
 const formatJson = (jsonStr: string | object | undefined): string => {
   if (!jsonStr) return '{}'
@@ -42,7 +42,7 @@ const appChartConfig = computed(() => formatJson(templateData.value?.app_chart_c
 
     <div v-else class="config-container">
       <NGrid :x-gap="20" :y-gap="20" :cols="1">
-        <!-- Web 图表配置 -->
+        <!-- Web Chart configuration -->
         <NGi>
           <NCard :bordered="false" :title="$t('device_template.webChartConfiguration')">
             <CodeMirror
@@ -63,7 +63,7 @@ const appChartConfig = computed(() => formatJson(templateData.value?.app_chart_c
           </NCard>
         </NGi>
 
-        <!-- App 图表配置 -->
+        <!-- App Chart configuration -->
         <NGi>
           <NCard :bordered="false" :title="$t('device_template.appChartConfiguration')">
             <CodeMirror

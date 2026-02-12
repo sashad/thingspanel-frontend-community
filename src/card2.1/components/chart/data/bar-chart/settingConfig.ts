@@ -1,24 +1,24 @@
 /**
- * 柱状图组件配置接口
+ * Bar chart component configuration interface
  */
 export interface BarChartCustomize {
-  // 图表配置
-  title?: string // 图表标题
-  showLegend?: boolean // 显示图例
-  barWidth?: string // 柱宽度（可以是数字或百分比）
-  showLabel?: boolean // 显示标签
+  // Chart configuration
+  title?: string // Chart title
+  showLegend?: boolean // Show legend
+  barWidth?: string // column width（Can be a number or percentage）
+  showLabel?: boolean // show label
 
-  // 坐标轴配置
-  xAxisLabel?: string // X轴标签
-  yAxisLabel?: string // Y轴标签
-  showGrid?: boolean // 显示网格
+  // Axis configuration
+  xAxisLabel?: string // Xaxis labels
+  yAxisLabel?: string // Yaxis labels
+  showGrid?: boolean // show grid
 
-  // 颜色配置
-  barColor?: string // 柱条颜色
-  barGradient?: boolean // 使用渐变色
-  barGradientColor?: string // 渐变终止颜色
+  // Color configuration
+  barColor?: string // Bar color
+  barGradient?: boolean // Use gradient colors
+  barGradientColor?: string // gradient end color
 
-  // 动画配置
-  animationDuration?: number // 动画时长
-  animationDelay?: number // 动画延迟
+  // Animation configuration
+  animationDuration?: number // Animation duration
+  animationDelay?: number // animation delay
 }

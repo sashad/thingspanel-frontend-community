@@ -1,11 +1,11 @@
 import { request } from '../request'
 
-/** 获取设备功能模板列表 */
+/** Get a list of device function templates */
 export const deviceTemplate = async (params: { page: number; page_size: number; name?: string }) => {
   return await request.get<Api.BaseApi.Data | any>(`/device/template`, { params })
 }
 
-/** 删除设备功能模板 */
+/** Delete device feature template */
 export const deleteDeviceTemplate = async (id: string) => {
   return await request.delete<Api.BaseApi.Data | any>(`/device/template/${id}`)
 }
@@ -41,13 +41,13 @@ export const putDeviceModel = async (params: {
 }
 
 /**
- * 获取用于下拉选择的设备列表 (根据文档更新)
+ * Get a list of devices for drop-down selection (Updated based on documentation)
  *
- * @param params - 查询参数 (可选)
+ * @param params - query parameters (Optional)
  */
 export const getDeviceListForSelect = async (params?: Api.Device.DeviceSelectorParams) => {
-  // 使用文档提供的 URL 和参数类型
-  // API返回格式: { code: 200, message: "操作成功", data: { total: number, list: DeviceSelectItem[] } }
+  // Use the documentation provided URL and parameter types
+  // APIReturn format: { code: 200, message: "Operation successful", data: { total: number, list: DeviceSelectItem[] } }
   return await request.get<{
     total: number
     list: Api.Device.DeviceSelectItem[]

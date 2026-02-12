@@ -3,7 +3,7 @@
     <n-form-item>
       <template #label>
         <n-space size="small" align="center">
-          <span>数据过滤路径</span>
+          <span>Data filtering path</span>
           <n-tooltip>
             <template #trigger>
               <n-icon size="14" style="color: var(--text-color-3); cursor: help">
@@ -27,27 +27,27 @@
               </n-icon>
             </template>
             <div style="max-width: 250px; font-size: 12px">
-              <div><strong>过滤路径语法：</strong></div>
+              <div><strong>Filter path syntax：</strong></div>
               <div style="margin-top: 4px">
                 •
                 <code>$</code>
-                或 空白：使用完整数据
+                or blank：Use complete data
                 <br />
                 •
                 <code>$.data</code>
-                ：提取 data 字段
+                ：extract data Field
                 <br />
                 •
                 <code>$.data.list</code>
-                ：提取 data.list 数组
+                ：extract data.list array
                 <br />
                 •
                 <code>$.users[0]</code>
-                ：提取 users 数组第一项
+                ：extract users first item in array
                 <br />
                 •
                 <code>$.result.items</code>
-                ：提取嵌套对象
+                ：Extract nested objects
               </div>
             </div>
           </n-tooltip>
@@ -55,7 +55,7 @@
       </template>
       <n-input
         :value="filterPath"
-        placeholder="$ (使用完整数据) 或 $.data.list (过滤路径)"
+        placeholder="$ (Use complete data) or $.data.list (filter path)"
         clearable
         @update:value="handlePathChange"
       >
@@ -82,16 +82,16 @@
       </n-input>
     </n-form-item>
 
-    <!-- 简化状态提示 -->
+    <!-- Simplified status prompts -->
     <div v-if="filterPath && !filterError" class="filter-status">
-      <n-tag size="tiny" type="success">✓ 路径有效</n-tag>
+      <n-tag size="tiny" type="success">✓ Path is valid</n-tag>
     </div>
 
-    <!-- 错误提示 -->
+    <!-- Error message -->
     <div v-if="filterError" class="filter-error">
       <n-alert type="warning" size="small" :show-icon="false">
         <template #header>
-          <span style="font-size: 12px">⚠️ 路径错误</span>
+          <span style="font-size: 12px">⚠️ Path error</span>
         </template>
         <div style="font-size: 11px">{{ filterError }}</div>
       </n-alert>
@@ -101,19 +101,19 @@
 
 <script setup lang="ts">
 /**
- * 通用数据过滤器组件
- * 支持 JSONPath 语法过滤复杂数据结构
+ * Generic data filter component
+ * support JSONPath Grammarly filtering complex data structures
  */
 
 import { ref, watch, computed } from 'vue'
 import { NFormItem, NInput, NIcon, NTooltip, NSpace, NTag, NAlert } from 'naive-ui'
 
 interface Props {
-  /** 原始数据，用于预览过滤结果 */
+  /** raw data，Used to preview filter results */
   sourceData?: any
-  /** 当前的过滤路径 */
+  /** Current filter path */
   modelValue?: string
-  /** 是否禁用 */
+  /** Whether to disable */
   disabled?: boolean
 }
 
@@ -130,11 +130,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 响应式状态
+// Responsive state
 const filterPath = ref(props.modelValue || '')
 const filterError = ref('')
 
-// 监听外部变化
+// Listen for external changes
 watch(
   () => props.modelValue,
   newValue => {
@@ -145,41 +145,41 @@ watch(
 )
 
 /**
- * 应用数据过滤器
- * @param data 原始数据
- * @param path 过滤路径
+ * Apply data filter
+ * @param data raw data
+ * @param path filter path
  */
 const applyDataFilter = (data: any, path: string): { result: any; error: string } => {
-  // 如果路径为空或者是 $，返回完整数据
+  // If the path is empty or is $，Return complete data
   if (!path || path === '$') {
     return { result: data, error: '' }
   }
 
-  // 如果数据为空，返回 null
+  // if the data is empty，return null
   if (data === null || data === undefined) {
     return { result: null, error: '' }
   }
 
   try {
-    // 简单的 JSONPath 实现
+    // simple JSONPath accomplish
     let current = data
 
-    // 移除开头的 $ 符号
+    // Remove the beginning of $ symbol
     const cleanPath = path.startsWith('$') ? path.substring(1) : path
 
     if (cleanPath === '') {
       return { result: current, error: '' }
     }
 
-    // 按点分割路径，但要处理数组索引
+    // Split path by points，But to deal with array indexing
     const parts = parseJsonPath(cleanPath)
 
     for (const part of parts) {
       if (current === null || current === undefined) {
-        return { result: null, error: `路径 "${part}" 处数据为空` }
+        return { result: null, error: `path "${part}" The data is empty` }
       }
 
-      // 处理数组索引
+      // Handle array index
       if (part.includes('[') && part.includes(']')) {
         const [field, indexPart] = part.split('[')
         const index = parseInt(indexPart.replace(']', ''), 10)
@@ -187,27 +187,27 @@ const applyDataFilter = (data: any, path: string): { result: any; error: string 
         if (field) {
           current = current[field]
           if (current === undefined) {
-            return { result: null, error: `字段 "${field}" 不存在` }
+            return { result: null, error: `Field "${field}" does not exist` }
           }
         }
 
         if (!Array.isArray(current)) {
-          return { result: null, error: `${field || '数据'} 不是数组类型` }
+          return { result: null, error: `${field || 'data'} Not an array type` }
         }
 
         if (index < 0 || index >= current.length) {
-          return { result: null, error: `数组索引 ${index} 超出范围 (0-${current.length - 1})` }
+          return { result: null, error: `array index ${index} out of range (0-${current.length - 1})` }
         }
 
         current = current[index]
       } else {
-        // 普通字段访问
+        // Normal field access
         if (typeof current !== 'object' || current === null) {
-          return { result: null, error: `无法在非对象类型上访问字段 "${part}"` }
+          return { result: null, error: `Cannot access field on non-object type "${part}"` }
         }
 
         if (!(part in current)) {
-          return { result: null, error: `字段 "${part}" 不存在` }
+          return { result: null, error: `Field "${part}" does not exist` }
         }
 
         current = current[part]
@@ -216,12 +216,12 @@ const applyDataFilter = (data: any, path: string): { result: any; error: string 
 
     return { result: current, error: '' }
   } catch (error) {
-    return { result: null, error: `路径解析错误: ${error instanceof Error ? error.message : String(error)}` }
+    return { result: null, error: `Path parsing error: ${error instanceof Error ? error.message : String(error)}` }
   }
 }
 
 /**
- * 解析 JSONPath，处理嵌套结构
+ * parse JSONPath，Handle nested structures
  */
 const parseJsonPath = (path: string): string[] => {
   const parts: string[] = []
@@ -255,18 +255,18 @@ const parseJsonPath = (path: string): string[] => {
 }
 
 /**
- * 处理路径变化
+ * Handling path changes
  */
 const handlePathChange = (value: string) => {
   filterPath.value = value
   emit('update:modelValue', value)
 
-  // 应用过滤器并更新结果
+  // Apply filters and update results
   updateFilter()
 }
 
 /**
- * 更新过滤结果
+ * Update filter results
  */
 const updateFilter = () => {
   if (props.sourceData === null || props.sourceData === undefined) {
@@ -283,7 +283,7 @@ const updateFilter = () => {
   emit('filter-change', result, isValid)
 }
 
-// 监听原始数据变化，自动更新过滤结果
+// Monitor changes in raw data，Automatically update filter results
 watch(() => props.sourceData, updateFilter, { immediate: true, deep: true })
 watch(() => filterPath.value, updateFilter)
 </script>

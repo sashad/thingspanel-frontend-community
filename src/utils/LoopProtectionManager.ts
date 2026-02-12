@@ -1,18 +1,18 @@
 /**
- * 🔥 全局循环检测和防护管理器
+ * 🔥 Global loop detection and protection manager
  *
- * 解决200+组件场景下的循环触发问题：
- * 1. 检测配置变更的循环依赖
- * 2. 防止数据源的递归执行
- * 3. 监控属性绑定的循环更新
- * 4. 提供性能统计和调试信息
+ * solve200+Loop triggering problem in component scenario：
+ * 1. Detecting circular dependencies on configuration changes
+ * 2. Prevent recursive execution of data sources
+ * 3. Monitor cyclic updates of property bindings
+ * 4. Provide performance statistics and debugging information
  */
 
 export interface LoopDetectionConfig {
-  maxDepth: number         // 最大递归深度
-  timeWindow: number       // 时间窗口 (ms)
-  maxCallsInWindow: number // 时间窗口内最大调用次数
-  enableDebug: boolean     // 是否启用调试输出
+  maxDepth: number         // maximum recursion depth
+  timeWindow: number       // time window (ms)
+  maxCallsInWindow: number // Maximum number of calls within the time window
+  enableDebug: boolean     // Whether to enable debugging output
 }
 
 export interface CallRecord {
@@ -26,26 +26,26 @@ export interface CallRecord {
 class LoopProtectionManager {
   private static instance: LoopProtectionManager | null = null
 
-  // 配置
+  // Configuration
   private config: LoopDetectionConfig = {
     maxDepth: 10,
-    timeWindow: 5000,     // 5秒
-    maxCallsInWindow: 50, // 5秒内最多50次调用
+    timeWindow: 5000,     // 5Second
+    maxCallsInWindow: 50, // 5Most in seconds50calls
     enableDebug: process.env.NODE_ENV === 'development'
   }
 
-  // 调用栈跟踪
+  // call stack trace
   private callStacks = new Map<string, CallRecord[]>() // key: functionName
-  private activeCallCounts = new Map<string, number>() // 当前活跃调用计数
+  private activeCallCounts = new Map<string, number>() // Current active call count
 
-  // 时间窗口内的调用统计
+  // Call statistics within time window
   private callHistory = new Map<string, CallRecord[]>() // key: functionName
 
-  // 黑名单：被检测到循环的函数暂时禁用
+  // blacklist：Functions whose loops are detected are temporarily disabled
   private blacklistedFunctions = new Set<string>()
   private blacklistTimeouts = new Map<string, NodeJS.Timeout>()
 
-  // 性能统计
+  // Performance Statistics
   private performanceStats = {
     totalCallsBlocked: 0,
     totalLoopsDetected: 0,
@@ -66,7 +66,7 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 核心方法：检查函数调用是否应该被允许
+   * 🔥 core methods：Check whether the function call should be allowed
    */
   public shouldAllowCall(
     functionName: string,
@@ -76,76 +76,76 @@ class LoopProtectionManager {
   ): boolean {
     const callKey = componentId ? `${functionName}:${componentId}` : functionName
 
-    // 1. 检查黑名单
+    // 1. Check blacklist
     if (this.blacklistedFunctions.has(callKey)) {
       this.performanceStats.totalCallsBlocked++
       if (this.config.enableDebug) {
-        console.warn(`🚫 [LoopProtection] 阻止黑名单函数调用: ${callKey}`)
+        console.warn(`🚫 [LoopProtection] Block blacklist function calls: ${callKey}`)
       }
       return false
     }
 
-    // 2. 检查递归深度
+    // 2. Check recursion depth
     const currentDepth = this.getCurrentDepth(callKey)
     if (currentDepth >= this.config.maxDepth) {
-      this.addToBlacklist(callKey, `递归深度超过${this.config.maxDepth}`)
+      this.addToBlacklist(callKey, `Recursion depth exceeds${this.config.maxDepth}`)
       return false
     }
 
-    // 3. 检查时间窗口内的调用频率
+    // 3. Check the frequency of calls within a time window
     if (this.isCallFrequencyTooHigh(callKey)) {
-      this.addToBlacklist(callKey, `调用频率过高`)
+      this.addToBlacklist(callKey, `Call frequency is too high`)
       return false
     }
 
-    // 4. 记录这次调用
+    // 4. record this call
     this.recordCall(callKey, source, componentId, action)
 
     return true
   }
 
   /**
-   * 🔥 标记函数调用开始
+   * 🔥 Mark the start of a function call
    */
   public markCallStart(functionName: string, componentId?: string, source = 'unknown'): string {
     const callKey = componentId ? `${functionName}:${componentId}` : functionName
     const callId = `${callKey}:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`
 
     if (!this.shouldAllowCall(functionName, componentId, 'start', source)) {
-      return '' // 空字符串表示调用被阻止
+      return '' // An empty string indicates that the call is blocked
     }
 
-    // 增加活跃调用计数
+    // Increase active call count
     const currentCount = this.activeCallCounts.get(callKey) || 0
     this.activeCallCounts.set(callKey, currentCount + 1)
 
     if (this.config.enableDebug && currentCount > 3) {
-      console.warn(`⚠️ [LoopProtection] 高并发调用检测: ${callKey} (${currentCount + 1} 个并发)`)
+      console.warn(`⚠️ [LoopProtection] High concurrent call detection: ${callKey} (${currentCount + 1} concurrent)`)
     }
 
     return callId
   }
 
   /**
-   * 🔥 标记函数调用结束
+   * 🔥 Mark the end of a function call
    */
   public markCallEnd(callId: string, functionName: string, componentId?: string): void {
-    if (!callId) return // 调用被阻止的情况
+    if (!callId) return // Call blocked
 
     const callKey = componentId ? `${functionName}:${componentId}` : functionName
 
-    // 减少活跃调用计数
+    // Reduce active call count
     const currentCount = this.activeCallCounts.get(callKey) || 0
     if (currentCount > 0) {
       this.activeCallCounts.set(callKey, currentCount - 1)
     }
 
-    // 清理调用栈
+    // Clean the call stack
     this.cleanupCallStack(callKey)
   }
 
   /**
-   * 🔥 获取当前递归深度
+   * 🔥 Get the current recursion depth
    */
   private getCurrentDepth(callKey: string): number {
     const stack = this.callStacks.get(callKey) || []
@@ -153,13 +153,13 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 检查调用频率是否过高
+   * 🔥 Check whether the call frequency is too high
    */
   private isCallFrequencyTooHigh(callKey: string): boolean {
     const now = Date.now()
     const history = this.callHistory.get(callKey) || []
 
-    // 清理过期的历史记录
+    // Clean up expired history
     const validHistory = history.filter(record =>
       now - record.timestamp <= this.config.timeWindow
     )
@@ -169,7 +169,7 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 记录函数调用
+   * 🔥 Logging function calls
    */
   private recordCall(callKey: string, source: string, componentId?: string, action?: string): void {
     const now = Date.now()
@@ -181,33 +181,33 @@ class LoopProtectionManager {
       action
     }
 
-    // 更新调用栈
+    // Update call stack
     const stack = this.callStacks.get(callKey) || []
     stack.push(record)
     this.callStacks.set(callKey, stack)
 
-    // 更新历史记录
+    // Update history
     const history = this.callHistory.get(callKey) || []
     history.push(record)
     this.callHistory.set(callKey, history)
   }
 
   /**
-   * 🔥 添加到黑名单
+   * 🔥 Add to blacklist
    */
   private addToBlacklist(callKey: string, reason: string): void {
     this.blacklistedFunctions.add(callKey)
     this.performanceStats.totalLoopsDetected++
 
     if (this.config.enableDebug) {
-      console.error(`🚫 [LoopProtection] 检测到循环，已加入黑名单: ${callKey}`, {
+      console.error(`🚫 [LoopProtection] Loop detected，Blacklisted: ${callKey}`, {
         reason,
-        callHistory: this.callHistory.get(callKey)?.slice(-5), // 最后5次调用
+        callHistory: this.callHistory.get(callKey)?.slice(-5), // at last5calls
         currentDepth: this.getCurrentDepth(callKey)
       })
     }
 
-    // 设置自动解除黑名单的定时器
+    // Set a timer to automatically remove the blacklist
     const existingTimeout = this.blacklistTimeouts.get(callKey)
     if (existingTimeout) {
       clearTimeout(existingTimeout)
@@ -215,51 +215,51 @@ class LoopProtectionManager {
 
     const timeout = setTimeout(() => {
       this.removeFromBlacklist(callKey)
-    }, 10000) // 10秒后自动解除黑名单
+    }, 10000) // 10Automatically remove blacklist after seconds
 
     this.blacklistTimeouts.set(callKey, timeout)
   }
 
   /**
-   * 🔥 从黑名单移除
+   * 🔥 Remove from blacklist
    */
   private removeFromBlacklist(callKey: string): void {
     this.blacklistedFunctions.delete(callKey)
     this.blacklistTimeouts.delete(callKey)
 
-    // 清理相关的调用历史
+    // Clean up related call history
     this.callStacks.delete(callKey)
     this.callHistory.delete(callKey)
     this.activeCallCounts.delete(callKey)
 
     if (this.config.enableDebug) {
-      console.info(`✅ [LoopProtection] 已从黑名单移除: ${callKey}`)
+      console.info(`✅ [LoopProtection] Removed from blacklist: ${callKey}`)
     }
   }
 
   /**
-   * 🔥 清理调用栈
+   * 🔥 Clean the call stack
    */
   private cleanupCallStack(callKey: string): void {
     const stack = this.callStacks.get(callKey) || []
     if (stack.length > 0) {
-      stack.pop() // 移除最后一个调用记录
+      stack.pop() // Remove the last call record
       this.callStacks.set(callKey, stack)
     }
   }
 
   /**
-   * 🔥 设置全局错误处理
+   * 🔥 Set global error handling
    */
   private setupGlobalErrorHandling(): void {
-    // 监听未捕获的异常，可能是循环调用导致的栈溢出
+    // Listen for uncaught exceptions，It may be a stack overflow caused by a loop call
     if (typeof window !== 'undefined') {
       window.addEventListener('error', (event) => {
         if (event.error && event.error.message.includes('Maximum call stack size exceeded')) {
-          console.error('🚫 [LoopProtection] 检测到栈溢出，可能存在无限递归')
+          console.error('🚫 [LoopProtection] Stack overflow detected，Possible infinite recursion')
           this.performanceStats.totalLoopsDetected++
 
-          // 清空所有活跃调用，防止系统崩溃
+          // Clear all active calls，Prevent system crashes
           this.activeCallCounts.clear()
           this.callStacks.clear()
         }
@@ -268,7 +268,7 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 启动性能监控
+   * 🔥 Start performance monitoring
    */
   private startPerformanceMonitoring(): void {
     setInterval(() => {
@@ -283,19 +283,19 @@ class LoopProtectionManager {
       if (this.config.enableDebug && totalCalls > 0) {
       }
 
-      // 清理过期的历史记录
+      // Clean up expired history
       this.cleanupExpiredHistory()
-    }, 30000) // 每30秒统计一次
+    }, 30000) // Every30Statistics once every second
   }
 
   /**
-   * 🔥 清理过期的历史记录
+   * 🔥 Clean up expired history
    */
   private cleanupExpiredHistory(): void {
     const now = Date.now()
     for (const [callKey, history] of this.callHistory.entries()) {
       const validHistory = history.filter(record =>
-        now - record.timestamp <= this.config.timeWindow * 2 // 保留2倍时间窗口的历史
+        now - record.timestamp <= this.config.timeWindow * 2 // reserve2History of multiple time windows
       )
       if (validHistory.length !== history.length) {
         this.callHistory.set(callKey, validHistory)
@@ -304,7 +304,7 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 获取性能统计信息
+   * 🔥 Get performance statistics
    */
   public getPerformanceStats() {
     return {
@@ -316,14 +316,14 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 获取当前黑名单
+   * 🔥 Get the current blacklist
    */
   public getBlacklistedFunctions(): string[] {
     return Array.from(this.blacklistedFunctions)
   }
 
   /**
-   * 🔥 手动清理（用于测试或重置）
+   * 🔥 Manual cleanup（for testing or resetting）
    */
   public reset(): void {
     this.callStacks.clear()
@@ -331,7 +331,7 @@ class LoopProtectionManager {
     this.activeCallCounts.clear()
     this.blacklistedFunctions.clear()
 
-    // 清理所有定时器
+    // Clear all timers
     for (const timeout of this.blacklistTimeouts.values()) {
       clearTimeout(timeout)
     }
@@ -347,18 +347,18 @@ class LoopProtectionManager {
   }
 
   /**
-   * 🔥 更新配置
+   * 🔥 Update configuration
    */
   public updateConfig(newConfig: Partial<LoopDetectionConfig>): void {
     this.config = { ...this.config, ...newConfig }
   }
 }
 
-// 导出单例实例
+// Export singleton instance
 export const loopProtectionManager = LoopProtectionManager.getInstance()
 
 /**
- * 🔥 装饰器：自动添加循环保护
+ * 🔥 Decorator：Automatically add loop protection
  */
 export function loopProtection(functionName?: string) {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
@@ -370,7 +370,7 @@ export function loopProtection(functionName?: string) {
       const callId = loopProtectionManager.markCallStart(fnName, componentId, 'decorator')
 
       if (!callId) {
-        // 调用被阻止
+        // call blocked
         return Promise.resolve()
       }
 

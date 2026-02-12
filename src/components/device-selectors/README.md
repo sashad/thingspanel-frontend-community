@@ -1,55 +1,55 @@
-# 设备选择器组件
+# Device selector component
 
-## 概述
+## Overview
 
-这个文件夹包含了两个专门用于设备指标选择的组件：
+This folder contains two components specifically for device indicator selection：
 
-- **DeviceMetricsSelector** - 通用的设备指标选择器
-- **DeviceDispatchSelector** - 专门用于调度数据的设备指标选择器
+- **DeviceMetricsSelector** - Generic device metric selector
+- **DeviceDispatchSelector** - Device metric selector specifically for scheduling data
 
-## 组件特性
+## Component properties
 
-### 🎯 核心功能
-- **设备选择** - 支持设备列表筛选和搜索
-- **指标选择** - 按数据源类型分组的指标显示
-- **自动加载** - 组件挂载时自动加载设备列表
-- **智能过滤** - 根据数据类型自动过滤指标
-- **完整国际化** - 支持中英文界面
+### 🎯 Core functions
+- **Equipment selection** - Support device list filtering and search
+- **Indicator selection** - Metric display grouped by data source type
+- **autoload** - Automatically load the device list when the component is mounted
+- **Smart filtering** - Automatically filter metrics based on data type
+- **Complete internationalization** - Support Chinese and English interface
 
-### 🔧 技术特点
-- **TypeScript** - 完整的类型支持
-- **Vue 3 Composition API** - 现代化的Vue语法
-- **Naive UI** - 统一的UI组件库
-- **响应式设计** - 支持双向数据绑定
-- **API适配** - 正确适配后端API数据结构
+### 🔧 Technical features
+- **TypeScript** - Complete type support
+- **Vue 3 Composition API** - modernVuegrammar
+- **Naive UI** - unifiedUIComponent library
+- **Responsive design** - Supports two-way data binding
+- **APIadaptation** - Correctly adapt the backendAPIdata structure
 
-## 最近修复
+## Recently fixed
 
-### ✅ 已修复问题
-1. **指标下拉无数据** - 修复了API数据结构适配问题
-2. **国际化不完整** - 添加了完整的国际化翻译
-3. **设备自动加载** - 确保组件挂载时自动加载设备列表
-4. **功能精简** - 移除了不必要的输入框，专注核心功能
-5. **JavaScript错误** - 修复了`undefined`的`forEach`调用错误
+### ✅ Issue fixed
+1. **There is no data in the indicator drop-down** - fixedAPIData structure adaptation problem
+2. **Incomplete internationalization** - Added full international translations
+3. **Device autoloads** - Ensure that the device list is automatically loaded when the component is mounted
+4. **Simplified functions** - Removed unnecessary input boxes，Focus on core functions
+5. **JavaScriptmistake** - fixed`undefined`of`forEach`Call error
 
-### 🔧 技术改进
-- 正确适配API返回的数据结构：`[{ data_source_type, options: [{ key, label, data_type }] }]`
-- 完善了指标选择逻辑，支持分组显示
-- 添加了完整的错误处理和调试信息
-- 增强了数据验证，防止`undefined`和`null`值导致的错误
-- 改进了API响应数据的类型检查
+### 🔧 technical improvements
+- Correct fitAPIReturned data structure：`[{ data_source_type, options: [{ key, label, data_type }] }]`
+- Improved indicator selection logic，Support group display
+- Added complete error handling and debugging information
+- Enhanced data validation，prevent`undefined`and`null`Error caused by value
+- improvedAPIType checking of response data
 
-## 组件对比
+## Component comparison
 
-| 特性 | DeviceMetricsSelector | DeviceDispatchSelector |
+| characteristic | DeviceMetricsSelector | DeviceDispatchSelector |
 |------|----------------------|----------------------|
-| 用途 | 通用设备指标选择 | 调度数据专用 |
-| 数据类型选择 | ❌ | ✅ |
-| 指标名称输入 | ✅ | ❌ |
-| 聚合函数选择 | ✅ | ❌ |
-| 发送数据输入 | ❌ | ❌ |
+| use | General equipment indicator selection | Dedicated to scheduling data |
+| Data type selection | ❌ | ✅ |
+| Indicator name input | ✅ | ❌ |
+| Aggregation function selection | ✅ | ❌ |
+| Send data input | ❌ | ❌ |
 
-## 使用方法
+## How to use
 
 ### DeviceMetricsSelector
 
@@ -103,83 +103,83 @@ const dispatchConfig = ref({
 </script>
 ```
 
-## 数据格式
+## Data format
 
-### DeviceMetricsSelector 数据格式
+### DeviceMetricsSelector Data format
 
 ```typescript
 interface DeviceMetricsValue {
-  deviceId?: string        // 设备ID
-  metricsId?: string       // 指标ID
-  metricsName?: string     // 指标名称
-  aggregateFunction?: string // 聚合函数
+  deviceId?: string        // equipmentID
+  metricsId?: string       // indexID
+  metricsName?: string     // Indicator name
+  aggregateFunction?: string // aggregate function
 }
 ```
 
-### DeviceDispatchSelector 数据格式
+### DeviceDispatchSelector Data format
 
 ```typescript
 interface DeviceDispatchValue {
-  deviceId?: string        // 设备ID
-  deviceName?: string      // 设备名称
-  dataType?: string        // 数据类型 (attributes/telemetry/command)
-  metricsId?: string       // 指标ID
-  metricsName?: string     // 指标名称
+  deviceId?: string        // equipmentID
+  deviceName?: string      // Device name
+  dataType?: string        // data type (attributes/telemetry/command)
+  metricsId?: string       // indexID
+  metricsName?: string     // Indicator name
 }
 ```
 
-## Props 配置
+## Props Configuration
 
 ### DeviceMetricsSelector Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
+| attribute name | type | default value | illustrate |
 |--------|------|--------|------|
-| `modelValue` | `Object` | `{}` | 双向绑定的数据对象 |
-| `deviceOptions` | `Array` | `[]` | 设备选项列表 |
-| `disabled` | `Boolean` | `false` | 是否禁用 |
-| `showMetricsName` | `Boolean` | `true` | 是否显示指标名称输入框 |
-| `showAggregateFunction` | `Boolean` | `false` | 是否显示聚合函数选择 |
-| `isNoAggregate` | `Boolean` | `false` | 是否为不聚合状态 |
+| `modelValue` | `Object` | `{}` | Two-way bound data object |
+| `deviceOptions` | `Array` | `[]` | Device options list |
+| `disabled` | `Boolean` | `false` | Whether to disable |
+| `showMetricsName` | `Boolean` | `true` | Whether to display the indicator name input box |
+| `showAggregateFunction` | `Boolean` | `false` | Whether to display aggregate function selection |
+| `isNoAggregate` | `Boolean` | `false` | Whether it is in non-aggregation state |
 
 ### DeviceDispatchSelector Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
+| attribute name | type | default value | illustrate |
 |--------|------|--------|------|
-| `modelValue` | `Object` | `{}` | 双向绑定的数据对象 |
-| `deviceOptions` | `Array` | `[]` | 设备选项列表 |
-| `disabled` | `Boolean` | `false` | 是否禁用 |
+| `modelValue` | `Object` | `{}` | Two-way bound data object |
+| `deviceOptions` | `Array` | `[]` | Device options list |
+| `disabled` | `Boolean` | `false` | Whether to disable |
 
 ## Events
 
 ### DeviceMetricsSelector Events
 
-| 事件名 | 参数 | 说明 |
+| event name | parameter | illustrate |
 |--------|------|------|
-| `update:modelValue` | `value: DeviceMetricsValue` | 数据变化时触发 |
-| `device-change` | `deviceId: string, device: DeviceOption` | 设备选择变化时触发 |
-| `metrics-change` | `metricsId: string, metrics: MetricsOption` | 指标选择变化时触发 |
+| `update:modelValue` | `value: DeviceMetricsValue` | Triggered when data changes |
+| `device-change` | `deviceId: string, device: DeviceOption` | Triggered when device selection changes |
+| `metrics-change` | `metricsId: string, metrics: MetricsOption` | Triggered when indicator selection changes |
 
 ### DeviceDispatchSelector Events
 
-| 事件名 | 参数 | 说明 |
+| event name | parameter | illustrate |
 |--------|------|------|
-| `update:modelValue` | `value: DeviceDispatchValue` | 数据变化时触发 |
-| `device-change` | `deviceId: string, device: DeviceOption` | 设备选择变化时触发 |
-| `data-type-change` | `dataType: string` | 数据类型变化时触发 |
-| `metrics-change` | `metricsId: string, metrics: MetricsOption` | 指标选择变化时触发 |
+| `update:modelValue` | `value: DeviceDispatchValue` | Triggered when data changes |
+| `device-change` | `deviceId: string, device: DeviceOption` | Triggered when device selection changes |
+| `data-type-change` | `dataType: string` | Triggered when data type changes |
+| `metrics-change` | `metricsId: string, metrics: MetricsOption` | Triggered when indicator selection changes |
 
-## 方法
+## method
 
-两个组件都暴露了以下方法：
+Both components expose the following methods：
 
-| 方法名 | 参数 | 返回值 | 说明 |
+| method name | parameter | return value | illustrate |
 |--------|------|--------|------|
-| `loadDeviceOptions` | - | `Promise<void>` | 加载设备列表 |
-| `reset` | - | `void` | 重置组件状态 |
+| `loadDeviceOptions` | - | `Promise<void>` | Load device list |
+| `reset` | - | `void` | Reset component state |
 
-## 样式定制
+## Style customization
 
-组件支持通过CSS变量进行样式定制：
+Component support viaCSSVariables for style customization：
 
 ```css
 .device-metrics-selector,
@@ -190,44 +190,44 @@ interface DeviceDispatchValue {
 }
 ```
 
-## 注意事项
+## Things to note
 
-1. **设备选项格式**: 设备选项必须包含 `id` 和 `name` 字段
-2. **指标数据格式**: 指标数据必须包含 `key`、`label`、`data_type` 等字段
-3. **API依赖**: 组件依赖 `deviceListForPanel` 和 `deviceMetricsList` API
-4. **国际化**: 组件使用 `$t` 进行国际化，确保相关翻译文件存在
-5. **自动加载**: 如果没有提供 `deviceOptions`，组件会自动加载设备列表
-6. **数据结构**: API返回的指标数据结构为 `[{ data_source_type, options: [{ key, label, data_type }] }]`
+1. **Device option format**: Device options must contain `id` and `name` Field
+2. **Indicator data format**: Metric data must contain `key`、`label`、`data_type` etc fields
+3. **APIrely**: Component dependencies `deviceListForPanel` and `deviceMetricsList` API
+4. **internationalization**: Component usage `$t` 进行internationalization，Make sure the relevant translation files exist
+5. **autoload**: if not provided `deviceOptions`，The component will automatically load the device list
+6. **data structure**: API返回的指标data structure为 `[{ data_source_type, options: [{ key, label, data_type }] }]`
 
-## 测试
+## test
 
-可以使用测试页面来测试组件的各种功能：
+Test pages can be used to test various functionality of the component：
 
-- `src/views/test/DeviceMetricsSelectorTest.vue` - DeviceMetricsSelector 测试页面
-- `src/views/test/DeviceDispatchSelectorTest.vue` - DeviceDispatchSelector 测试页面
+- `src/views/test/DeviceMetricsSelectorTest.vue` - DeviceMetricsSelector test page
+- `src/views/test/DeviceDispatchSelectorTest.vue` - DeviceDispatchSelector test page
 
-## 更新日志
+## Change log
 
-### v1.3.0 (最新)
-- ✅ 彻底修复Naive UI组件`undefined`错误
-- ✅ 为所有`NSelect`组件添加`|| []`保护
-- ✅ 在`processedMetricsOptions`中添加try-catch错误处理
-- ✅ 确保组件在任何情况下都不会传递`undefined`给Naive UI
+### v1.3.0 (up to date)
+- ✅ Complete restorationNaive UIcomponents`undefined`mistake
+- ✅ for all`NSelect`Component addition`|| []`Protect
+- ✅ exist`processedMetricsOptions`Add intry-catchError handling
+- ✅ Make sure the component is not passed under any circumstances`undefined`GiveNaive UI
 
 ### v1.2.0
-- ✅ 修复JavaScript错误：`undefined`的`forEach`调用
-- ✅ 增强数据验证和类型检查
-- ✅ 改进API响应数据处理
-- ✅ 防止空值和异常数据导致的错误
+- ✅ repairJavaScriptmistake：`undefined`of`forEach`call
+- ✅ Enhanced data validation and type checking
+- ✅ improveAPIResponse data processing
+- ✅ Prevent errors caused by null values ​​and abnormal data
 
 ### v1.1.0
-- ✅ 修复指标下拉无数据问题
-- ✅ 完善国际化翻译
-- ✅ 优化API数据结构适配
-- ✅ 改进错误处理机制
+- ✅ Fixed the problem of no data in indicator drop-down
+- ✅ Improve international translation
+- ✅ optimizationAPIData structure adaptation
+- ✅ Improve error handling mechanism
 
 ### v1.0.0
-- 🎉 初始版本发布
-- ✅ 基础设备指标选择功能
-- ✅ 支持分组显示
-- ✅ 双向数据绑定 
+- 🎉 Initial release
+- ✅ Basic equipment indicator selection function
+- ✅ Support group display
+- ✅ Two-way data binding 

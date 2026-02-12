@@ -5,11 +5,11 @@ import { $t } from '@/locales'
 defineOptions({ name: 'IconSelect' })
 
 interface Props {
-  /** 选中的图标 */
+  /** selected icon */
   value: string
-  /** 图标列表 */
+  /** Icon list */
   icons: string[]
-  /** 未选中图标 */
+  /** unchecked icon */
   emptyIcon?: string
 }
 

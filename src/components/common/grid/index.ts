@@ -1,46 +1,46 @@
 /**
- * 通用栅格组件导出
+ * Generic raster component export
  *
  * @description
- * 该文件作为栅格组件模块的统一出口。
- * 目前，项目已全面转向基于 `grid-layout-plus` 的 `GridLayoutPlus` 组件，
- * 此前的 `DraggableResizableGrid` 实现已被移除。
+ * This file serves as a unified export for the Raster Component module。
+ * at present，The project has been fully shifted to be based on `grid-layout-plus` of `GridLayoutPlus` components，
+ * previous `DraggableResizableGrid` Implementation has been removed。
  *
- * `gridLayoutPlusIndex.ts` 文件中包含了所有与 `GridLayoutPlus` 相关的导出，
- * 包括组件、类型、Hooks 和工具函数。
+ * `gridLayoutPlusIndex.ts` The file contains all `GridLayoutPlus` Related exports，
+ * include components、type、Hooks and utility functions。
  */
 
-// ==================== Grid Layout Plus (推荐) ====================
-// 基于 grid-layout-plus 的现代化解决方案
+// ==================== Grid Layout Plus (recommend) ====================
+// based on grid-layout-plus modern solutions for
 export * from './gridLayoutPlusIndex'
 
-// ==================== 组件信息 ====================
+// ==================== Component information ====================
 
-// 版本信息
-export const GRID_VERSION = '3.0.0' // 版本升级，因为旧组件已被移除
+// Version information
+export const GRID_VERSION = '3.0.0' // Version upgrade，Because the old component has been removed
 export const GRID_BUILD_DATE = new Date().toISOString()
 
 /**
- * 获取组件信息
+ * Get component information
  */
 export function getGridInfo() {
   return {
     version: GRID_VERSION,
     buildDate: GRID_BUILD_DATE,
     currentComponent: 'GridLayoutPlus',
-    description: '项目已全面采用基于 grid-layout-plus 的现代化网格布局组件。',
+    description: 'The project has fully adopted the grid-layout-plus A modern grid layout component。',
     features: [
-      '基于 Grid Layout Plus 库',
-      '响应式布局',
-      '拖拽和调整大小',
-      '主题支持',
-      '完整的 TypeScript 支持',
-      '性能优化',
-      '丰富的 API 和事件系统',
-      '历史记录（撤销/重做）',
-      '布局导入/导出'
+      'based on Grid Layout Plus Library',
+      'Responsive layout',
+      'Drag and resize',
+      'Theme support',
+      'complete TypeScript support',
+      'Performance optimization',
+      'rich API and event system',
+      'History（Cancel/Redo）',
+      'Layout import/Export'
     ],
     migration_notes:
-      '所有旧的 DraggableResizableGrid 相关组件和 API 已被移除，请确保所有引用都已更新至 GridLayoutPlus。'
+      'all old DraggableResizableGrid related components and API has been removed，Please ensure all citations are updated to GridLayoutPlus。'
   }
 }

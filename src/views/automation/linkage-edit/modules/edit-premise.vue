@@ -27,7 +27,7 @@ const premiseFormRef = ref<FormInst | null>(null)
 const premiseForm = ref({
   ifGroups: [] as any
 })
-// 场景表单规则
+// Scenario form rules
 const premiseFormRules = ref({
   ifType: {
     required: true,
@@ -121,8 +121,8 @@ const premiseFormRules = ref({
   }
 })
 
-/** if分组的数据类型 */
-// 选项一条件类型的下拉
+/** ifgrouped data type */
+// Option one condition type drop-down
 // const ifTypeOptions = ref([
 //   {
 //     label: $t('common.deviceConditions'),
@@ -133,7 +133,7 @@ const premiseFormRules = ref({
 //     value: '2'
 //   }
 //   // {
-//   //   label: '服务条件',
+//   //   label: 'Conditions of service',
 //   //   value: '3'
 //   // }
 // ]);
@@ -159,7 +159,7 @@ const ifTypeChange = (ifItem: any, data: any) => {
   ifItem.ifType = data
 }
 
-// 设备条件类型下选项2使用的下拉
+// Options under device condition type2Use the dropdown
 const deviceConditionOptions = computed(() => [
   {
     label: $t('common.singleDevice'),
@@ -188,9 +188,9 @@ const triggerConditionsTypeChange = (ifItem: any, data: any) => {
   emit('conditionChose', data)
 }
 
-// 设备分组列表
+// Device group list
 const deviceGroupOptions = ref([] as any)
-// 获取设备分组
+// Get device group
 const getGroup = async () => {
   deviceGroupOptions.value = []
   const res = await deviceGroupTree({})
@@ -200,7 +200,7 @@ const getGroup = async () => {
   })
 }
 
-// 设备列表
+// Device list
 const deviceOptions = ref([] as any)
 const queryDevice = ref({
   group_id: null as any,
@@ -221,7 +221,7 @@ const onDeviceKeydownEnter = (e: any, ifIndex: number) => {
   e.preventDefault()
   return false
 }
-// 获取设备列表
+// Get device list
 const getDevice = async (groupId: any, name: any) => {
   queryDevice.value.group_id = groupId || null
   queryDevice.value.device_name = name || null
@@ -234,7 +234,7 @@ const getDevice = async (groupId: any, name: any) => {
   //   selectInstRef.value = false;
   // }
 }
-// 选择设备
+// Select device
 const triggerSourceChange = (ifItem: any, ifIndex: number) => {
   ifItem.trigger_param_type = null
   ifItem.trigger_param = null
@@ -257,12 +257,12 @@ const triggerSourceChange = (ifItem: any, ifIndex: number) => {
 
 const queryDeviceName = ref<Record<number, any>>({})
 
-// 清理 refs 的函数
+// clean up refs function
 onBeforeUpdate(() => {
   queryDeviceName.value = {}
 })
 
-// 设置 ref 的函数
+// set up ref function
 const setQueryDeviceNameRef = (el: any, index: number) => {
   if (el) {
     queryDeviceName.value[index] = el
@@ -277,28 +277,28 @@ const handleFocus = (ifIndex: any) => {
   }
 }
 
-// 设备配置列表
+// Device configuration list
 const deviceConfigOption = ref([])
-// 设备配置列表查询条件
+// Device configuration list query conditions
 const queryDeviceConfig = ref({
   device_config_name: ''
 })
-// 获取设备配置列表
+// Get device configuration list
 const getDeviceConfig = async (name: string) => {
   queryDeviceConfig.value.device_config_name = name || ''
   const res = await deviceConfigAll(queryDeviceConfig.value)
   deviceConfigOption.value = res.data || []
 }
 
-// 新增：主动加载选项的函数
+// New：Function to actively load options
 const loadTriggerParamOptions = async (ifItem: any) => {
-  // 避免重复加载，如果选项已存在则不重新加载
+  // Avoid repeated loading，Do not reload if option already exists
   if (ifItem.triggerParamOptions && ifItem.triggerParamOptions.length > 0) {
     return
   }
 
   if (ifItem.trigger_source && (ifItem.trigger_conditions_type === '10' || ifItem.trigger_conditions_type === '11')) {
-    ifItem.triggerParamOptions = [] // 初始化为空数组
+    ifItem.triggerParamOptions = [] // Initialized to an empty array
     let res = null as any
     try {
       if (ifItem.trigger_conditions_type === '10') {
@@ -338,14 +338,14 @@ const loadTriggerParamOptions = async (ifItem: any) => {
   }
 }
 
-// 下拉获取的动作标识符
+// Action identifier obtained by pulling down
 const actionParamShow = async (ifItem: any, data: any) => {
-  // 调用主动加载函数，它会处理重复加载的问题
+  // Call active loading function，It will handle duplicate loading issues
   if (data === true) {
     await loadTriggerParamOptions(ifItem)
   }
-  // 原有的 actionParamShow 逻辑可以简化或移除，因为 loadTriggerParamOptions 做了主要工作
-  // 保留原始注释掉的逻辑以供参考，或者完全移除
+  // original actionParamShow Logic can be simplified or removed，because loadTriggerParamOptions did the main work
+  // Keep original commented out logic for reference，or remove it completely
   // if (data === true && ifItem.trigger_source) {
   //   ifItem.triggerParamOptions = [];
   //   let res = null as any;
@@ -376,21 +376,21 @@ const actionParamShow = async (ifItem: any, data: any) => {
   //   }
   //   const statusData = {
   //     value: 'status',
-  //     label: 'status(状态)',
+  //     label: 'status(state)',
   //     options: [
   //       {
   //         value: 'status/On-line',
-  //         label: 'On-line(上线)',
+  //         label: 'On-line(Go online)',
   //         key: 'On-line'
   //       },
   //       {
   //         value: 'status/Off-line',
-  //         label: 'Off-line(下线)',
+  //         label: 'Off-line(offline)',
   //         key: 'Off-line'
   //       },
   //       {
   //         value: 'status/All',
-  //         label: 'All(全部)',
+  //         label: 'All(all)',
   //         key: 'All'
   //       }
   //     ]
@@ -399,7 +399,7 @@ const actionParamShow = async (ifItem: any, data: any) => {
   // }
 }
 
-// 创建全局的statusData计算属性
+// Create a globalstatusDataComputed properties
 const statusData = computed(() => ({
   value: 'status',
   label: $t('page.automation.linkage.premise.status.label'),
@@ -424,7 +424,7 @@ const statusData = computed(() => ({
 
 const message = useMessage()
 
-// 动作值标识
+// action value identifier
 const actionValueChange = (ifItem: any) => {
   if (ifItem.trigger_param_type === 'event') {
     try {
@@ -443,7 +443,7 @@ const actionValueChange = (ifItem: any) => {
   }
 }
 
-// 时间条件类型下选项2使用的下拉
+// Options under time condition type2Use the dropdown
 const getTimeConditionOptions = ifGroup => {
   return [
     {
@@ -477,7 +477,7 @@ const getTimeConditionOptions = ifGroup => {
 //     value: '22'
 //   }
 // ]);
-// 服务条件类型下选项2使用的下拉
+// Options under service condition type2Use the dropdown
 const serviceConditionOptions = computed(() => [
   {
     label: $t('common.weather'),
@@ -487,7 +487,7 @@ const serviceConditionOptions = computed(() => [
 
 // const deviceOptions = ref([]);
 
-// 时间条件下，重复时，使用的周期选项
+// under time conditions，when repeated，Period options used
 const cycleOptions = computed(() => [
   {
     label: $t('common.everyHour'),
@@ -507,7 +507,7 @@ const cycleOptions = computed(() => [
   }
 ])
 
-// 时间条件下，范围时，使用的周期选项
+// under time conditions，range，Period options used
 const weekOptions = computed(() => [
   {
     label: $t('page.irrigation.time.week.monday'),
@@ -538,7 +538,7 @@ const weekOptions = computed(() => [
     value: '7'
   }
 ])
-// 天气条件选项
+// Weather conditions options
 const weatherOptions = computed(() => [
   {
     label: $t('common.sunrise'),
@@ -550,7 +550,7 @@ const weatherOptions = computed(() => [
   }
 ])
 
-// 操作符选项
+// Operator options
 const determineOptions = computed(() => [
   {
     label: $t('common.equal'),
@@ -585,7 +585,7 @@ const determineOptions = computed(() => [
     value: 'in'
   }
 ])
-// 过期时间选项
+// Expiration time options
 const expirationTimeOptions = computed(() => [
   {
     label: $t('common.minutes5'),
@@ -609,89 +609,89 @@ const expirationTimeOptions = computed(() => [
   }
 ])
 
-// 月份范围选项
+// Month range options
 const mouthRangeOptions = repeat(31, undefined).map((_, i) => ({
   label: String(i + 1),
   value: i + 1
 }))
 const judgeItem = ref({
-  ifType: null, // 第一条件类型
-  trigger_conditions_type: null, // 第二条件-后端
-  trigger_source: null, // 设备/设备类ID值-后端
-  trigger_param_type: null, // 触发消息标识符-后端
-  trigger_param: null, // 触发参数-后端
-  trigger_param_key: null, // 触发参数-
-  trigger_operator: null, // 操作符
-  trigger_value: null, // 目标值(后端)
-  task_type: null, // 重复时间周期值-后端
-  params: null, //  时间值-后端
-  execution_time: null, // 执行时间-日时分值-后端
-  expiration_time: null, // 过期时间-日时分值-后端
-  timeValue: null, // 时分秒值
-  onceTimeValue: null, // 单次执行时间-日时分值
-  hourTimeValue: null, // 时间值-选择小时
-  dayTimeValue: null, // 时间值-选择天
-  weekTimeValue: null, // 时间值-选择周
-  monthTimeValue: null, // 时间值-选择月
+  ifType: null, // first condition type
+  trigger_conditions_type: null, // second condition-rear end
+  trigger_source: null, // equipment/Equipment classIDvalue-rear end
+  trigger_param_type: null, // Trigger message identifier-rear end
+  trigger_param: null, // Trigger parameters-rear end
+  trigger_param_key: null, // Trigger parameters-
+  trigger_operator: null, // Operator
+  trigger_value: null, // target value(rear end)
+  task_type: null, // Repeat time period value-rear end
+  params: null, //  time value-rear end
+  execution_time: null, // Execution time-Day time minute value-rear end
+  expiration_time: null, // Expiration time-Day time minute value-rear end
+  timeValue: null, // Hours, minutes and seconds
+  onceTimeValue: null, // Single execution time-Day time minute value
+  hourTimeValue: null, // time value-Select hour
+  dayTimeValue: null, // time value-Select day
+  weekTimeValue: null, // time value-Select week
+  monthTimeValue: null, // time value-Select month
 
   // eslint-disable-next-line no-bitwise
-  weekChoseValue: [], // 星期多选值
-  monthChoseValue: null, // 月份某一天
+  weekChoseValue: [], // Weekday multiple choice value
+  monthChoseValue: null, // a certain day of the month
 
-  startTimeValue: null, // 范围的开始时间
-  endTimeValue: null, // 范围的结束时间
-  minValue: null, // 最小
-  maxValue: null, // 最大
-  weatherValue: null, // 天气值
-  deviceGroupId: null, // 设备分组id
-  triggerParamOptions: [] // 动作标识菜单下拉列表数据选项
+  startTimeValue: null, // range start time
+  endTimeValue: null, // range end time
+  minValue: null, // smallest
+  maxValue: null, // maximum
+  weatherValue: null, // weather value
+  deviceGroupId: null, // Device groupingid
+  triggerParamOptions: [] // Action ID menu dropdown list data options
 })
 // interface JudgeItem {
-//   ifType: string; // 第一条件类型
-//   trigger_conditions_type: string; // 第二条件--后端
-//   trigger_source: string; // 设备类ID值--后端
-//   trigger_param_type: string; // 触发消息标识符--后端
-//   trigger_param: string; // 触发参数--后端
-//   trigger_operator: string; // 操作符
-//   trigger_value: string; // 目标值(后端)
-//   onceTimeValue: string; // 单次执行时间-日时分值
-//   execution_time: string; // 单次执行时间-后端
-//   expiration_time: string; // 单次过期时间-后端
+//   ifType: string; // first condition type
+//   trigger_conditions_type: string; // second condition--rear end
+//   trigger_source: string; // Equipment classIDvalue--rear end
+//   trigger_param_type: string; // Trigger message identifier--rear end
+//   trigger_param: string; // Trigger parameters--rear end
+//   trigger_operator: string; // Operator
+//   trigger_value: string; // target value(rear end)
+//   onceTimeValue: string; // Single execution time-Day time minute value
+//   execution_time: string; // Single execution time-rear end
+//   expiration_time: string; // Single expiration time-rear end
 //
-//   timeValue: string; // 时分秒值
-//   task_type: string; // 重复时间周期值
-//   params: string; //  时间值-后端
-//   hourTimeValue: number; // 时间值-选择小时
-//   dayTimeValue: number; // 时间值-选择天
-//   weekTimeValue: number; // 时间值-选择周
-//   monthTimeValue: number; // 时间值-选择月
-//   weekChoseValue: (string | number)[] | null | undefined; // 星期多选值
-//   monthChoseValue: string; // 月份某一天
-//   startTimeValue: number; // 范围的开始时间
-//   endTimeValue: number; // 范围的结束时间
-//   minValue: string; // 最小
-//   maxValue: string; // 最大
-//   weatherValue: string; // 天气值
-//   deviceGroupId: string; // 设备分组id
-//   triggerParamOptions: object | any; // 动作标识菜单下拉列表数据选项
+//   timeValue: string; // Hours, minutes and seconds
+//   task_type: string; // Repeat time period value
+//   params: string; //  time value-rear end
+//   hourTimeValue: number; // time value-Select hour
+//   dayTimeValue: number; // time value-Select day
+//   weekTimeValue: number; // time value-Select week
+//   monthTimeValue: number; // time value-Select month
+//   weekChoseValue: (string | number)[] | null | undefined; // Weekday multiple choice value
+//   monthChoseValue: string; // a certain day of the month
+//   startTimeValue: number; // range start time
+//   endTimeValue: number; // range end time
+//   minValue: string; // smallest
+//   maxValue: string; // maximum
+//   weatherValue: string; // weather value
+//   deviceGroupId: string; // Device groupingid
+//   triggerParamOptions: object | any; // Action ID menu dropdown list data options
 // }
 
 // const ifGroups = ref([] as any);
 
-// 给某个条件中增加条件
+// Add a condition to a condition
 const addIfGroupsSubItem = async (ifGroupIndex: any) => {
   await premiseFormRef.value?.validate()
   premiseForm.value.ifGroups[ifGroupIndex].push(JSON.parse(JSON.stringify(judgeItem.value)))
 }
-// 删除某个条进组中的某个条件
+// Delete a condition in an entry group
 const deleteIfGroupsSubItem = (ifGroupIndex: any, ifIndex: any) => {
   premiseForm.value.ifGroups[ifGroupIndex].splice(ifIndex, 1)
 }
-// 删除某个条件组
+// Delete a condition group
 const deleteIfGroupsItem = (ifIndex: any) => {
   premiseForm.value.ifGroups.splice(ifIndex, 1)
 }
-// 新增一个条件组
+// Add a new condition group
 const addIfGroupItem = (data: any) => {
   // await premiseFormRef.value?.validate();
   const groupObj: any = []
@@ -749,9 +749,9 @@ watch(
   () => props.conditionData,
   newValue => {
     if (newValue && Array.isArray(newValue)) {
-      // 使用深拷贝确保响应性
+      // Use deep copies to ensure responsiveness
       premiseForm.value.ifGroups = JSON.parse(JSON.stringify(newValue))
-      // 遍历并主动加载选项
+      // Traverse and actively load options
       premiseForm.value.ifGroups.forEach(ifGroup => {
         if (Array.isArray(ifGroup)) {
           ifGroup.forEach(ifItem => {
@@ -787,16 +787,16 @@ onMounted(() => {
   }
 })
 
-// 监听国际化语言变化，更新triggerParamOptions中的statusData
+// Monitor internationalization language changes，renewtriggerParamOptionsinstatusData
 watch(locale, () => {
-  // 遍历所有ifGroups中的ifItems，更新其triggerParamOptions中的statusData
+  // Traverse allifGroupsinifItems，update itstriggerParamOptionsinstatusData
   premiseForm.value.ifGroups.forEach((ifGroup: any) => {
     ifGroup.ifItems.forEach((ifItem: any) => {
       if (ifItem.triggerParamOptions && Array.isArray(ifItem.triggerParamOptions)) {
-        // 找到并更新statusData项
+        // Find and updatestatusDataitem
         const statusIndex = ifItem.triggerParamOptions.findIndex((opt: any) => opt.value === 'status')
         if (statusIndex !== -1) {
-          // 用新的statusData替换旧的
+          // use newstatusDatareplace old one
           ifItem.triggerParamOptions[statusIndex] = statusData.value
         }
       }
@@ -831,7 +831,7 @@ watch(
           <NFlex v-for="(ifItem, ifIndex) in ifGroupItem" :key="ifIndex" class="ifGroupItem-class mb-2 w-100%">
             <NFlex class="flex-1" align="center">
               <NTag v-if="ifIndex !== 0" type="success" class="tag-class" size="small">{{ $t('generate.and') }}</NTag>
-              <!-- 选项1条件类型下拉-->
+              <!-- Options1Condition type drop-down-->
               <NFormItem
                 :show-label="false"
                 :path="`ifGroups[${ifGroupIndex}][${ifIndex}].ifType`"
@@ -846,7 +846,7 @@ watch(
                 />
               </NFormItem>
               <NFlex v-if="ifItem.ifType === '1'" class="flex-1">
-                <!--  设备条件->选择类型下拉-->
+                <!--  Equipment conditions->Select type drop down-->
                 <NFormItem
                   :show-label="false"
                   :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_conditions_type`"
@@ -923,7 +923,7 @@ watch(
                   </NFormItem>
                 </template>
                 <template v-if="ifItem.trigger_conditions_type === '11'">
-                  <!--  设备条件下->单类设备>选择设备类型下拉-->
+                  <!--  under equipment conditions->single class device>Select device type drop down-->
                   <NFormItem
                     :show-label="false"
                     :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_source`"
@@ -944,7 +944,7 @@ watch(
                   </NFormItem>
                 </template>
                 <template v-if="ifItem.trigger_source">
-                  <!--            设备条件下->单个设备/单类设备->设备ID/设备类ID->选择设备状态-->
+                  <!--            under equipment conditions->single device/单类equipment->equipmentID/equipment类ID->选择equipment状态-->
                   <NFormItem
                     :show-label="false"
                     :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_param`"
@@ -965,7 +965,7 @@ watch(
                   <template
                     v-if="ifItem.trigger_param_type === 'telemetry' || ifItem.trigger_param_type === 'attributes'"
                   >
-                    <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是遥测/属性->选择操作符 --->
+                    <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is telemetry/property->selection operator --->
                     <NFormItem
                       :show-label="false"
                       :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_operator`"
@@ -975,7 +975,7 @@ watch(
                       <NSelect v-model:value="ifItem.trigger_operator" :options="determineOptions" />
                     </NFormItem>
                     <template v-if="ifItem.trigger_operator === 'in'">
-                      <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是遥测->操作符是in(包含在)->输入范围值 --->
+                      <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is telemetry->The operator isin(included in)->Enter range value --->
                       <NFormItem
                         :show-label="false"
                         :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_value`"
@@ -989,7 +989,7 @@ watch(
                       </NFormItem>
                     </template>
                     <template v-else-if="ifItem.trigger_operator == 'between'">
-                      <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是遥测->操作符是between(介于)->输入最大/最小值 --->
+                      <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is telemetry->The operator isbetween(between)->Enter maximum/minimum value --->
                       <NFormItem
                         :show-label="false"
                         :path="`ifGroups[${ifGroupIndex}][${ifIndex}].minValue`"
@@ -1008,7 +1008,7 @@ watch(
                       </NFormItem>
                     </template>
                     <template v-else>
-                      <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是遥测->操作符是除以上外->输入目标值 --->
+                      <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is telemetry->The operators are except for the above->Enter target value --->
                       <NFormItem
                         :show-label="false"
                         :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_value`"
@@ -1020,7 +1020,7 @@ watch(
                     </template>
                   </template>
                   <!--                  <template v-if="ifItem.trigger_param_type === 'attributes'">-->
-                  <!--                    &lt;!&ndash;          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是属性->输入参数 -&ndash;&gt;-->
+                  <!--                    &lt;!&ndash;          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is a property->input parameters -&ndash;&gt;-->
                   <!--                    <NFormItem-->
                   <!--                      :show-label="false"-->
                   <!--                      :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_value`"-->
@@ -1034,7 +1034,7 @@ watch(
                   <!--                    </NFormItem>-->
                   <!--                  </template>-->
                   <template v-if="ifItem.trigger_param_type === 'event'">
-                    <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是事件->输入参数 --->
+                    <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is the event->input parameters --->
                     <NFormItem
                       :show-label="false"
                       :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_value`"
@@ -1051,12 +1051,12 @@ watch(
                     </NFormItem>
                   </template>
                   <template v-if="ifItem.trigger_param_type === 'status'">
-                    <!--          设备条件下->单个设备/单类设备>-设备ID/选择设备类ID>触发消息标识符是状态-> --->
+                    <!--          under equipment conditions->single device/单类equipment>-equipmentID/Select device classID>The trigger message identifier is status-> --->
                   </template>
                 </template>
               </NFlex>
               <NFlex v-if="ifItem.ifType === '2'" class="flex-1">
-                <!--  时间条件->选择类型下拉-->
+                <!--  time condition->Select type drop down-->
                 <NFormItem
                   :show-label="false"
                   :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_conditions_type`"
@@ -1071,7 +1071,7 @@ watch(
                   />
                 </NFormItem>
                 <template v-if="ifItem.trigger_conditions_type === '20'">
-                  <!--  时间条件下->单次->输入时间-->
+                  <!--  under time conditions->Single->Enter time-->
                   <NFormItem
                     :show-label="false"
                     :path="`ifGroups[${ifGroupIndex}][${ifIndex}].onceTimeValue`"
@@ -1113,12 +1113,12 @@ watch(
                           <IosAlert />
                         </n-icon>
                       </template>
-                      超过执行时间{{ expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || '' }}后失效
+                      execution time exceeded{{ expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || '' }}expire after
                     </n-tooltip>
                   </NFormItem>
                 </template>
                 <template v-if="ifItem.trigger_conditions_type === '21'">
-                  <!--  时间条件下->重复->选择周期-->
+                  <!--  under time conditions->repeat->Select cycle-->
                   <NFormItem
                     :show-label="false"
                     :path="`ifGroups[${ifGroupIndex}][${ifIndex}].task_type`"
@@ -1143,7 +1143,7 @@ watch(
                     />
                   </NFormItem>
                   <template v-if="ifItem.task_type === 'HOUR'">
-                    <!--  时间条件下->重复->每小时->选择分-->
+                    <!--  under time conditions->repeat->per hour->Select points-->
                     <NFormItem
                       key="hourTimeValue"
                       :show-label="false"
@@ -1176,14 +1176,14 @@ watch(
                             <IosAlert />
                           </n-icon>
                         </template>
-                        超过执行时间{{
+                        execution time exceeded{{
                           expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || ''
-                        }}后失效
+                        }}expire after
                       </n-tooltip>
                     </NFormItem>
                   </template>
                   <template v-if="ifItem.task_type === 'DAY'">
-                    <!--  时间条件下->重复->每天->选择时分秒-->
+                    <!--  under time conditions->repeat->every day->Select hours, minutes and seconds-->
                     <NFormItem
                       key="dayTimeValue"
                       :show-label="false"
@@ -1217,14 +1217,14 @@ watch(
                             <IosAlert />
                           </n-icon>
                         </template>
-                        超过执行时间{{
+                        execution time exceeded{{
                           expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || ''
-                        }}后失效
+                        }}expire after
                       </n-tooltip>
                     </NFormItem>
                   </template>
                   <template v-if="ifItem.task_type === 'WEEK'">
-                    <!--  时间条件下->重复->每周->选择星期和输入时分-->
+                    <!--  under time conditions->repeat->weekly->Select the day of the week and enter the hours and minutes-->
                     <div class="weekChoseValue-box w-120">
                       <NFormItem
                         key="weekChoseValue"
@@ -1279,14 +1279,14 @@ watch(
                             <IosAlert />
                           </n-icon>
                         </template>
-                        超过执行时间{{
+                        execution time exceeded{{
                           expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || ''
-                        }}后失效
+                        }}expire after
                       </n-tooltip>
                     </NFormItem>
                   </template>
                   <template v-if="ifItem.task_type === 'MONTH'">
-                    <!--  时间条件下->重复->每月->选择日期和时分-->
+                    <!--  under time conditions->repeat->per month->Select date and time-->
                     <NFormItem
                       key="monthChoseValue"
                       :show-label="false"
@@ -1333,15 +1333,15 @@ watch(
                             <IosAlert />
                           </n-icon>
                         </template>
-                        超过执行时间{{
+                        execution time exceeded{{
                           expirationTimeOptions.find(data => ifItem['expiration_time'])?.label || ''
-                        }}后失效
+                        }}expire after
                       </n-tooltip>
                     </NFormItem>
                   </template>
                 </template>
                 <template v-if="ifItem.trigger_conditions_type === '22'">
-                  <!--  时间条件下->范围->选择星期和时间周期-->
+                  <!--  under time conditions->scope->Select the day of the week and time period-->
                   <div class="weekChoseValue-box w-120">
                     <NFormItem
                       :show-label="false"
@@ -1392,7 +1392,7 @@ watch(
                 </template>
               </NFlex>
               <NFlex v-if="ifItem.ifType === '3'" class="flex-1">
-                <!--            服务条件->选择类型下拉-->
+                <!--            Conditions of service->Select type drop down-->
                 <NFormItem
                   :show-label="false"
                   :path="`ifGroups[${ifGroupIndex}][${ifIndex}].trigger_conditions_type`"

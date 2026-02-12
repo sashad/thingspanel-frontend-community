@@ -1,7 +1,7 @@
 <template>
   <div class="component-config-form">
 
-    <!-- Card2.1组件配置 -->
+    <!-- Card2.1Component configuration -->
     <div v-if="isCard2Component && card2ConfigComponent">
       <component
         :is="card2ConfigComponent"
@@ -14,7 +14,7 @@
       />
     </div>
 
-    <!-- Card2组件但没有配置组件 -->
+    <!-- Card2Component but no configuration component -->
     <div v-else-if="isCard2Component && !card2ConfigComponent">
       <div
         style="
@@ -26,13 +26,13 @@
           text-align: center;
         "
       >
-        <h3 style="color: #f57c00; margin: 0 0 8px 0">🔧 Card2组件配置</h3>
-        <p style="margin: 0; font-size: 14px; color: #666">组件类型: {{ widget?.type || '未知' }}</p>
-        <p style="margin: 8px 0 0 0; font-size: 12px; color: #999">该Card2组件暂无配置表单</p>
+        <h3 style="color: #f57c00; margin: 0 0 8px 0">🔧 Card2Component configuration</h3>
+        <p style="margin: 0; font-size: 14px; color: #666">Component type: {{ widget?.type || 'unknown' }}</p>
+        <p style="margin: 8px 0 0 0; font-size: 12px; color: #999">ShouldCard2There is currently no configuration form for the component</p>
       </div>
     </div>
 
-    <!-- 传统组件配置 -->
+    <!-- Traditional component configuration -->
     <div v-else-if="!isCard2Component">
       <div
         style="
@@ -44,24 +44,24 @@
           text-align: center;
         "
       >
-        <h3 style="color: #666; margin: 0 0 8px 0">📦 传统组件配置</h3>
-        <p style="margin: 0; font-size: 14px; color: #888">组件类型: {{ widget?.type || '未知' }}</p>
-        <p style="margin: 8px 0 0 0; font-size: 12px; color: #999">传统组件配置功能待实现</p>
+        <h3 style="color: #666; margin: 0 0 8px 0">📦 Traditional component configuration</h3>
+        <p style="margin: 0; font-size: 14px; color: #888">Component type: {{ widget?.type || 'unknown' }}</p>
+        <p style="margin: 8px 0 0 0; font-size: 12px; color: #999">The traditional component configuration function needs to be implemented</p>
       </div>
     </div>
 
-    <!-- 开发模式调试tip -->
+    <!-- Development mode debuggingtip -->
     <div v-if="isDevelopment" class="debug-tip">
       <n-tooltip>
         <template #trigger>
           <span class="debug-icon">🐛</span>
         </template>
         <div>
-          <div>类型: {{ widget?.type }}</div>
-          <div>Card2.1: {{ isCard2Component ? '是' : '否' }}</div>
-          <div>有配置: {{ !!card2ConfigComponent ? '是' : '否' }}</div>
+          <div>type: {{ widget?.type }}</div>
+          <div>Card2.1: {{ isCard2Component ? 'yes' : 'no' }}</div>
+          <div>Have configuration: {{ !!card2ConfigComponent ? 'yes' : 'no' }}</div>
           <div style="margin-top: 8px;">
-            <n-button size="tiny" @click="logToConsole">控制台输出</n-button>
+            <n-button size="tiny" @click="logToConsole">console output</n-button>
           </div>
         </div>
       </n-tooltip>
@@ -71,9 +71,9 @@
 
 <script setup lang="ts">
 /**
- * 组件特定配置表单 - 重写版本
- * 位置：src/components/visual-editor/renderers/base/ComponentConfigForm.vue
- * 负责处理各个组件的特定配置，支持Card2.1组件的独立配置
+ * Component specific configuration form - rewritten version
+ * Location：src/components/visual-editor/renderers/base/ComponentConfigForm.vue
+ * Responsible for handling the specific configuration of each component，supportCard2.1Independent configuration of components
  */
 
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
@@ -97,21 +97,21 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// Card2集成hook
+// Card2integratedhook
 const card2Integration = useCard2Integration({ autoInit: true })
 
-// 开发环境判断
+// Development environment judgment
 const isDevelopment = computed(() => import.meta.env.DEV)
 
 /**
- * 判断是否为Card2.1组件
+ * Determine whether it isCard2.1components
  */
 const isCard2Component = computed(() => {
   return props.widget?.metadata?.isCard2Component === true
 })
 
 /**
- * 获取Card2组件的配置组件
+ * GetCard2Component configuration component
  */
 const card2ConfigComponent = computed(() => {
   if (!isCard2Component.value || !props.widget?.type) {
@@ -119,50 +119,50 @@ const card2ConfigComponent = computed(() => {
   }
 
   try {
-    // 🔥 优先从widget.metadata.card2Definition获取配置组件
+    // 🔥 Prioritize fromwidget.metadata.card2DefinitionGet configuration components
     const card2Definition = props.widget?.metadata?.card2Definition
     if (card2Definition?.configComponent) {
       return card2Definition.configComponent
     }
 
-    // 通过Card2集成hook获取组件定义（从filteredComponents中查找）
+    // passCard2integratedhookGet component definition（fromfilteredComponentsSearch in）
     const componentDefinition = card2Integration.filteredComponents.value.find(
       comp => comp.type === props.widget.type
     )
 
-    // 优先使用组件自定义的配置组件
+    // Prioritize the use of component-customized configuration components
     if (componentDefinition?.configComponent) {
       return componentDefinition.configComponent
     }
 
-    // 如果组件有配置属性但没有自定义配置组件，使用通用配置表单
+    // If the component has configuration properties but no custom configuration component，Use the common configuration form
     const hasProperties =
       componentDefinition?.config?.properties &&
       Object.keys(componentDefinition.config.properties).length > 0
 
     if (hasProperties) {
-      // 返回通用的Card2配置表单（使用FlexibleConfigForm）
+      // return genericCard2Configuration form（useFlexibleConfigForm）
       return () => import('@/card2.1/core2/form/FlexibleConfigForm.vue')
     }
 
     return null
   } catch (error) {
-    console.error('❌ [ComponentConfigForm] 获取配置组件出错', error)
+    console.error('❌ [ComponentConfigForm] Error getting configuration component', error)
     return null
   }
 })
 
 /**
- * 🔥 统一配置中心：从配置管理器获取组件配置
+ * 🔥 Unified configuration center：Get component configuration from configuration manager
  */
 const getComponentConfig = (): any => {
   if (!props.widget) return {}
 
   if (props.widget?.metadata?.isCard2Component) {
-    // 🔥 Card2组件：获取配置管理器中的配置
+    // 🔥 Card2components：Get configuration from configuration manager
     const nodeId = props.widget.id
 
-    // 🔥 异步获取配置，避免模块导入问题
+    // 🔥 Get configuration asynchronously，Avoid module import issues
     import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
       .then(({ configurationIntegrationBridge }) => {
         const fullConfig = configurationIntegrationBridge.getConfiguration(nodeId)
@@ -171,93 +171,93 @@ const getComponentConfig = (): any => {
         }
       })
       .catch(error => {
-        console.warn(`⚠️ [ComponentConfigForm] 获取配置失败:`, error)
+        console.warn(`⚠️ [ComponentConfigForm] Failed to get configuration:`, error)
       })
 
-    // 🔥 返回默认配置作为初始值
+    // 🔥 Return default configuration as initial value
     const card2Definition = props.widget?.metadata?.card2Definition
     const defaultConfig = card2Definition?.defaultConfig?.customize || {}
     return defaultConfig
   } else {
-    // 传统组件：从properties获取
+    // traditional components：frompropertiesGet
     return props.widget?.properties || {}
   }
 }
 
 /**
- * 组件配置数据
+ * Component configuration data
  */
 const componentConfig = ref<any>(getComponentConfig())
 
-// 🔥 新增：用户编辑状态标记
+// 🔥 New：User edit status tag
 const isUserEditing = ref(false)
 
 /**
- * 🔥 统一配置中心：配置更新处理 - 修复配置合并和重复更新问题
+ * 🔥 Unified configuration center：Configuration update handling - Fix configuration merge and duplicate update issues
  */
 const handleConfigUpdate = (newConfig: any) => {
 
-  // 🔥 标记用户正在编辑，防止外部更新覆盖
+  // 🔥 Flag user is editing，Prevent external updates from overwriting
   isUserEditing.value = true
 
-  // 🔥 修复：完整合并配置，避免覆盖其他字段
+  // 🔥 repair：Complete merge configuration，Avoid overwriting other fields
   const mergedConfig = {
     ...componentConfig.value,
     ...newConfig
   }
 
-  // 更新本地配置
+  // Update local configuration
   componentConfig.value = mergedConfig
 
-  // 🔥 统一配置中心：直接通过配置管理器保存完整配置
+  // 🔥 Unified configuration center：Save complete configuration directly through Configuration Manager
   if (props.widget?.metadata?.isCard2Component && props.widget?.id) {
     const nodeId = props.widget.id
 
-    // 🔥 修复：使用动态import，避免require报错
+    // 🔥 repair：Use dynamicsimport，avoidrequireReport an error
     import('@/components/visual-editor/configuration/ConfigurationIntegrationBridge')
       .then(({ configurationIntegrationBridge }) => {
         configurationIntegrationBridge.updateConfiguration(
           nodeId,
           'component',
-          mergedConfig, // 🔥 保存完整配置，不是部分配置
+          mergedConfig, // 🔥 Save complete configuration，Not a partial configuration
           props.widget.type
         )
       })
       .catch(error => {
-        console.error(`❌ [ComponentConfigForm] 保存配置失败:`, error)
+        console.error(`❌ [ComponentConfigForm] Failed to save configuration:`, error)
       })
   } else {
-    // 传统组件：直接更新properties
+    // traditional components：direct updateproperties
     if (props.widget?.properties) {
       Object.assign(props.widget.properties, mergedConfig)
     }
   }
 
-  // 通知编辑器
+  // notification editor
   emit('update', mergedConfig)
 
-  // 🔥 延迟重置编辑状态，给配置保存足够时间
+  // 🔥 Delayed reset of edit state，Give the configuration enough time to save
   setTimeout(() => {
     isUserEditing.value = false
   }, 500)
 }
 
 /**
- * 🔥 监听Card2配置变更事件，实时同步配置面板显示
+ * 🔥 monitorCard2Configuration change event，Real-time synchronization configuration panel display
  */
 const handleCard2ConfigUpdate = (event: CustomEvent) => {
   const { componentId, layer, config } = event.detail
   if (componentId === props.widget?.id && layer === 'component') {
-    // 🔥 修复：只有当不是用户正在编辑时才更新
+    // 🔥 repair：Only updates if someone other than the user is editing
     if (!isUserEditing.value) {
-      // 🔥 关键修复：完全替换配置，而不是合并，确保配置面板完全同步
-      componentConfig.value = { ...config }  // 完全使用新配置
+      // 🔥 critical fix：Completely replace configuration，instead of merging，Ensure configuration panels are fully synchronized
+      componentConfig.value = { ...config }  // Completely use new configuration
     } else {
     }
   }
 }
 
-// 🔥 监听配置更新事件（移除定时同步，避免覆盖用户输入）
+// 🔥 Listen for configuration update events（Remove scheduled sync，Avoid overwriting user input）
 onMounted(() => {
   window.addEventListener('card2-config-update', handleCard2ConfigUpdate as EventListener)
 })
@@ -267,7 +267,7 @@ onUnmounted(() => {
 })
 
 /**
- * 监听widget变化，重新获取配置
+ * monitorwidgetchange，Retrieve configuration
  */
 watch(
   () => props.widget?.id,
@@ -280,20 +280,20 @@ watch(
   { immediate: true }
 )
 
-// ============ 调试方法 ============
+// ============ Debugging method ============
 
 /**
- * 输出调试信息到控制台
+ * Output debugging information to the console
  */
 const logToConsole = () => {
-  console.group('🔍 [ComponentConfigForm] 调试信息')
+  console.group('🔍 [ComponentConfigForm] debugging information')
   console.groupEnd()
 }
 </script>
 
 <style scoped>
 .component-config-form {
-  /* 占满整个配置面板 */
+  /* Takes up the entire configuration panel */
   height: 100%;
   width: 100%;
   display: flex;
@@ -303,21 +303,21 @@ const logToConsole = () => {
   position: relative;
 }
 
-/* Card2组件配置区域 */
+/* Card2Component configuration area */
 .component-config-form > div {
   flex: 1;
   height: 100%;
   overflow-y: auto;
 }
 
-/* 确保动态组件能正常显示并占满空间 */
+/* Ensure that dynamic components can be displayed normally and occupy full space */
 :deep(.simple-test-config) {
   border: none;
   padding: 0;
   height: 100%;
 }
 
-/* 确保传统组件提示居中显示 */
+/* Ensure legacy component tooltips are centered */
 .component-config-form > div[style*='border: 2px solid'] {
   display: flex;
   align-items: center;
@@ -325,7 +325,7 @@ const logToConsole = () => {
   min-height: 200px;
 }
 
-/* 调试tip样式 */
+/* debugtipstyle */
 .debug-tip {
   position: absolute;
   top: 8px;

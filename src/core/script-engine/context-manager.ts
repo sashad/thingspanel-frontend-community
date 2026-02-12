@@ -1,6 +1,6 @@
 /**
- * 脚本执行上下文管理器
- * 管理脚本执行时的上下文环境，包括变量和函数
+ * Script execution context manager
+ * Manage the context in which scripts are executed，Includes variables and functions
  */
 
 import type { IScriptContextManager, ScriptExecutionContext } from '@/core/script-engine/types'
@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid'
 import { smartDeepClone } from '@/utils/deep-clone'
 
 /**
- * 脚本上下文管理器实现类
+ * Script context manager implementation class
  */
 export class ScriptContextManager implements IScriptContextManager {
   private contexts: Map<string, ScriptExecutionContext>
@@ -19,7 +19,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 创建执行上下文
+   * Create execution context
    */
   createContext(name: string, variables: Record<string, any> = {}): ScriptExecutionContext {
     const now = Date.now()
@@ -37,21 +37,21 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 获取上下文
+   * Get context
    */
   getContext(id: string): ScriptExecutionContext | null {
     return this.contexts.get(id) || null
   }
 
   /**
-   * 获取所有上下文
+   * Get all context
    */
   getAllContexts(): ScriptExecutionContext[] {
     return Array.from(this.contexts.values())
   }
 
   /**
-   * 根据名称查找上下文
+   * Find context by name
    */
   getContextByName(name: string): ScriptExecutionContext | null {
     for (const context of this.contexts.values()) {
@@ -63,7 +63,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 更新上下文
+   * update context
    */
   updateContext(id: string, updates: Partial<ScriptExecutionContext>): boolean {
     const context = this.contexts.get(id)
@@ -74,7 +74,7 @@ export class ScriptContextManager implements IScriptContextManager {
     const updatedContext: ScriptExecutionContext = {
       ...context,
       ...updates,
-      id, // 确保ID不被修改
+      id, // make sureIDnot be modified
       updatedAt: Date.now()
     }
 
@@ -83,14 +83,14 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 删除上下文
+   * Remove context
    */
   deleteContext(id: string): boolean {
     return this.contexts.delete(id)
   }
 
   /**
-   * 克隆上下文
+   * Clone context
    */
   cloneContext(id: string, newName: string): ScriptExecutionContext | null {
     const sourceContext = this.contexts.get(id)
@@ -102,8 +102,8 @@ export class ScriptContextManager implements IScriptContextManager {
     const clonedContext: ScriptExecutionContext = {
       id: nanoid(),
       name: newName,
-      variables: smartDeepClone(sourceContext.variables), // 使用智能深拷贝
-      functions: { ...sourceContext.functions }, // 函数浅拷贝即可
+      variables: smartDeepClone(sourceContext.variables), // Use smart deep copy
+      functions: { ...sourceContext.functions }, // Just copy the function shallowly
       createdAt: now,
       updatedAt: now
     }
@@ -113,7 +113,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 合并上下文
+   * merge context
    */
   mergeContexts(sourceId: string, targetId: string): boolean {
     const sourceContext = this.contexts.get(sourceId)
@@ -123,19 +123,19 @@ export class ScriptContextManager implements IScriptContextManager {
       return false
     }
 
-    // 合并变量（目标上下文的变量优先）
+    // merge variables（Variables of the target context take precedence）
     const mergedVariables = {
       ...sourceContext.variables,
       ...targetContext.variables
     }
 
-    // 合并函数（目标上下文的函数优先）
+    // merge function（Functions in the target context take precedence）
     const mergedFunctions = {
       ...sourceContext.functions,
       ...targetContext.functions
     }
 
-    // 更新目标上下文
+    // Update target context
     return this.updateContext(targetId, {
       variables: mergedVariables,
       functions: mergedFunctions
@@ -143,7 +143,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 添加变量到上下文
+   * Add variables to context
    */
   addVariable(contextId: string, name: string, value: any): boolean {
     const context = this.contexts.get(contextId)
@@ -157,7 +157,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 移除上下文中的变量
+   * Remove variables from context
    */
   removeVariable(contextId: string, name: string): boolean {
     const context = this.contexts.get(contextId)
@@ -171,7 +171,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 添加函数到上下文
+   * Add function to context
    */
   addFunction(contextId: string, name: string, func: Function): boolean {
     const context = this.contexts.get(contextId)
@@ -185,7 +185,7 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 移除上下文中的函数
+   * Remove function from context
    */
   removeFunction(contextId: string, name: string): boolean {
     const context = this.contexts.get(contextId)
@@ -199,11 +199,11 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 创建内置函数
+   * Create built-in functions
    */
   private createBuiltinFunctions(): Record<string, Function> {
     return {
-      // 数学函数
+      // Math functions
       random: Math.random,
       floor: Math.floor,
       ceil: Math.ceil,
@@ -212,13 +212,13 @@ export class ScriptContextManager implements IScriptContextManager {
       max: Math.max,
       min: Math.min,
 
-      // 字符串函数
+      // String functions
       trim: (str: string) => str.trim(),
       toUpperCase: (str: string) => str.toUpperCase(),
       toLowerCase: (str: string) => str.toLowerCase(),
       replace: (str: string, search: string | RegExp, replacement: string) => str.replace(search, replacement),
 
-      // 数组函数
+      // array function
       arrayMap: <T, R>(arr: T[], callback: (item: T, index: number) => R) => arr.map(callback),
       arrayFilter: <T>(arr: T[], callback: (item: T, index: number) => boolean) => arr.filter(callback),
       arrayReduce: <T, R>(arr: T[], callback: (acc: R, item: T, index: number) => R, initial: R) =>
@@ -226,13 +226,13 @@ export class ScriptContextManager implements IScriptContextManager {
       arraySort: <T>(arr: T[], compareFunction?: (a: T, b: T) => number) => [...arr].sort(compareFunction),
       arrayUnique: <T>(arr: T[]) => [...new Set(arr)],
 
-      // 对象函数
+      // object function
       objectKeys: Object.keys,
       objectValues: Object.values,
       objectEntries: Object.entries,
       objectAssign: Object.assign,
 
-      // 类型检查函数
+      // Type checking function
       isArray: Array.isArray,
       isString: (value: any) => typeof value === 'string',
       isNumber: (value: any) => typeof value === 'number',
@@ -242,13 +242,13 @@ export class ScriptContextManager implements IScriptContextManager {
       isUndefined: (value: any) => value === undefined,
       isNull: (value: any) => value === null,
 
-      // 转换函数
+      // conversion function
       toString: String,
       toNumber: Number,
       parseJSON: JSON.parse,
       stringifyJSON: JSON.stringify,
 
-      // 时间函数
+      // time function
       getCurrentTime: () => Date.now(),
       getCurrentDate: () => new Date(),
       formatDate: (date: Date | number, format: string = 'YYYY-MM-DD HH:mm:ss') => {
@@ -272,35 +272,35 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 初始化默认上下文
+   * Initialize the default context
    */
   private initializeDefaultContexts(): void {
-    // 创建默认上下文
+    // Create default context
     this.createDefaultContext()
 
-    // 创建数据处理上下文
+    // Create a data processing context
     this.createDataProcessingContext()
 
-    // 创建物联网设备上下文
+    // Create IoT device context
     this.createIoTDeviceContext()
   }
 
   /**
-   * 创建默认上下文
+   * Create default context
    */
   private createDefaultContext(): void {
-    const context = this.createContext('默认上下文', {
+    const context = this.createContext('default context', {
       appName: 'ThingsPanel',
       version: '1.0.0',
       environment: process.env.NODE_ENV || 'development',
       currentUser: {
         id: 'guest',
-        name: '访客用户',
+        name: 'guest user',
         role: 'viewer'
       }
     })
 
-    // 添加常用工具函数
+    // Add common tool functions
     this.addFunction(context.id, 'generateId', () => nanoid())
     this.addFunction(context.id, 'sleep', (ms: number) => new Promise(resolve => setTimeout(resolve, ms)))
     this.addFunction(context.id, 'retry', async (fn: Function, maxAttempts: number = 3, delay: number = 1000) => {
@@ -320,20 +320,20 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 创建数据处理上下文
+   * Create a data processing context
    */
   private createDataProcessingContext(): void {
-    const context = this.createContext('数据处理上下文', {
+    const context = this.createContext('data processing context', {
       dataSource: 'default',
       batchSize: 100,
       timeout: 30000
     })
 
-    // 添加数据处理函数
+    // Add data processing function
     this.addFunction(context.id, 'validateData', (data: any, schema: any) => {
-      // 简单的数据验证
+      // Simple data validation
       if (schema.required && !data) {
-        throw new Error('数据不能为空')
+        throw new Error('Data cannot be empty')
       }
       return true
     })
@@ -347,17 +347,17 @@ export class ScriptContextManager implements IScriptContextManager {
   }
 
   /**
-   * 创建物联网设备上下文
+   * Create IoT device context
    */
   private createIoTDeviceContext(): void {
-    const context = this.createContext('IoT设备上下文', {
+    const context = this.createContext('IoTdevice context', {
       deviceProtocol: 'mqtt',
-      sampleRate: 1000, // 毫秒
+      sampleRate: 1000, // millisecond
       deviceTypes: ['sensor', 'actuator', 'gateway'],
       dataFormat: 'json'
     })
 
-    // 添加IoT相关函数
+    // Add toIoTRelated functions
     this.addFunction(context.id, 'parseDeviceMessage', (message: string) => {
       try {
         return JSON.parse(message)

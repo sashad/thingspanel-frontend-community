@@ -1,174 +1,174 @@
-# 交互系统更新日志
+# Interactive system update log
 
-本文档记录了ThingsPanel核心交互系统的所有版本变更和新功能。
+This document recordsThingsPanelAll version changes and new features of the core interaction system。
 
-## 🎯 版本规范
+## 🎯 version specifications
 
-我们遵循[语义化版本控制](https://semver.org/)规范：
+we follow[Semantic versioning](https://semver.org/)specification：
 
-- **主版本号 (Major)**：不兼容的API变更
-- **次版本号 (Minor)**：向后兼容的功能新增
-- **修订版本号 (Patch)**：向后兼容的问题修复
+- **Major version number (Major)**：incompatibleAPIchange
+- **Minor version number (Minor)**：Backwards compatible features added
+- **revision number (Patch)**：Backward compatibility issue fixes
 
 ---
 
 ## [1.3.0] - 2024-08-31 🚀
 
-### ✨ 新增功能
+### ✨ New features
 
-#### 条件执行系统增强
-- 🎯 **智能属性监听**：集成属性暴露注册表，自动获取组件可监听属性
-- 🔧 **多种条件类型**：支持比较、范围、表达式三种条件执行模式
-- ⚡ **实时条件验证**：配置时即时验证条件逻辑的有效性
+#### Conditional execution system enhancements
+- 🎯 **Intelligent attribute monitoring**：Integrated properties expose registry，Automatically obtain component listenable properties
+- 🔧 **Multiple condition types**：Support comparison、scope、Three conditional execution modes for expressions
+- ⚡ **Real-time condition verification**：Instantly verify the validity of conditional logic during configuration
 
-#### 跨组件交互优化
-- 🌐 **Visual Editor集成**：深度集成可视化编辑器，动态获取画布组件列表
-- 🎛️ **属性分组显示**：按功能分组展示可修改属性，提升用户体验
-- 🔄 **更新模式选择**：支持替换、追加、前置三种属性更新模式
+#### Cross-component interaction optimization
+- 🌐 **Visual Editorintegrated**：深度integrated可视化编辑器，Dynamically obtain the list of canvas components
+- 🎛️ **Attribute group display**：Display modifiable attributes grouped by function，Improve user experience
+- 🔄 **Update mode selection**：Support replacement、Append、Three attribute update modes in front
 
-#### 用户体验改进
-- 📱 **移动端适配**：新增InteractionCardWizard简化向导，优化小屏设备体验
-- 🎨 **高级选项折叠**：智能隐藏高级配置选项，保持界面简洁
-- 🔍 **搜索过滤**：属性和组件选择器支持输入搜索过滤
+#### User experience improvements
+- 📱 **Mobile terminal adaptation**：NewInteractionCardWizardSimplified Wizard，Optimize the experience of small screen devices
+- 🎨 **Advanced options fold**：Smartly hide advanced configuration options，Keep the interface simple
+- 🔍 **Search filter**：Property and component selectors support input search filtering
 
-### 🛠️ 功能优化
+### 🛠️ Function optimization
 
-- ⚡ **性能提升**：优化大量交互配置下的渲染性能
-- 🎯 **智能默认值**：根据属性类型自动设置合理的条件默认值
-- 📊 **执行统计**：新增交互执行次数和响应时间统计
-- 🌍 **国际化完善**：补充缺失的多语言翻译键值
+- ⚡ **Performance improvements**：Optimize rendering performance under a large number of interactive configurations
+- 🎯 **Smart defaults**：Automatically set sensible conditional defaults based on property type
+- 📊 **Execution statistics**：Added statistics on interaction execution times and response time
+- 🌍 **Perfect internationalization**：Supplement missing multi-language translation keys
 
-### 🐛 错误修复
+### 🐛 bug fixes
 
-- 🔧 修复条件配置在某些情况下不保存的问题
-- 🔧 修复跨组件交互目标组件选择后属性列表不更新的问题  
-- 🔧 修复模板导入时格式验证过于严格的问题
-- 🔧 修复预览功能在某些动作类型下不生效的问题
+- 🔧 Fixed an issue where conditional configuration was not saved in some cases
+- 🔧 Fixed the problem that the property list is not updated after selecting the target component of cross-component interaction  
+- 🔧 Fixed the problem of too strict format verification when importing templates
+- 🔧 Fixed the problem that the preview function does not take effect in certain action types
 
 ---
 
 ## [1.2.0] - 2024-08-15 🎨
 
-### ✨ 新增功能
+### ✨ New features
 
-#### 模板系统
-- 📚 **预设模板库**：提供基础交互、视觉效果、动画效果、复合交互四大类模板
-- 🎨 **自定义模板**：支持用户导入和保存自定义交互模板
-- 💾 **本地存储**：用户模板自动保存到localStorage，跨会话保持
-- 🔍 **模板预览**：专用的模板预览组件，可视化展示模板效果
+#### template system
+- 📚 **Preset template library**：Provide basic interaction、visual effects、Animation effects、Four categories of composite interaction templates
+- 🎨 **Custom template**：Support users to import and save custom interaction templates
+- 💾 **local storage**：User templates are automatically saved tolocalStorage，Persistence across sessions
+- 🔍 **Template preview**：专用的Template preview组件，Visual display template effect
 
-#### 模板预览组件 (InteractionTemplatePreview)
-- 🎮 **交互式预览**：实时展示模板的交互效果
-- 📋 **详细信息**：显示模板的事件类型、动作序列等详细信息
-- 🎯 **一键应用**：直接将模板应用到当前组件配置
+#### Template preview component (InteractionTemplatePreview)
+- 🎮 **Interactive preview**：Real-time display of interactive effects of templates
+- 📋 **Details**：Display event types for templates、动作序列等Details
+- 🎯 **One click application**：Apply the template directly to the current component configuration
 
-### 🛠️ 功能优化
+### 🛠️ Function optimization
 
-- 🎭 **图标系统**：为不同模板类型配置专属图标和颜色
-- 📁 **分类管理**：按功能和复杂度对模板进行分类组织
-- 🔄 **向后兼容**：确保旧版本配置在新模板系统中正常工作
+- 🎭 **icon system**：Configure exclusive icons and colors for different template types
+- 📁 **Classification management**：Classify and organize templates by function and complexity
+- 🔄 **backwards compatible**：Make sure old version configurations work properly in the new template system
 
 ---
 
 ## [1.1.0] - 2024-08-01 ⚡
 
-### ✨ 新增功能
+### ✨ New features
 
-#### 实时预览系统
-- 🎮 **交互式预览**：InteractionPreview组件提供完整的交互测试环境
-- 📊 **执行日志**：详细记录交互执行过程，包含时间戳和执行结果
-- 🎛️ **配置控制**：实时启用/禁用特定交互配置
-- 🔄 **重置功能**：一键恢复预览元素到初始状态
+#### Live preview system
+- 🎮 **Interactive preview**：InteractionPreviewComponents provide a complete interactive testing environment
+- 📊 **execution log**：Record the interactive execution process in detail，Contains timestamp and execution results
+- 🎛️ **Configuration control**：Enable in real time/Disable specific interaction configurations
+- 🔄 **reset function**：Restore preview elements to their initial state with one click
 
-#### 条件执行系统
-- 🎯 **数据变化监听**：支持监听组件属性变化并触发相应交互
-- ⚖️ **条件判断**：支持数值比较、范围检查、表达式计算等多种条件
-- 🔧 **属性绑定**：与属性暴露系统深度集成，自动获取可监听属性
+#### conditional execution system
+- 🎯 **Data change monitoring**：Supports monitoring component property changes and triggering corresponding interactions
+- ⚖️ **Conditional judgment**：Support numerical comparison、range check、Expression calculation and other conditions
+- 🔧 **Property binding**：Deep integration with attribute exposure system，Automatically obtain listenable attributes
 
-#### 响应动作扩展
-- 🌐 **URL跳转增强**：支持内部菜单路由和外部链接两种跳转模式
-- 🎨 **视觉效果**：新增背景色、文字色、边框色、透明度等视觉变化动作
-- ⚡ **动画支持**：集成CSS动画和自定义动画效果
-- 📱 **组件通信**：支持跨组件的数据更新和状态同步
+#### Response action extension
+- 🌐 **URLJump enhancement**：Supports two jump modes: internal menu routing and external links
+- 🎨 **visual effects**：Add background color、text color、border color、Visual changes such as transparency
+- ⚡ **animation support**：integratedCSSAnimation and custom animation effects
+- 📱 **Component communication**：Supports data updates and status synchronization across components
 
-### 🛠️ 技术改进
+### 🛠️ technical improvements
 
-- 🏗️ **架构重构**：采用更清晰的组件职责分离设计
-- 📝 **类型安全**：完善的TypeScript类型定义系统
-- 🎨 **主题集成**：完全适配ThingsPanel主题系统
-- 📱 **响应式设计**：适配移动端和平板设备
+- 🏗️ **Architecture refactoring**：Adopt a clearer component separation of responsibility design
+- 📝 **type safety**：perfectTypeScripttype definition system
+- 🎨 **Theme integration**：fully adaptedThingsPaneltheme system
+- 📱 **Responsive design**：Adapted to mobile and tablet devices
 
 ---
 
 ## [1.0.0] - 2024-07-15 🎉
 
-### ✨ 初始发布
+### ✨ initial release
 
-#### 核心组件
-- 🎛️ **InteractionSettingsForm**：主交互配置表单组件
-- ✏️ **InteractionResponseEditor**：响应动作编辑器
-- 📋 **ConfigRegistry**：配置组件注册管理器
+#### core components
+- 🎛️ **InteractionSettingsForm**：Main interactive configuration form component
+- ✏️ **InteractionResponseEditor**：Response Action Editor
+- 📋 **ConfigRegistry**：Configure component registration manager
 
-#### 基础功能
-- 🖱️ **基础事件支持**：点击、悬停、获焦、失焦等常用事件
-- 🎯 **响应动作系统**：支持样式变化、内容更新、函数调用等动作
-- 🔧 **配置管理**：完整的交互配置增删改查功能
-- 🌍 **国际化支持**：中英文双语界面
+#### Basic functions
+- 🖱️ **Basic event support**：Click、Hover、Get focus、Common events such as out of focus
+- 🎯 **responsive action system**：Support style changes、Content update、Actions such as function calls
+- 🔧 **Configuration management**：Complete interactive configuration adding, deleting, modifying and checking functions
+- 🌍 **International support**：Chinese and English bilingual interface
 
-#### 技术基础
-- ⚡ **Vue 3 Composition API**：基于最新Vue 3技术栈
-- 🎨 **Naive UI集成**：深度集成Naive UI组件库
-- 📝 **TypeScript支持**：完整的类型定义和类型安全
-- 🎯 **模块化设计**：清晰的组件职责和接口定义
+#### Technical basis
+- ⚡ **Vue 3 Composition API**：Based on the latestVue 3technology stack
+- 🎨 **Naive UIintegrated**：深度integratedNaive UIComponent library
+- 📝 **TypeScriptsupport**：Complete type definitions and type safety
+- 🎯 **Modular design**：Clear definition of component responsibilities and interfaces
 
 ---
 
-## 🔄 升级指南
+## 🔄 Upgrade guide
 
-### 从 v1.2.x 升级到 v1.3.x
+### from v1.2.x upgrade to v1.3.x
 
-#### 💡 推荐升级步骤
+#### 💡 Recommended upgrade steps
 
-1. **更新依赖**
+1. **Update dependencies**
    ```bash
    npm update @thingspanel/interaction-system
    ```
 
-2. **检查属性暴露配置**
+2. **Check property exposure configuration**
    ```typescript
-   // 确保组件已正确配置属性暴露
+   // Make sure the component has correctly configured property exposure
    propertyExposureRegistry.register('your-component', {
      listenableProperties: [
-       { name: 'value', type: 'number', label: '数值' }
+       { name: 'value', type: 'number', label: 'numerical value' }
      ]
    })
    ```
 
-3. **更新交互配置**
+3. **Update interaction configuration**
    ```typescript
-   // 新版本支持更丰富的条件配置
+   // The new version supports richer condition configurations
    const config: InteractionConfig = {
      event: 'dataChange',
-     watchedProperty: 'temperature',  // 新增属性
-     condition: {                     // 增强的条件系统
+     watchedProperty: 'temperature',  // Add new attributes
+     condition: {                     // Enhanced conditions system
        type: 'comparison',
        operator: 'greaterThan',
        value: 30
      },
-     // ... 其他配置
+     // ... Other configurations
    }
    ```
 
-#### ⚠️ 破坏性变更
+#### ⚠️ breaking changes
 
-**无破坏性变更** - v1.3.0 完全向后兼容 v1.2.x
+**No breaking changes** - v1.3.0 Fully backwards compatible v1.2.x
 
-### 从 v1.1.x 升级到 v1.2.x
+### from v1.1.x upgrade to v1.2.x
 
-#### 🆕 新功能使用
+#### 🆕 Use new features
 
 ```typescript
-// 使用新的模板系统
+// Use the new template system
 import { InteractionTemplateSelector } from '@/core/interaction-system'
 
 const applyTemplate = (template: InteractionConfig) => {
@@ -176,109 +176,109 @@ const applyTemplate = (template: InteractionConfig) => {
 }
 ```
 
-#### ⚠️ 破坏性变更
+#### ⚠️ breaking changes
 
-**无破坏性变更** - v1.2.0 完全向后兼容 v1.1.x
+**No breaking changes** - v1.2.0 Fully backwards compatible v1.1.x
 
-### 从 v1.0.x 升级到 v1.1.x
+### from v1.0.x upgrade to v1.1.x
 
-#### 🔄 配置迁移
+#### 🔄 Configuration migration
 
 ```typescript
-// 旧版本配置
+// Old version configuration
 const oldConfig = {
   event: 'click',
   responses: [{ action: 'changeColor', value: '#ff0000' }]
 }
 
-// 新版本支持更多配置选项
+// The new version supports more configuration options
 const newConfig = {
   event: 'click',
-  condition: { type: 'always' },        // 新增条件配置
-  priority: 1,                          // 新增优先级
+  condition: { type: 'always' },        // Add condition configuration
+  priority: 1,                          // Add priority
   responses: [{ 
-    action: 'changeBackgroundColor',     // 更具体的动作类型
+    action: 'changeBackgroundColor',     // More specific action types
     value: '#ff0000',
-    duration: 300                       // 新增持续时间
+    duration: 300                       // Add duration
   }]
 }
 ```
 
 ---
 
-## 🛣️ 发展路线图
+## 🛣️ Development roadmap
 
-### v1.4.0 (计划中) 🔮
+### v1.4.0 (in plan) 🔮
 
-#### 🎯 计划新功能
-- 🤖 **AI辅助配置**：基于用户意图智能生成交互配置
-- 🔄 **批量操作**：支持多组件同时配置相同交互
-- 📊 **使用分析**：交互使用情况统计和热点分析
-- 🎨 **主题定制**：交互组件的视觉主题深度定制
+#### 🎯 Plan new features
+- 🤖 **AIAuxiliary configuration**：Intelligent generation of interactive configurations based on user intent
+- 🔄 **Batch operations**：Support multiple components to configure the same interaction at the same time
+- 📊 **Use analytics**：Interactive usage statistics and hotspot analysis
+- 🎨 **Theme customization**：Deep customization of visual themes for interactive components
 
-#### 🛠️ 技术改进
-- ⚡ **性能优化**：大规模交互配置下的渲染性能提升
-- 🧪 **测试覆盖**：完善单元测试和集成测试覆盖率
-- 📚 **文档完善**：API文档自动生成和交互式示例
+#### 🛠️ technical improvements
+- ⚡ **Performance optimization**：Improved rendering performance in large-scale interactive configurations
+- 🧪 **test coverage**：完善单元测试和集成test coverage率
+- 📚 **Complete documentation**：APIAutomatic documentation generation and interactive examples
 
-### v1.5.0 (规划中) 🌟
+### v1.5.0 (Under planning) 🌟
 
-- 🌐 **云端同步**：交互模板和配置的云端存储同步
-- 🔌 **插件系统**：第三方开发者可扩展的插件架构
-- 📱 **PWA支持**：渐进式Web应用功能支持
-- 🎮 **游戏化元素**：为配置过程添加游戏化体验
-
----
-
-## 🙋‍♀️ 社区贡献
-
-### 🎉 贡献者名单
-
-感谢所有为交互系统做出贡献的开发者们！
-
-- 👨‍💻 **核心开发团队**
-- 🐛 **问题反馈者**
-- 📝 **文档贡献者**
-- 🧪 **测试参与者**
-
-### 📋 贡献指南
-
-1. 🍴 Fork 项目仓库
-2. 🌿 创建特性分支：`git checkout -b feature/amazing-feature`
-3. 💾 提交更改：`git commit -m 'Add amazing feature'`
-4. 📤 推送分支：`git push origin feature/amazing-feature`
-5. 🔄 提交Pull Request
+- 🌐 **Cloud sync**：Cloud storage synchronization of interactive templates and configurations
+- 🔌 **plug-in system**：Extensible plug-in architecture for third-party developers
+- 📱 **PWAsupport**：ProgressiveWebApplication function support
+- 🎮 **Gamification elements**：Add a gamified experience to the configuration process
 
 ---
 
-## 📞 支持和反馈
+## 🙋‍♀️ community contribution
 
-- 🐛 **问题报告**：[GitHub Issues](https://github.com/thingspanel/frontend/issues)
-- 💬 **讨论交流**：[GitHub Discussions](https://github.com/thingspanel/frontend/discussions)
-- 📧 **邮件联系**：support@thingspanel.io
-- 📚 **文档中心**：[ThingsPanel Docs](https://docs.thingspanel.io)
+### 🎉 Contributor list
+
+Thanks to all developers who contributed to the interactive system！
+
+- 👨‍💻 **Core development team**
+- 🐛 **Question feedback person**
+- 📝 **Documentation Contributor**
+- 🧪 **test participants**
+
+### 📋 Contribution Guide
+
+1. 🍴 Fork Project warehouse
+2. 🌿 Create a feature branch：`git checkout -b feature/amazing-feature`
+3. 💾 Commit changes：`git commit -m 'Add amazing feature'`
+4. 📤 push branch：`git push origin feature/amazing-feature`
+5. 🔄 submitPull Request
 
 ---
 
-## 📜 许可证
+## 📞 Support and feedback
 
-本项目采用 [MIT许可证](./LICENSE) 开源发布。
+- 🐛 **Problem report**：[GitHub Issues](https://github.com/thingspanel/frontend/issues)
+- 💬 **Discussion and exchange**：[GitHub Discussions](https://github.com/thingspanel/frontend/discussions)
+- 📧 **Email contact**：support@thingspanel.io
+- 📚 **Document Center**：[ThingsPanel Docs](https://docs.thingspanel.io)
 
 ---
 
-*更新日志会持续维护，记录系统的每一次进步。感谢您选择ThingsPanel交互系统！*
+## 📜 license
+
+This project uses [MITlicense](./LICENSE) Open source release。
 
 ---
 
-**🎯 版本总览**
+*The update log will be continuously maintained，Record every progress of the system。Thank you for choosingThingsPanelinteractive system！*
 
-| 版本 | 发布日期 | 主要特性 | 兼容性 |
+---
+
+**🎯 Version overview**
+
+| Version | release date | Main features | compatibility |
 |------|----------|----------|---------|
-| v1.3.0 | 2024-08-31 | 条件执行系统、跨组件交互 | ✅ 完全兼容 |
-| v1.2.0 | 2024-08-15 | 模板系统、自定义模板 | ✅ 完全兼容 |
-| v1.1.0 | 2024-08-01 | 实时预览、条件执行 | ✅ 完全兼容 |
-| v1.0.0 | 2024-07-15 | 初始发布、核心功能 | - |
+| v1.3.0 | 2024-08-31 | conditional execution system、Cross-component interaction | ✅ Fully compatible |
+| v1.2.0 | 2024-08-15 | template system、Custom template | ✅ Fully compatible |
+| v1.1.0 | 2024-08-01 | Live preview、conditional execution | ✅ Fully compatible |
+| v1.0.0 | 2024-07-15 | initial release、Core functions | - |
 
 ---
 
-*最后更新：2024年8月31日*
+*last updated：2024Year8moon31day*

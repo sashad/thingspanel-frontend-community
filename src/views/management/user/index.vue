@@ -31,37 +31,37 @@ const customUserStatusOptions = computed(() => {
   })
 })
 
-// 时区选项
+// Time zone options
 const timezoneOptions = [
-  { label: 'Asia/Shanghai (北京时间)', value: 'Asia/Shanghai' },
-  { label: 'Asia/Tokyo (东京时间)', value: 'Asia/Tokyo' },
-  { label: 'Asia/Seoul (首尔时间)', value: 'Asia/Seoul' },
-  { label: 'Asia/Singapore (新加坡时间)', value: 'Asia/Singapore' },
-  { label: 'Asia/Hong_Kong (香港时间)', value: 'Asia/Hong_Kong' },
-  { label: 'Asia/Bangkok (曼谷时间)', value: 'Asia/Bangkok' },
-  { label: 'Asia/Dubai (迪拜时间)', value: 'Asia/Dubai' },
-  { label: 'Asia/Kolkata (印度时间)', value: 'Asia/Kolkata' },
-  { label: 'Europe/London (伦敦时间)', value: 'Europe/London' },
-  { label: 'Europe/Paris (巴黎时间)', value: 'Europe/Paris' },
-  { label: 'Europe/Berlin (柏林时间)', value: 'Europe/Berlin' },
-  { label: 'Europe/Moscow (莫斯科时间)', value: 'Europe/Moscow' },
-  { label: 'America/New_York (纽约时间)', value: 'America/New_York' },
-  { label: 'America/Los_Angeles (洛杉矶时间)', value: 'America/Los_Angeles' },
-  { label: 'America/Chicago (芝加哥时间)', value: 'America/Chicago' },
-  { label: 'America/Toronto (多伦多时间)', value: 'America/Toronto' },
-  { label: 'Australia/Sydney (悉尼时间)', value: 'Australia/Sydney' },
-  { label: 'Australia/Melbourne (墨尔本时间)', value: 'Australia/Melbourne' },
-  { label: 'Pacific/Auckland (奥克兰时间)', value: 'Pacific/Auckland' },
-  { label: 'UTC (协调世界时)', value: 'UTC' }
+  { label: 'Asia/Shanghai (Beijing time)', value: 'Asia/Shanghai' },
+  { label: 'Asia/Tokyo (Tokyo time)', value: 'Asia/Tokyo' },
+  { label: 'Asia/Seoul (Seoul time)', value: 'Asia/Seoul' },
+  { label: 'Asia/Singapore (Singapore time)', value: 'Asia/Singapore' },
+  { label: 'Asia/Hong_Kong (Hong Kong time)', value: 'Asia/Hong_Kong' },
+  { label: 'Asia/Bangkok (Bangkok time)', value: 'Asia/Bangkok' },
+  { label: 'Asia/Dubai (dubai time)', value: 'Asia/Dubai' },
+  { label: 'Asia/Kolkata (indian time)', value: 'Asia/Kolkata' },
+  { label: 'Europe/London (london time)', value: 'Europe/London' },
+  { label: 'Europe/Paris (paris time)', value: 'Europe/Paris' },
+  { label: 'Europe/Berlin (Berlin time)', value: 'Europe/Berlin' },
+  { label: 'Europe/Moscow (Moscow time)', value: 'Europe/Moscow' },
+  { label: 'America/New_York (new york time)', value: 'America/New_York' },
+  { label: 'America/Los_Angeles (Los Angeles time)', value: 'America/Los_Angeles' },
+  { label: 'America/Chicago (chicago time)', value: 'America/Chicago' },
+  { label: 'America/Toronto (toronto time)', value: 'America/Toronto' },
+  { label: 'Australia/Sydney (Sydney time)', value: 'Australia/Sydney' },
+  { label: 'Australia/Melbourne (Melbourne time)', value: 'Australia/Melbourne' },
+  { label: 'Pacific/Auckland (Auckland time)', value: 'Pacific/Auckland' },
+  { label: 'UTC (coordinated universal time)', value: 'UTC' }
 ]
 
-// 语言选项
+// Language options
 const languageOptions = [
-  { label: '中文', value: 'zh-CN' },
+  { label: 'Chinese', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
 ]
 
-// 转换 pw.json 数据为级联选择器格式
+// Convert pw.json Data is in cascading selector format
 const convertPwDataToCascader = (data: any): any[] => {
   return data.map((province: any) => ({
     value: province.name,
@@ -79,16 +79,16 @@ const convertPwDataToCascader = (data: any): any[] => {
   }))
 }
 
-// 省市区数据
+// Province and city data
 const provinceCityData = convertPwDataToCascader(pwData)
 
-// 处理省市区选择变化，将选择的值映射到对应的字段
+// Handling province and city selection changes，Map the selected value to the corresponding field
 const handleAddressChange = (value: string[]) => {
   queryParams.address.cascaderValue = value
   if (value && value.length >= 3) {
-    queryParams.address.province = value[0] // 省份
-    queryParams.address.city = value[1] // 城市
-    queryParams.address.district = value[2] // 区县
+    queryParams.address.province = value[0] // province
+    queryParams.address.city = value[1] // City
+    queryParams.address.district = value[2] // Districts and counties
   } else {
     queryParams.address.province = null
     queryParams.address.city = null
@@ -96,7 +96,7 @@ const handleAddressChange = (value: string[]) => {
   }
 }
 
-// 级联选择器搜索过滤函数
+// Cascading selector search filter function
 const filterCascader = (pattern: string, option: any) => {
   return option.label.toLowerCase().includes(pattern.toLowerCase())
 }
@@ -112,7 +112,7 @@ type QueryFormModel = Pick<UserManagement.User, 'email' | 'name' | 'status'> & {
     city: string | null
     district: string | null
     detailed_address: string | null
-    cascaderValue: string[] | null // 新增：存储级联选择器的值
+    cascaderValue: string[] | null // New：Storing the value of a cascading selector
   }
 }
 
@@ -228,7 +228,7 @@ const columns: Ref<DataTableColumns<UserManagement.User>> = ref([
   },
   // {
   //   key: 'gender',
-  //   title: '性别',
+  //   title: 'gender',
   //   align: 'center',
   //   render: row => {
   //     if (row.gender) {
@@ -314,7 +314,7 @@ function handleAddTable() {
   openModal()
 }
 
-/** 切换用户 */
+/** Switch user */
 async function handleEnter(rowId: string) {
   await authStore.enter(rowId)
 }
@@ -373,7 +373,7 @@ function init() {
   getTableData()
 }
 
-// 初始化
+// initialization
 init()
 const getPlatform = computed(() => {
   const { proxy }: any = getCurrentInstance()
@@ -401,14 +401,14 @@ const getPlatform = computed(() => {
                 :options="customUserStatusOptions"
               />
             </NFormItem>
-            <NFormItem :label="'组织'" path="organization">
-              <NInput v-model:value="queryParams.organization" placeholder="请输入组织名称" />
+            <NFormItem :label="'organize'" path="organization">
+              <NInput v-model:value="queryParams.organization" placeholder="Please enter organization name" />
             </NFormItem>
-            <NFormItem :label="'省市区'" path="address.province">
+            <NFormItem :label="'Provinces and municipalities'" path="address.province">
               <NCascader
                 v-model:value="queryParams.address.cascaderValue"
                 :options="provinceCityData"
-                placeholder="请选择省市区（三级联动）"
+                placeholder="Please select a province or city（Level three linkage）"
                 clearable
                 class="w-300px"
                 :show-path="true"
@@ -417,25 +417,25 @@ const getPlatform = computed(() => {
                 @update:value="handleAddressChange"
               />
             </NFormItem>
-            <NFormItem :label="'详细地址'" path="address.detailed_address">
-              <NInput v-model:value="queryParams.address.detailed_address" placeholder="请输入详细地址" />
+            <NFormItem :label="'Detailed address'" path="address.detailed_address">
+              <NInput v-model:value="queryParams.address.detailed_address" placeholder="Please enter detailed address" />
             </NFormItem>
-            <NFormItem :label="'时区'" path="timezone">
+            <NFormItem :label="'time zone'" path="timezone">
               <NSelect
                 v-model:value="queryParams.timezone"
                 clearable
                 class="w-200px"
                 :options="timezoneOptions"
-                placeholder="请选择时区"
+                placeholder="Please select a time zone"
               />
             </NFormItem>
-            <NFormItem :label="'默认语言'" path="default_language">
+            <NFormItem :label="'Default language'" path="default_language">
               <NSelect
                 v-model:value="queryParams.default_language"
                 clearable
                 class="w-200px"
                 :options="languageOptions"
-                placeholder="请选择默认语言"
+                placeholder="Please select a default language"
               />
             </NFormItem>
             <NFormItem>

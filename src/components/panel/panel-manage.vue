@@ -42,7 +42,7 @@ const dataFetched = ref(false)
 const layout = ref<ICardView[]>([])
 const theme = ref(NO_THEME)
 const preTheme = ref(NO_THEME)
-const preLayout = ref<ICardView[]>([]) // 用来保存用户修改前的内容
+const preLayout = ref<ICardView[]>([]) // Used to save content before modification by the user
 const fetchBroad = async () => {
   const { data } = await getBoard(props.panelId)
   if (data) {
@@ -200,11 +200,11 @@ const savePanel = async () => {
       preTheme.value = theme.value
       message.success($t('page.dataForward.saveSuccess'))
     } else {
-      message.error($t('page.dataForward.saveFailed') || '保存失败')
+      message.error($t('page.dataForward.saveFailed') || 'Save failed')
       logger.error('Failed to save panel:', error)
     }
   } catch (err) {
-    message.error($t('page.dataForward.saveFailed') || '保存失败')
+    message.error($t('page.dataForward.saveFailed') || 'Save failed')
     logger.error('Error saving panel:', err)
   } finally {
     isSaving.value = false
@@ -272,22 +272,22 @@ onUnmounted(() => {
             { label: $t('card.applePurpleTheme'), value: 'theme-royal-purple' },
             { label: $t('card.msStyleTheme'), value: 'theme-microsoft-style' },
             { label: $t('card.blackTheme'), value: 'theme-cool-black' }
-            /*{ label: $t('清新浅绿主题'), value: 'theme-light-mode-light-green' },
-            { label: $t('静谧浅蓝主题'), value: 'theme-light-mode-light-blue' },
-            { label: $t('温暖浅橙主题'), value: 'theme-light-mode-light-orange' },
-            { label: $t('活力浅红主题'), value: 'theme-light-mode-light-red' },
-            { label: $t('暗调清新绿主题'), value: 'theme-dark-mode-light-green' },
-            { label: $t('暗调静谧蓝主题'), value: 'theme-dark-mode-light-blue' },
-            { label: $t('暗调温暖橙主题'), value: 'theme-dark-mode-light-orange' },
-            { label: $t('暗调活力红主题'), value: 'theme-dark-mode-light-red' },
-            { label: $t('深邃暗绿主题'), value: 'theme-dark-mode-dark-green' },
-            { label: $t('宁静暗蓝主题'), value: 'theme-dark-mode-dark-blue' },
-            { label: $t('炽热暗橙主题'), value: 'theme-dark-mode-dark-orange' },
-            { label: $t('热烈暗红主题'), value: 'theme-dark-mode-dark-red' },
-            { label: $t('明净深绿主题'), value: 'theme-light-mode-dark-green' },
-            { label: $t('明净深蓝主题'), value: 'theme-light-mode-dark-blue' },
-            { label: $t('明净炽橙主题'), value: 'theme-light-mode-dark-orange' },
-            { label: $t('明净烈红主题'), value: 'theme-light-mode-dark-red' }*/
+            /*{ label: $t('Fresh light green theme'), value: 'theme-light-mode-light-green' },
+            { label: $t('Quiet light blue theme'), value: 'theme-light-mode-light-blue' },
+            { label: $t('Warm light orange theme'), value: 'theme-light-mode-light-orange' },
+            { label: $t('Vibrant light red theme'), value: 'theme-light-mode-light-red' },
+            { label: $t('Dark tone fresh green theme'), value: 'theme-dark-mode-light-green' },
+            { label: $t('Dark quiet blue theme'), value: 'theme-dark-mode-light-blue' },
+            { label: $t('Dark warm orange theme'), value: 'theme-dark-mode-light-orange' },
+            { label: $t('Dark Vibrant Red Theme'), value: 'theme-dark-mode-light-red' },
+            { label: $t('Deep dark green theme'), value: 'theme-dark-mode-dark-green' },
+            { label: $t('Tranquil dark blue theme'), value: 'theme-dark-mode-dark-blue' },
+            { label: $t('Blazing Dark Orange Theme'), value: 'theme-dark-mode-dark-orange' },
+            { label: $t('Warm dark red theme'), value: 'theme-dark-mode-dark-red' },
+            { label: $t('Clear and dark green theme'), value: 'theme-light-mode-dark-green' },
+            { label: $t('Clear dark blue theme'), value: 'theme-light-mode-dark-blue' },
+            { label: $t('Clear and Blazing Orange Theme'), value: 'theme-light-mode-dark-orange' },
+            { label: $t('Clear and bright red theme'), value: 'theme-light-mode-dark-red' }*/
           ]"
         ></NSelect>
         <NButton v-if="isEditing" @click="quitEditMode">{{ $t('card.quitEdit') }}</NButton>

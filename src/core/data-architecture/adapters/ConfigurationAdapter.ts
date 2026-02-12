@@ -1,16 +1,16 @@
 /**
- * 配置版本适配器实现
- * 负责新旧配置格式的自动转换和兼容性处理
+ * Configuration version adapter implementation
+ * Responsible for automatic conversion and compatibility processing of old and new configuration formats
  *
- * 核心功能：
- * 1. 自动检测配置版本
- * 2. 无损升级 v1 -> v2
- * 3. 兼容降级 v2 -> v1
- * 4. 数据项格式转换
+ * Core functions：
+ * 1. Automatically detect configuration versions
+ * 2. Lossless upgrade v1 -> v2
+ * 3. Compatibility downgrade v2 -> v1
+ * 4. Data item format conversion
  */
 
 import type {
-  // 现有类型
+  // Existing types
   DataSourceConfiguration as LegacyDataSourceConfiguration,
   ExecutionResult
 } from '../executors/MultiLayerExecutorChain'
@@ -22,7 +22,7 @@ import type {
 } from '../executors/DataItemFetcher'
 
 import type {
-  // 增强类型
+  // Enhancement type
   EnhancedDataSourceConfiguration,
   DataItemConfig,
   EnhancedJsonDataItemConfig,
@@ -35,67 +35,67 @@ import type {
 import { DEFAULT_ENHANCED_FEATURES } from '@/core/data-architecture/types/enhanced-types'
 
 /**
- * 配置转换结果
+ * Configuration conversion results
  */
 export interface ConversionResult<T = any> {
-  /** 转换是否成功 */
+  /** Is the conversion successful? */
   success: boolean
 
-  /** 转换后的数据 */
+  /** converted data */
   data?: T
 
-  /** 转换过程中的警告 */
+  /** Warnings during conversion */
   warnings: string[]
 
-  /** 转换过程中的错误 */
+  /** Errors during conversion */
   errors: string[]
 
-  /** 转换元信息 */
+  /** Convert meta information */
   metadata: {
-    /** 源版本 */
+    /** source version */
     sourceVersion: string
-    /** 目标版本 */
+    /** target version */
     targetVersion: string
-    /** 转换时间 */
+    /** conversion time */
     convertedAt: number
   }
 }
 
 /**
- * 配置版本适配器实现类
+ * Configuration version adapter implementation class
  */
 export class ConfigurationAdapter implements IConfigurationAdapter {
   /**
-   * 检测配置版本
+   * Check configuration version
    */
   detectVersion(config: any): 'v1.0' | 'v2.0' {
-    // 检查版本字段
+    // Check version field
     if (config && typeof config.version === 'string') {
       return config.version.startsWith('2.') ? 'v2.0' : 'v1.0'
     }
 
-    // 检查增强特性字段
+    // Check the Enhanced Features field
     if (config && (config.dynamicParams || config.enhancedFeatures)) {
       return 'v2.0'
     }
 
-    // 检查数据项格式特征
+    // Check data item format characteristics
     if (config && config.dataSources && Array.isArray(config.dataSources)) {
       const firstDataSource = config.dataSources[0]
       if (firstDataSource && firstDataSource.dataItems && Array.isArray(firstDataSource.dataItems)) {
         const firstDataItem = firstDataSource.dataItems[0]
         if (firstDataItem && firstDataItem.id) {
-          return 'v2.0' // 有id字段，是v2格式
+          return 'v2.0' // haveidField，yesv2Format
         }
       }
     }
 
-    // 默认为v1格式
+    // Default isv1Format
     return 'v1.0'
   }
 
   /**
-   * 适配配置到指定版本
+   * Adapt configuration to specified version
    */
   adaptToVersion(config: any, targetVersion: 'v1.0' | 'v2.0'): ConversionResult {
     const sourceVersion = this.detectVersion(config)
@@ -143,41 +143,41 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 
   /**
-   * v1升级到v2（无损升级）
+   * v1upgrade tov2（Lossless upgrade）
    */
   upgradeV1ToV2(v1Config: LegacyDataSourceConfiguration): EnhancedDataSourceConfiguration {
     const enhancedConfig: EnhancedDataSourceConfiguration = {
-      // 保留所有原有字段
+      // Keep all original fields
       ...v1Config,
 
-      // 添加版本标识
+      // Add version identifier
       version: '2.0.0',
 
-      // 默认动态参数配置
+      // Default dynamic parameter configuration
       dynamicParams: [],
 
-      // 默认增强功能开关
+      // Default enhancement switch
       enhancedFeatures: {
         ...DEFAULT_ENHANCED_FEATURES
       },
 
-      // 添加配置元数据
+      // Add configuration metadata
       metadata: {
-        name: `配置_${v1Config.componentId}`,
-        description: `从v1.0升级的配置`,
+        name: `Configuration_${v1Config.componentId}`,
+        description: `fromv1.0Upgraded configuration`,
         author: 'system',
         versionHistory: [
           {
             version: '2.0.0',
             timestamp: Date.now(),
-            changelog: '从v1.0自动升级到v2.0',
+            changelog: 'fromv1.0Automatically upgrade tov2.0',
             author: 'ConfigurationAdapter'
           }
         ],
         tags: ['upgraded', 'v2']
       },
 
-      // 升级数据源配置
+      // Upgrade data source configuration
       dataSources: v1Config.dataSources.map(dataSource => ({
         ...dataSource,
         dataItems: dataSource.dataItems.map((dataItemWrapper, index) => ({
@@ -191,7 +191,7 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 
   /**
-   * v2降级到v1（兼容降级）
+   * v2downgrade tov1（Compatibility downgrade）
    */
   downgradeV2ToV1(v2Config: EnhancedDataSourceConfiguration): LegacyDataSourceConfiguration {
     const legacyConfig: LegacyDataSourceConfiguration = {
@@ -205,14 +205,14 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
         mergeStrategy: dataSource.mergeStrategy
       })),
       createdAt: v2Config.createdAt,
-      updatedAt: Date.now() // 更新时间戳
+      updatedAt: Date.now() // Update timestamp
     }
 
     return legacyConfig
   }
 
   /**
-   * 数据项升级到v2格式
+   * The data item is upgraded tov2Format
    */
   private upgradeDataItemToV2(v1Item: LegacyDataItem, itemId: string): DataItemConfig {
     const baseItem: DataItemConfig = {
@@ -220,8 +220,8 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
       id: itemId,
       config: v1Item.config,
       metadata: {
-        displayName: `${v1Item.type}数据项`,
-        description: `从v1.0升级的${v1Item.type}数据项`,
+        displayName: `${v1Item.type}data item`,
+        description: `fromv1.0upgraded${v1Item.type}data item`,
         createdAt: Date.now(),
         lastUpdated: Date.now(),
         enabled: true,
@@ -229,12 +229,12 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
       }
     }
 
-    // 特殊处理不同类型的配置
+    // Special handling of different types of configurations
     switch (v1Item.type) {
       case 'json':
         const legacyJsonConfig = v1Item.config as LegacyJsonDataItemConfig
         const enhancedJsonConfig: EnhancedJsonDataItemConfig = {
-          jsonData: legacyJsonConfig.jsonString, // 字段重命名
+          jsonData: legacyJsonConfig.jsonString, // Field rename
           validation: {
             enableFormat: true,
             enableStructure: false
@@ -252,7 +252,7 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
           url: legacyHttpConfig.url,
           method: legacyHttpConfig.method,
           headers: this.convertHeadersRecordToArray(legacyHttpConfig.headers || {}),
-          params: [], // v1中没有params，默认为空数组
+          params: [], // v1Noneparams，Default is empty array
           body: legacyHttpConfig.body
             ? {
                 type: 'json',
@@ -268,13 +268,13 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
         return { ...baseItem, config: enhancedHttpConfig }
 
       default:
-        // 其他类型保持原样
+        // Leave other types as is
         return baseItem
     }
   }
 
   /**
-   * 数据项降级到v1格式
+   * The data item is downgraded tov1Format
    */
   private downgradeDataItemToV1(v2Item: DataItemConfig): LegacyDataItem {
     switch (v2Item.type) {
@@ -283,7 +283,7 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
         return {
           type: 'json',
           config: {
-            jsonString: enhancedJsonConfig.jsonData // 字段重命名回去
+            jsonString: enhancedJsonConfig.jsonData // Field renamed back
           }
         }
 
@@ -303,17 +303,17 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
       case 'websocket':
         return {
           type: 'websocket',
-          config: v2Item.config // WebSocket配置保持不变
+          config: v2Item.config // WebSocketConfiguration remains unchanged
         }
 
       case 'script':
         return {
           type: 'script',
-          config: v2Item.config // Script配置保持不变
+          config: v2Item.config // ScriptConfiguration remains unchanged
         }
 
       default:
-        // 未知类型，尝试保持原格式
+        // unknown type，Try to keep the original format
         return {
           type: v2Item.type as any,
           config: v2Item.config
@@ -322,7 +322,7 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 
   /**
-   * 将Record格式的headers转换为Array格式
+   * WillRecordFormat的headersConvert toArrayFormat
    */
   private convertHeadersRecordToArray(headers: Record<string, string>): HttpHeader[] {
     return Object.entries(headers).map(([key, value]) => ({
@@ -334,7 +334,7 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 
   /**
-   * 将Array格式的headers转换为Record格式
+   * WillArrayFormat的headersConvert toRecordFormat
    */
   private convertHeadersArrayToRecord(headers: HttpHeader[]): Record<string, string> {
     return headers
@@ -349,38 +349,38 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 
   /**
-   * 批量转换配置
+   * Batch conversion configuration
    */
   public batchConvert(configs: any[], targetVersion: 'v1.0' | 'v2.0'): ConversionResult[] {
     return configs.map(config => this.adaptToVersion(config, targetVersion))
   }
 
   /**
-   * 验证配置转换的一致性
+   * Verify consistency of configuration transformations
    */
   public validateConversion(original: any, converted: any): { valid: boolean; issues: string[] } {
     const issues: string[] = []
 
-    // 检查基本字段
+    // Check basic fields
     if (original.componentId !== converted.componentId) {
-      issues.push('componentId不匹配')
+      issues.push('componentIdno match')
     }
 
     if (original.dataSources.length !== converted.dataSources.length) {
-      issues.push('dataSources数量不匹配')
+      issues.push('dataSourcesQuantity does not match')
     }
 
-    // 检查数据源
+    // Check data source
     for (let i = 0; i < original.dataSources.length; i++) {
       const origDs = original.dataSources[i]
       const convDs = converted.dataSources[i]
 
       if (origDs.sourceId !== convDs.sourceId) {
-        issues.push(`数据源${i}的sourceId不匹配`)
+        issues.push(`data source${i}ofsourceIdno match`)
       }
 
       if (origDs.dataItems.length !== convDs.dataItems.length) {
-        issues.push(`数据源${i}的dataItems数量不匹配`)
+        issues.push(`data source${i}ofdataItemsQuantity does not match`)
       }
     }
 
@@ -391,37 +391,37 @@ export class ConfigurationAdapter implements IConfigurationAdapter {
   }
 }
 
-// ==================== 工厂函数 ====================
+// ==================== Factory function ====================
 
 /**
- * 创建配置适配器实例
+ * Create a configuration adapter instance
  */
 export function createConfigurationAdapter(): ConfigurationAdapter {
   return new ConfigurationAdapter()
 }
 
-// ==================== 便捷函数 ====================
+// ==================== Convenience function ====================
 
 /**
- * 快速检测配置版本
+ * Quickly detect configuration versions
  */
 export function detectConfigVersion(config: any): 'v1.0' | 'v2.0' {
   return createConfigurationAdapter().detectVersion(config)
 }
 
 /**
- * 快速升级配置到v2
+ * Quickly upgrade configuration tov2
  */
 export function upgradeToV2(v1Config: LegacyDataSourceConfiguration): EnhancedDataSourceConfiguration {
   return createConfigurationAdapter().upgradeV1ToV2(v1Config)
 }
 
 /**
- * 快速降级配置到v1
+ * Quickly downgrade configuration tov1
  */
 export function downgradeToV1(v2Config: EnhancedDataSourceConfiguration): LegacyDataSourceConfiguration {
   return createConfigurationAdapter().downgradeV2ToV1(v2Config)
 }
 
-// ==================== 导出 ====================
+// ==================== Export ====================
 export type { ConversionResult }

@@ -1,173 +1,173 @@
-# Chart Card 组件分类索引
+# Chart Card Component classification index
 
-基于 `src/card2.1/core/category-definition.ts` 的分类体系，对 `src/card/chart-card` 目录下的组件进行归类和 Card 2.1 迁移状态跟踪。
+based on `src/card2.1/core/category-definition.ts` classification system，right `src/card/chart-card` Components in the directory are classified and Card 2.1 Migration status tracking。
 
-## 📊 仪表盘 (dashboard)
+## 📊 Dashboard (dashboard)
 
-### instrument-panel - 仪表盘组件
-- **组件ID**: `chart-instrument`
-- **功能描述**: 显示单个数值的圆形仪表盘，支持自定义最小值、最大值、单位和颜色配置
-- **技术特性**: 
-  - 基于 Canvas 绘制的高性能仪表盘
-  - 支持动态数值更新和动画效果
-  - 可配置刻度、指针样式和颜色主题
-- **适用场景**: 温度、压力、速度、电压等单一指标的可视化展示
-- **数据源**: 支持单个设备的遥测数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### instrument-panel - Dashboard components
+- **componentsID**: `chart-instrument`
+- **Function description**: Circular dashboard showing a single value，Support custom minimum value、maximum value、Units and color configurations
+- **Technical characteristics**: 
+  - based on Canvas High-performance dashboards drawn
+  - Support dynamic numerical updates and animation effects
+  - Configurable scale、Pointer styles and color themes
+- **Applicable scenarios**: temperature、pressure、speed、Visual display of single indicators such as voltage
+- **data source**: Supports telemetry data from a single device
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-## ℹ️ 信息 (information)
+## ℹ️ information (information)
 
-### digit-indicator - 数字指示器
-- **组件ID**: `chart-digit`
-- **功能描述**: 以大字体数字形式显示设备数据，支持单位、颜色和字体配置
-- **技术特性**:
-  - 响应式数字显示，自适应容器大小
-  - 支持数值格式化和单位显示
-  - 可配置颜色主题和字体样式
-- **适用场景**: 关键指标的醒目展示，如在线设备数、告警数量、总计数值等
-- **数据源**: 支持单个设备的遥测或属性数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### digit-indicator - digital indicator
+- **componentsID**: `chart-digit`
+- **Function description**: Display device data as large font numbers，Support unit、Color and font configuration
+- **Technical characteristics**:
+  - Responsive digital display，Adaptive container size
+  - Supports numerical formatting and unit display
+  - Configurable color themes and font styles
+- **Applicable scenarios**: Prominent display of key indicators，Such as the number of online devices、Number of alarms、total value etc.
+- **data source**: Supports telemetry or attribute data from a single device
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### text-info - 文本信息组件
-- **组件ID**: `chart-text`
-- **功能描述**: 展示静态或动态文本信息，支持富文本格式和模板变量
-- **技术特性**:
-  - 支持 Markdown 格式渲染
-  - 模板变量替换功能
-  - 可配置字体、颜色和对齐方式
-- **适用场景**: 设备描述、状态说明、通知消息、操作指南等文本内容展示
-- **数据源**: 支持静态文本或设备属性数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### text-info - text message component
+- **componentsID**: `chart-text`
+- **Function description**: Display static or dynamic text information，Supports rich text formatting and template variables
+- **Technical characteristics**:
+  - support Markdown format rendering
+  - Template variable substitution function
+  - Configurable fonts、Color and alignment
+- **Applicable scenarios**: Device description、Status description、notification message、Display of text content such as operation guides
+- **data source**: Supports static text or device property data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### state-display - 状态显示组件
-- **组件ID**: `chart-state`
-- **功能描述**: 以图标、颜色或文本形式展示设备/系统的运行状态
-- **技术特性**:
-  - 支持多种状态映射规则
-  - 可配置图标库和颜色主题
-  - 支持状态变化动画效果
-- **适用场景**: 设备在线状态、系统健康状态、连接状态、运行模式等
-- **数据源**: 支持设备遥测或属性数据的状态映射
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### state-display - Status display component
+- **componentsID**: `chart-state`
+- **Function description**: with icon、Display device in color or text form/system operating status
+- **Technical characteristics**:
+  - Supports multiple state mapping rules
+  - Configurable icon library and color themes
+  - Support status change animation effects
+- **Applicable scenarios**: Device online status、System health status、connection status、Operation mode, etc.
+- **data source**: Supports state mapping of device telemetry or attribute data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### demo - 演示组件
-- **组件ID**: `chart-demo`
-- **功能描述**: 用于开发测试和功能演示的示例组件，展示组件开发规范
-- **技术特性**:
-  - 包含完整的组件开发示例
-  - 演示数据源集成方式
-  - 展示配置表单最佳实践
-- **适用场景**: 组件开发调试、功能展示、培训演示、新手入门
-- **数据源**: 支持模拟数据和真实设备数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### demo - Demo component
+- **componentsID**: `chart-demo`
+- **Function description**: Sample components for development testing and functional demonstrations，Display component development specifications
+- **Technical characteristics**:
+  - Contains complete component development examples
+  - Demonstrate data source integration methods
+  - Demonstrate configuration form best practices
+- **Applicable scenarios**: Component development and debugging、Function display、training demonstration、Getting Started
+- **data source**: Supports simulated data and real device data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-## 🎛️ 控制 (control)
+## 🎛️ control (control)
 
-### chart-switch - 开关控制器
-- **组件ID**: `chart-switch`
-- **功能描述**: 提供开关按钮，可远程控制设备的开启/关闭状态
-- **技术特性**:
-  - 支持多种开关样式（按钮、滑块、切换器）
-  - 实时状态反馈和确认机制
-  - 支持权限控制和操作日志
-- **适用场景**: 灯光控制、设备电源管理、功能开关、阀门控制等
-- **数据源**: 支持设备属性数据的读写操作
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### chart-switch - switch controller
+- **componentsID**: `chart-switch`
+- **Function description**: Provide switch button，Can remotely control the opening of the device/closed state
+- **Technical characteristics**:
+  - Supports multiple switch styles（button、slider、switcher）
+  - Real-time status feedback and confirmation mechanism
+  - Support permission control and operation log
+- **Applicable scenarios**: Light control、Device power management、Function switch、Valve control, etc.
+- **data source**: Supports reading and writing of device attribute data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### digit-setter - 数字设置器
-- **组件ID**: `chart-setter`
-- **功能描述**: 通过输入框或滑块设置数字参数，支持范围限制和步长控制
-- **技术特性**:
-  - 支持输入框、滑块、步进器等多种输入方式
-  - 数值验证和范围限制
-  - 实时预览和确认机制
-- **适用场景**: 温度设定、速度调节、阈值配置、参数调整等数值参数控制
-- **数据源**: 支持设备属性数据的读写操作
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### digit-setter - digital setter
+- **componentsID**: `chart-setter`
+- **Function description**: Set numeric parameters via input boxes or sliders，Support range limit and step size control
+- **Technical characteristics**:
+  - Support input box、slider、Stepper and other input methods
+  - Numerical validation and range limits
+  - Real-time preview and confirmation mechanism
+- **Applicable scenarios**: Temperature setting、Speed ​​adjustment、Threshold configuration、Parameter adjustment and other numerical parameter control
+- **data source**: Supports reading and writing of device attribute data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### enum-control - 枚举控制组件
-- **组件ID**: `chart-enum`
-- **功能描述**: 提供下拉选择或按钮组，用于多选项参数的切换
-- **技术特性**:
-  - 支持下拉菜单、单选按钮、按钮组等多种选择方式
-  - 可配置选项列表和显示文本
-  - 支持选项分组和搜索功能
-- **适用场景**: 模式选择、档位切换、状态设定、配置选择等枚举类型控制
-- **数据源**: 支持设备属性数据的枚举值操作
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### enum-control - Enum control components
+- **componentsID**: `chart-enum`
+- **Function description**: Provide drop-down selections or button groups，Used to switch multiple option parameters
+- **Technical characteristics**:
+  - Support drop-down menu、radio button、Button group and other selection methods
+  - Configurable options list and display text
+  - Support option grouping and search functions
+- **Applicable scenarios**: Mode selection、Gear switch、Status settings、Configuration selection and other enumeration type control
+- **data source**: Supports enumeration value operations for device attribute data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-## 📈 数据 (data)
+## 📈 data (data)
 
-### chart-bar - 柱状图组件
-- **组件ID**: `chart-bar`
-- **功能描述**: 以柱状图形式展示数据，支持时间范围选择和数据聚合
-- **技术特性**:
-  - 基于 ECharts 的高性能图表渲染
-  - 支持多系列数据和分组显示
-  - 可配置颜色主题和动画效果
-- **适用场景**: 销量统计、用量对比、历史数据分析、性能指标对比等
-- **数据源**: 支持多个设备的历史遥测数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### chart-bar - Bar chart component
+- **componentsID**: `chart-bar`
+- **Function description**: Display data as a bar chart，Supports time range selection and data aggregation
+- **Technical characteristics**:
+  - based on ECharts High performance chart rendering
+  - Supports multi-series data and group display
+  - Configurable color themes and animation effects
+- **Applicable scenarios**: sales statistics、Dosage comparison、Historical data analysis、Comparison of performance indicators, etc.
+- **data source**: Supports historical telemetry data from multiple devices
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### chart-curve - 曲线图组件
-- **组件ID**: `chart-curve`
-- **功能描述**: 以折线图形式展示数据趋势变化，支持多条数据线和实时更新
-- **技术特性**:
-  - 高性能时间序列数据渲染
-  - 支持数据缩放和平移操作
-  - 可配置线条样式和标记点
-- **适用场景**: 温度变化、流量监控、性能趋势分析、实时数据监控等
-- **数据源**: 支持多个设备的历史和实时遥测数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### chart-curve - Graph component
+- **componentsID**: `chart-curve`
+- **Function description**: Display data trend changes in the form of a line chart，Supports multiple data lines and real-time updates
+- **Technical characteristics**:
+  - High performance time series data rendering
+  - Support data zoom and pan operations
+  - Configurable line styles and marker points
+- **Applicable scenarios**: temperature change、Traffic monitoring、Performance trend analysis、Real-time data monitoring, etc.
+- **data source**: Supports historical and real-time telemetry data from multiple devices
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### chart-table - 数据表格组件
-- **组件ID**: `chart-table`
-- **功能描述**: 以表格形式展示结构化数据，支持排序、筛选、分页和导出
-- **技术特性**:
-  - 虚拟滚动支持大数据量显示
-  - 可配置列定义和数据格式化
-  - 支持行选择和批量操作
-- **适用场景**: 设备列表、日志记录、详细数据查看、报表展示等
-- **数据源**: 支持多个设备的历史数据和实时数据
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### chart-table - Data table component
+- **componentsID**: `chart-table`
+- **Function description**: Present structured data in tabular form，Support sorting、filter、Paging and exporting
+- **Technical characteristics**:
+  - Virtual scrolling supports display of large amounts of data
+  - Configurable column definitions and data formatting
+  - Supports row selection and batch operations
+- **Applicable scenarios**: Device list、logging、View detailed data、Report display, etc.
+- **data source**: Supports historical and real-time data from multiple devices
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-### dispatch-data - 数据分发组件
-- **组件ID**: `chart-dispatch`
-- **功能描述**: 处理和分发数据到其他组件或系统，支持数据转换和路由
-- **技术特性**:
-  - 支持多种数据发送方式（HTTP、MQTT、WebSocket）
-  - 可配置数据转换规则和格式
-  - 支持错误重试和状态监控
-- **适用场景**: 数据转换、消息路由、系统集成、第三方接口对接等
-- **数据源**: 支持设备遥测和属性数据的处理分发
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### dispatch-data - Data distribution component
+- **componentsID**: `chart-dispatch`
+- **Function description**: Process and distribute data to other components or systems，Support data transformation and routing
+- **Technical characteristics**:
+  - Supports multiple data sending methods（HTTP、MQTT、WebSocket）
+  - Configurable data conversion rules and formats
+  - Support error retry and status monitoring
+- **Applicable scenarios**: data conversion、message routing、System integration、Third-party interface docking, etc.
+- **data source**: Supports processing and distribution of device telemetry and attribute data
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
-## 🎥 音视频 (media)
+## 🎥 Audio and video (media)
 
-### video-player - 视频播放器组件
-- **组件ID**: `chart-videoplayer`
-- **功能描述**: 播放实时视频流或录制视频文件，支持多种视频格式和流媒体协议
-- **技术特性**:
-  - 基于 Video.js 的专业视频播放器
-  - 支持 HLS、RTMP、WebRTC 等流媒体协议
-  - 可配置播放控制和画质选择
-- **适用场景**: 监控画面、设备状态视频、操作指导视频、直播流媒体等
-- **数据源**: 支持设备属性数据提供的视频URL
-- **迁移状态**: ✅ 已完成 Card 2.1 迁移配置文档
+### video-player - Video player component
+- **componentsID**: `chart-videoplayer`
+- **Function description**: Play live video streams or record video files，Supports multiple video formats and streaming protocols
+- **Technical characteristics**:
+  - based on Video.js professional video player
+  - support HLS、RTMP、WebRTC Waiting for streaming protocols
+  - Configurable playback controls and quality selection
+- **Applicable scenarios**: Monitoring screen、Device status video、Operation instruction video、Live streaming and more
+- **data source**: Support video provided by device attribute dataURL
+- **Migration status**: ✅ Completed Card 2.1 Migrate configuration documents
 
 ---
 
-## 📋 迁移状态总览
+## 📋 Migration status overview
 
-### 已完成迁移配置文档 (13/13)
-- ✅ **仪表盘类 (1/1)**: instrument-panel
-- ✅ **信息类 (4/4)**: digit-indicator, text-info, state-display, demo
-- ✅ **控制类 (3/3)**: chart-switch, digit-setter, enum-control
-- ✅ **数据类 (4/4)**: chart-bar, chart-curve, chart-table, dispatch-data
-- ✅ **音视频类 (1/1)**: video-player
+### Migration configuration document completed (13/13)
+- ✅ **Dashboard class (1/1)**: instrument-panel
+- ✅ **Information (4/4)**: digit-indicator, text-info, state-display, demo
+- ✅ **Control class (3/3)**: chart-switch, digit-setter, enum-control
+- ✅ **data class (4/4)**: chart-bar, chart-curve, chart-table, dispatch-data
+- ✅ **Audio and video (1/1)**: video-player
 
-### 迁移文档位置
-所有组件的 Card 2.1 迁移配置文档位于：
+### Migrate document location
+of all components Card 2.1 The migration configuration document is located at：
 ```
 src/card/chart-card/cardInfodoc/cards/
 ├── chart-bar-card21-migration.md
@@ -185,13 +185,13 @@ src/card/chart-card/cardInfodoc/cards/
 └── video-player-card21-migration.md
 ```
 
-### 迁移优先级建议
-1. **高优先级**: instrument-panel, digit-indicator, chart-curve, chart-bar
-2. **中优先级**: state-display, chart-switch, chart-table, text-info
-3. **低优先级**: digit-setter, enum-control, demo, dispatch-data, video-player
+### Migration priority recommendations
+1. **high priority**: instrument-panel, digit-indicator, chart-curve, chart-bar
+2. **medium priority**: state-display, chart-switch, chart-table, text-info
+3. **low priority**: digit-setter, enum-control, demo, dispatch-data, video-player
 
 ---
 
-**统计**: 总共 13 个组件，分布在 5 个分类中，所有组件的 Card 2.1 迁移配置文档已完成 ✅
+**statistics**: total 13 components，distributed in 5 in categories，of all components Card 2.1 Migrating configuration documents has been completed ✅
 
-**最后更新**: 2024年12月 - 完成所有组件的 Card 2.1 迁移配置文档编写
+**last updated**: 2024Year12moon - Complete all components Card 2.1 Writing migration configuration documents

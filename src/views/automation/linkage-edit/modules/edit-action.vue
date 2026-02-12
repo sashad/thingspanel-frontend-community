@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
   actionData: []
 })
 
-// 条件中单个/单类设备变化时,重置操作动作中的设备内容
+// single condition/When a single type of equipment changes,Reset device content in action
 const resetActionData = () => {
   actionForm.value.actionGroups.map((item: any) => {
     if (item.actionInstructList && item.actionInstructList.length > 0) {
@@ -68,13 +68,13 @@ watch(
 
 const configId = ref(route.query.id || null)
 
-// 新建告警弹窗显示状态
+// Create a new alarm pop-up window to display status
 const popUpVisible = ref(false)
-// 新建告警回执
+// Create a new alarm receipt
 const newEdit = () => {
   getAlarmList('')
 }
-// 场景表单实例
+// Scenario form example
 const configFormRef = ref<FormInst | null>(null)
 const actionGroupsReturn = () => {
   return actionForm.value.actionGroups
@@ -82,7 +82,7 @@ const actionGroupsReturn = () => {
 const actionFormRefReturn = () => {
   return configFormRef.value
 }
-// 场景表单数据
+// Scenario form data
 const actionForm = ref({
   actionGroups: [] as any
 })
@@ -92,7 +92,7 @@ defineExpose({
   actionFormRefReturn
 })
 
-// 场景表单规则
+// Scenario form rules
 const configFormRules = ref({
   actionType: {
     required: true,
@@ -124,10 +124,10 @@ const configFormRules = ref({
     message: $t('common.select')
   }
 })
-// 下拉选择器加载状态
+// Dropdown selector loading status
 const loadingSelect = ref(false)
 
-// 动作选项
+// Action options
 const actionOptions = ref([
   {
     label: $t('common.operateDevice'),
@@ -148,7 +148,7 @@ const actionOptions = ref([
   // }
 ])
 
-// 动作选择action值改变时
+// action selectionactionwhen value changes
 const actionChange = (actionGroupItem: any, actionGroupIndex: any, data: any) => {
   // eslint-disable-next-line array-callback-return
   actionOptions.value.map(item => {
@@ -181,7 +181,7 @@ const actionChange = (actionGroupItem: any, actionGroupIndex: any, data: any) =>
     addIfGroupsSubItem(actionGroupIndex)
   }
 }
-// 设备类型选项
+// Device type options
 const actionTypeOptions = ref([
   {
     label: $t('common.singleDevice'),
@@ -193,7 +193,7 @@ const actionTypeOptions = ref([
   }
 ])
 
-// 选择设备类型
+// Select device type
 const actionTypeChange = (instructItem: any, data: any) => {
   instructItem.action_target = null
   instructItem.action_param_type = null
@@ -207,9 +207,9 @@ const actionTypeChange = (instructItem: any, data: any) => {
   }
 }
 
-// 设备分组列表
+// Device group list
 const deviceGroupOptions = ref([] as any)
-// 获取设备分组
+// Get device group
 const getGroup = async () => {
   deviceGroupOptions.value = []
   const res = await deviceGroupTree({})
@@ -219,7 +219,7 @@ const getGroup = async () => {
   })
 }
 
-// 设备列表
+// Device list
 const deviceOptions = ref([] as any)
 const queryDevice = ref({
   group_id: null,
@@ -227,7 +227,7 @@ const queryDevice = ref({
   bind_config: 0
 })
 
-// 获取设备列表
+// Get device list
 const getDevice = async (groupId: any, name: any) => {
   queryDevice.value.group_id = groupId || null
   queryDevice.value.device_name = name || null
@@ -240,20 +240,20 @@ const handleFocus = (ifIndex: any) => {
   queryDeviceName.value[ifIndex].focus()
 }
 
-// 设备配置列表
+// Device configuration list
 const deviceConfigOption = ref([])
-// 设备配置列表查询条件
+// Device configuration list query conditions
 const queryDeviceConfig = ref({
   device_config_name: ''
 })
-// 获取设备配置列表
+// Get device configuration list
 const getDeviceConfig = async (name: any) => {
   queryDeviceConfig.value.device_config_name = name || ''
   const res = await deviceConfigAll(queryDeviceConfig.value)
   deviceConfigOption.value = res.data || []
 }
 
-// 选择动作目标
+// Select action target
 const actionTargetChange = (instructItem: any) => {
   instructItem.action_param_type = null
   instructItem.action_param = null
@@ -264,7 +264,7 @@ const actionTargetChange = (instructItem: any) => {
   actionParamShow(instructItem)
 }
 
-// 下拉获取的动作标识符
+// Action identifier obtained by pulling down
 const actionParamShow = async (instructItem: any) => {
   if (instructItem.action_target) {
     let res = null as any
@@ -329,7 +329,7 @@ const placeholderMap = {
   c_attribute: '{"addr":1,"port":0}',
   c_command: '{"method":"switch1","params":{"false":0}}'
 }
-// 选择设备属性类型
+// Select device attribute type
 const actionParamTypeChange = (instructItem: any, data: any) => {
   instructItem.action_param = null
   instructItem.actionParamData = null
@@ -347,7 +347,7 @@ const actionParamTypeChange = (instructItem: any, data: any) => {
     instructItem.showSubSelect = true
   }
 }
-// 选择动作标识符
+// Select action identifier
 const actionParamChange = (instructItem: any, data: any) => {
   instructItem.actionValue = null
   instructItem.actionParamData = instructItem.actionParamOptions.find(item => item.key === data) || null
@@ -356,7 +356,7 @@ const actionParamChange = (instructItem: any, data: any) => {
   }
 }
 const message = useMessage()
-// 动作值标识
+// action value identifier
 const actionValueChange = (instructItem: any) => {
   if (
     instructItem.action_param_type === 'command' ||
@@ -380,15 +380,15 @@ const actionValueChange = (instructItem: any) => {
     }
   }
 }
-// 场景列表
+// scene list
 const sceneList = ref([])
-// 场景查询条件
+// Scene query conditions
 const queryScene = ref({
   page: 1,
   page_size: 10,
   name: ''
 })
-// 获取场景列表
+// Get scene list
 const getSceneList = async (name: string) => {
   queryScene.value.name = name || ''
   loadingSelect.value = true
@@ -397,9 +397,9 @@ const getSceneList = async (name: string) => {
   loadingSelect.value = false
 }
 
-// 告警列表
+// Alarm list
 const alarmList = ref([])
-// 告警列表查询条件
+// Alarm list query conditions
 const queryAlarm = ref({
   page: 1,
   page_size: 10,
@@ -413,34 +413,34 @@ const getAlarmList = async (name: string) => {
   alarmList.value = res.data.list
 }
 
-// 操作设备类型的数据Item
+// Data for operating device typesItem
 const instructListItem = ref({
-  action_target: null, //  动作目标id  设备id、设备配置id，场景id、告警id
-  action_type: null, // 动作标识符类型
-  action_param_type: null, // 属性类型
-  action_param: null, // 属性值
-  actionValue: null, // 参数/命令值
-  deviceGroupId: null, // 设备分组ID
-  actionParamOptions: [], // 动作标识属性下拉列表数据选项
-  actionParamOptionsData: [], // 动作标识菜单下拉列表数据选项
-  actionParamTypeOptions: [] // 动作标识类型下拉列表
+  action_target: null, //  action targetid  equipmentid、Device configurationid，sceneid、Alarmid
+  action_type: null, // action identifier type
+  action_param_type: null, // Property type
+  action_param: null, // attribute value
+  actionValue: null, // parameter/command value
+  deviceGroupId: null, // Device groupingID
+  actionParamOptions: [], // Action ID attribute drop-down list data options
+  actionParamOptionsData: [], // Action ID menu dropdown list data options
+  actionParamTypeOptions: [] // Action ID type drop-down list
 })
 
 // interface ActionInstructItem {
 //   action_target: string;
 //   action_type: string;
 //   action_param_type: string;
-//   action_param: string; // 动作标识符类型
-//   actionValue: string; // 参数值
+//   action_param: string; // action identifier type
+//   actionValue: string; // Parameter value
 //   deviceGroupId: string;
 //   actionParamOptions: object | any;
 // }
 
-// 动作数组的item
+// action arrayitem
 const actionItem = ref({
   actionType: '30',
-  action_type: null, // 动作类型后端
-  action_target: null, // 动作目标id   设备id、设备配置id，场景id、告警id
+  action_type: null, // Action type backend
+  action_target: null, // action targetid   equipmentid、Device configurationid，sceneid、Alarmid
   actionInstructList: []
 })
 // interface ActionItem {
@@ -451,25 +451,25 @@ const actionItem = ref({
 //   actions: any;
 // }
 
-// 动作数组的值
+// action array values
 // const state = reactive({
 //   actionGroups: [] as any
 // });
 // let actionForm.value.actionGroups: Array<ActionItem> = reactive([] as any);
 
-// 新增一个动作组
+// Add a new action group
 const addActionGroupItem = async () => {
   await configFormRef.value?.validate()
   const actionItemData = JSON.parse(JSON.stringify(actionItem.value))
   // actionItemData.actionInstructList.push(JSON.parse(JSON.stringify(instructListItem.value)));
   actionForm.value.actionGroups.push(actionItemData)
 }
-// 删除一个动作组
+// Delete an action group
 const deleteActionGroupItem = (actionGroupIndex: any) => {
   actionForm.value.actionGroups.splice(actionGroupIndex, 1)
 }
 
-// 给某个动作组中增加指令
+// Add instructions to an action group
 const addIfGroupsSubItem = async (actionGroupIndex: any) => {
   await configFormRef.value?.validate()
   const data = JSON.parse(JSON.stringify(instructListItem.value))
@@ -478,7 +478,7 @@ const addIfGroupsSubItem = async (actionGroupIndex: any) => {
   }
   actionForm.value.actionGroups[actionGroupIndex].actionInstructList.push(data)
 }
-// 删除某个动作组中的某个指令
+// Delete an instruction in an action group
 const deleteIfGroupsSubItem = (actionGroupIndex: any, ifIndex: any) => {
   actionForm.value.actionGroups[actionGroupIndex].actionInstructList.splice(ifIndex, 1)
 }
@@ -526,7 +526,7 @@ onMounted(() => {
                 @update:value="data => actionChange(actionGroupItem, actionGroupIndex, data)"
               />
               <template v-if="actionGroupItem.actionType === '1'">
-                <!--          执行动作是操作设备->添加指令--->
+                <!--          To perform an action is to operate a device->Add directive--->
                 <NCard class="flex-1">
                   <NFlex
                     v-for="(instructItem, instructIndex) in actionGroupItem.actionInstructList"
@@ -549,7 +549,7 @@ onMounted(() => {
                       </NFormItem>
                     </template>
                     <template v-if="instructItem.action_type === '10'">
-                      <!--                      选择单个设备-->
+                      <!--                      Select a single device-->
                       <NFormItem
                         :show-label="false"
                         :path="`actionGroups[${actionGroupIndex}].actionInstructList[${instructIndex}].action_target`"
@@ -597,7 +597,7 @@ onMounted(() => {
                       </NFormItem>
                     </template>
                     <template v-if="instructItem.action_type === '11'">
-                      <!--                      选择单类设备-->
+                      <!--                      Select a single type of device-->
                       <NFormItem
                         :show-label="false"
                         :path="`actionGroups[${actionGroupIndex}].actionInstructList[${instructIndex}].action_target`"
@@ -619,7 +619,7 @@ onMounted(() => {
                       </NFormItem>
                     </template>
                     <template v-if="instructItem.action_type">
-                      <!--                      选择属性-->
+                      <!--                      Select properties-->
                       <NFormItem
                         :show-label="false"
                         :path="`actionGroups[${actionGroupIndex}].actionInstructList[${instructIndex}].action_param_type`"
@@ -721,7 +721,7 @@ onMounted(() => {
                 </NCard>
               </template>
               <template v-if="actionGroupItem.actionType === '20'">
-                <!--          执行动作是激活场景->添加指令--->
+                <!--          Executing an action is the activation scene->Add directive--->
                 <NFlex class="ml-6" align="center">
                   <NFormItem
                     label-width="60"
@@ -745,7 +745,7 @@ onMounted(() => {
                 </NFlex>
               </template>
               <template v-if="actionGroupItem.actionType === '30'">
-                <!--          执行动作是触发告警->添加指令--->
+                <!--          The execution action is to trigger an alarm->Add directive--->
                 <NFlex class="ml-6">
                   <NFormItem
                     label-width="60"

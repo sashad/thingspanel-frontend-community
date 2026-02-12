@@ -1,11 +1,11 @@
 <!--
-  四种参数添加方式演示组件
-  用于展示和测试DynamicParameterEditor的4种参数添加功能
+  Four ways to add parameters to demonstrate components
+  for demonstration and testingDynamicParameterEditorof4Parameter addition function
 -->
 <script setup lang="ts">
 /**
- * FourParameterTypesDemo - 四种参数添加方式演示组件
- * 演示手动输入、卡片属性绑定、设备选择、接口模板四种方式
+ * FourParameterTypesDemo - Four ways to add parameters to demonstrate components
+ * Demo manual input、Card attribute binding、Equipment selection、Four methods of interface templates
  */
 
 import { ref } from 'vue'
@@ -17,14 +17,14 @@ import type { EnhancedParameter } from '@/core/data-architecture/types/parameter
 const { t } = useI18n()
 
 /**
- * 四种类型的参数演示数据
+ * Four types of parameter demonstration data
  */
 const headerParams = ref<EnhancedParameter[]>([])
 const queryParams = ref<EnhancedParameter[]>([])
 const pathParams = ref<EnhancedParameter[]>([])
 
 /**
- * 重置所有参数
+ * Reset all parameters
  */
 const resetAllParams = () => {
   headerParams.value = []
@@ -33,22 +33,22 @@ const resetAllParams = () => {
 }
 
 /**
- * 获取参数概述信息
+ * Get parameter summary information
  */
 const getParamsSummary = (params: EnhancedParameter[]) => {
-  if (params.length === 0) return '暂无参数'
+  if (params.length === 0) return 'No parameters yet'
 
   return params
     .map(param => {
       const template = param.selectedTemplate || 'manual'
       const templateNames: Record<string, string> = {
-        manual: '手动输入',
-        'property-binding': '属性绑定',
-        'device-dispatch-selector': '设备选择',
-        'interface-template': '接口模板'
+        manual: 'Manual entry',
+        'property-binding': 'Property binding',
+        'device-dispatch-selector': 'Equipment selection',
+        'interface-template': 'interface template'
       }
 
-      return `${param.key}: ${param.value || '未设置'} (${templateNames[template] || template})`
+      return `${param.key}: ${param.value || 'not set'} (${templateNames[template] || template})`
     })
     .join(', ')
 }
@@ -56,96 +56,96 @@ const getParamsSummary = (params: EnhancedParameter[]) => {
 
 <template>
   <div class="four-parameter-types-demo">
-    <n-card title="四种参数添加方式演示" size="small">
+    <n-card title="Demonstration of four ways to add parameters" size="small">
       <template #header-extra>
-        <n-button size="small" @click="resetAllParams">重置所有</n-button>
+        <n-button size="small" @click="resetAllParams">reset all</n-button>
       </template>
 
       <n-space vertical :size="24">
-        <!-- 请求头参数 -->
+        <!-- Request header parameters -->
         <div>
-          <n-text strong>1. 请求头参数 (Header Parameters)</n-text>
+          <n-text strong>1. Request header parameters (Header Parameters)</n-text>
           <n-text depth="3" style="display: block; margin: 8px 0; font-size: 12px">
-            支持：手动输入、属性绑定、接口模板、内容类型模板、认证类型模板
+            support：Manual entry、Property binding、interface template、Content type template、Authentication type template
           </n-text>
           <DynamicParameterEditor
             v-model="headerParams"
             parameter-type="header"
             title=""
-            add-button-text="添加请求头参数"
-            key-placeholder="Header名称"
-            value-placeholder="Header值"
+            add-button-text="Add request header parameters"
+            key-placeholder="Headername"
+            value-placeholder="Headervalue"
             :max-parameters="3"
           />
           <n-text depth="3" style="font-size: 11px; margin-top: 8px; display: block">
-            当前参数：{{ getParamsSummary(headerParams) }}
+            Current parameters：{{ getParamsSummary(headerParams) }}
           </n-text>
         </div>
 
         <n-divider />
 
-        <!-- 查询参数 -->
+        <!-- query parameters -->
         <div>
-          <n-text strong>2. 查询参数 (Query Parameters)</n-text>
+          <n-text strong>2. query parameters (Query Parameters)</n-text>
           <n-text depth="3" style="display: block; margin: 8px 0; font-size: 12px">
-            支持：手动输入、属性绑定、接口模板、布尔值模板、设备选择
+            support：Manual entry、Property binding、interface template、boolean template、Equipment selection
           </n-text>
           <DynamicParameterEditor
             v-model="queryParams"
             parameter-type="query"
             title=""
-            add-button-text="添加查询参数"
-            key-placeholder="参数名称"
-            value-placeholder="参数值"
+            add-button-text="Add query parameters"
+            key-placeholder="Parameter name"
+            value-placeholder="Parameter value"
             :max-parameters="5"
           />
           <n-text depth="3" style="font-size: 11px; margin-top: 8px; display: block">
-            当前参数：{{ getParamsSummary(queryParams) }}
+            Current parameters：{{ getParamsSummary(queryParams) }}
           </n-text>
         </div>
 
         <n-divider />
 
-        <!-- 路径参数 -->
+        <!-- path parameters -->
         <div>
-          <n-text strong>3. 路径参数 (Path Parameters)</n-text>
+          <n-text strong>3. path parameters (Path Parameters)</n-text>
           <n-text depth="3" style="display: block; margin: 8px 0; font-size: 12px">
-            支持：手动输入、属性绑定、接口模板、设备选择（限制1个参数）
+            support：Manual entry、Property binding、interface template、Equipment selection（limit1parameters）
           </n-text>
           <DynamicParameterEditor
             v-model="pathParams"
             parameter-type="path"
             title=""
-            add-button-text="添加路径参数"
-            key-placeholder="路径变量名"
-            value-placeholder="路径变量值"
+            add-button-text="Add path parameters"
+            key-placeholder="path variable name"
+            value-placeholder="path variable value"
             :max-parameters="1"
           />
           <n-text depth="3" style="font-size: 11px; margin-top: 8px; display: block">
-            当前参数：{{ getParamsSummary(pathParams) }}
+            Current parameters：{{ getParamsSummary(pathParams) }}
           </n-text>
         </div>
       </n-space>
     </n-card>
 
-    <!-- 使用说明 -->
-    <n-card title="使用说明" size="small" style="margin-top: 16px">
+    <!-- Instructions for use -->
+    <n-card title="Instructions for use" size="small" style="margin-top: 16px">
       <n-space vertical :size="8">
         <div>
-          <n-text strong>1. 手动输入：</n-text>
-          <n-text depth="3">直接输入固定的参数值，适用于不变的静态参数</n-text>
+          <n-text strong>1. Manual entry：</n-text>
+          <n-text depth="3">Directly enter fixed parameter values，Works with immutable static parameters</n-text>
         </div>
         <div>
-          <n-text strong>2. 卡片属性绑定：</n-text>
-          <n-text depth="3">绑定到组件属性，运行时动态获取值，适用于动态参数</n-text>
+          <n-text strong>2. Card attribute binding：</n-text>
+          <n-text depth="3">Bind to component properties，Dynamically obtain values ​​at runtime，Works with dynamic parameters</n-text>
         </div>
         <div>
-          <n-text strong>3. 设备选择：</n-text>
-          <n-text depth="3">从设备列表中选择设备和指标，自动生成参数值</n-text>
+          <n-text strong>3. Equipment selection：</n-text>
+          <n-text depth="3">Select device and metric from device list，Automatically generate parameter values</n-text>
         </div>
         <div>
-          <n-text strong>4. 接口模板：</n-text>
-          <n-text depth="3">使用预定义的参数模板，如设备ID、用户ID等常用参数</n-text>
+          <n-text strong>4. interface template：</n-text>
+          <n-text depth="3">Use predefined parameter templates，Such as equipmentID、userIDand other commonly used parameters</n-text>
         </div>
       </n-space>
     </n-card>

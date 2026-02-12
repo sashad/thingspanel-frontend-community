@@ -1,26 +1,26 @@
 /**
- * 折线图组件配置接口
+ * Line chart component configuration interface
  */
 export interface LineChartCustomize {
-  // 图表配置
-  title?: string // 图表标题
-  showLegend?: boolean // 显示图例
-  smooth?: boolean // 平滑曲线
-  showArea?: boolean // 显示面积
+  // Chart configuration
+  title?: string // Chart title
+  showLegend?: boolean // Show legend
+  smooth?: boolean // smooth curve
+  showArea?: boolean // display area
 
-  // 坐标轴配置
-  xAxisLabel?: string // X轴标签
-  yAxisLabel?: string // Y轴标签
-  showGrid?: boolean // 显示网格
+  // Axis configuration
+  xAxisLabel?: string // Xaxis labels
+  yAxisLabel?: string // Yaxis labels
+  showGrid?: boolean // show grid
 
-  // 颜色配置
-  lineColor?: string // 线条颜色
-  areaColor?: string // 面积颜色
+  // Color configuration
+  lineColor?: string // line color
+  areaColor?: string // area color
 
-  // 数据点配置
-  showDataPoints?: boolean // 显示数据点
-  dataPointSize?: number // 数据点大小
+  // Data point configuration
+  showDataPoints?: boolean // Show data points
+  dataPointSize?: number // data point size
 
-  // 动画配置
-  animationDuration?: number // 动画时长
+  // Animation configuration
+  animationDuration?: number // Animation duration
 }

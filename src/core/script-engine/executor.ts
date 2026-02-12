@@ -1,6 +1,6 @@
 /**
- * 脚本执行器实现
- * 负责实际的脚本执行、结果处理和统计收集
+ * Script executor implementation
+ * Responsible for actual script execution、Results processing and statistics collection
  */
 
 import type {
@@ -14,7 +14,7 @@ import type {
 import { ScriptSandbox, defaultSandboxConfig } from '@/core/script-engine/sandbox'
 
 /**
- * 脚本执行器实现类
+ * Script executor implementation class
  */
 export class ScriptExecutor implements IScriptExecutor {
   private sandbox: ScriptSandbox
@@ -37,49 +37,49 @@ export class ScriptExecutor implements IScriptExecutor {
   }
 
   /**
-   * 执行脚本
+   * Execute script
    */
   async execute<T = any>(config: ScriptConfig, context?: ScriptExecutionContext): Promise<ScriptExecutionResult<T>> {
     const startTime = Date.now()
     const logs: ScriptLog[] = []
 
-    // 增加并发计数
+    // increase concurrency count
     this.currentExecutions++
     this.stats.currentConcurrentExecutions = this.currentExecutions
 
     try {
-      // 验证脚本语法
+      // Verify script syntax
       const syntaxCheck = this.validateSyntax(config.code)
       if (!syntaxCheck.valid) {
-        throw new Error(`脚本语法错误: ${syntaxCheck.error}`)
+        throw new Error(`Script syntax error: ${syntaxCheck.error}`)
       }
 
-      // 创建执行环境
+      // Create execution environment
       const sandboxEnv = this.sandbox.createSandbox(defaultSandboxConfig)
 
-      // 添加上下文变量
+      // Add context variables
       if (context) {
         Object.assign(sandboxEnv, context.variables)
         Object.assign(sandboxEnv, context.functions)
       }
 
-      // 添加自定义全局变量
+      // Add custom global variables
       if (config.globals) {
         Object.assign(sandboxEnv, config.globals)
       }
 
-      // 添加日志收集器
+      // Add log collector
       sandboxEnv.console = this.createLoggingConsole(logs)
 
-      // 执行脚本
+      // Execute script
       const timeout = config.timeout || 5000
       const result = await this.sandbox.executeInSandbox(config.code, sandboxEnv, timeout)
 
-      // 计算执行时间
+      // Calculate execution time
       const executionTime = Date.now() - startTime
       this.updateStats(executionTime, true)
 
-      // 销毁沙箱
+      // Destroy sandbox
       this.sandbox.destroySandbox(sandboxEnv)
 
       return {
@@ -101,18 +101,18 @@ export class ScriptExecutor implements IScriptExecutor {
         logs
       }
     } finally {
-      // 减少并发计数
+      // Reduce concurrency count
       this.currentExecutions--
       this.stats.currentConcurrentExecutions = this.currentExecutions
     }
   }
 
   /**
-   * 验证脚本语法
+   * Verify script syntax
    */
   validateSyntax(code: string): { valid: boolean; error?: string } {
     try {
-      // 使用Function构造器验证语法
+      // useFunctionConstructor validation syntax
       new Function(code)
       return { valid: true }
     } catch (error) {
@@ -124,14 +124,14 @@ export class ScriptExecutor implements IScriptExecutor {
   }
 
   /**
-   * 获取执行统计
+   * Get execution statistics
    */
   getExecutionStats(): ExecutionStats {
     return { ...this.stats }
   }
 
   /**
-   * 创建日志收集器
+   * Create a log collector
    */
   private createLoggingConsole(logs: ScriptLog[]) {
     const createLogMethod =
@@ -145,7 +145,7 @@ export class ScriptExecutor implements IScriptExecutor {
         }
         logs.push(log)
 
-        // 同时输出到真实console（带前缀）
+        // Simultaneously output to realconsole（with prefix）
         const realConsole = console as any
         if (realConsole[level]) {
           realConsole[level](`[ScriptEngine:${level.toUpperCase()}]`, ...args)
@@ -162,7 +162,7 @@ export class ScriptExecutor implements IScriptExecutor {
   }
 
   /**
-   * 更新执行统计
+   * Update execution statistics
    */
   private updateStats(executionTime: number, success: boolean): void {
     this.stats.totalExecutions++
@@ -173,15 +173,15 @@ export class ScriptExecutor implements IScriptExecutor {
       this.stats.failedExecutions++
     }
 
-    // 更新执行时间统计
+    // Update execution time statistics
     this.executionTimes.push(executionTime)
 
-    // 保持最近1000次执行的记录
+    // keep recent1000Records of executions
     if (this.executionTimes.length > 1000) {
       this.executionTimes = this.executionTimes.slice(-1000)
     }
 
-    // 更新时间统计
+    // Update time statistics
     this.stats.maxExecutionTime = Math.max(this.stats.maxExecutionTime, executionTime)
     this.stats.minExecutionTime =
       this.stats.minExecutionTime === 0 ? executionTime : Math.min(this.stats.minExecutionTime, executionTime)
@@ -191,7 +191,7 @@ export class ScriptExecutor implements IScriptExecutor {
   }
 
   /**
-   * 重置统计信息
+   * Reset statistics
    */
   resetStats(): void {
     this.stats = {
@@ -208,7 +208,7 @@ export class ScriptExecutor implements IScriptExecutor {
 }
 
 /**
- * 默认脚本配置
+ * Default script configuration
  */
 export const defaultScriptConfig: ScriptConfig = {
   code: '',

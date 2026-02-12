@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /**
- * 设备单选选择器组件
- * 支持无限滚动和搜索功能
+ * Device radio selector component
+ * Supports infinite scrolling and search functionality
  */
 
 import { computed, ref, watch } from 'vue'
 import { NEmpty, NFlex, NInfiniteScroll, NPopover, NSelect, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-// --- 类型定义 ---
+// --- type definition ---
 interface DeviceOption {
   device_id: string
   device_name: string
@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
   loading: false,
   hasMore: true,
-  placeholder: '请选择设备',
+  placeholder: 'Please select a device',
   disabled: false,
   clearable: false
 })
@@ -46,29 +46,29 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// --- 组合式函数 ---
+// --- Combined functions ---
 const { t } = useI18n()
 
-// --- 内部状态 ---
-/** 控制 Popover 是否显示 */
+// --- internal state ---
+/** control Popover Whether to display */
 const showPopover = ref(false)
-/** 搜索关键词 */
+/** Search keywords */
 const searchKeyword = ref('')
 
-// --- 计算属性 ---
-/** 选中的设备选项 */
+// --- Computed properties ---
+/** Selected device options */
 const selectedOption = computed(() => {
   if (!props.modelValue) return null
   return props.options.find(opt => opt.device_id === props.modelValue) || null
 })
 
-/** 显示标签 */
+/** show label */
 const displayLabel = computed(() => {
   if (!selectedOption.value) return ''
   return selectedOption.value.device_name
 })
 
-/** 根据搜索关键词过滤后的选项列表 */
+/** List of options filtered by search keywords */
 const filteredOptions = computed(() => {
   if (!searchKeyword.value.trim()) {
     return props.options
@@ -81,8 +81,8 @@ const filteredOptions = computed(() => {
   )
 })
 
-// --- 方法 ---
-/** 处理无限滚动加载事件 */
+// --- method ---
+/** Handling infinite scroll loading events */
 const handleLoadMore = () => {
   if (!props.loading && props.hasMore) {
     emit('loadMore')
@@ -90,33 +90,33 @@ const handleLoadMore = () => {
 }
 
 /**
- * 处理选项点击事件
+ * Handling option click events
  *
- * @param deviceId 被点击选项的设备 ID
+ * @param deviceId The device on which the option was clicked ID
  */
 const handleOptionClick = (deviceId: string) => {
   if (props.modelValue === deviceId) {
-    // 如果点击的是已选中的选项，则取消选中
+    // If you click on a selected option，then uncheck
     emit('update:modelValue', null)
   } else {
-    // 选中新选项
+    // Check new options
     emit('update:modelValue', deviceId)
   }
-  // 选中后关闭弹窗
+  // Close pop-up window after selection
   showPopover.value = false
 }
 
 /**
- * 当 Popover 显示状态改变时触发
+ * when Popover Triggered when display status changes
  *
- * @param show 是否显示
+ * @param show Whether to display
  */
 const handlePopoverUpdateShow = (show: boolean) => {
   showPopover.value = show
   if (show) {
-    // 重置搜索关键词
+    // Reset search keywords
     searchKeyword.value = ''
-    // 当首次展开且没有选项时，触发初始加载
+    // When first expanded with no options，Trigger initial load
     if (props.options.length === 0) {
       emit('initialLoad')
     }
@@ -124,9 +124,9 @@ const handlePopoverUpdateShow = (show: boolean) => {
 }
 
 /**
- * 处理搜索事件
+ * Handling search events
  *
- * @param searchValue 搜索关键词
+ * @param searchValue Search keywords
  */
 const handleSearch = (searchValue: string) => {
   searchKeyword.value = searchValue
@@ -134,16 +134,16 @@ const handleSearch = (searchValue: string) => {
 }
 
 /**
- * 检查某个选项是否被选中
+ * Check if an option is selected
  *
- * @param deviceId 设备 ID
+ * @param deviceId equipment ID
  */
 const isSelected = (deviceId: string): boolean => {
   return props.modelValue === deviceId
 }
 
 /**
- * 清空选择
+ * Clear selection
  */
 const handleClear = () => {
   emit('update:modelValue', null)
@@ -160,7 +160,7 @@ const handleClear = () => {
     :disabled="props.disabled"
     @update:show="handlePopoverUpdateShow"
   >
-    <!-- 触发器 -->
+    <!-- trigger -->
     <template #trigger>
       <div class="select-trigger-wrapper" :class="{ 'is-disabled': props.disabled }">
         <NSelect
@@ -185,7 +185,7 @@ const handleClear = () => {
       </div>
     </template>
 
-    <!-- Popover 内容 -->
+    <!-- Popover content -->
     <div class="device-select-popover-content">
       <NInfiniteScroll
         class="options-scroll-container"
@@ -206,23 +206,23 @@ const handleClear = () => {
         </div>
         <NEmpty
           v-else-if="!props.loading"
-          :description="searchKeyword ? '未找到匹配的设备' : t('common.noData') || '暂无数据'"
+          :description="searchKeyword ? 'No matching device found' : t('common.noData') || 'No data yet'"
           class="empty-placeholder"
         />
 
-        <!-- 加载中提示 -->
+        <!-- Loading prompt -->
         <NFlex v-if="props.loading" justify="center" class="loading-indicator">
           <NSpin size="small" />
-          <span class="loading-text">{{ t('card.loading') || '加载中...' }}</span>
+          <span class="loading-text">{{ t('card.loading') || 'loading...' }}</span>
         </NFlex>
 
-        <!-- 没有更多提示 -->
+        <!-- no more prompts -->
         <NFlex
           v-if="!props.loading && !props.hasMore && filteredOptions && filteredOptions.length > 0"
           justify="center"
           class="no-more-indicator"
         >
-          {{ t('common.noMoreData') || '没有更多了' }}
+          {{ t('common.noMoreData') || 'no more' }}
         </NFlex>
       </NInfiniteScroll>
     </div>
@@ -250,11 +250,11 @@ const handleClear = () => {
 }
 
 .options-scroll-container {
-  // NInfiniteScroll 内部样式
+  // NInfiniteScroll internal style
 }
 
 .options-list {
-  // 列表容器样式
+  // List container style
 }
 
 .device-option-item {

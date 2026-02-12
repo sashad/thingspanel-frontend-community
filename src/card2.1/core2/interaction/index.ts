@@ -1,9 +1,9 @@
 /**
- * 交互系统导出
+ * Interactive system export
  */
 
 export * from './interaction-manager'
 export * from './types'
 
-// 默认导出交互管理器实例
+// Export interaction manager instance by default
 export { interactionManager } from './interaction-manager'

@@ -1,5 +1,5 @@
 /**
- * Grid Layout Plus 工具函数
+ * Grid Layout Plus Utility function
  */
 
 import type {
@@ -11,25 +11,25 @@ import type {
 } from './gridLayoutPlusTypes'
 
 /**
- * 验证网格项
+ * Validate grid items
  */
 export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResult<boolean> {
   try {
-    // 检查必要字段
+    // Check required fields
     if (!item.i || typeof item.i !== 'string') {
       return {
         success: false,
         error: new Error('Grid item must have a valid string id'),
-        message: '网格项必须有有效的字符串ID'
+        message: 'Grid item must have a valid stringID'
       }
     }
 
-    // 检查位置和尺寸
+    // Check position and size
     if (item.x < 0 || item.y < 0) {
       return {
         success: false,
         error: new Error('Grid position must be >= 0'),
-        message: '网格位置必须大于等于0'
+        message: 'Grid position must be greater than or equal to0'
       }
     }
 
@@ -37,16 +37,16 @@ export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResul
       return {
         success: false,
         error: new Error('Grid size must be > 0'),
-        message: '网格尺寸必须大于0'
+        message: 'Grid size must be greater than0'
       }
     }
 
-    // 检查约束条件
+    // Check constraints
     if (item.minW && item.w < item.minW) {
       return {
         success: false,
         error: new Error('Width is less than minimum'),
-        message: '宽度小于最小值'
+        message: 'width less than minimum'
       }
     }
 
@@ -54,7 +54,7 @@ export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResul
       return {
         success: false,
         error: new Error('Width exceeds maximum'),
-        message: '宽度超过最大值'
+        message: 'Width exceeds maximum'
       }
     }
 
@@ -62,7 +62,7 @@ export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResul
       return {
         success: false,
         error: new Error('Height is less than minimum'),
-        message: '高度小于最小值'
+        message: 'height less than minimum'
       }
     }
 
@@ -70,7 +70,7 @@ export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResul
       return {
         success: false,
         error: new Error('Height exceeds maximum'),
-        message: '高度超过最大值'
+        message: 'Height exceeds maximum'
       }
     }
 
@@ -79,28 +79,28 @@ export function validateGridItem(item: GridLayoutPlusItem): LayoutOperationResul
     return {
       success: false,
       error: error as Error,
-      message: '网格项验证失败'
+      message: 'Grid item validation failed'
     }
   }
 }
 
 /**
- * 验证布局
+ * Verify layout
  */
 export function validateLayout(layout: GridLayoutPlusItem[]): LayoutOperationResult<boolean> {
   try {
-    // 检查ID唯一性
+    // examineIDuniqueness
     const ids = layout.map(item => item.i)
     const uniqueIds = new Set(ids)
     if (ids.length !== uniqueIds.size) {
       return {
         success: false,
         error: new Error('Duplicate item IDs found'),
-        message: '发现重复ID'
+        message: 'Duplicate foundID'
       }
     }
 
-    // 检查每个项目
+    // Check each item
     for (const item of layout) {
       const itemValidation = validateGridItem(item)
       if (!itemValidation.success) {
@@ -113,13 +113,13 @@ export function validateLayout(layout: GridLayoutPlusItem[]): LayoutOperationRes
     return {
       success: false,
       error: error as Error,
-      message: '布局验证失败'
+      message: 'Layout validation failed'
     }
   }
 }
 
 /**
- * 检查两个项目是否重叠
+ * Check if two items overlap
  */
 export function isItemsOverlapping(item1: GridLayoutPlusItem, item2: GridLayoutPlusItem): boolean {
   return !(
@@ -131,7 +131,7 @@ export function isItemsOverlapping(item1: GridLayoutPlusItem, item2: GridLayoutP
 }
 
 /**
- * 寻找可用位置
+ * Find available locations
  */
 export function findAvailablePosition(
   w: number,
@@ -139,12 +139,12 @@ export function findAvailablePosition(
   layout: GridLayoutPlusItem[],
   colNum: number = 12
 ): { x: number; y: number } {
-  // 简单的位置查找算法
+  // Simple location finding algorithm
   for (let y = 0; y < 100; y++) {
     for (let x = 0; x <= colNum - w; x++) {
       const proposed = { x, y, w, h, i: 'temp' }
 
-      // 检查是否与现有项目冲突
+      // Check for conflicts with existing projects
       const hasCollision = layout.some(item => isItemsOverlapping(proposed, item))
 
       if (!hasCollision) {
@@ -157,14 +157,14 @@ export function findAvailablePosition(
 }
 
 /**
- * 生成唯一ID
+ * generate uniqueID
  */
 export function generateId(prefix: string = 'item'): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
 /**
- * 深度克隆网格项
+ * Deep clone grid items
  */
 export function cloneGridItem(item: GridLayoutPlusItem): GridLayoutPlusItem {
   return {
@@ -177,14 +177,14 @@ export function cloneGridItem(item: GridLayoutPlusItem): GridLayoutPlusItem {
 }
 
 /**
- * 批量克隆网格项
+ * Batch clone grid items
  */
 export function cloneLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[] {
   return layout.map(cloneGridItem)
 }
 
 /**
- * 计算布局边界
+ * Calculate layout bounds
  */
 export function getLayoutBounds(layout: GridLayoutPlusItem[]): {
   minX: number
@@ -214,7 +214,7 @@ export function getLayoutBounds(layout: GridLayoutPlusItem[]): {
 }
 
 /**
- * 紧凑布局
+ * Compact layout
  */
 export function compactLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[] {
   const sortedLayout = [...layout].sort((a, b) => {
@@ -227,7 +227,7 @@ export function compactLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[
   for (const item of sortedLayout) {
     let newY = 0
 
-    // 寻找最高可放置位置
+    // Find the highest place you can place it
     while (newY <= item.y) {
       const tempItem = { ...item, y: newY }
       const hasCollision = compacted.some(placedItem => isItemsOverlapping(tempItem, placedItem))
@@ -246,7 +246,7 @@ export function compactLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[
 }
 
 /**
- * 布局排序
+ * Layout sorting
  */
 export function sortLayout(
   layout: GridLayoutPlusItem[],
@@ -260,7 +260,7 @@ export function sortLayout(
       case 'size': {
         const sizeA = a.w * a.h
         const sizeB = b.w * b.h
-        return sizeB - sizeA // 大的在前
+        return sizeB - sizeA // Big one first
       }
       case 'id':
         return a.i.localeCompare(b.i)
@@ -271,7 +271,7 @@ export function sortLayout(
 }
 
 /**
- * 过滤布局
+ * Filter layout
  */
 export function filterLayout(
   layout: GridLayoutPlusItem[],
@@ -281,7 +281,7 @@ export function filterLayout(
 }
 
 /**
- * 搜索布局项
+ * Search layout items
  */
 export function searchLayout(
   layout: GridLayoutPlusItem[],
@@ -302,7 +302,7 @@ export function searchLayout(
 }
 
 /**
- * 布局统计信息
+ * layout statistics
  */
 export function getLayoutStats(layout: GridLayoutPlusItem[], colNum: number = 12) {
   const bounds = getLayoutBounds(layout)
@@ -337,7 +337,7 @@ export function getLayoutStats(layout: GridLayoutPlusItem[], colNum: number = 12
 }
 
 /**
- * 响应式布局转换
+ * Responsive layout conversion
  */
 export function transformLayoutForBreakpoint(
   layout: GridLayoutPlusItem[],
@@ -352,12 +352,12 @@ export function transformLayoutForBreakpoint(
     ...item,
     x: Math.round(item.x * scale),
     w: Math.max(1, Math.round(item.w * scale))
-    // y和h保持不变，只缩放水平方向
+    // yandhremain unchanged，Zoom horizontally only
   }))
 }
 
 /**
- * 创建响应式布局
+ * Create a responsive layout
  */
 export function createResponsiveLayout(
   baseLayout: GridLayoutPlusItem[],
@@ -376,7 +376,7 @@ export function createResponsiveLayout(
 }
 
 /**
- * 优化布局性能
+ * Optimize layout performance
  */
 export function optimizeLayoutPerformance(
   layout: GridLayoutPlusItem[],
@@ -384,22 +384,22 @@ export function optimizeLayoutPerformance(
 ): GridLayoutPlusItem[] {
   let optimizedLayout = [...layout]
 
-  // 如果启用懒加载，标记非可见项目
+  // If lazy loading is enabled，Mark invisible items
   if (config.enableLazyLoading) {
-    // 这里可以根据可视区域标记项目
-    // 实际实现需要结合滚动位置和容器大小
+    // Here you can mark items based on the visible area
+    // The actual implementation requires a combination of scroll position and container size
   }
 
-  // 如果项目数量超过虚拟化阈值，启用虚拟化优化
+  // If the number of projects exceeds the virtualization threshold，Enable virtualization optimization
   if (config.enableVirtualization && layout.length > config.virtualizationThreshold) {
-    // 虚拟化逻辑
+    // virtualization logic
   }
 
   return optimizedLayout
 }
 
 /**
- * 防抖函数
+ * Anti-shake function
  */
 export function debounce<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout
@@ -410,7 +410,7 @@ export function debounce<T extends (...args: any[]) => any>(func: T, delay: numb
 }
 
 /**
- * 节流函数
+ * Throttle function
  */
 export function throttle<T extends (...args: any[]) => any>(func: T, delay: number): (...args: Parameters<T>) => void {
   let lastCall = 0
@@ -424,7 +424,7 @@ export function throttle<T extends (...args: any[]) => any>(func: T, delay: numb
 }
 
 /**
- * 布局导出
+ * Layout export
  */
 export function exportLayout(layout: GridLayoutPlusItem[], format: 'json' | 'csv' = 'json'): string {
   switch (format) {
@@ -444,7 +444,7 @@ export function exportLayout(layout: GridLayoutPlusItem[], format: 'json' | 'csv
 }
 
 /**
- * 布局导入
+ * Layout import
  */
 export function importLayout(data: string, format: 'json' | 'csv' = 'json'): GridLayoutPlusItem[] {
   try {
@@ -477,7 +477,7 @@ export function importLayout(data: string, format: 'json' | 'csv' = 'json'): Gri
 }
 
 /**
- * 获取项目在指定断点的配置
+ * Get the project's configuration at the specified breakpoint
  */
 export function getItemAtBreakpoint(
   item: GridLayoutPlusItem,

@@ -16,17 +16,17 @@ const { routerPushByKey } = useRouterPush()
 const showLog = ref(false)
 const logDataTotal = ref(0)
 const logData = ref([])
-// 新建场景
+// Create new scene
 const sceneAdd = () => {
   routerPushByKey('automation_scene-edit')
 }
 
-// 编辑场景
+// Edit scene
 const sceneEdit = (item: any) => {
   routerPushByKey('automation_scene-edit', { query: { id: item.id } })
 }
 
-// 激活场景
+// Activate scene
 const sceneActivation = async (item: any) => {
   // dialog.warning({
   //   title: $t('common.activationPrompt'),
@@ -85,13 +85,13 @@ const getLogList = async () => {
   logData.value = res.data.list
   logDataTotal.value = res.data.total
 }
-// 查看日志
+// View log
 const openLog = (item: any) => {
   logQuery.value.id = item.id
   getLogList()
   showLog.value = true
 }
-// 删除场景
+// delete scene
 const deleteScene = async (item: any) => {
   dialog.warning({
     title: $t('common.deletePrompt'),

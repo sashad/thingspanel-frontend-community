@@ -1,124 +1,124 @@
 /**
- * 统一数据执行器 (UnifiedDataExecutor)
- * Task 2.1: 合并多个分散的执行器，提供统一的数据获取接口
+ * Unified Data Executor (UnifiedDataExecutor)
+ * Task 2.1: Merge multiple scattered executors，Provide a unified data acquisition interface
  *
- * 设计原则：
- * 1. 职责单一：只做数据获取和基础转换
- * 2. 类型统一：支持所有常见数据源类型
- * 3. 轻量高效：移除企业级冗余功能
- * 4. 插件扩展：支持新数据源类型扩展
- * 5. 事件集成：与配置事件总线协同工作
+ * design principles：
+ * 1. Single responsibility：Only do data acquisition and basic conversion
+ * 2. Type unity：Supports all common data source types
+ * 3. Lightweight and efficient：Remove enterprise-level redundant features
+ * 4. Plug-in extension：Support for new data source type extensions
+ * 5. event integration：Works with configuration event bus
  */
 
 import { request } from '@/service/request'
 import type { HttpParam, HttpHeader } from '@/core/data-architecture/types/enhanced-types'
 
 /**
- * 统一数据源配置
- * 支持多种数据源类型的统一配置接口
+ * Unified data source configuration
+ * Unified configuration interface that supports multiple data source types
  */
 export interface UnifiedDataConfig {
-  /** 数据源唯一标识 */
+  /** Data source unique identifier */
   id: string
-  /** 数据源类型 */
+  /** Data source type */
   type: 'static' | 'http' | 'websocket' | 'json' | 'file' | 'data-source-bindings'
-  /** 数据源名称 */
+  /** Data source name */
   name?: string
-  /** 是否启用 */
+  /** Whether to enable */
   enabled?: boolean
-  /** 配置选项 */
+  /** Configuration options */
   config: {
-    // === 静态数据配置 ===
+    // === Static data configuration ===
     data?: any
 
-    // === HTTP配置 ===
-    /** 请求URL (必填) */
+    // === HTTPConfiguration ===
+    /** askURL (Required) */
     url?: string
-    /** HTTP请求方法 (必填) */
+    /** HTTPRequest method (Required) */
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
-    /** 请求超时时间 */
+    /** Request timeout */
     timeout?: number
-    /** HTTP请求头配置 */
+    /** HTTPRequest header configuration */
     headers?: HttpHeader[]
-    /** HTTP请求参数配置 */
+    /** HTTPRequest parameter configuration */
     params?: HttpParam[]
 
-    // === WebSocket配置 ===
+    // === WebSocketConfiguration ===
     wsUrl?: string
     protocols?: string[]
     reconnect?: boolean
     heartbeat?: boolean
 
-    // === JSON数据配置 ===
+    // === JSONData configuration ===
     jsonContent?: string
     jsonPath?: string
 
-    // === 文件配置 ===
+    // === File configuration ===
     filePath?: string
     fileType?: 'json' | 'csv' | 'xml'
     encoding?: string
 
-    // === 数据转换配置 ===
+    // === Data conversion configuration ===
     transform?: {
-      /** JSONPath表达式 */
+      /** JSONPathexpression */
       path?: string
-      /** 数据映射规则 */
+      /** Data mapping rules */
       mapping?: Record<string, string>
-      /** 数据过滤条件 */
+      /** Data filter conditions */
       filter?: any
-      /** 自定义转换函数 */
+      /** Custom conversion function */
       script?: string
     }
 
-    // === 扩展配置 ===
+    // === extended configuration ===
     [key: string]: any
   }
 }
 
 /**
- * 统一执行结果
+ * Unified execution results
  */
 export interface UnifiedDataResult {
-  /** 执行是否成功 */
+  /** Whether the execution was successful */
   success: boolean
-  /** 数据内容 */
+  /** Data content */
   data?: any
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 错误代码 */
+  /** error code */
   errorCode?: string
-  /** 执行时间戳 */
+  /** Execution timestamp */
   timestamp: number
-  /** 数据源ID */
+  /** data sourceID */
   sourceId: string
-  /** 额外元数据 */
+  /** additional metadata */
   metadata?: {
-    /** 响应时间(ms) */
+    /** response time(ms) */
     responseTime?: number
-    /** 数据大小 */
+    /** Data size */
     dataSize?: number
-    /** 原始响应(调试用) */
+    /** original response(for debugging) */
     rawResponse?: any
   }
 }
 
 /**
- * 数据源执行器接口
- * 支持插件化扩展不同类型的数据源
+ * Data source executor interface
+ * Support plug-in expansion of different types of data sources
  */
 export interface DataSourceExecutor {
-  /** 执行器类型 */
+  /** Actuator type */
   type: string
-  /** 执行数据获取 */
+  /** Perform data acquisition */
   execute(config: UnifiedDataConfig): Promise<UnifiedDataResult>
-  /** 验证配置 */
+  /** Verify configuration */
   validate?(config: UnifiedDataConfig): boolean
-  /** 清理资源 */
+  /** Clean up resources */
   cleanup?(): void
 }
 
 /**
- * HTTP数据源执行器
+ * HTTPdata source executor
  */
 class HttpExecutor implements DataSourceExecutor {
   type = 'http'
@@ -130,7 +130,7 @@ class HttpExecutor implements DataSourceExecutor {
       const { url, method = 'GET', headers, params, body, timeout = 5000 } = config.config
 
       if (!url) {
-        return this.createErrorResult(config.id, 'HTTP_NO_URL', 'URL未配置', startTime)
+        return this.createErrorResult(config.id, 'HTTP_NO_URL', 'URLNot configured', startTime)
       }
       const response = await request({
         url,
@@ -143,7 +143,7 @@ class HttpExecutor implements DataSourceExecutor {
 
       const responseTime = Date.now() - startTime
 
-      // 应用数据转换
+      // Apply data transformation
       const transformedData = this.applyTransform(response.data, config.config.transform)
 
       return {
@@ -159,7 +159,7 @@ class HttpExecutor implements DataSourceExecutor {
       }
     } catch (error: any) {
       const responseTime = Date.now() - startTime
-      return this.createErrorResult(config.id, 'HTTP_REQUEST_FAILED', error.message || '请求失败', startTime, {
+      return this.createErrorResult(config.id, 'HTTP_REQUEST_FAILED', error.message || 'Request failed', startTime, {
         responseTime
       })
     }
@@ -190,17 +190,17 @@ class HttpExecutor implements DataSourceExecutor {
 
     let result = data
 
-    // JSONPath处理
+    // JSONPathdeal with
     if (transform.path) {
       result = this.extractByPath(result, transform.path)
     }
 
-    // 字段映射
+    // Field mapping
     if (transform.mapping) {
       result = this.applyMapping(result, transform.mapping)
     }
 
-    // 数据过滤
+    // Data filtering
     if (transform.filter) {
       result = this.applyFilter(result, transform.filter)
     }
@@ -209,7 +209,7 @@ class HttpExecutor implements DataSourceExecutor {
   }
 
   private extractByPath(data: any, path: string): any {
-    // 简单的JSONPath实现，支持基本的点语法
+    // simpleJSONPathaccomplish，Supports basic dot syntax
     const keys = path.split('.')
     let result = data
 
@@ -236,7 +236,7 @@ class HttpExecutor implements DataSourceExecutor {
   }
 
   private applyFilter(data: any, filter: any): any {
-    // 简单过滤实现，支持数组过滤
+    // Simple filtering implementation，Support array filtering
     if (Array.isArray(data)) {
       return data.filter(item => {
         for (const [key, value] of Object.entries(filter)) {
@@ -251,7 +251,7 @@ class HttpExecutor implements DataSourceExecutor {
 }
 
 /**
- * 静态数据源执行器
+ * Static data source executor
  */
 class StaticExecutor implements DataSourceExecutor {
   type = 'static'
@@ -261,7 +261,7 @@ class StaticExecutor implements DataSourceExecutor {
 
     try {
       const { data } = config.config
-      // 应用数据转换
+      // Apply data transformation
       const transformedData = this.applyTransform(data, config.config.transform)
 
       return {
@@ -277,7 +277,7 @@ class StaticExecutor implements DataSourceExecutor {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || '静态数据处理失败',
+        error: error.message || 'Static data processing failed',
         errorCode: 'STATIC_DATA_ERROR',
         timestamp: Date.now(),
         sourceId: config.id,
@@ -289,15 +289,15 @@ class StaticExecutor implements DataSourceExecutor {
   }
 
   private applyTransform(data: any, transform?: any): any {
-    // 复用HTTP执行器的转换逻辑
+    // ReuseHTTPExecutor conversion logic
     if (!transform) return data
-    // 实现基础转换功能
+    // Implement basic conversion functions
     return data
   }
 }
 
 /**
- * JSON数据源执行器
+ * JSONdata source executor
  */
 class JsonExecutor implements DataSourceExecutor {
   type = 'json'
@@ -311,7 +311,7 @@ class JsonExecutor implements DataSourceExecutor {
       if (!jsonContent) {
         return {
           success: false,
-          error: 'JSON内容未配置',
+          error: 'JSONContent not configured',
           errorCode: 'JSON_NO_CONTENT',
           timestamp: Date.now(),
           sourceId: config.id,
@@ -321,10 +321,10 @@ class JsonExecutor implements DataSourceExecutor {
         }
       }
 
-      // 解析JSON
+      // parseJSON
       const parsedData = JSON.parse(jsonContent)
 
-      // 应用数据转换
+      // Apply data transformation
       const transformedData = this.applyTransform(parsedData, config.config.transform)
 
       return {
@@ -340,7 +340,7 @@ class JsonExecutor implements DataSourceExecutor {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || 'JSON解析失败',
+        error: error.message || 'JSONParsing failed',
         errorCode: 'JSON_PARSE_ERROR',
         timestamp: Date.now(),
         sourceId: config.id,
@@ -352,13 +352,13 @@ class JsonExecutor implements DataSourceExecutor {
   }
 
   private applyTransform(data: any, transform?: any): any {
-    // 复用转换逻辑
+    // Reuse conversion logic
     return data
   }
 }
 
 /**
- * WebSocket数据源执行器 (基础实现)
+ * WebSocketdata source executor (Basic implementation)
  */
 class WebSocketExecutor implements DataSourceExecutor {
   type = 'websocket'
@@ -373,7 +373,7 @@ class WebSocketExecutor implements DataSourceExecutor {
       if (!wsUrl) {
         return {
           success: false,
-          error: 'WebSocket URL未配置',
+          error: 'WebSocket URLNot configured',
           errorCode: 'WS_NO_URL',
           timestamp: Date.now(),
           sourceId: config.id,
@@ -383,7 +383,7 @@ class WebSocketExecutor implements DataSourceExecutor {
         }
       }
 
-      // 简单实现：WebSocket需要异步处理，这里返回连接状态
+      // Simple implementation：WebSocketRequires asynchronous processing，Return the connection status here
       return {
         success: true,
         data: { status: 'connecting', url: wsUrl },
@@ -396,7 +396,7 @@ class WebSocketExecutor implements DataSourceExecutor {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || 'WebSocket连接失败',
+        error: error.message || 'WebSocketConnection failed',
         errorCode: 'WS_CONNECTION_ERROR',
         timestamp: Date.now(),
         sourceId: config.id,
@@ -408,59 +408,59 @@ class WebSocketExecutor implements DataSourceExecutor {
   }
 
   cleanup() {
-    // 清理所有WebSocket连接
+    // clean allWebSocketconnect
     this.connections.forEach(ws => ws.close())
     this.connections.clear()
   }
 }
 
 /**
- * 统一数据执行器类
- * 核心功能：管理不同类型的数据源执行器，提供统一接口
+ * Unified Data Executor Class
+ * Core functions：Manage different types of data source executors，Provide a unified interface
  */
 export class UnifiedDataExecutor {
   private executors = new Map<string, DataSourceExecutor>()
 
   constructor() {
-    // 注册内置执行器
+    // Register built-in executor
     this.registerExecutor(new HttpExecutor())
     this.registerExecutor(new StaticExecutor())
     this.registerExecutor(new JsonExecutor())
     this.registerExecutor(new WebSocketExecutor())
-    this.registerExecutor(new DataSourceBindingsExecutor()) // 🆕 支持data-source-bindings类型
+    this.registerExecutor(new DataSourceBindingsExecutor()) // 🆕 supportdata-source-bindingstype
   }
 
   /**
-   * 注册数据源执行器 (支持插件扩展)
+   * Register data source executor (Support plug-in extension)
    */
   registerExecutor(executor: DataSourceExecutor): void {
     this.executors.set(executor.type, executor)
   }
 
   /**
-   * 执行数据源配置
-   * 统一的数据获取入口
+   * Perform data source configuration
+   * Unified data acquisition entrance
    */
   async execute(config: UnifiedDataConfig): Promise<UnifiedDataResult> {
     const { type, enabled = true } = config
 
-    // 检查是否启用
+    // Check if enabled
     if (!enabled) {
       return {
         success: false,
-        error: '数据源未启用',
+        error: 'Data source is not enabled',
         errorCode: 'DATA_SOURCE_DISABLED',
         timestamp: Date.now(),
         sourceId: config.id
       }
     }
 
-    // 获取对应执行器
+    // Get the corresponding executor
     const executor = this.executors.get(type)
     if (!executor) {
       return {
         success: false,
-        error: `不支持的数据源类型: ${type}`,
+        error: `Unsupported data source type: ${type}`,
         errorCode: 'UNSUPPORTED_DATA_SOURCE',
         timestamp: Date.now(),
         sourceId: config.id
@@ -474,7 +474,7 @@ export class UnifiedDataExecutor {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || '执行器异常',
+        error: error.message || 'Executor exception',
         errorCode: 'EXECUTOR_EXCEPTION',
         timestamp: Date.now(),
         sourceId: config.id
@@ -483,7 +483,7 @@ export class UnifiedDataExecutor {
   }
 
   /**
-   * 批量执行多个数据源
+   * Execute multiple data sources in batches
    */
   async executeMultiple(configs: UnifiedDataConfig[]): Promise<UnifiedDataResult[]> {
     const results = await Promise.allSettled(configs.map(config => this.execute(config)))
@@ -494,7 +494,7 @@ export class UnifiedDataExecutor {
       } else {
         return {
           success: false,
-          error: result.reason?.message || '批量执行失败',
+          error: result.reason?.message || 'Batch execution failed',
           errorCode: 'BATCH_EXECUTION_ERROR',
           timestamp: Date.now(),
           sourceId: configs[index]?.id || 'unknown'
@@ -504,30 +504,30 @@ export class UnifiedDataExecutor {
   }
 
   /**
-   * 获取支持的数据源类型
+   * Get supported data source types
    */
   getSupportedTypes(): string[] {
     return Array.from(this.executors.keys())
   }
 
   /**
-   * 验证数据源配置
+   * Verify data source configuration
    */
   validateConfig(config: UnifiedDataConfig): boolean {
     const executor = this.executors.get(config.type)
     if (!executor) return false
 
-    // 如果执行器提供验证方法，使用它
+    // If the executor provides a verification method，use it
     if (executor.validate) {
       return executor.validate(config)
     }
 
-    // 基础验证：检查必需字段
+    // Basic verification：Check required fields
     return !!(config.id && config.type)
   }
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   cleanup(): void {
     this.executors.forEach(executor => {
@@ -539,8 +539,8 @@ export class UnifiedDataExecutor {
 }
 
 /**
- * 🆕 数据源绑定执行器 - 处理data-source-bindings类型
- * 用于处理复杂的数据源绑定配置
+ * 🆕 Data source binding executor - deal withdata-source-bindingstype
+ * Used to handle complex data source binding configurations
  */
 class DataSourceBindingsExecutor implements DataSourceExecutor {
   type = 'data-source-bindings'
@@ -549,13 +549,13 @@ class DataSourceBindingsExecutor implements DataSourceExecutor {
     const startTime = Date.now()
 
     try {
-      // 从config中提取dataSourceBindings配置
+      // fromconfigextracted fromdataSourceBindingsConfiguration
       const bindings = config.config?.dataSourceBindings || config.config
 
       if (!bindings || typeof bindings !== 'object') {
         return {
           success: false,
-          error: 'dataSourceBindings配置缺失或格式错误',
+          error: 'dataSourceBindingsConfiguration is missing or in the wrong format',
           errorCode: 'BINDINGS_CONFIG_ERROR',
           timestamp: Date.now(),
           sourceId: config.id,
@@ -565,32 +565,32 @@ class DataSourceBindingsExecutor implements DataSourceExecutor {
         }
       }
 
-      // 🔥 关键：处理各种可能的数据格式
+      // 🔥 key：Handles every possible data format
       let resultData: any = null
 
-      // 情况1：如果bindings包含rawData字段（来自FinalDataProcessing）
+      // Condition1：ifbindingsIncluderawDataField（fromFinalDataProcessing）
       const bindingKeys = Object.keys(bindings)
       if (bindingKeys.length > 0) {
         const firstBinding = bindings[bindingKeys[0]]
 
         if (firstBinding?.rawData) {
-          // 尝试解析rawData（可能是JSON字符串）
+          // try to parserawData（may beJSONstring）
           try {
             resultData =
               typeof firstBinding.rawData === 'string' ? JSON.parse(firstBinding.rawData) : firstBinding.rawData
           } catch (error) {
-            // 如果解析失败，直接使用原始数据
+            // If parsing fails，Use raw data directly
             resultData = firstBinding.rawData
           }
         } else if (firstBinding?.finalResult) {
-          // 使用finalResult
+          // usefinalResult
           resultData = firstBinding.finalResult
         } else {
-          // 直接使用整个binding作为数据
+          // Use the entirebindingas data
           resultData = firstBinding
         }
       } else {
-        // 情况2：直接使用config中的数据
+        // Condition2：Use directlyconfigdata in
         resultData = bindings
       }
 
@@ -608,7 +608,7 @@ class DataSourceBindingsExecutor implements DataSourceExecutor {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || '数据源绑定处理失败',
+        error: error.message || 'Data source binding processing failed',
         errorCode: 'BINDINGS_EXECUTION_ERROR',
         timestamp: Date.now(),
         sourceId: config.id,
@@ -620,10 +620,10 @@ class DataSourceBindingsExecutor implements DataSourceExecutor {
   }
 }
 
-// 创建全局统一执行器实例
+// Create a global unified executor instance
 export const unifiedDataExecutor = new UnifiedDataExecutor()
 
-// 开发环境下暴露到全局作用域，便于调试
+// Exposed to global scope in development environment，Easy to debug
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   ;(window as any).unifiedDataExecutor = unifiedDataExecutor
 }

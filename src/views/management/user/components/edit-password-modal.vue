@@ -6,9 +6,9 @@ import { formRules, getConfirmPwdRule } from '@/utils/form/rule'
 import { $t } from '@/locales'
 
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   editData?: UserManagement.User | null
 }
 
@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'update:visible', visible: boolean): void
 
-  /** 点击协议 */
+  /** Click Agreement */
   (e: 'success'): void
 }
 

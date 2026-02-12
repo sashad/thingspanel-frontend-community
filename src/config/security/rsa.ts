@@ -1,10 +1,10 @@
 /**
- * RSA 安全配置
+ * RSA Security configuration
  * RSA Security Configuration
  */
 
 /**
- * RSA 公钥配置
+ * RSA Public key configuration
  * RSA Public Key Configuration
  */
 export const rsaPublicKey = `-----BEGIN PUBLIC KEY-----
@@ -17,27 +17,27 @@ UsdVUZ0ESaoP326ag8R5EqBSa2+4gce14QIDAQAB
 -----END PUBLIC KEY-----`
 
 /**
- * RSA 配置选项
+ * RSA Configuration options
  * RSA Configuration Options
  */
 export const rsaConfig = {
-  /** 密钥大小 */
+  /** Key size */
   keySize: 2048,
-  /** 加密算法 */
+  /** encryption algorithm */
   algorithm: 'RSA-OAEP',
-  /** 哈希算法 */
+  /** Hash algorithm */
   hashAlgorithm: 'SHA-256',
-  /** 是否启用环境变量覆盖 */
+  /** Whether to enable environment variable override */
   enableEnvOverride: true,
 } as const
 
 /**
- * 获取 RSA 公钥
+ * Get RSA public key
  * Get RSA Public Key
- * @returns RSA 公钥字符串
+ * @returns RSA public key string
  */
 export function getRSAPublicKey(): string {
-  // 如果启用环境变量覆盖，优先使用环境变量
+  // If environment variable overrides are enabled，Use environment variables first
   if (rsaConfig.enableEnvOverride && import.meta.env.VITE_RSA_PUBLIC_KEY) {
     return import.meta.env.VITE_RSA_PUBLIC_KEY
   }
@@ -46,10 +46,10 @@ export function getRSAPublicKey(): string {
 }
 
 /**
- * 验证 RSA 公钥格式
+ * verify RSA Public key format
  * Validate RSA Public Key Format
- * @param key 公钥字符串
- * @returns 是否为有效的 RSA 公钥格式
+ * @param key public key string
+ * @returns is it valid RSA Public key format
  */
 export function validateRSAPublicKey(key: string): boolean {
   return key.includes('-----BEGIN PUBLIC KEY-----') && 

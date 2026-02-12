@@ -19,9 +19,9 @@ const props = defineProps<{
 const cardRefs = reactive<{ [key: string]: any | undefined }>({})
 
 const generateUniqueNumberId = () => {
-  const timestamp = Date.now() // 获取当前时间戳
-  const random = Math.floor(Math.random() * 1000) // 生成一个随机数
-  const uniqueId = timestamp * 1000 + random // 结合时间戳和随机数生成唯一 ID
+  const timestamp = Date.now() // Get current timestamp
+  const random = Math.floor(Math.random() * 1000) // Generate a random number
+  const uniqueId = timestamp * 1000 + random // Combine timestamp and random number to generate unique ID
   return uniqueId
 }
 

@@ -1,28 +1,28 @@
 /**
- * 基础渲染器类
- * 定义所有渲染器的统一接口和生命周期
+ * Basic renderer class
+ * Define a unified interface and life cycle for all renderers
  */
 
 import type { Ref } from 'vue'
 
-// 渲染器状态枚举
+// Renderer status enum
 export enum RendererState {
-  IDLE = 'idle', // 闲置状态
-  INITIALIZING = 'initializing', // 初始化中
-  READY = 'ready', // 就绪状态
-  RENDERING = 'rendering', // 渲染中
-  ERROR = 'error', // 错误状态
-  DESTROYED = 'destroyed' // 已销毁
+  IDLE = 'idle', // idle state
+  INITIALIZING = 'initializing', // Initializing
+  READY = 'ready', // Ready state
+  RENDERING = 'rendering', // Rendering
+  ERROR = 'error', // error status
+  DESTROYED = 'destroyed' // Destroyed
 }
 
-// 渲染器配置接口
+// Renderer configuration interface
 export interface RendererConfig {
   readonly?: boolean
   theme?: 'light' | 'dark'
   [key: string]: any
 }
 
-// 渲染器事件接口
+// Renderer event interface
 export interface RendererEvents {
   ready: []
   error: [Error]
@@ -32,7 +32,7 @@ export interface RendererEvents {
   'state-change': [RendererState]
 }
 
-// 节点数据接口
+// Node data interface
 export interface NodeData {
   id: string
   type: string
@@ -44,7 +44,7 @@ export interface NodeData {
   renderer?: string[]
 }
 
-// 渲染器上下文接口
+// Renderer context interface
 export interface RendererContext {
   nodes: Ref<NodeData[]>
   selectedIds: Ref<string[]>
@@ -52,7 +52,7 @@ export interface RendererContext {
   container?: HTMLElement
 }
 
-// 基础渲染器抽象类
+// Basic renderer abstract class
 export abstract class BaseRenderer {
   protected state: RendererState = RendererState.IDLE
   protected context: RendererContext
@@ -65,7 +65,7 @@ export abstract class BaseRenderer {
     this.initializeEventMap()
   }
 
-  // 初始化事件映射
+  // Initialize event mapping
   private initializeEventMap() {
     const events: (keyof RendererEvents)[] = [
       'ready',
@@ -80,12 +80,12 @@ export abstract class BaseRenderer {
     })
   }
 
-  // 获取当前状态
+  // Get current status
   getState(): RendererState {
     return this.state
   }
 
-  // 设置状态
+  // Set status
   protected setState(newState: RendererState) {
     if (this.state !== newState) {
       const oldState = this.state
@@ -95,10 +95,10 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 状态变化钩子
+  // state change hook
   protected onStateChange(oldState: RendererState, newState: RendererState) {}
 
-  // 事件监听
+  // event listening
   on<K extends keyof RendererEvents>(event: K, listener: (...args: RendererEvents[K]) => void): void {
     const listeners = this.eventListeners.get(event)
     if (listeners) {
@@ -106,7 +106,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 移除事件监听
+  // Remove event listener
   off<K extends keyof RendererEvents>(event: K, listener: (...args: RendererEvents[K]) => void): void {
     const listeners = this.eventListeners.get(event)
     if (listeners) {
@@ -117,7 +117,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 触发事件
+  // trigger event
   protected emit<K extends keyof RendererEvents>(event: K, ...args: RendererEvents[K]): void {
     const listeners = this.eventListeners.get(event)
     if (listeners) {
@@ -131,7 +131,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 生命周期方法 - 初始化
+  // life cycle methods - initialization
   async init(): Promise<void> {
     if (this.state !== RendererState.IDLE) {
       throw new Error(`Cannot initialize renderer in state: ${this.state}`)
@@ -149,7 +149,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 生命周期方法 - 渲染
+  // life cycle methods - rendering
   async render(): Promise<void> {
     if (this.state !== RendererState.READY) {
       console.error(`[${this.constructor.name}] Render called in state: ${this.state}`)
@@ -167,7 +167,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 生命周期方法 - 更新
+  // life cycle methods - renew
   async update(changes: Partial<RendererConfig>): Promise<void> {
     try {
       this.config = { ...this.config, ...changes }
@@ -179,7 +179,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 生命周期方法 - 销毁
+  // life cycle methods - destroy
   async destroy(): Promise<void> {
     try {
       await this.onDestroy()
@@ -191,7 +191,7 @@ export abstract class BaseRenderer {
     }
   }
 
-  // 节点操作方法
+  // Node operation method
   selectNode(nodeId: string): void {
     this.emit('node-select', nodeId)
     this.onNodeSelect(nodeId)
@@ -207,31 +207,31 @@ export abstract class BaseRenderer {
     this.onCanvasClick(event)
   }
 
-  // 获取配置
+  // Get configuration
   getConfig(): RendererConfig {
     return { ...this.config }
   }
 
-  // 抽象方法 - 子类必须实现
+  // abstract method - Subclasses must implement
   protected abstract onInit(): Promise<void>
   protected abstract onRender(): Promise<void>
   protected abstract onUpdate(changes: Partial<RendererConfig>): Promise<void>
   protected abstract onDestroy(): Promise<void>
 
-  // 可选的钩子方法 - 子类可以重写
+  // Optional hook method - Subclasses can override
   protected onNodeSelect(nodeId: string): void {
-    // 默认实现，子类可以重写
+    // Default implementation，Subclasses can override
   }
 
   protected onNodeUpdate(nodeId: string, updates: Partial<NodeData>): void {
-    // 默认实现，子类可以重写
+    // Default implementation，Subclasses can override
   }
 
   protected onCanvasClick(event?: MouseEvent): void {
-    // 默认实现，子类可以重写
+    // Default implementation，Subclasses can override
   }
 
-  // 工具方法
+  // Tool method
   protected isReady(): boolean {
     return this.state === RendererState.READY
   }
@@ -247,20 +247,20 @@ export abstract class BaseRenderer {
   }
 }
 
-// 渲染器工厂接口
+// Renderer factory interface
 export interface RendererFactory {
   create(context: RendererContext, config?: RendererConfig): BaseRenderer
   getType(): string
   isSupported(): boolean
 }
 
-// 抽象渲染器工厂类
+// Abstract renderer factory class
 export abstract class BaseRendererFactory implements RendererFactory {
   abstract create(context: RendererContext, config?: RendererConfig): BaseRenderer
   abstract getType(): string
 
   isSupported(): boolean {
-    // 默认实现，子类可以重写以检查特定的支持条件
+    // Default implementation，Subclasses can override to check for specific support conditions
     return true
   }
 }

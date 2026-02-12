@@ -10,7 +10,7 @@
     @focus="handleFocus"
     @blur="handleBlur"
   >
-    <!-- 🔥 组件渲染 - 基于统一配置架构 -->
+    <!-- 🔥 Component rendering - Based on unified configuration architecture -->
     <component
       v-if="currentComponentDef?.component"
       :is="currentComponentDef.component"
@@ -21,26 +21,26 @@
       class="card2-component"
     />
 
-    <!-- 🔥 第一级调试：Card2Wrapper 传递给组件的数据 -->
+    <!-- 🔥 First level debugging：Card2Wrapper Data passed to the component -->
     <div v-if="props.componentType === 'digit-indicator'" class="card2-wrapper-debug">
-      <div class="debug-title">🔥 Card2Wrapper 数据传递（第一级）:</div>
+      <div class="debug-title">🔥 Card2Wrapper data transfer（first level）:</div>
       <div class="debug-content">
-        <div>传递给组件的 data: {{ JSON.stringify(componentDataFromWarehouse) }}</div>
-        <div>时间戳: {{ new Date().toLocaleTimeString() }}</div>
+        <div>passed to the component data: {{ JSON.stringify(componentDataFromWarehouse) }}</div>
+        <div>Timestamp: {{ new Date().toLocaleTimeString() }}</div>
       </div>
     </div>
 
-    <!-- 组件加载失败提示 -->
+    <!-- Component loading failure prompt -->
     <n-alert v-else-if="!currentComponentDef?.component" type="error" size="small">
-      组件 {{ props.componentType }} 未找到或加载失败
+      components {{ props.componentType }} Not found or failed to load
     </n-alert>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * 🔥 Card2Wrapper - 统一配置架构版本
- * 基于新的统一配置架构，实现完整的配置管理
+ * 🔥 Card2Wrapper - Unified configuration architecture version
+ * Based on the new unified configuration architecture，Implement complete configuration management
  */
 
 import { ref, onMounted, onUnmounted, computed, inject, nextTick, watch } from 'vue'
@@ -48,7 +48,7 @@ import { NAlert } from 'naive-ui'
 import { useComponentTree as useCard2Integration } from '@/card2.1/hooks/useComponentTree'
 import { useCard2Props } from '@/card2.1/hooks/useCard2Props'
 import { usePreviewMode } from '@/components/visual-editor/hooks/usePreviewMode'
-// 🔥 导入循环保护管理器
+// 🔥 Import loop protection manager
 import { loopProtectionManager } from '@/utils/LoopProtectionManager'
 import type {
   InteractionConfig,
@@ -57,15 +57,15 @@ import type {
   ComponentInteractionCapability
 } from '@/card2.1/core2/interaction'
 import type { UnifiedCard2Configuration } from '@/card2.1/hooks/useCard2Props'
-// 🔥 导入DataWarehouse以获取数据源执行结果（兼容性保留）
+// 🔥 importDataWarehouseTo obtain the data source execution results（Compatibility preserved）
 import { dataWarehouse } from '@/core/data-architecture/DataWarehouse'
-// 🔥 导入配置管理器和数据桥接器
+// 🔥 Import configuration managers and data bridges
 import { configurationIntegrationBridge as configurationManager } from '@/components/visual-editor/configuration/ConfigurationIntegrationBridge'
 import { simpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
-// 🔥 导入交互配置路由器
+// 🔥 Import interactive configuration router
 import { interactionConfigRouter } from '@/components/visual-editor/configuration/InteractionConfigRouter'
 
-// 🚀 新增：导入Card2.1 Core响应式数据绑定系统
+// 🚀 New：importCard2.1 CoreResponsive data binding system
 import { dataBindingManager } from '@/card2.1/core2/data-source'
 import { reactiveDataManager } from '@/card2.1/core2/data-source'
 import { componentRegistry } from '@/card2.1/core2/registry'
@@ -84,92 +84,92 @@ const props = withDefaults(defineProps<Props>(), {
   previewMode: false
 })
 
-// 基础引用
+// base reference
 const currentComponentRef = ref<any>(null)
 const containerRef = ref<HTMLElement | null>(null)
 
-// 获取组件定义
+// Get component definition
 const { filteredComponents } = useCard2Integration()
 const currentComponentDef = computed(() => {
   const found = filteredComponents.value?.find((comp: any) => comp.type === props.componentType)
 
-  // 🔥 修复：如果没找到组件且组件列表为空，等待系统初始化
+  // 🔥 repair：If the component is not found and the component list is empty，Wait for system initialization
   if (!found && filteredComponents.value.length === 0 && props.componentType) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 
   return found
 })
 
-// 注入编辑器上下文
+// Inject editor context
 const editorContext = inject('editorContext', null) as any
 
-// 🔥 注入组件执行器注册表
+// 🔥 Inject component executor registry
 const componentExecutorRegistry = inject('componentExecutorRegistry', null) as Map<string, () => Promise<void>> | null
 
-// 🔥 预览模式检测
+// 🔥 Preview mode detection
 const { isPreviewMode } = usePreviewMode()
 
-// 🚀 Card2.1 Core响应式数据绑定状态
+// 🚀 Card2.1 CoreReactive data binding state
 const card2CoreDataBinding = ref<string | null>(null)
 const card2CoreBindingStatus = ref<DataBindingStatus>({})
 const card2CoreData = ref<Record<string, any>>({})
 const useCard2CoreDataBinding = ref(false)
 
-// 🚀 检查组件是否支持Card2.1 Core数据绑定
+// 🚀 Check if the component supportsCard2.1 Coredata binding
 const checkCard2CoreSupport = () => {
   const isRegistered = componentRegistry.has(props.componentType)
   const dataSourceKeys = componentRegistry.getDataSourceKeys(props.componentType)
   const supportsDataBinding = isRegistered && dataSourceKeys.length > 0
 
-  // 已移除：console语句
+  // Removed：consolestatement
 
   useCard2CoreDataBinding.value = supportsDataBinding
   return supportsDataBinding
 }
 
-// 🚀 初始化Card2.1 Core数据绑定
+// 🚀 initializationCard2.1 Coredata binding
 const initializeCard2CoreBinding = async () => {
   if (!useCard2CoreDataBinding.value) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return
   }
 
   try {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 创建组件数据绑定配置
+    // Create component data binding configuration
     const bindingConfig: ComponentDataBinding = {
       componentId: props.nodeId,
-      dataSourceId: `${props.nodeId}-datasource`, // 临时数据源ID
+      dataSourceId: `${props.nodeId}-datasource`, // Temporary data sourceID
       bindingConfig: {
-        // 基于组件定义自动生成绑定配置
+        // Automatically generate binding configurations based on component definitions
         ...generateBindingConfig()
       }
     }
 
-    // 创建绑定
+    // Create binding
     const bindingId = dataBindingManager.createBinding(bindingConfig)
     card2CoreDataBinding.value = bindingId
 
-    // 订阅数据更新
+    // Subscribe to data updates
     dataBindingManager.subscribe(bindingId, (newData) => {
       card2CoreData.value = newData
 
-      // 🔥 更新绑定状态
+      // 🔥 Update binding status
       const status = dataBindingManager.getBindingStatus(bindingId)
       if (status) {
         card2CoreBindingStatus.value = status
       }
     })
 
-    // 已移除：console语句
+    // Removed：consolestatement
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 }
 
-// 🚀 生成绑定配置
+// 🚀 Generate binding configuration
 const generateBindingConfig = () => {
   const dataSourceKeys = componentRegistry.getDataSourceKeys(props.componentType)
   const bindingConfig: Record<string, any> = {}
@@ -181,62 +181,62 @@ const generateBindingConfig = () => {
     }
   })
 
-  // 已移除：console语句
+  // Removed：consolestatement
   return bindingConfig
 }
 
-// 🚀 清理Card2.1 Core绑定
+// 🚀 clean upCard2.1 Corebinding
 const cleanupCard2CoreBinding = () => {
   if (card2CoreDataBinding.value) {
     dataBindingManager.removeBinding(card2CoreDataBinding.value)
     card2CoreDataBinding.value = null
     card2CoreData.value = {}
     card2CoreBindingStatus.value = {}
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 }
 
-// 🔥 关键修复：性能优化的数据源获取 - 解决200+组件的频繁计算问题
+// 🔥 critical fix：Performance-optimized data source acquisition - solve200+Frequent calculation problem of components
 let lastDataHash = ''
 let cachedWarehouseData = {}
 let dataFetchDebounce: NodeJS.Timeout | null = null
 
-// 🔥 强制清除缓存的方法
+// 🔥 How to force clear cache
 const clearDataCache = () => {
   lastDataHash = ''
   cachedWarehouseData = {}
-  // 已移除：console语句
+  // Removed：consolestatement
 }
 
 const componentDataFromWarehouse = computed(() => {
-  // 已移除：console语句
+  // Removed：consolestatement
 
   try {
-    // 🚀 优先使用Card2.1 Core响应式数据绑定
+    // 🚀 priority useCard2.1 CoreReactive data binding
     if (useCard2CoreDataBinding.value && Object.keys(card2CoreData.value).length > 0) {
-      // 已移除：console语句
+      // Removed：consolestatement
       return card2CoreData.value
     }
 
-    // 🚨 **关键修复**：直接绕过DataWarehouse的响应式，手动获取最新数据
-    // 已移除：console语句
+    // 🚨 **critical fix**：Directly bypassDataWarehouseresponsive，Get latest data manually
+    // Removed：consolestatement
 
-    // 强制清除缓存，确保获取最新数据
+    // Force clear cache，Make sure you get the latest data
     dataWarehouse.clearComponentMergedCache(props.nodeId)
 
-    // 直接调用DataWarehouse获取数据，绕过响应式依赖问题
+    // call directlyDataWarehouseGet data，Bypassing reactive dependency issues
     const latestData = dataWarehouse.getComponentData(props.nodeId)
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
     return latestData || {}
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return {}
   }
 })
 
-// 🔥 核心：使用统一配置管理
+// 🔥 core：Use unified configuration management
 const {
   config: componentConfig,
   displayData,
@@ -248,14 +248,14 @@ const {
   syncToEditor
 } = useCard2Props({
   config: props.config || {},
-  data: componentDataFromWarehouse, // 🔥 关键修复：传递响应式计算属性，而不是静态值
+  data: componentDataFromWarehouse, // 🔥 critical fix：Passing reactive computed properties，instead of a static value
   componentId: props.nodeId,
   initialUnifiedConfig: getInitialUnifiedConfig()
 })
 
 /**
- * 获取初始统一配置
- * 从编辑器上下文或其他来源获取已有的配置
+ * Get initial unified configuration
+ * Get an existing configuration from the editor context or other source
  */
 function getInitialUnifiedConfig() {
   try {
@@ -266,41 +266,41 @@ function getInitialUnifiedConfig() {
       }
     }
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
   return undefined
 }
 
-// 已移除：console语句
+// Removed：consolestatement
 
-// 配置变更回调
+// Configuration change callback
 setConfigChangeCallback((config) => {
-  // 已移除：console语句
+  // Removed：consolestatement
 })
 
-// ================== 交互系统集成 ==================
+// ================== Interactive system integration ==================
 
-// 🔥 统一配置中心：交互配置基于 unifiedConfig
+// 🔥 Unified configuration center：Interaction configuration is based on unifiedConfig
 const interactionConfigs = computed<InteractionConfig[]>(() => {
   return unifiedConfig.value.interaction?.configs || []
 })
 
-// 🔥 统一配置中心：数据源配置基于 unifiedConfig
+// 🔥 Unified configuration center：The data source configuration is based on unifiedConfig
 const dataSourceConfig = computed(() => {
   return unifiedConfig.value.dataSource || {}
 })
 
-// 获取组件的交互能力
+// Get the interactive capabilities of a component
 const componentInteractionCapability = computed<ComponentInteractionCapability | undefined>(() => {
   return currentComponentDef.value?.interactionCapabilities
 })
 
-// 🔥 字段层级映射函数：判断字段应该更新到哪个配置层
+// 🔥 Field level mapping function：Determine which configuration layer the field should be updated to
 const isBaseLayerField = (field: string): boolean => {
-  // base层字段：设备绑定、UI基础配置
+  // baselayer field：Device binding、UIBasic configuration
   const baseFields = [
-    'deviceId', 'metricsList', // 设备绑定字段
-    'title', 'showTitle', 'visible', 'opacity', // UI基础字段
+    'deviceId', 'metricsList', // Device binding fields
+    'title', 'showTitle', 'visible', 'opacity', // UIBasic fields
     'backgroundColor', 'borderWidth', 'borderColor', 'borderStyle', 'borderRadius',
     'padding', 'margin'
   ]
@@ -308,7 +308,7 @@ const isBaseLayerField = (field: string): boolean => {
 }
 
 const isDataSourceLayerField = (field: string): boolean => {
-  // dataSource层字段：数据绑定配置
+  // dataSourcelayer field：Data binding configuration
   const dataSourceFields = [
     'dataSourceConfig', 'fieldMappings', 'refreshInterval', 'autoRefresh'
   ]
@@ -316,35 +316,35 @@ const isDataSourceLayerField = (field: string): boolean => {
 }
 
 const isInteractionLayerField = (field: string): boolean => {
-  // interaction层字段：交互配置
+  // interactionlayer field：Interactive configuration
   const interactionFields = [
     'interactions', 'clickActions', 'hoverActions', 'eventHandlers'
   ]
   return interactionFields.includes(field)
 }
 
-// 🔥 批量执行交互响应 - 解决多属性修改相互覆盖问题
+// 🔥 Execute interactive responses in batches - Solve the problem of mutual overwriting of multiple attribute modifications
 const executeBatchedInteractionResponses = async (responses: InteractionResponse[]) => {
-  // 已移除：console语句
+  // Removed：consolestatement
 
-  // 按组件ID和动作类型分组响应
+  // by componentIDand action type group responses
   const groupedResponses = {
     self: { modify: [] as InteractionResponse[], other: [] as InteractionResponse[] },
     cross: new Map<string, InteractionResponse[]>(),  // componentId -> responses
-    nonModify: [] as InteractionResponse[]  // 跳转等非修改动作
+    nonModify: [] as InteractionResponse[]  // Non-modification actions such as jumps
   }
 
-  // 分类所有响应
+  // Classify all responses
   for (const response of responses) {
     if (response.action === 'modify' || response.action === 'modifyProperty' || response.action === 'updateComponentData') {
       if (response.modifyConfig) {
         const { targetComponentId } = response.modifyConfig
 
         if (targetComponentId === props.nodeId) {
-          // 修改自己
+          // modify yourself
           groupedResponses.self.modify.push(response)
         } else {
-          // 修改其他组件
+          // Modify other components
           if (!groupedResponses.cross.has(targetComponentId)) {
             groupedResponses.cross.set(targetComponentId, [])
           }
@@ -352,14 +352,14 @@ const executeBatchedInteractionResponses = async (responses: InteractionResponse
         }
       }
     } else {
-      // 非修改动作（跳转等）
+      // non-modifying action（Jump etc.）
       groupedResponses.nonModify.push(response)
     }
   }
 
-  // 已移除：console语句
+  // Removed：consolestatement
 
-  // 🔥 关键修复1：批量处理自组件属性修改
+  // 🔥 critical fix1：Batch processing of self-component property modifications
   if (groupedResponses.self.modify.length > 0) {
     const batchedSelfUpdates = {}
 
@@ -367,42 +367,42 @@ const executeBatchedInteractionResponses = async (responses: InteractionResponse
       if (response.modifyConfig) {
         const { targetProperty, updateValue } = response.modifyConfig
         batchedSelfUpdates[targetProperty] = updateValue
-        // 已移除：console语句
+        // Removed：consolestatement
       }
     })
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 🔥 恢复原始逻辑：自组件修改用 updateConfig，保持与配置表单同步
+    // 🔥 Restore original logic：For modifying self-components updateConfig，Stay in sync with configuration forms
     updateConfig('component', batchedSelfUpdates)
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 
-  // 🔥 关键修复2：批量处理跨组件属性修改
+  // 🔥 critical fix2：Batch processing of cross-component property modifications
   for (const [targetComponentId, targetResponses] of groupedResponses.cross.entries()) {
-    // 🔥 分层收集配置更新 - 根据字段特性分配到不同配置层
+    // 🔥 Tiered collection configuration updates - Assigned to different configuration layers based on field characteristics
     const layeredUpdates = {
-      base: {},        // 设备绑定等基础配置
-      component: {},   // 组件特有属性
-      dataSource: {}, // 数据源配置
-      interaction: {} // 交互配置
+      base: {},        // Basic configuration such as device binding
+      component: {},   // Component specific properties
+      dataSource: {}, // Data source configuration
+      interaction: {} // Interactive configuration
     }
 
     targetResponses.forEach(response => {
       if (response.modifyConfig) {
         const { targetProperty, updateValue } = response.modifyConfig
 
-        // 🔥 处理带层级前缀的字段名（如 "base.deviceId"）
+        // 🔥 Processing field names with hierarchical prefixes（like "base.deviceId"）
         let actualProperty = targetProperty
-        let targetLayer = 'component' // 默认层级
+        let targetLayer = 'component' // Default level
 
         if (targetProperty.includes('.')) {
           const [layerPrefix, fieldName] = targetProperty.split('.')
           actualProperty = fieldName
           targetLayer = layerPrefix
-    // 已移除：console语句
+    // Removed：consolestatement
         } else {
-          // 🔥 字段层级映射：根据字段名确定应该更新哪个配置层
+          // 🔥 Field level mapping：Determine which configuration layer should be updated based on the field name
           if (isBaseLayerField(targetProperty)) {
             targetLayer = 'base'
           } else if (isDataSourceLayerField(targetProperty)) {
@@ -412,19 +412,19 @@ const executeBatchedInteractionResponses = async (responses: InteractionResponse
           }
         }
 
-        // 根据目标层级收集更新
+        // Collect updates based on target level
         layeredUpdates[targetLayer][actualProperty] = updateValue
-    // 已移除：console语句
+    // Removed：consolestatement
       }
     })
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
     try {
-      // 🔥 分层批量更新：按配置层级分别更新
+      // 🔥 Hierarchical batch update：Updated separately by configuration level
       for (const [layer, updates] of Object.entries(layeredUpdates)) {
         if (Object.keys(updates).length > 0) {
-    // 已移除：console语句
+    // Removed：consolestatement
           configurationManager.updateConfigurationForInteraction(
             targetComponentId,
             layer as keyof UnifiedCard2Configuration,
@@ -433,13 +433,13 @@ const executeBatchedInteractionResponses = async (responses: InteractionResponse
           )
         }
       }
-    // 已移除：console语句
+    // Removed：consolestatement
     } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
     }
   }
 
-  // 处理非修改动作（跳转等）
+  // Handle non-modification actions（Jump etc.）
   for (const response of groupedResponses.nonModify) {
     const delay = response.delay || 0
     setTimeout(() => {
@@ -448,54 +448,54 @@ const executeBatchedInteractionResponses = async (responses: InteractionResponse
   }
 }
 
-// 交互事件执行器（处理非属性修改动作）
+// interactive event executor（Handle non-attribute modification actions）
 const executeInteractionResponse = async (response: InteractionResponse) => {
-    // 已移除：console语句
+    // Removed：consolestatement
 
   try {
     switch (response.action) {
       case 'navigateToUrl':
       case 'jump':
-    // 已移除：console语句
-        // 支持多种URL数据格式
+    // Removed：consolestatement
+        // Support multipleURLData format
         let url = response.jumpConfig?.url || response.value || response.url
         let target = response.jumpConfig?.target || response.target || '_self'
 
         if (url) {
-    // 已移除：console语句
+    // Removed：consolestatement
           if (target === '_self') {
             window.location.href = url
           } else {
             window.open(url, target)
           }
         } else {
-    // 已移除：console语句
+    // Removed：consolestatement
         }
         break
 
       case 'updateComponentData':
       case 'modifyProperty':
       case 'modify':
-        // 🔥 修复说明：属性修改现在由 executeBatchedInteractionResponses 批量处理
-    // 已移除：console语句
+        // 🔥 Repair instructions：Property modifications are now made by executeBatchedInteractionResponses Batch processing
+    // Removed：consolestatement
         break
 
       case 'changeVisibility':
-        // 改变可见性
+        // change visibility
         if (containerRef.value) {
           containerRef.value.style.visibility = response.value === 'visible' ? 'visible' : 'hidden'
         }
         break
 
       case 'changeBackgroundColor':
-        // 改变背景颜色
+        // Change background color
         if (containerRef.value) {
           containerRef.value.style.backgroundColor = response.value
         }
         break
 
       case 'triggerAnimation':
-        // 触发动画
+        // trigger animation
         if (containerRef.value && response.value) {
           containerRef.value.style.animation = `${response.value} ${response.duration || 300}ms ease`
           setTimeout(() => {
@@ -507,120 +507,120 @@ const executeInteractionResponse = async (response: InteractionResponse) => {
         break
 
       default:
-    // 已移除：console语句
+    // Removed：consolestatement
     }
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 }
 
-// 通用交互事件处理器
+// Universal interaction event handler
 const handleInteractionEvent = async (eventType: InteractionEventType, event?: Event) => {
-  // 🔥 关键修复：编辑模式下禁用交互，避免与编辑操作冲突
+  // 🔥 critical fix：Disable interaction in edit mode，Avoid conflicts with editing operations
   if (!isPreviewMode.value) {
-    // 已移除：console语句
-    return // 编辑模式下不执行交互
+    // Removed：consolestatement
+    return // No interaction is performed in edit mode
   }
 
   if (!componentInteractionCapability.value?.supportedEvents.includes(eventType)) {
-    // 已移除：console语句
-    return // 组件不支持此事件类型
+    // Removed：consolestatement
+    return // The component does not support this event type
   }
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 执行匹配的交互配置
+  // Execute matching interaction configuration
   const matchingConfigs = interactionConfigs.value.filter(config =>
     config.event === eventType && config.enabled !== false
   )
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 🔥 关键修复：将所有匹配配置的responses合并，避免多个配置相互覆盖
+  // 🔥 critical fix：All matching configuredresponsesmerge，Avoid multiple configurations overwriting each other
   const allResponses: InteractionResponse[] = []
   for (const config of matchingConfigs) {
-    // 已移除：console语句
+    // Removed：consolestatement
     allResponses.push(...config.responses)
   }
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 一次性批量处理所有响应，避免配置间相互覆盖
+  // Batch all responses at once，Avoid configurations overwriting each other
   if (allResponses.length > 0) {
     await executeBatchedInteractionResponses(allResponses)
   }
 }
 
-// ================== 事件处理 ==================
+// ================== event handling ==================
 
 const handleWrapperClick = async (event: MouseEvent) => {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 执行交互响应（内部已有预览模式检查）
+  // Perform interactive responses（There is already a preview mode check internally）
   await handleInteractionEvent('click', event)
 
-  // 原有的预览模式逻辑保持兼容性
+  // Original preview mode logic remains compatible
   if (!props.previewMode) return
 }
 
 const handleContextMenu = (event: MouseEvent) => {
-    // 已移除：console语句
-  event.preventDefault() // 阻止默认右键菜单
+    // Removed：consolestatement
+  event.preventDefault() // Block default right-click menu
 }
 
-// 新增交互事件处理函数
+// Added interactive event handler function
 const handleMouseEnter = async (event: MouseEvent) => {
-    // 已移除：console语句
+    // Removed：consolestatement
   await handleInteractionEvent('hover', event)
 }
 
 const handleMouseLeave = (event: MouseEvent) => {
-    // 已移除：console语句
-  // hover事件的离开可以触发一些重置操作
+    // Removed：consolestatement
+  // hoverThe departure of an event can trigger some reset operations
 }
 
 const handleFocus = async (event: FocusEvent) => {
-    // 已移除：console语句
+    // Removed：consolestatement
   await handleInteractionEvent('focus', event)
 }
 
 const handleBlur = async (event: FocusEvent) => {
-    // 已移除：console语句
+    // Removed：consolestatement
   await handleInteractionEvent('blur', event)
 }
 
-// 🔥 监听来自编辑器层的配置更新事件
+// 🔥 Listen for configuration update events from the editor layer
 const handleConfigUpdateEvent = (event: CustomEvent) => {
   const { componentId, layer, config } = event.detail
   if (componentId === props.nodeId) {
-    // 已移除：console语句
+    // Removed：consolestatement
 
     if (layer === 'interaction') {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-      // 🔥 统一配置中心：通过updateConfig更新交互配置
+      // 🔥 Unified configuration center：passupdateConfigUpdate interaction configuration
       if (config?.configs) {
         updateConfig('interaction', { configs: config.configs })
       }
     } else {
-      // 非交互配置正常处理
+      // Non-interactive configuration is processed normally
       updateConfig(layer, config)
     }
 
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 }
 
-// 🔥 响应配置请求事件
+// 🔥 Respond to configuration request events
 const handleConfigRequestEvent = (event: CustomEvent) => {
   const { componentId, layer } = event.detail
   if (componentId === props.nodeId) {
-    // 已移除：console语句
+    // Removed：consolestatement
 
     const fullConfig = getFullConfiguration()
     const requestedConfig = layer ? fullConfig[layer] : fullConfig
 
-    // 发送配置响应事件
+    // Send configuration response event
     window.dispatchEvent(new CustomEvent('card2-config-response', {
       detail: {
         componentId,
@@ -631,86 +631,86 @@ const handleConfigRequestEvent = (event: CustomEvent) => {
   }
 }
 
-// ================== 交互配置管理 ==================
+// ================== Interactive configuration management ==================
 
-// 更新交互配置
+// Update interaction configuration
 const updateInteractionConfigs = (configs: InteractionConfig[]) => {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 🔥 统一配置中心：直接通过updateConfig更新，计算属性会自动响应
+  // 🔥 Unified configuration center：pass directlyupdateConfigrenew，Computed properties automatically respond to
   updateConfig('interaction', { configs })
 
-    // 已移除：console语句
+    // Removed：consolestatement
 }
 
-// 获取交互配置
+// Get interaction configuration
 const getInteractionConfigs = (): InteractionConfig[] => {
   return interactionConfigs.value
 }
 
-// 获取组件交互能力
+// Get component interaction capabilities
 const getInteractionCapability = (): ComponentInteractionCapability | undefined => {
   return componentInteractionCapability.value
 }
 
-// ================== 属性变化监听系统 ==================
+// ================== Property change monitoring system ==================
 
-// 存储上一次的属性值，用于检测变化
+// Store the last attribute value，used to detect changes
 const previousValues = ref<Record<string, any>>({})
 
-// 监听displayData变化，检测属性改变事件
+// monitordisplayDatachange，Detect property change events
 watch(
   () => displayData.value,
   (newDisplayData, oldDisplayData) => {
     if (!isPreviewMode.value) {
-      // 编辑模式下不处理属性变化事件
+      // Property change events are not processed in edit mode
       return
     }
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 检查每个dataChange交互配置
+    // Check eachdataChangeInteractive configuration
     const dataChangeConfigs = interactionConfigs.value.filter(config =>
       config.event === 'dataChange' && config.enabled !== false
     )
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 🔥 关键修复：收集所有触发的dataChange响应，进行批量处理
+    // 🔥 critical fix：Collect all triggereddataChangeresponse，Perform batch processing
     const triggeredResponses: InteractionResponse[] = []
 
     for (const config of dataChangeConfigs) {
-      // 🔥 修复：dataChange事件的监听属性存储在config.watchedProperty，不是response中
+      // 🔥 repair：dataChangeThe listening properties of the event are stored inconfig.watchedProperty，noresponsemiddle
       if (config.watchedProperty) {
         const propertyPath = config.watchedProperty
         const newValue = getNestedValue(newDisplayData, propertyPath)
         const oldValue = getNestedValue(oldDisplayData || {}, propertyPath)
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
-        // 如果属性值发生了变化
+        // If the attribute value changes
         if (newValue !== oldValue) {
-          // 检查执行条件（使用config.condition而不是response.executionCondition）
+          // Check execution conditions（useconfig.conditioninstead ofresponse.executionCondition）
           if (checkDataChangeCondition(config.condition, newValue)) {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-            // 🔥 关键修复：收集响应而不是立即执行
+            // 🔥 critical fix：Collect responses instead of executing immediately
             triggeredResponses.push(...config.responses)
-    // 已移除：console语句
+    // Removed：consolestatement
           } else {
-    // 已移除：console语句
+    // Removed：consolestatement
           }
         }
       }
     }
 
-    // 🔥 关键修复：批量执行所有触发的响应，避免相互覆盖
+    // 🔥 critical fix：Execute all triggered responses in batches，Avoid covering each other
     if (triggeredResponses.length > 0) {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-      // 延迟执行避免与同步更新冲突
+      // Delayed execution to avoid conflicts with synchronous updates
       setTimeout(async () => {
         await executeBatchedInteractionResponses(triggeredResponses)
       }, 100)
@@ -719,11 +719,11 @@ watch(
   { deep: true }
 )
 
-// 获取嵌套对象属性值的辅助函数
+// Helper function for getting nested object property values
 const getNestedValue = (obj: any, path: string): any => {
   if (!obj || !path) return undefined
 
-  // 支持点号分隔的路径，如 'base.deviceId' 或简单属性如 'title'
+  // Supports dot-separated paths，like 'base.deviceId' 或简单属性like 'title'
   const keys = path.split('.')
   let current = obj
 
@@ -738,18 +738,18 @@ const getNestedValue = (obj: any, path: string): any => {
   return current
 }
 
-// 🔥 专门用于dataChange事件的条件检查函数
+// 🔥 dedicated todataChangeEvent condition checking function
 const checkDataChangeCondition = (condition: any, currentValue: any): boolean => {
-  if (!condition) return true // 无条件直接执行
+  if (!condition) return true // Execute directly without conditions
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
   switch (condition.type) {
     case 'comparison':
       const operator = condition.operator || 'equals'
       const targetValue = condition.value
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
       return compareValues(currentValue, targetValue, operator)
 
@@ -760,17 +760,17 @@ const checkDataChangeCondition = (condition: any, currentValue: any): boolean =>
       return checkExpressionCondition(currentValue, condition.value)
 
     default:
-    // 已移除：console语句
+    // Removed：consolestatement
       return true
   }
 }
 
-// 通用的执行条件检查函数（用于其他事件类型）
+// General execution condition checking function（for other event types）
 const checkExecutionCondition = (response: any, currentValue: any): boolean => {
   const condition = response.executionCondition
-  if (!condition) return true // 无条件直接执行
+  if (!condition) return true // Execute directly without conditions
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
   switch (condition.type) {
     case 'equals':
@@ -778,7 +778,7 @@ const checkExecutionCondition = (response: any, currentValue: any): boolean => {
       const operator = condition.operator || '=='
       const targetValue = condition.value
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
       return compareValues(currentValue, targetValue, operator)
 
@@ -789,12 +789,12 @@ const checkExecutionCondition = (response: any, currentValue: any): boolean => {
       return checkExpressionCondition(currentValue, condition.value)
 
     default:
-    // 已移除：console语句
+    // Removed：consolestatement
       return true
   }
 }
 
-// 值比较函数
+// value comparison function
 const compareValues = (currentValue: any, targetValue: any, operator: string): boolean => {
   switch (operator) {
     case '==':
@@ -816,9 +816,9 @@ const compareValues = (currentValue: any, targetValue: any, operator: string): b
   }
 }
 
-// 范围检查函数
+// Range check function
 const checkRangeCondition = (currentValue: any, rangeValue: string): boolean => {
-  // 简单实现，支持 "10-20" 格式
+  // Simple implementation，support "10-20" Format
   const range = rangeValue.split('-').map(v => Number(v.trim()))
   if (range.length === 2) {
     const numValue = Number(currentValue)
@@ -827,57 +827,57 @@ const checkRangeCondition = (currentValue: any, rangeValue: string): boolean => 
   return false
 }
 
-// 表达式检查函数
+// Expression checking function
 const checkExpressionCondition = (currentValue: any, expression: string): boolean => {
   try {
-    // 简单的表达式检查，将${value}替换为实际值
+    // Simple expression checking，Will${value}Replace with actual value
     const expr = expression.replace(/\${value}/g, String(currentValue))
-    // 这里应该使用安全的表达式求值器，暂时简化处理
+    // A safe expression evaluator should be used here，Temporarily simplify processing
     return eval(expr)
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return false
   }
 }
 
-// ================== 组件执行器 ==================
+// ================== component executor ==================
 
 /**
- * 🔥 关键修复：防循环的组件数据源执行器
- * 这是注册到 componentExecutorRegistry 的核心函数
+ * 🔥 critical fix：Loop-proof component data source executor
+ * This is registered to componentExecutorRegistry core function
  */
 let executionInProgress = false
 let lastExecutionConfig = ''
 let executionDebounce: NodeJS.Timeout | null = null
-// 🔥 新增：执行序号追踪，确保只有最新的执行结果被应用
+// 🔥 New：Execution serial number tracking，Ensure that only the latest execution results are applied
 let currentExecutionSequence = 0
-// 🔥 新增：配置版本追踪，防止使用过期配置
+// 🔥 New：Configure version tracking，Prevent the use of outdated configurations
 let lastConfigHash = ''
 
 const executeComponentDataSource = async (): Promise<void> => {
-  // 🔥 生成当前执行序号
+  // 🔥 Generate the current execution sequence number
   currentExecutionSequence++
   const currentSequence = currentExecutionSequence
   const executionId = `${props.nodeId}-seq${currentSequence}-${Date.now()}`
 
-  // 已移除：console语句
+  // Removed：consolestatement
 
-  // 🔥 关键修复：立即获取最新配置快照，防止执行过程中配置变化
+  // 🔥 critical fix：Get the latest configuration snapshot now，Prevent configuration changes during execution
   const configSnapshot = await captureLatestConfigurationSnapshot(executionId)
   if (!configSnapshot) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return
   }
 
-  // 🔥 关键修复：检查配置版本，防止重复执行相同配置
+  // 🔥 critical fix：Check configuration version，Prevent repeated execution of the same configuration
   const currentConfigHash = calculateConfigurationHash(configSnapshot.dataSource)
   if (currentConfigHash === lastConfigHash && currentConfigHash !== '') {
-    // 已移除：console语句
+    // Removed：consolestatement
     return
   }
   lastConfigHash = currentConfigHash
 
-  // 🔥 循环保护：检查是否应该允许这次执行
+  // 🔥 cycle protection：Check whether this execution should be allowed
   const callId = loopProtectionManager.markCallStart(
     'Card2Wrapper.executeComponentDataSource',
     props.nodeId,
@@ -885,27 +885,27 @@ const executeComponentDataSource = async (): Promise<void> => {
   )
 
   if (!callId) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return
   }
 
-  // 🔥 关键修复1：防止并发执行和递归调用
+  // 🔥 critical fix1：Prevent concurrent execution and recursive calls
   if (executionInProgress) {
     loopProtectionManager.markCallEnd(callId, 'Card2Wrapper.executeComponentDataSource', props.nodeId)
-    // 已移除：console语句
+    // Removed：consolestatement
     return
   }
 
-  // 🔥 关键修复2：防抖处理，避免频繁触发
+  // 🔥 critical fix2：Anti-shake processing，Avoid frequent triggering
   if (executionDebounce) {
     clearTimeout(executionDebounce)
   }
 
   return new Promise((resolve) => {
     executionDebounce = setTimeout(async () => {
-      // 🔥 再次检查序号，确保这是最新的执行请求
+      // 🔥 Check the serial number again，Make sure this is the latest execution request
       if (currentSequence !== currentExecutionSequence) {
-        // 已移除：console语句
+        // Removed：consolestatement
         resolve()
         return
       }
@@ -917,28 +917,28 @@ const executeComponentDataSource = async (): Promise<void> => {
 
       executionInProgress = true
       try {
-        // 🔥 关键修复：使用配置快照，而不是重新获取（可能已过期）
+        // 🔥 critical fix：Using configuration snapshots，instead of reacquiring（may have expired）
         const dataSourceConfig = configSnapshot.dataSource
 
         if (!dataSourceConfig) {
-          // 已移除：console语句
+          // Removed：consolestatement
           resolve()
           return
         }
 
-        // 🔥 关键修复3：使用快照的配置哈希，避免重复执行检查
-        // 已移除：console语句
+        // 🔥 critical fix3：Using snapshot's configuration hash，Avoid repeated checks
+        // Removed：consolestatement
 
-        // 🎯 用户要求的打印这几个字 - 阶段0：Card2Wrapper组件执行器被调用
+        // 🎯 Print these words as requested by the user - stage0：Card2WrapperThe component executor is called
         if (process.env.NODE_ENV === 'development') {
-    // 已移除：console语句
+    // Removed：consolestatement
         }
 
-        // 🔥 使用 VisualEditorBridge 执行数据源
+        // 🔥 use VisualEditorBridge Execute data source
         const { getVisualEditorBridge } = await import('@/core/data-architecture/VisualEditorBridge')
         const visualEditorBridge = getVisualEditorBridge()
 
-        // 🔥 关键修复：传递带有执行ID的完整配置快照
+        // 🔥 critical fix：pass with executionIDFull configuration snapshot of
         const enhancedConfig = {
           ...configSnapshot,
           executionId,
@@ -946,58 +946,58 @@ const executeComponentDataSource = async (): Promise<void> => {
           configHash: currentConfigHash
         }
 
-        // 清除缓存确保获取最新数据
+        // Clear cache to ensure you get the latest data
         simpleDataBridge.clearComponentCache(props.nodeId)
 
-        // 执行数据源
+        // Execute data source
         const result = await visualEditorBridge.updateComponentExecutor(
           props.nodeId,
           props.componentType,
           enhancedConfig
         )
 
-        // 🔥 再次检查序号，确保这个结果仍然是最新的
+        // 🔥 Check the serial number again，Make sure this result remains up to date
         if (currentSequence !== currentExecutionSequence) {
-          // 已移除：console语句
+          // Removed：consolestatement
           resolve()
           return
         }
 
         if (process.env.NODE_ENV === 'development') {
-    // 已移除：console语句
+    // Removed：consolestatement
         }
 
-        // 🔥 数据源执行完成后，清除缓存强制重新获取最新数据
+        // 🔥 After the data source execution is completed，Clear cache to force re-fetching of latest data
         clearDataCache()
 
-        // 🔥 强制清除 DataWarehouse 的合并缓存并触发响应式更新
+        // 🔥 force clear DataWarehouse merge cache and trigger responsive updates
         dataWarehouse.clearComponentMergedCache(props.nodeId)
 
-        // 🔥 新增：延迟强制刷新，确保数据传播
+        // 🔥 New：Delay forced refresh，Ensure data dissemination
         setTimeout(() => {
           forceDataRefresh()
         }, 100)
 
         resolve()
       } catch (error) {
-    // 已移除：console语句
-        resolve() // 即使失败也要resolve，避免阻塞
+    // Removed：consolestatement
+        resolve() // Even if you failresolve，avoid blocking
       } finally {
         executionInProgress = false
         executionDebounce = null
-        // 🔥 循环保护：标记调用结束
+        // 🔥 cycle protection：Mark the end of the call
         loopProtectionManager.markCallEnd(callId, 'Card2Wrapper.executeComponentDataSource', props.nodeId)
       }
-    }, 300) // 300ms防抖延迟，适应大量组件场景
+    }, 300) // 300msAnti-shake delay，Adapt to a large number of component scenarios
   })
 }
 
-// 🔥 新增：捕获最新配置快照的工具函数
+// 🔥 New：Utility function to capture the latest configuration snapshot
 const captureLatestConfigurationSnapshot = async (executionId: string): Promise<{ dataSource: any; base: any; timestamp: number } | null> => {
   try {
     const latestConfig = configurationManager.getConfiguration(props.nodeId)
     if (!latestConfig) {
-      // 已移除：console语句
+      // Removed：consolestatement
       return null
     }
 
@@ -1007,16 +1007,16 @@ const captureLatestConfigurationSnapshot = async (executionId: string): Promise<
       timestamp: Date.now()
     }
 
-    // 已移除：console语句
+    // Removed：consolestatement
 
     return snapshot
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
     return null
   }
 }
 
-// 🔥 新增：计算配置哈希值的工具函数
+// 🔥 New：Utility function to calculate configuration hash value
 const calculateConfigurationHash = (config: any): string => {
   try {
     if (!config) return ''
@@ -1025,7 +1025,7 @@ const calculateConfigurationHash = (config: any): string => {
     for (let i = 0; i < configString.length; i++) {
       const char = configString.charCodeAt(i)
       hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 转换为32位整数
+      hash = hash & hash // Convert to32bit integer
     }
     return Math.abs(hash).toString(36)
   } catch (error) {
@@ -1033,25 +1033,25 @@ const calculateConfigurationHash = (config: any): string => {
   }
 }
 
-// ================== 生命周期 ==================
+// ================== life cycle ==================
 
 /**
- * 🔥 初始化数据源配置 - 通过配置变更触发数据源执行
- * 这是进入编辑器时触发数据源执行的正确方式
+ * 🔥 Initialize data source configuration - Trigger data source execution through configuration changes
+ * This is the correct way to trigger datasource execution when entering the editor
  */
 const initializeDataSourceConfiguration = async () => {
   try {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-    // 检查是否有数据源配置
+    // Check if there is data source configuration
     const currentConfig = configurationManager.getConfiguration(props.nodeId)
     const hasDataSourceConfig = currentConfig?.dataSource
 
     if (hasDataSourceConfig) {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-      // 🔥 关键：通过"触碰"配置来触发执行，而不是直接执行
-      // 这样能确保所有监听器都被正确触发
+      // 🔥 key：pass"touch"Configure to trigger execution，rather than executing it directly
+      // This ensures that all listeners are triggered correctly
       configurationManager.updateConfiguration(
         props.nodeId,
         'dataSource',
@@ -1059,14 +1059,14 @@ const initializeDataSourceConfiguration = async () => {
         props.componentType
       )
     } else {
-    // 已移除：console语句
+    // Removed：consolestatement
     }
   } catch (error) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 }
 
-// 🔥 监听组件定义变化，确保metadata始终同步
+// 🔥 Listen for component definition changes，make suremetadataAlways in sync
 watch(
   () => currentComponentDef.value,
   (newDef, oldDef) => {
@@ -1083,56 +1083,56 @@ watch(
           metadata: updatedMetadata
         })
 
-    // 已移除：console语句
+    // Removed：consolestatement
       }
     }
   },
   { immediate: false }
 )
 
-// 🔥 监听 componentDataFromWarehouse 变化
+// 🔥 monitor componentDataFromWarehouse change
 watch(
   () => componentDataFromWarehouse.value,
   (newData, oldData) => {
-    // 已移除：console语句
+    // Removed：consolestatement
   },
   { deep: true, immediate: true }
 )
 
-// 🔥 新增：强制数据更新机制 - 当数据源执行完成后手动触发
+// 🔥 New：Forced data update mechanism - Manually triggered when the data source execution is completed
 const forceDataRefresh = () => {
-  // 强制清除DataWarehouse缓存
+  // force clearDataWarehousecache
   dataWarehouse.clearComponentMergedCache(props.nodeId)
 
-  // 手动触发计算属性重新计算
+  // Manually triggering computed property recalculation
   nextTick(() => {
     const freshData = componentDataFromWarehouse.value
-    // 已移除：console语句
+    // Removed：consolestatement
   })
 }
 
 onMounted(async () => {
-    // 已移除：console语句
+    // Removed：consolestatement
 
-  // 🚀 首先初始化Card2.1 Core响应式数据绑定系统
+  // 🚀 First initializeCard2.1 CoreResponsive data binding system
   checkCard2CoreSupport()
   if (useCard2CoreDataBinding.value) {
     await initializeCard2CoreBinding()
   }
 
-  // 🔥 强制清除缓存，确保获取最新数据
+  // 🔥 Force clear cache，Make sure you get the latest data
   clearDataCache()
 
-  // 🚨 **关键修复**：强制初始化计算属性，建立Vue响应式依赖
+  // 🚨 **critical fix**：Force initialization of computed properties，EstablishVueReactive dependencies
   try {
-    // 强制访问计算属性，确保Vue响应式系统能追踪到依赖关系
+    // Force access to computed properties，make sureVueReactive systems track dependencies
     const initialData = componentDataFromWarehouse.value
 
   } catch (initError) {
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 
-  // 🔥 新增：确保组件定义被注入到节点的metadata中
+  // 🔥 New：Make sure the component definition is injected into the node'smetadatamiddle
   if (currentComponentDef.value && editorContext?.updateNode) {
     const currentNode = editorContext.getNodeById(props.nodeId)
     if (currentNode) {
@@ -1146,39 +1146,39 @@ onMounted(async () => {
         metadata: updatedMetadata
       })
 
-    // 已移除：console语句
+    // Removed：consolestatement
     }
   }
 
-  // 🔥 关键修复：注册组件执行器到执行器注册表
+  // 🔥 critical fix：Register the component executor to the executor registry
   if (componentExecutorRegistry) {
     componentExecutorRegistry.set(props.nodeId, executeComponentDataSource)
 
-    // 🔥 关键修复：执行器注册后，检查并重新触发已有配置的执行
+    // 🔥 critical fix：After the executor is registered，Check and retrigger execution of existing configurations
     nextTick(async () => {
       try {
-        // 检查是否已有配置（说明fetchBoard已经执行过）
+        // Check if there is already a configuration（illustratefetchBoardAlready executed）
         const existingConfig = configurationManager.getConfiguration(props.nodeId)
         if (existingConfig && existingConfig.dataSource) {
-          // 直接调用执行器，重新执行数据源
+          // Call the executor directly，Re-execute the data source
           await executeComponentDataSource()
         } else {
-          // 没有配置，执行初始化
+          // No configuration，Perform initialization
           await initializeDataSourceConfiguration()
         }
       } catch (error) {
-         // 已移除：console语句
+         // Removed：consolestatement
       }
     })
   }
-  // 🔥 注释：数据源初始化已在执行器注册后进行，这里不需要重复调用
-  // 🔥 统一配置中心：交互配置初始化由计算属性自动处理
+  // 🔥 Comment：Data source initialization has taken place after executor registration，No need to call repeatedly here
+  // 🔥 Unified configuration center：Interaction configuration initialization is handled automatically by computed properties
   const savedConfigs = unifiedConfig.value.interaction?.configs as InteractionConfig[]
-  // 监听配置更新和请求事件
+  // Listen for configuration updates and request events
   window.addEventListener('card2-config-update', handleConfigUpdateEvent as EventListener)
   window.addEventListener('card2-config-request', handleConfigRequestEvent as EventListener)
 
-  // 🔥 注册组件实例到交互配置路由器
+  // 🔥 Register the component instance to the interactive configuration router
   nextTick(() => {
     const componentExpose = {
       getFullConfiguration,
@@ -1210,43 +1210,43 @@ onMounted(async () => {
   })
 })
 
-// 清理事件监听
+// Clean up event listening
 onUnmounted(() => {
-  // 🚀 清理Card2.1 Core数据绑定
+  // 🚀 clean upCard2.1 Coredata binding
   cleanupCard2CoreBinding()
 
-  // 🔥 清理组件执行器注册
+  // 🔥 Clean up component executor registration
   if (componentExecutorRegistry) {
     componentExecutorRegistry.delete(props.nodeId)
-    // 已移除：console语句
+    // Removed：consolestatement
   }
 
-  // 🔥 清理交互配置路由器中的组件注册
+  // 🔥 Clean up component registration in interactive configuration router
   interactionConfigRouter.unregisterComponent(props.nodeId)
-    // 已移除：console语句
+    // Removed：consolestatement
 
   window.removeEventListener('card2-config-update', handleConfigUpdateEvent as EventListener)
   window.removeEventListener('card2-config-request', handleConfigRequestEvent as EventListener)
 })
 
-// 🔥 向外暴露配置管理接口，供NodeWrapper调用
+// 🔥 Expose the configuration management interface to the outside world，forNodeWrappercall
 defineExpose({
   getFullConfiguration,
   updateConfig,
   updateUnifiedConfig,
   getDisplayData: () => displayData.value,
   getUnifiedConfig: () => unifiedConfig.value,
-  // 🎯 交互系统相关接口
+  // 🎯 Interactive system related interfaces
   updateInteractionConfigs,
   getInteractionConfigs,
   getInteractionCapability,
-  // 🔥 新增：属性监听接口，供交互引擎使用
+  // 🔥 New：Property listening interface，For use by interaction engines
   watchProperty: (propertyName: string, callback: (newValue: any, oldValue: any) => void) => {
-    // 检查当前组件实例是否有watchProperty方法
+    // Check if the current component instance haswatchPropertymethod
     if (currentComponentRef.value?.watchProperty) {
       return currentComponentRef.value.watchProperty(propertyName, callback)
     } else {
-      // Fallback：监听 unifiedConfig 变化
+      // Fallback：monitor unifiedConfig change
       return watch(
         () => unifiedConfig.value.component?.[propertyName],
         (newValue, oldValue) => {
@@ -1270,7 +1270,7 @@ defineExpose({
   overflow: hidden;
 }
 
-/* 🔥 Card2Wrapper 调试样式 */
+/* 🔥 Card2Wrapper debug style */
 .card2-wrapper-debug {
   background: #e8f4ff;
   border: 2px solid #1890ff;

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * 设备模板详情页主入口
- * 支持三种模式：新增、编辑、预览
- * - 新增/编辑：使用 Editor 组件（3步流程）
- * - 预览：使用 Viewer 组件（Tab布局）
+ * Main entrance of device template details page
+ * Support three modes：New、edit、Preview
+ * - New/edit：use Editor components（3step process）
+ * - Preview：use Viewer components（Tablayout）
  */
 
 import { ref, computed, watch } from 'vue'
@@ -15,15 +15,15 @@ const route = useRoute()
 const router = useRouter()
 
 /**
- * 当前显示模式
- * - 'add': 新增模式
- * - 'edit': 编辑模式
- * - 'preview': 预览模式
+ * Current display mode
+ * - 'add': New mode
+ * - 'edit': edit mode
+ * - 'preview': preview mode
  */
 const currentMode = ref<'add' | 'edit' | 'preview'>('add')
 
 /**
- * 模板ID（编辑或预览时使用）
+ * templateID（Used when editing or previewing）
  */
 const templateId = computed(() => {
   const id = route.query.id
@@ -31,28 +31,28 @@ const templateId = computed(() => {
 })
 
 /**
- * 根据路由参数初始化模式
+ * Initialize mode based on routing parameters
  */
 const initMode = () => {
   const { id, mode } = route.query
 
   if (mode === 'add') {
-    // 新增模式
+    // New mode
     currentMode.value = 'add'
   } else if (mode === 'edit') {
-    // 编辑模式
+    // edit mode
     currentMode.value = 'edit'
   } else if (id) {
-    // 有 id 但没有指定mode，或者 mode === 'preview'，默认预览模式
+    // have id 但没have指定mode，or mode === 'preview'，Default preview mode
     currentMode.value = 'preview'
   } else {
-    // 没有任何参数，默认新增模式
+    // without any parameters，Default new mode
     currentMode.value = 'add'
   }
 }
 
 /**
- * 切换到预览模式
+ * Switch to preview mode
  */
 const handleSwitchToPreview = () => {
   if (templateId.value) {
@@ -65,7 +65,7 @@ const handleSwitchToPreview = () => {
 }
 
 /**
- * 切换到编辑模式
+ * Switch to edit mode
  */
 const handleSwitchToEdit = () => {
   if (templateId.value) {
@@ -78,16 +78,16 @@ const handleSwitchToEdit = () => {
 }
 
 /**
- * 保存成功后的处理
+ * Processing after successful saving
  */
 const handleSaved = (data: any) => {
   console.log('Template saved:', data)
-  // 保存成功后可以跳转到预览或列表
+  // After successful saving, you can jump to the preview or list
   // router.push({ name: 'device_new-device-template_template-list' })
 }
 
 /**
- * 监听路由变化
+ * Monitor routing changes
  */
 watch(
   () => route.query,
@@ -100,7 +100,7 @@ watch(
 
 <template>
   <div class="template-details-container">
-    <!-- 新增或编辑模式 - 显示编辑器（3步流程） -->
+    <!-- Add or edit mode - show editor（3step process） -->
     <TemplateEditor
       v-if="currentMode === 'add' || currentMode === 'edit'"
       :template-id="templateId"
@@ -109,7 +109,7 @@ watch(
       @saved="handleSaved"
     />
 
-    <!-- 预览模式 - 显示查看器（Tab布局） -->
+    <!-- preview mode - show viewer（Tablayout） -->
     <TemplateViewer v-else-if="currentMode === 'preview'" :template-id="templateId" @edit="handleSwitchToEdit" />
   </div>
 </template>

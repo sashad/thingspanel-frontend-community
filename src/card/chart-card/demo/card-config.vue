@@ -7,7 +7,7 @@ import IconSelector from './icon-selector.vue'
 const ctx = inject<IConfigCtx>('config-ctx')!
 
 const setIcon = icon => {
-  ctx.config.iconName = icon // 更新配置
+  ctx.config.iconName = icon // Update configuration
 }
 </script>
 

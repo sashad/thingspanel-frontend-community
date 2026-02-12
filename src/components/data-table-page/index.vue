@@ -13,7 +13,7 @@ import AdvancedListLayout from '@/components/list-page/index.vue'
 import TencentMap from './modules/tencent-map.vue'
 import DevCardItem from '@/components/dev-card-item/index.vue'
 
-// 新增 DeviceItem 接口定义
+// New DeviceItem Interface definition
 interface DeviceItem {
   id: string
   device_number: string
@@ -31,23 +31,23 @@ interface DeviceItem {
   access_way: string
   protocol_type: string
   device_status: number
-  warn_status: string // 例如 'N' 表示正常, 'Y' 表示告警
+  warn_status: string // For example 'N' means normal, 'Y' Indicates an alarm
   device_type: string
   image_url?: string
-  // 根据实际情况可以添加更多字段
-  title?: string // DevCardItem 可能用到的备用字段
-  description?: string // DevCardItem 可能用到的备用字段
-  status?: string | number // DevCardItem 可能用到的备用字段
-  value?: string // DevCardItem 可能用到的备用字段
-  indicator?: string // DevCardItem 可能用到的备用字段
-  timestamp?: string // DevCardItem 可能用到的备用字段
-  updatedAt?: string // DevCardItem 可能用到的备用字段
-  key?: string // DevCardItem 可能用到的备用字段
+  // More fields can be added according to actual conditions
+  title?: string // DevCardItem Possible alternate fields
+  description?: string // DevCardItem Possible alternate fields
+  status?: string | number // DevCardItem Possible alternate fields
+  value?: string // DevCardItem Possible alternate fields
+  indicator?: string // DevCardItem Possible alternate fields
+  timestamp?: string // DevCardItem Possible alternate fields
+  updatedAt?: string // DevCardItem Possible alternate fields
+  key?: string // DevCardItem Possible alternate fields
 }
 
 const logger = createLogger('TablePage')
 
-// 定义搜索配置项的类型，支持多种输入类型：纯文本、日期选择器、日期范围选择器、下拉选择和树形选择器
+// Define the type of search configuration item，Supports multiple input types：plain text、date picker、date range picker、Dropdown selection and tree selector
 export type theLabel = string | (() => string) | undefined
 export type SearchConfig =
   | {
@@ -79,68 +79,68 @@ export type SearchConfig =
       loadOptions?: () => Promise<TreeSelectOption[]>
     }
 
-// 通过props从父组件接收参数
+// passpropsReceive parameters from parent component
 const props = defineProps<{
-  fetchData: () => Promise<any> // 数据获取函数
-  columnsToShow: // 表格列配置
+  fetchData: () => Promise<any> // Data acquisition function
+  columnsToShow: // Table column configuration
   | {
         key: string
         label: theLabel
-        render?: () => VueElement | string | undefined // 自定义渲染函数
+        render?: () => VueElement | string | undefined // Custom rendering function
       }[]
-    | 'all' // 特殊值'all'表示显示所有列
-  searchConfigs: SearchConfig[] // 搜索配置数组
+    | 'all' // special value'all'Show all columns
+  searchConfigs: SearchConfig[] // Search configuration array
   tableActions: Array<{
-    // 表格行操作
-    theKey?: string // 操作键
-    label: theLabel // 按钮文本
-    callback: any // 点击回调
+    // Table row operations
+    theKey?: string // Operation keys
+    label: theLabel // button text
+    callback: any // Click callback
   }>
-  topActions: { element: () => JSX.Element }[] // 顶部操作组件列表
-  rowClick?: () => void // 表格行点击回调
+  topActions: { element: () => JSX.Element }[] // Top operating component list
+  rowClick?: () => void // Table row click callback
   initPage?: number
   initPageSize?: number
 }>()
 
 const { loading, startLoading, endLoading } = useLoading()
-// 解构props以简化访问
+// deconstructpropsto simplify access
 const { fetchData, columnsToShow, searchConfigs }: any = props
 
-const dataList = ref<DeviceItem[]>([]) // 为 dataList 指定类型
-const total = ref(0) // 数据总数
-const currentPage = ref(props.initPage || 1) // 当前页码
-const pageSize = ref(props.initPageSize || 10) // 每页显示数量
-const searchCriteria: any = ref(Object.fromEntries(searchConfigs.map(item => [item.key, item.initValue]))) // 搜索条件
+const dataList = ref<DeviceItem[]>([]) // for dataList Specify type
+const total = ref(0) // Total data
+const currentPage = ref(props.initPage || 1) // Current page number
+const pageSize = ref(props.initPageSize || 10) // Display quantity per page
+const searchCriteria: any = ref(Object.fromEntries(searchConfigs.map(item => [item.key, item.initValue]))) // Search criteria
 
-// 添加当前视图状态管理
-const currentViewType = ref('list') // 默认为列表视图
+// Add current view state management
+const currentViewType = ref('list') // Default is list view
 
-// 添加图片URL相关变量
+// add pictureURLrelated variables
 const demoUrl = getDemoServerUrl()
 const url = ref(demoUrl)
 
-// 获取数据的函数，结合搜索条件、分页等
+// function to get data，Combine search criteria、Pagination etc.
 const getData = async () => {
-  // 处理搜索条件，特别是将日期对象转换为字符串
+  // Process search criteria，Specifically converting a date object to a string
   startLoading()
   const processedSearchCriteria = Object.fromEntries(
     Object.entries(searchCriteria.value).map(([key, value]) => {
       if (value && Array.isArray(value)) {
-        // 处理日期范围
+        // Processing date range
         return [key, value.map(v => (v instanceof Date ? v.toISOString() : v))]
       }
-      // 单一日期处理
+      // single date processing
       return [key, value instanceof Date ? value.toISOString() : value]
     })
   )
-  // 调用提供的fetchData函数获取数据
+  // Call the providedfetchDataFunction to get data
 
   const response = await fetchData({
     page: currentPage.value,
     page_size: pageSize.value,
     ...processedSearchCriteria
   })
-  // 处理响应
+  // Handle response
   if (!response.error) {
     dataList.value = response.data.list
     total.value = response.data.total
@@ -150,15 +150,15 @@ const getData = async () => {
   endLoading()
 }
 
-// 使用计算属性动态生成表格的列配置
+// Dynamically generate table column configuration using computed properties
 const generatedColumns = computed(() => {
   let columns
 
   if (dataList.value.length > 0) {
-    // 根据columnsToShow生成列配置
+    // according tocolumnsToShowGenerate column configuration
     columns = (columnsToShow === 'all' ? Object.keys(dataList.value[0]) : columnsToShow).map(item => {
       if (item.render) {
-        // 使用自定义的render函数渲染列
+        // Use customrenderfunction render column
         return {
           ...item,
           title: item.label,
@@ -183,31 +183,31 @@ const generatedColumns = computed(() => {
   return columns || []
 })
 
-// 更新页码或页面大小时重新获取数据
+// Re-fetch data when updating page number or page size
 const onUpdatePage = newPage => {
   currentPage.value = newPage
-  getData() // 更新数据
+  getData() // Update data
 }
 const onUpdatePageSize = newPageSize => {
   pageSize.value = newPageSize
-  currentPage.value = 1 // 重置为第一页
-  getData() // 更新数据
+  currentPage.value = 1 // Reset to first page
+  getData() // Update data
 }
 
-// 添加对 searchCriteria 的监听
+// add pair searchCriteria monitoring
 watch(
   searchCriteria,
   (newVal, oldVal) => {
-    // 检查是否真的发生了变化
+    // Check if changes have actually occurred
     if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      currentPage.value = 1 // 重置到第一页
-      getData() // 重新获取数据
+      currentPage.value = 1 // Reset to first page
+      getData() // Retrieve data
     }
   },
-  { deep: true } // 深度监听对象的变化
+  { deep: true } // Deeply monitor changes in objects
 )
 
-// 观察分页和搜索条件的变化，自动重新获取数据
+// Observe changes in pagination and search conditions，Automatically re-fetch data
 watchEffect(() => {
   searchConfigs.map((item: any) => {
     const vals = searchCriteria.value[item.key]
@@ -224,40 +224,40 @@ watchEffect(() => {
   getData()
 })
 
-// 搜索和重置按钮的逻辑
+// Search and reset button logic
 const handleSearch = () => {
-  currentPage.value = 1 // 搜索时重置到第一页
+  currentPage.value = 1 // Reset to first page when searching
   getData()
 }
 
 const handleReset = () => {
-  // 重置搜索条件为初始值
+  // Reset search conditions to initial values
   Object.keys(searchCriteria.value).forEach(key => {
     const config = searchConfigs.find(item => item.key === key)
     if (config) {
-      // 如果是日期范围选择器，设置为空数组
+      // If it is a date range selector，Set to empty array
       if (config.type === 'date-range') {
         searchCriteria.value[key] = []
       }
-      // 如果是树形选择器，根据 multiple 属性设置空值
+      // If it is a tree selector，according to multiple Property setting null value
       else if (config.type === 'tree-select') {
         searchCriteria.value[key] = config.multiple ? [] : null
       }
-      // 如果是下拉选择框，设置为 null 以显示占位符
+      // If it is a drop-down selection box，set to null to show placeholders
       else if (config.type === 'select') {
         searchCriteria.value[key] = null
       }
-      // 其他类型设置为空字符串
+      // Other types are set to empty strings
       else {
         searchCriteria.value[key] = ''
       }
     }
   })
 
-  handleSearch() // 重置后重新获取数据
+  handleSearch() // Retrieve data after reset
 }
 
-// 强制更新指定参数并刷新数据
+// Force update of specified parameters and refresh data
 const forceChangeParamsByKey = (params: Record<string, any>) => {
   Object.entries(params).forEach(([key, value]) => {
     if (key in searchCriteria.value) {
@@ -267,21 +267,21 @@ const forceChangeParamsByKey = (params: Record<string, any>) => {
   getData()
 }
 
-// 暴露方法给父组件
+// Expose methods to parent component
 defineExpose({
   handleSearch,
   handleReset,
   forceChangeParamsByKey,
-  dataList // 暴露dataList以便父组件能够直接更新数据
+  dataList // exposeddataListso that the parent component can directly update the data
 })
 
-// 更新树形选择器的选项
+// Update tree selector options
 const handleTreeSelectUpdate = (value, key) => {
   currentPage.value = 1
   searchCriteria.value[key] = value
 }
 
-// 用于加载动态选项的函数，适用于select和tree-select类型的搜索配置
+// Function for loading dynamic options，Applicable toselectandtree-selectType of search configuration
 const loadOptionsOnMount = async pattern => {
   for (const config of searchConfigs) {
     if (config.type === 'select' && config.loadOptions) {
@@ -312,23 +312,23 @@ const loadOptionsOnMount2 = async () => {
   }
 }
 
-// 在组件挂载时加载选项
+// Load options when component is mounted
 loadOptionsOnMount('')
 loadOptionsOnMount2()
 
-// 为 input 类型添加专门的处理函数
+// for input Add specialized processing functions to types
 const handleInputChange = () => {
   currentPage.value = 1
   getData()
 }
 
-// 修复 NSelect 的 filter 函数类型错误
+// repair NSelect of filter function type error
 const filterSelectOption = (pattern: string, option: any) => {
   const label = typeof option.label === 'string' ? option.label : ''
   return label.includes(pattern)
 }
 
-// AdvancedListLayout 事件处理
+// AdvancedListLayout event handling
 const handleLayoutQuery = () => {
   handleSearch()
 }
@@ -338,11 +338,11 @@ const handleLayoutReset = () => {
 }
 
 const handleAddNew = () => {
-  // 触发新建事件，由父组件或第一个 topAction 处理
+  // trigger new event，by parent component or first topAction deal with
 }
 
 const handleViewChange = ({ viewType }: { viewType: string }) => {
-  // 更新当前视图类型
+  // Update current view type
   currentViewType.value = viewType
 }
 
@@ -350,38 +350,38 @@ const handleRefresh = () => {
   getData()
 }
 
-// 导入SvgIcon组件，使用项目标准图标系统
+// importSvgIconcomponents，Use the project standard icon system
 import SvgIcon from '@/components/custom/svg-icon.vue'
 
-// 设备类型到图标名称的映射 (使用项目标准图标系统)
+// Device type to icon name mapping (Use the project standard icon system)
 const deviceTypeIcons = {
-  '1': 'direct', // 直连设备图标
-  '2': 'gateway', // 网关图标
-  '3': 'subdevice', // 网关子设备图标
-  default: 'defaultdevice' // 默认设备图标
+  '1': 'direct', // Direct connect device icon
+  '2': 'gateway', // gateway icon
+  '3': 'subdevice', // Gateway subdevice icon
+  default: 'defaultdevice' // Default device icon
 }
 
-// 获取设备图标名称的函数，针对"默认配置"使用直连设备图标
+// Function to get the device icon name，against"Default configuration"Use direct device icon
 const getDeviceIconName = (deviceType: string, deviceConfigName?: string): string => {
-  // 当配置是默认配置时，强制使用直连设备图标
-  if (!deviceConfigName || deviceConfigName === '默认配置') {
-    return deviceTypeIcons['1'] // 直连设备图标
+  // When the configuration is the default configuration，Force direct connect device icon
+  if (!deviceConfigName || deviceConfigName === 'Default configuration') {
+    return deviceTypeIcons['1'] // Direct connect device icon
   }
   return deviceTypeIcons[deviceType] || deviceTypeIcons.default
 }
 
-// 获取配置图片URL的函数
+// Get configuration pictureURLfunction
 const getConfigImageUrl = (imagePath: string | undefined): string => {
   logger.info('imagePath:', imagePath)
-  if (!imagePath) return '' // 返回空字符串，让模板使用默认图标
+  if (!imagePath) return '' // Return empty string，Let the template use the default icon
   const relativePath = imagePath.replace(/^\.?\//, '')
   return `${url.value.replace('api/v1', '') + relativePath}`
 }
 
-// 导入图标组件（修复图标显示问题）
+// Import icon component（Fix icon display problem）
 import { ListOutline, MapOutline, GridOutline as CardIcon } from '@vicons/ionicons5'
 
-// 定义可用视图，修复图标引用
+// Define available views，Fix icon references
 const availableViews = [
   { key: 'card', icon: CardIcon, label: 'common.viewCard' },
   { key: 'list', icon: ListOutline, label: 'common.viewList' },
@@ -389,15 +389,15 @@ const availableViews = [
 ]
 const formSize = ref(undefined)
 const router = useRouter()
-// 处理告警铃铛图标点击事件
+// Handling the click event of the alarm bell icon
 const handleWarningClick = (item: DeviceItem) => {
-  // 根据设备信息跳转到相应的告警页面
-  // 可以传递设备ID等参数
+  // Jump to the corresponding alarm page based on device information
+  // Devices can be passed onIDand other parameters
   if (item.warn_status === 'Y') {
-    // 有告警时跳转到具体设备的告警详情
+    // When an alarm occurs, jump to the alarm details of the specific device.
     router.push(`/alarm/warning-message?device_id=${item.id}`)
   } else {
-    // 无告警时可能跳转到告警管理页面
+    // When there is no alarm, it may jump to the alarm management page.
     router.push('/alarm/warning-message')
   }
 }
@@ -413,7 +413,7 @@ const handleWarningClick = (item: DeviceItem) => {
     @view-change="handleViewChange"
     @refresh="handleRefresh"
   >
-    <!-- 搜索表单内容 -->
+    <!-- Search form content -->
     <template #search-form-content>
       <n-grid cols="1 s:2 m:3 l:4 xl:6 2xl:8" x-gap="18" y-gap="18" responsive="screen">
         <n-gi v-for="config in searchConfigs" :key="config.key">
@@ -485,14 +485,14 @@ const handleWarningClick = (item: DeviceItem) => {
       </n-grid>
     </template>
 
-    <!-- 头部左侧操作区域 -->
+    <!-- Operating area on the left side of the head -->
     <template #header-left>
       <div class="flex gap-2">
         <component :is="action.element" v-for="(action, index) in topActions" :key="index"></component>
       </div>
     </template>
 
-    <!-- 卡片视图 - 使用铃铛图标插槽 -->
+    <!-- card view - Use bell icon slot -->
     <template #card-view>
       <n-scrollbar style="height: calc(100vh - 442px)" :size="1">
         <n-spin :show="loading">
@@ -515,7 +515,7 @@ const handleWarningClick = (item: DeviceItem) => {
                   />
                 </template>
 
-                <!-- 右上角铃铛图标插槽 -->
+                <!-- Bell icon slot in the upper right corner -->
                 <template #top-right-icon>
                   <svg
                     width="20"
@@ -524,7 +524,7 @@ const handleWarningClick = (item: DeviceItem) => {
                     :fill="item.warn_status === 'Y' ? '#ff4d4f' : '#d9d9d9'"
                     class="bell-icon"
                   >
-                    <!-- 铃铛图标 SVG 路径 -->
+                    <!-- bell icon SVG path -->
                     <path
                       d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
                     />
@@ -543,7 +543,7 @@ const handleWarningClick = (item: DeviceItem) => {
       </n-scrollbar>
     </template>
 
-    <!-- 列表视图 -->
+    <!-- list view -->
     <template #list-view>
       <n-scrollbar style="height: calc(100vh - 442px)" :size="1">
         <NDataTable
@@ -557,7 +557,7 @@ const handleWarningClick = (item: DeviceItem) => {
       </n-scrollbar>
     </template>
 
-    <!-- 地图视图 -->
+    <!-- map view -->
     <template #map-view>
       <n-spin :show="loading">
         <div class="map-view-container">
@@ -566,7 +566,7 @@ const handleWarningClick = (item: DeviceItem) => {
       </n-spin>
     </template>
 
-    <!-- 底部分页 -->
+    <!-- bottom pagination -->
     <template #footer>
       <NPagination
         v-model:page="currentPage"
@@ -605,7 +605,7 @@ const handleWarningClick = (item: DeviceItem) => {
   transition: fill 0.3s ease;
 }
 
-// 底部图标容器 - 固定40x40正方形
+// bottom icon container - fixed40x40square
 .footer-icon-container {
   width: 40px;
   height: 40px;

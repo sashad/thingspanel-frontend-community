@@ -18,7 +18,7 @@ const cardData = ref<any>({
   icon: 'fa-envelope'
 })
 
-// 获取数据
+// Get data
 const getData: () => void = async () => {
   try {
     const response: { data: any } = await tenantNum()
@@ -28,12 +28,12 @@ const getData: () => void = async () => {
       logger.error('Data does not contain the required properties or they are not numbers.')
     }
   } catch (error) {
-    // 处理请求数据时的错误
+    // Error while processing request data
     logger.error('Error fetching data:')
   }
 }
 
-// 调用 getData 函数
+// call getData function
 getData()
 </script>
 

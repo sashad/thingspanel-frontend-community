@@ -1,9 +1,9 @@
 /**
- * Grid 工具函数统一导出
- * 模块化重构后的工具函数集合
+ * Grid Unified export of tool functions
+ * A collection of tool functions after modular reconstruction
  */
 
-// ==================== 验证相关工具 ====================
+// ==================== Verification related tools ====================
 export {
   validateGridItem,
   validateLayout,
@@ -11,13 +11,13 @@ export {
   checkItemsOverlap,
   validateNoOverlaps,
   validateResponsiveConfig,
-  // 🔥 新增：扩展网格验证工具
+  // 🔥 New：Extended Grid Validation Tool
   validateExtendedGridConfig,
   validateLargeGridPerformance,
   optimizeItemForLargeGrid
 } from './validation'
 
-// ==================== 布局算法相关工具 ====================
+// ==================== Layout algorithm related tools ====================
 export {
   findAvailablePosition,
   findOptimalPosition,
@@ -29,7 +29,7 @@ export {
   moveItemWithCollisionHandling
 } from './layout-algorithm'
 
-// ==================== 性能相关工具 ====================
+// ==================== Performance related tools ====================
 export {
   debounce,
   throttle,
@@ -41,7 +41,7 @@ export {
   AsyncQueue
 } from './performance'
 
-// ==================== 响应式相关工具 ====================
+// ==================== Responsive related tools ====================
 export {
   createResponsiveLayout,
   transformLayoutForBreakpoint,
@@ -53,7 +53,7 @@ export {
   ResponsiveMediaQuery
 } from './responsive'
 
-// ==================== 通用工具 ====================
+// ==================== general tools ====================
 export {
   generateId,
   cloneLayout,
@@ -72,28 +72,28 @@ export {
   formatDuration
 } from './common'
 
-// ==================== 工具函数版本信息 ====================
-export const GRID_UTILS_VERSION = '2.1.0' // 🔥 升级版本：支持0-99网格
+// ==================== Tool function version information ====================
+export const GRID_UTILS_VERSION = '2.1.0' // 🔥 Upgraded version：support0-99grid
 export const GRID_UTILS_INFO = {
   version: GRID_UTILS_VERSION,
-  description: '模块化网格工具函数库',
+  description: 'Modular grid tool library',
   modules: {
-    validation: '网格验证相关工具',
-    'layout-algorithm': '布局算法和位置计算',
-    performance: '性能监控和优化工具',
-    responsive: '响应式布局处理',
-    common: '通用辅助工具'
+    validation: 'Grid verification related tools',
+    'layout-algorithm': 'Layout algorithms and position calculations',
+    performance: 'Performance monitoring and optimization tools',
+    responsive: 'Responsive layout processing',
+    common: 'Universal auxiliary tools'
   },
   migration: {
     from: 'gridLayoutPlusUtils.ts',
-    to: 'utils/* 模块',
+    to: 'utils/* module',
     breaking_changes: false,
     benefits: [
-      '更好的代码组织和可维护性',
-      '按功能模块化，便于独立使用',
-      '更完善的错误处理和类型安全',
-      '增强的性能监控能力',
-      '新增的缓存和异步处理工具'
+      'Better code organization and maintainability',
+      'Modular by function，Easy to use independently',
+      'Better error handling and type safety',
+      'Enhanced performance monitoring capabilities',
+      'New caching and asynchronous processing tools'
     ]
   },
   usage_examples: {
@@ -105,8 +105,8 @@ export const GRID_UTILS_INFO = {
   }
 }
 
-// ==================== 向后兼容性导出 ====================
-// 为了保持向后兼容，重新导出原有函数名
+// ==================== Backward compatibility export ====================
+// To maintain backward compatibility，Re-export the original function name
 export { validateGridItem as validateItem } from './validation'
 export { findAvailablePosition as findPosition } from './layout-algorithm'
 export { getLayoutStats as getStats } from './common'

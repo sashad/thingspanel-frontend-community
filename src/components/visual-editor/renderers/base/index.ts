@@ -1,9 +1,9 @@
 /**
- * 渲染器基础模块入口文件
- * 导出所有基础渲染器相关的类型和工具
+ * Renderer basic module entry file
+ * Export all base renderer related types and tools
  */
 
-// 基础渲染器类和接口
+// Basic renderer classes and interfaces
 export {
   BaseRenderer,
   BaseRendererFactory,
@@ -15,15 +15,15 @@ export {
   type RendererFactory
 } from './BaseRenderer'
 
-// Vue 组件基础渲染器
+// Vue Component base renderer
 export { default as BaseRendererComponent } from '@/components/visual-editor/renderers/base/BaseRendererComponent.vue'
 
-// 基础 UI 组件
+// Base UI components
 export { default as NodeWrapper } from '@/components/visual-editor/renderers/base/NodeWrapper.vue'
 export { default as ContextMenu } from '@/components/visual-editor/renderers/base/ContextMenu.vue'
 export { default as Card2Wrapper } from '@/components/visual-editor/renderers/base/Card2Wrapper.vue'
 
-// 渲染器管理器
+// Renderer Manager
 export {
   RendererManager,
   rendererManager,
@@ -32,7 +32,7 @@ export {
   getRendererOptions
 } from './RendererManager'
 
-// 工具类型
+// Tool type
 export interface RendererOption {
   value: string
   label: string
@@ -48,7 +48,7 @@ export interface RendererSwitchContext {
   config?: RendererConfig
 }
 
-// 渲染器生命周期钩子类型
+// Renderer lifecycle hook types
 export interface RendererLifecycleHooks {
   onBeforeInit?: () => Promise<void> | void
   onAfterInit?: () => Promise<void> | void
@@ -58,7 +58,7 @@ export interface RendererLifecycleHooks {
   onAfterDestroy?: () => Promise<void> | void
 }
 
-// 渲染器性能监控接口
+// Renderer performance monitoring interface
 export interface RendererPerformanceMetrics {
   initTime: number
   renderTime: number
@@ -67,7 +67,7 @@ export interface RendererPerformanceMetrics {
   lastUpdateTime: number
 }
 
-// 渲染器错误类型
+// Renderer error type
 export class RendererError extends Error {
   constructor(
     message: string,
@@ -79,7 +79,7 @@ export class RendererError extends Error {
   }
 }
 
-// 渲染器初始化错误
+// Renderer initialization error
 export class RendererInitError extends RendererError {
   constructor(rendererType: string, cause?: Error) {
     super(`Failed to initialize renderer: ${rendererType}`, rendererType, cause)
@@ -87,7 +87,7 @@ export class RendererInitError extends RendererError {
   }
 }
 
-// 渲染器渲染错误
+// Renderer rendering error
 export class RendererRenderError extends RendererError {
   constructor(rendererType: string, cause?: Error) {
     super(`Failed to render with renderer: ${rendererType}`, rendererType, cause)
@@ -95,10 +95,10 @@ export class RendererRenderError extends RendererError {
   }
 }
 
-// 工具函数
+// Utility function
 
 /**
- * 创建渲染器上下文
+ * Create renderer context
  */
 export function createRendererContext(
   nodes: any,
@@ -115,15 +115,15 @@ export function createRendererContext(
 }
 
 /**
- * 验证渲染器配置
+ * Verify renderer configuration
  */
 export function validateRendererConfig(config: RendererConfig): boolean {
-  // 基础验证逻辑
+  // Basic verification logic
   if (typeof config !== 'object' || config === null) {
     return false
   }
 
-  // 检查必要字段
+  // Check required fields
   if (config.readonly !== undefined && typeof config.readonly !== 'boolean') {
     return false
   }
@@ -136,7 +136,7 @@ export function validateRendererConfig(config: RendererConfig): boolean {
 }
 
 /**
- * 合并渲染器配置
+ * Merge renderer configuration
  */
 export function mergeRendererConfig(
   baseConfig: RendererConfig,
@@ -149,10 +149,10 @@ export function mergeRendererConfig(
 }
 
 /**
- * 检查渲染器兼容性
+ * Check renderer compatibility
  */
 export function checkRendererCompatibility(type: string): boolean {
-  // 检查浏览器特性支持
+  // Check browser feature support
   switch (type) {
     case 'canvas':
       return !!document.createElement('canvas').getContext
@@ -171,7 +171,7 @@ export function checkRendererCompatibility(type: string): boolean {
 }
 
 /**
- * 创建渲染器性能监控器
+ * Create a renderer performance monitor
  */
 export function createPerformanceMonitor(): {
   startTiming: (operation: string) => void

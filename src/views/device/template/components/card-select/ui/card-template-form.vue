@@ -69,12 +69,12 @@ const transformForTransfer = data => {
   const transformed: any = []
   data.forEach(group => {
     group.options.forEach(option => {
-      // 在label中添加data_source_type来模拟分组效果
+      // existlabelAdd indata_source_typeto simulate the grouping effect
       const label = `${group.data_source_type} -- ${option.label}`
       transformed.push({
         label,
         value: `${group.data_source_type}~${option.label}~${option.key}`
-        // 这里可以根据需要添加其他属性，比如 data_type
+        // You can add other attributes here as needed，for example data_type
       })
     })
   })
@@ -137,7 +137,7 @@ onMounted(() => {
 <template>
   <div>
     <NTabs v-if="state.selectCard" v-model:value="state.tab" type="line" animated>
-      <NTabPane v-if="state.selectCard.type === 'chart'" name="dataSource" tab="数据源">
+      <NTabPane v-if="state.selectCard.type === 'chart'" name="dataSource" tab="data source">
         <div :class="`${mobile ? '' : 'h-[calc(100vh_-_270px)] '} overflow-y-auto py-5`">
           <NForm>
             <div>
@@ -152,7 +152,7 @@ onMounted(() => {
           </NForm>
         </div>
       </NTabPane>
-      <NTabPane v-if="!!state.selectCard?.configForm" name="config" tab="组件设置">
+      <NTabPane v-if="!!state.selectCard?.configForm" name="config" tab="Component settings">
         <div :class="`${mobile ? '' : 'overflow-y-auto'} py-5`">
           <div class="max-w-[600px]">
             <ConfigCtx v-model:config="state.data.config" mode="insert">
@@ -169,6 +169,6 @@ onMounted(() => {
 <style scoped>
 .custom-select-container .v-binder-follower-container {
   width: 300px !important;
-  /* 只会影响该组件内的 NSelect 下拉宽度 */
+  /* Will only affect the components within this component NSelect Drop down width */
 }
 </style>

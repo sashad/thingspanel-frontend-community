@@ -1,146 +1,146 @@
-# ThingsPanel Visual Editor 架构文档
+# ThingsPanel Visual Editor Architecture documentation
 
-**文档日期**: 2025-08-29  
-**版本**: v2.0.0  
-**项目版本**: 0.1.0
+**Document date**: 2025-08-29  
+**Version**: v2.0.0  
+**Project version**: 0.1.0
 
-## 📋 概述
+## 📋 Overview
 
-ThingsPanel Visual Editor 是一个基于 Vue 3 的可视化编辑器系统，支持多种渲染器架构，为物联网仪表板提供拖拽式可视化组件编辑功能。
+ThingsPanel Visual Editor is a based on Vue 3 visual editor system，Supports multiple renderer architectures，Provides drag-and-drop visual component editing capabilities for IoT dashboards。
 
-> 📖 **详细开发文档**: 查看 [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) 获取完整的API参考、开发指南和最佳实践。
+> 📖 **Detailed development documentation**: Check [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) get completeAPIrefer to、Development Guidelines and Best Practices。
 
-### 核心特性
+### Core features
 
-- **多渲染器架构**: 支持 Canvas、Gridstack、GridLayoutPlus 等多种布局引擎
-- **组件化设计**: 完全组件化的 Widget 系统
-- **配置系统**: 统一的组件配置和数据绑定管理
-- **主题集成**: 完全支持明暗主题切换
-- **Card 2.1 集成**: 与新一代数据绑定系统深度集成
+- **Multi-renderer architecture**: support Canvas、Gridstack、GridLayoutPlus and other layout engines
+- **Component design**: fully componentized Widget system
+- **Configure the system**: Unified component configuration and data binding management
+- **Theme integration**: Fully supports light and dark theme switching
+- **Card 2.1 integrated**: 与新一代数据绑定系统深度integrated
 
-## 🏗️ 架构概览
+## 🏗️ Architecture overview
 
 ```
 visual-editor/
-├── PanelEditor.vue              # 主入口组件
-├── index.ts                     # 对外 API 导出
-├── components/                  # UI 组件层
-│   ├── Canvas/                  # Canvas 渲染相关组件
-│   ├── PropertyPanel/           # 属性面板系统
-│   ├── WidgetLibrary/           # 组件库面板
-│   └── toolbar/                 # 工具栏组件
-├── renderers/                   # 多渲染器系统
-│   ├── base/                    # 渲染器基础类
-│   ├── canvas/                  # Canvas 渲染器
-│   ├── gridstack/               # Gridstack 渲染器
-│   └── templates/               # 渲染器模板
-├── configuration/               # 配置管理系统
-├── core/                        # 核心业务逻辑
-├── store/                       # 状态管理
-├── types/                       # TypeScript 类型定义
-└── widgets/                     # Widget 组件库
+├── PanelEditor.vue              # Main entrance component
+├── index.ts                     # foreign API Export
+├── components/                  # UI component layer
+│   ├── Canvas/                  # Canvas Rendering related components
+│   ├── PropertyPanel/           # Property panel system
+│   ├── WidgetLibrary/           # Component library panel
+│   └── toolbar/                 # toolbar component
+├── renderers/                   # Multi-renderer system
+│   ├── base/                    # Renderer base class
+│   ├── canvas/                  # Canvas Renderer
+│   ├── gridstack/               # Gridstack Renderer
+│   └── templates/               # Renderer template
+├── configuration/               # configuration management system
+├── core/                        # core business logic
+├── store/                       # Status management
+├── types/                       # TypeScript type definition
+└── widgets/                     # Widget Component library
 ```
 
-## 🎯 核心组件说明
+## 🎯 Core component description
 
-### 1. 主入口组件
-- **PanelEditor.vue**: 编辑器主组件，集成所有子系统
+### 1. Main entrance component
+- **PanelEditor.vue**: Editor main component，Integrate all subsystems
 
-### 2. 渲染器系统 (`renderers/`)
-多渲染器架构支持不同的布局引擎：
+### 2. renderer system (`renderers/`)
+Multi-renderer architecture supports different layout engines：
 
-#### 基础渲染器 (`base/`)
-- `BaseRenderer.ts`: 渲染器抽象基类
-- `BaseRendererComponent.vue`: 渲染器组件基类
-- `RendererManager.ts`: 渲染器管理器
+#### Basic renderer (`base/`)
+- `BaseRenderer.ts`: Renderer abstract base class
+- `BaseRendererComponent.vue`: Renderer component base class
+- `RendererManager.ts`: Renderer Manager
 
-#### Canvas 渲染器 (`canvas/`)
-- `CanvasRenderer.vue`: 自由布局画布渲染器
-- `Card2Wrapper.vue`: Card 2.1 组件包装器
-- `ContextMenu.vue`: 右键上下文菜单
+#### Canvas Renderer (`canvas/`)
+- `CanvasRenderer.vue`: Free layout canvas renderer
+- `Card2Wrapper.vue`: Card 2.1 component wrapper
+- `ContextMenu.vue`: Right-click context menu
 
-#### Gridstack 渲染器 (`gridstack/`)
-- `GridstackRenderer.vue`: 基于 GridStack.js 的网格渲染器
-- `GridLayoutPlusWrapper.vue`: 增强版网格布局包装器
+#### Gridstack Renderer (`gridstack/`)
+- `GridstackRenderer.vue`: based on GridStack.js mesh renderer
+- `GridLayoutPlusWrapper.vue`: Enhanced grid layout wrapper
 
-### 3. 组件系统 (`components/`)
+### 3. component system (`components/`)
 
-#### 属性面板 (`PropertyPanel/`)
-- `PropertyPanel.vue`: 主属性面板
-- `components/`: 各类型组件的属性编辑器
-  - `BarChartPropertyEditor.vue`: 柱状图属性编辑器
-  - `ImagePropertyEditor.vue`: 图片组件属性编辑器
-  - `TextPropertyEditor.vue`: 文本组件属性编辑器
+#### Properties panel (`PropertyPanel/`)
+- `PropertyPanel.vue`: Main properties panel
+- `components/`: Property editor for various types of components
+  - `BarChartPropertyEditor.vue`: Histogram Properties Editor
+  - `ImagePropertyEditor.vue`: Image component property editor
+  - `TextPropertyEditor.vue`: Text component property editor
 
-#### 组件库 (`WidgetLibrary/`)
-- `WidgetLibrary.vue`: 左侧组件库面板，展示可用 Widget
+#### Component library (`WidgetLibrary/`)
+- `WidgetLibrary.vue`: Left component library panel，Display available Widget
 
-#### 工具栏 (`toolbar/`)
-- `VisualEditorToolbar.vue`: 主工具栏
-- `CommonToolbar.vue`: 通用工具栏组件
+#### Toolbar (`toolbar/`)
+- `VisualEditorToolbar.vue`: Main toolbar
+- `CommonToolbar.vue`: Universal Toolbar Component
 
-### 4. 配置管理系统 (`configuration/`)
-统一的组件配置和数据绑定管理：
+### 4. configuration management system (`configuration/`)
+Unified component configuration and data binding management：
 
-- `ConfigurationManager.ts`: 配置管理器
-- `ConfigurationStateManager.ts`: 配置状态管理
-- `ConfigurationIntegrationBridge.ts`: 配置集成桥接器
-- `ConfigurationPanel.vue`: 配置面板组件
+- `ConfigurationManager.ts`: configuration manager
+- `ConfigurationStateManager.ts`: Configuration status management
+- `ConfigurationIntegrationBridge.ts`: Configuring the integrated bridge
+- `ConfigurationPanel.vue`: Configure panel components
 
-#### 配置组件 (`components/`)
-- `DataFieldMappingInput.vue`: 数据字段映射输入
-- `DataFilterInput.vue`: 数据过滤器输入
-- `ScriptDataSourceEditor.vue`: 脚本数据源编辑器
-- `SimpleDataDisplay.vue`: 简单数据展示组件
+#### Configure components (`components/`)
+- `DataFieldMappingInput.vue`: Data field mapping input
+- `DataFilterInput.vue`: Data filter input
+- `ScriptDataSourceEditor.vue`: Script data source editor
+- `SimpleDataDisplay.vue`: Simple data display component
 
-### 5. 核心系统 (`core/`)
-- `component-api-config.ts`: 组件 API 配置系统
-- `component-data-requirements.ts`: 组件数据需求声明系统
-- `EditorDataSourceManager.ts`: 编辑器数据源管理器
-- `GlobalPollingManager.ts`: 全局轮询管理器
-- `ConfigDiscovery.ts`: 配置发现系统
+### 5. core system (`core/`)
+- `component-api-config.ts`: components API Configure the system
+- `component-data-requirements.ts`: Component data requirement declaration system
+- `EditorDataSourceManager.ts`: Editor Data Source Manager
+- `GlobalPollingManager.ts`: Global Poll Manager
+- `ConfigDiscovery.ts`: Configure discovery system
 
-### 6. 状态管理 (`store/`)
-- `editor.ts`: 编辑器主状态管理（画布、视口、模式等）
-- `widget.ts`: Widget 状态管理（组件定义、实例管理等）
+### 6. Status management (`store/`)
+- `editor.ts`: Editor main state management（canvas、viewport、mode etc.）
+- `widget.ts`: Widget Status management（Component definition、Instance management, etc.）
 
-### 7. Widget 组件库 (`widgets/`)
+### 7. Widget Component library (`widgets/`)
 
-#### 基础 Widget
-- `ImageWidget.vue`: 图片组件
-- `TextWidget.vue`: 文本组件
-- `base-widgets.ts`: 基础 Widget 定义
+#### Base Widget
+- `ImageWidget.vue`: Picture component
+- `TextWidget.vue`: text component
+- `base-widgets.ts`: Base Widget definition
 
-#### 图表 Widget (`chart/`)
-- `BarChartChartWidget/`: 柱状图组件
-- `DigitIndicatorChartWidget/`: 数字指示器组件
+#### chart Widget (`chart/`)
+- `BarChartChartWidget/`: Bar chart component
+- `DigitIndicatorChartWidget/`: digital indicator component
 
-#### 自定义 Widget (`custom/`)
-- `BarChartWidget/`: 自定义柱状图
-- `DigitIndicatorWidget/`: 自定义数字指示器
-- `ImageWidget/`: 自定义图片组件
-- `TextWidget/`: 自定义文本组件
+#### Customize Widget (`custom/`)
+- `BarChartWidget/`: Custom histogram
+- `DigitIndicatorWidget/`: Custom digital indicator
+- `ImageWidget/`: Custom picture component
+- `TextWidget/`: Custom text component
 
-### 8. 类型系统 (`types/`)
-完整的 TypeScript 类型定义：
+### 8. type system (`types/`)
+complete TypeScript type definition：
 
-- `base-types.ts`: 基础类型定义
-- `editor.ts`: 编辑器相关类型
-- `renderer.ts`: 渲染器类型
-- `widget.ts`: Widget 组件类型
-- `layout.ts`: 布局相关类型
-- `plugin.ts`: 插件系统类型
+- `base-types.ts`: Basic type definition
+- `editor.ts`: Editor related types
+- `renderer.ts`: Renderer type
+- `widget.ts`: Widget Component type
+- `layout.ts`: Layout related types
+- `plugin.ts`: Plug-in system type
 
-## 🔧 使用方式
+## 🔧 Usage
 
-### 基础用法
+### Basic usage
 
 ```vue
 <script setup lang="ts">
 import { PanelEditor } from '@/components/visual-editor'
 import { useVisualEditor } from '@/store/modules/visual-editor'
 
-// 使用新统一架构
+// Use new unified architecture
 const editor = useVisualEditor()
 </script>
 
@@ -149,7 +149,7 @@ const editor = useVisualEditor()
 </template>
 ```
 
-### 类型导入
+### Type import
 
 ```typescript
 import type {
@@ -160,34 +160,34 @@ import type {
 } from '@/components/visual-editor'
 ```
 
-## 🎨 渲染器系统
+## 🎨 renderer system
 
-### 渲染器注册
+### Renderer registration
 
 ```typescript
 import { RendererManager } from '@/components/visual-editor/renderers'
 
-// 注册新渲染器
+// Register a new renderer
 RendererManager.register('custom', CustomRenderer)
 ```
 
-### 渲染器开发
+### Renderer development
 
-继承 `BaseRenderer` 类：
+inherit `BaseRenderer` kind：
 
 ```typescript
 import { BaseRenderer } from '@/components/visual-editor/renderers/base'
 
 export class CustomRenderer extends BaseRenderer {
   render(data: GraphData) {
-    // 自定义渲染逻辑
+    // Custom rendering logic
   }
 }
 ```
 
-## 📊 Widget 开发
+## 📊 Widget develop
 
-### Widget 定义
+### Widget definition
 
 ```typescript
 interface CustomWidget {
@@ -202,11 +202,11 @@ interface CustomWidget {
 }
 ```
 
-### Widget 组件
+### Widget components
 
 ```vue
 <script setup lang="ts">
-// Widget 组件实现
+// Widget Component implementation
 defineProps<{
   config: CustomWidgetConfig
   data: any
@@ -215,35 +215,35 @@ defineProps<{
 
 <template>
   <div class="custom-widget">
-    <!-- Widget 内容 -->
+    <!-- Widget content -->
   </div>
 </template>
 ```
 
-## 🔌 配置系统
+## 🔌 Configure the system
 
-### 组件配置
+### Component configuration
 
-使用配置管理器管理组件配置：
+Use Configuration Manager to manage component configurations：
 
 ```typescript
 import { configurationManager } from '@/components/visual-editor/configuration'
 
-// 获取组件配置
+// Get component configuration
 const config = configurationManager.getConfig(componentId)
 
-// 更新组件配置
+// Update component configuration
 configurationManager.updateConfig(componentId, newConfig)
 ```
 
-### 数据绑定
+### data binding
 
-与 Card 2.1 数据绑定系统集成：
+and Card 2.1 Data binding system integration：
 
 ```typescript
 import { componentDataRequirementsRegistry } from '@/components/visual-editor/core'
 
-// 声明组件数据需求
+// Declare component data requirements
 componentDataRequirementsRegistry.registerRequirement(
   'custom-widget',
   {
@@ -253,20 +253,20 @@ componentDataRequirementsRegistry.registerRequirement(
 )
 ```
 
-## 🎯 集成说明
+## 🎯 Integration instructions
 
-### Card 2.1 集成
+### Card 2.1 integrated
 
-编辑器与 Card 2.1 数据绑定系统深度集成，支持：
+Editor with Card 2.1 Deep integration of data binding system，support：
 
-- 组件数据需求声明
-- 响应式数据绑定  
-- 多种数据源（API、WebSocket、脚本等）
-- 实时数据更新
+- Component Data Requirements Statement
+- Reactive data binding  
+- Multiple data sources（API、WebSocket、Scripts etc.）
+- Real-time data updates
 
-### 主题系统集成
+### Theme system integration
 
-所有组件完全支持主题切换：
+All components fully support theme switching：
 
 ```vue
 <script setup lang="ts">
@@ -282,124 +282,124 @@ const themeStore = useThemeStore()
 </style>
 ```
 
-## 🚀 开发指南
+## 🚀 Development Guide
 
-### 开发环境
+### development environment
 
 ```bash
-# 启动开发服务器
+# Start the development server
 pnpm dev
 
-# 类型检查
+# type checking
 pnpm typecheck
 
-# 代码检查
+# code inspection
 pnpm lint
 
-# 质量检查
+# Quality check
 pnpm quality-check
 ```
 
-### 测试页面
+### test page
 
-- **编辑器集成测试**: `/test/editor-integration`
-- **配置系统测试**: `/test/new-config-system`
+- **Editor integration testing**: `/test/editor-integration`
+- **Configure system testing**: `/test/new-config-system`
 
-## 🧹 清理记录 (v2.0.0)
+## 🧹 clear record (v2.0.0)
 
-### 已清理的文件和目录
+### Cleaned files and directories
 
-#### 1. 测试和示例文件
-- ✅ `components/config/ConfigWrapperTest.vue` - 配置包装器测试组件
-- ✅ `components/Layout/example.vue` - 布局示例文件
-- ✅ `core/ConfigDiscoveryTest.ts` - 配置发现测试文件
+#### 1. Test and sample files
+- ✅ `components/config/ConfigWrapperTest.vue` - Configure wrapper test component
+- ✅ `components/Layout/example.vue` - Layout sample file
+- ✅ `core/ConfigDiscoveryTest.ts` - Configure discovery test files
 
-#### 2. 完全删除的文档目录
-- ✅ `docs/` 整个目录及其所有子文件
-  - `docs/ARCHITECTURE.md` - 旧架构文档
-  - `docs/CONFIGURATION.md` - 配置系统文档
-  - `docs/STATE_MANAGEMENT.md` - 状态管理文档
-  - `docs/WIDGET_REGISTRY_GUIDE.md` - Widget 注册指南
-  - `docs/components/Layout.md` - 布局组件文档
-  - `docs/renderers/` - 渲染器开发文档目录
-  - `docs/review/` - 代码审查文档目录
-  - `docs/xiugaidfangan/` - 修改方案文档目录
+#### 2. Completely deleted document directory
+- ✅ `docs/` The entire directory and all its subfiles
+  - `docs/ARCHITECTURE.md` - Old architecture documentation
+  - `docs/CONFIGURATION.md` - Configure system documentation
+  - `docs/STATE_MANAGEMENT.md` - State Management Documentation
+  - `docs/WIDGET_REGISTRY_GUIDE.md` - Widget Registration Guide
+  - `docs/components/Layout.md` - Layout component documentation
+  - `docs/renderers/` - Renderer development documentation directory
+  - `docs/review/` - Code review document directory
+  - `docs/xiugaidfangan/` - Modify the project document directory
 
-#### 3. 根目录文档文件
-- ✅ `ARCHITECTURE_GUIDE.md` - 架构指南
-- ✅ `COMPONENT_ANALYSIS.md` - 组件分析报告
-- ✅ `COMPONENT_SUMMARY.md` - 组件总结文档
-- ✅ `CLEANUP_SUMMARY.md` - 清理总结报告
-- ✅ `COMPONENT_API_CONFIG_IMPLEMENTATION.md` - API配置实现文档
-- ✅ `README.md` - 旧版主文档 (已重写)
+#### 3. root directory document file
+- ✅ `ARCHITECTURE_GUIDE.md` - Architecture Guide
+- ✅ `COMPONENT_ANALYSIS.md` - Component Analysis Report
+- ✅ `COMPONENT_SUMMARY.md` - Component Summary Document
+- ✅ `CLEANUP_SUMMARY.md` - Cleanup summary report
+- ✅ `COMPONENT_API_CONFIG_IMPLEMENTATION.md` - APIConfiguration implementation documentation
+- ✅ `README.md` - Old moderator documents (rewritten)
 
-#### 4. 子模块文档文件
-- ✅ `configuration/README.md` - 配置系统文档
-- ✅ `configuration/CONFIGURATION_ARCHITECTURE.md` - 配置架构文档
-- ✅ `configuration/test-integration.html` - 配置测试HTML
-- ✅ `renderers/RENDERER_SYSTEM_GUIDE.md` - 渲染器系统指南
-- ✅ `renderers/canvas/README.md` - Canvas渲染器文档
-- ✅ `core/component-api-config.test.md` - API配置测试文档
+#### 4. Submodule documentation file
+- ✅ `configuration/README.md` - Configure system documentation
+- ✅ `configuration/CONFIGURATION_ARCHITECTURE.md` - Configuration schema documentation
+- ✅ `configuration/test-integration.html` - Configuration testHTML
+- ✅ `renderers/RENDERER_SYSTEM_GUIDE.md` - Renderer System Guide
+- ✅ `renderers/canvas/README.md` - CanvasRenderer documentation
+- ✅ `core/component-api-config.test.md` - APIConfigure test documents
 
-### 待进一步评估的文件
+### Documents awaiting further evaluation
 
-#### 1. 重复的属性编辑器 (暂保留)
+#### 1. Duplicate property editor (Reserved for now)
 - `components/property-editors/ImagePropertyEditor.vue`
 - `components/property-editors/TextPropertyEditor.vue`
-- **说明**: 与 `PropertyPanel/components/` 中文件重复，需确认使用情况后清理
+- **illustrate**: and `PropertyPanel/components/` Duplicate files in，Need to confirm usage before cleaning
 
-#### 2. 重复的 Widget 文件 (暂保留)
+#### 2. Duplicate Widget document (Reserved for now)
 - `widgets/ImageWidget.vue` 
 - `widgets/TextWidget.vue`
-- **说明**: 与 `widgets/custom/` 目录下同名文件重复，需确认功能差异
+- **illustrate**: and `widgets/custom/` Duplicate files with the same name in the directory，Need to confirm functional differences
 
-#### 3. 疑似未使用的组件 (暂保留)
-- `components/EditorCanvas.vue` - 仅在已删除文档中提及
-- `components/PanelLayout.vue` - 仅在类型定义中引用
-- `components/DataSourceTriggerPanel.vue` - 已导入但未实际使用
+#### 3. Suspected unused components (Reserved for now)
+- `components/EditorCanvas.vue` - Only mentioned in deleted documents
+- `components/PanelLayout.vue` - Referenced only within type definitions
+- `components/DataSourceTriggerPanel.vue` - Imported but not actually used
 
-### 清理效果
+### Cleaning effect
 
-#### 数量统计
-- **删除文档文件**: 约 20+ 个 `.md` 文件
-- **删除测试文件**: 3 个测试相关文件
-- **删除HTML文件**: 1 个集成测试页面
-- **保留核心文件**: ~100 个核心功能文件
+#### Quantity statistics
+- **删除文档document**: about 20+ indivual `.md` document
+- **Delete test files**: 3 test related files
+- **deleteHTMLdocument**: 1 integration test pages
+- **Keep core files**: ~100 core function files
 
-#### 目录结构优化
-- 移除了 `docs/` 冗余文档目录
-- 清理了根目录的临时分析文档
-- 统一为单一 `README.md` 架构文档
-- 保持了完整的功能模块结构
+#### Directory structure optimization
+- Removed `docs/` redundant document directory
+- Cleaned up temporary analysis documents in the root directory
+- unified into one `README.md` Architecture documentation
+- Maintains a complete functional module structure
 
 #### 维护效益
-- 🎯 **简化维护**: 减少文档维护负担，统一信息源
-- 🚀 **提升性能**: 减少不必要的文件扫描和构建时间  
-- 📖 **改善体验**: 统一、清晰的架构文档替代分散的文件
-- 🔍 **便于导航**: 清晰的目录结构，便于开发者定位功能
+- 🎯 **Simplify maintenance**: Reduce document maintenance burden，unified information source
+- 🚀 **Improve performance**: Reduce unnecessary file scanning and build time  
+- 📖 **Improve experience**: unified、Clear architecture documentation replaces scattered files
+- 🔍 **Easy to navigate**: clear directory structure，Convenient for developers to locate functions
 
-## 📝 更新日志
+## 📝 Change log
 
 ### v2.0.0 (2025-08-29)
-- 🧹 **重大清理**: 删除 20+ 冗余文档文件和测试文件
-- 📋 **文档重构**: 创建统一的架构文档，替代分散的文档系统
-- 🏗️ **结构优化**: 简化目录结构，提高项目可维护性
-- ✨ **功能保持**: 保留所有核心功能模块，仅清理文档和测试文件
-- 🎯 **开发体验**: 提供清晰的使用指南和开发规范
+- 🧹 **major cleanup**: delete 20+ Redundant documentation files and test files
+- 📋 **Document reconstruction**: Create unified architecture documentation，Replacement of decentralized documentation systems
+- 🏗️ **Structural optimization**: Simplify directory structure，Improve project maintainability
+- ✨ **Functionality maintained**: Keep all core functional modules，Clean documentation and test files only
+- 🎯 **Development experience**: Provide clear usage guidelines and development specifications
 
-### 历史版本
-- v1.x: 初始多渲染器架构实现
-- v0.x: 原型和概念验证阶段
+### Historical version
+- v1.x: Initial multi-renderer architecture implementation
+- v0.x: Prototype and proof-of-concept phase
 
-## 🤝 贡献指南
+## 🤝 Contribution Guide
 
-1. 遵循项目 TypeScript 和 Vue 3 规范
-2. 新增 Widget 需要完整的类型定义
-3. 渲染器开发需要继承基础类
-4. 所有组件必须支持主题系统
-5. 使用中文注释说明关键业务逻辑
+1. follow project TypeScript and Vue 3 specification
+2. New Widget Requires complete type definition
+3. Renderer development requires inheriting base classes
+4. All components must support the theme system
+5. Use Chinese comments to illustrate key business logic
 
 ---
 
-**维护者**: ThingsPanel 开发团队  
-**最后更新**: 2025-08-29
+**maintainer**: ThingsPanel development team  
+**last updated**: 2025-08-29

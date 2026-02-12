@@ -1,20 +1,20 @@
 <!--
-  Grid Item 内容渲染组件
-  负责单个网格项的内容渲染和样式处理
+  Grid Item Content rendering component
+  Responsible for content rendering and style processing of individual grid items
 -->
 <template>
   <div class="grid-item-content" :class="item.className" :style="item.style">
-    <!-- 标题栏 -->
+    <!-- title bar -->
     <div v-if="!readonly && showTitle" class="grid-item-header">
       <span class="grid-item-title">{{ getItemTitle(item) }}</span>
     </div>
 
-    <!-- 内容区域 -->
+    <!-- content area -->
     <div class="grid-item-body">
       <slot :item="item">
-        <!-- 默认内容 -->
+        <!-- default content -->
         <div class="default-item-content">
-          <div class="item-type">{{ item.type || '组件' }}</div>
+          <div class="item-type">{{ item.type || 'components' }}</div>
           <div class="item-id">{{ item.i }}</div>
         </div>
       </slot>
@@ -24,18 +24,18 @@
 
 <script setup lang="ts">
 /**
- * Grid Item 内容组件
- * 专注于网格项内容的渲染和展示
+ * Grid Item content component
+ * Focus on the rendering and display of grid item content
  */
 
 import type { GridLayoutPlusItem } from '../gridLayoutPlusTypes'
 
 interface Props {
-  /** 网格项数据 */
+  /** Grid item data */
   item: GridLayoutPlusItem
-  /** 是否只读模式 */
+  /** Whether to read-only mode */
   readonly?: boolean
-  /** 是否显示标题 */
+  /** Whether to display title */
   showTitle?: boolean
 }
 
@@ -45,21 +45,21 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 /**
- * 获取网格项标题
- * 优先级: title > type > 默认格式
+ * Get grid item title
+ * priority: title > type > Default format
  */
 const getItemTitle = (item: GridLayoutPlusItem): string => {
-  return item.title || item.type || `项目 ${item.i}`
+  return item.title || item.type || `project ${item.i}`
 }
 </script>
 
 <style scoped>
 .grid-item-content {
   width: 100%;
-  height: 100%; /* 🔧 恢复高度100%以支持栅格容器中的高度自适应 */
+  height: 100%; /* 🔧 restore altitude100%To support adaptive height in grid containers */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 🔧 恢复overflow hidden确保内容不超出容器 */
+  overflow: hidden; /* 🔧 recoveroverflow hiddenEnsure content does not exceed container */
 }
 
 .grid-item-header {
@@ -79,7 +79,7 @@ const getItemTitle = (item: GridLayoutPlusItem): string => {
 .grid-item-body {
   flex: 1;
   padding: 12px;
-  overflow: hidden; /* 🔧 恢复overflow hidden确保内容不超出容器 */
+  overflow: hidden; /* 🔧 recoveroverflow hiddenEnsure content does not exceed container */
 }
 
 .default-item-content {
@@ -103,7 +103,7 @@ const getItemTitle = (item: GridLayoutPlusItem): string => {
   opacity: 0.7;
 }
 
-/* 响应主题变化 */
+/* Respond to theme changes */
 [data-theme='dark'] .grid-item-header {
   border-bottom-color: var(--border-color);
 }

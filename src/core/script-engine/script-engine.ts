@@ -1,6 +1,6 @@
 /**
- * 主脚本引擎类
- * 整合所有组件，提供统一的脚本执行接口
+ * Main script engine class
+ * Integrate all components，Provide a unified script execution interface
  */
 
 import type {
@@ -20,7 +20,7 @@ import { ScriptContextManager } from '@/core/script-engine/context-manager'
 import { initializeBuiltInTemplates } from '@/core/script-engine/templates/built-in-templates'
 
 /**
- * 主脚本引擎实现类
+ * Main script engine implementation class
  */
 export class ScriptEngine implements IScriptEngine {
   public readonly executor: IScriptExecutor
@@ -35,49 +35,49 @@ export class ScriptEngine implements IScriptEngine {
       defaultScriptConfig,
       sandboxConfig: defaultSandboxConfig,
       enableCache: true,
-      cacheTTL: 5 * 60 * 1000, // 5分钟
+      cacheTTL: 5 * 60 * 1000, // 5minute
       maxConcurrentExecutions: 10,
       enablePerformanceMonitoring: true,
       ...config
     }
 
-    // 初始化各个组件
+    // Initialize each component
     this.executor = new ScriptExecutor()
     this.sandbox = new ScriptSandbox(this.config.sandboxConfig)
     this.templateManager = new ScriptTemplateManager()
     this.contextManager = new ScriptContextManager()
 
-    // 初始化内置模板库
+    // Initialize the built-in template library
     const templateStats = initializeBuiltInTemplates(this.templateManager)
   }
 
   /**
-   * 快速执行脚本
+   * Quickly execute scripts
    */
   async execute<T = any>(code: string, context?: Record<string, any>): Promise<ScriptExecutionResult<T>> {
-    const displayCode = code ? code.substring(0, 100) + (code.length > 100 ? '...' : '') : '[空脚本]'
-    // 创建脚本配置
+    const displayCode = code ? code.substring(0, 100) + (code.length > 100 ? '...' : '') : '[empty script]'
+    // Create script configuration
     const scriptConfig: ScriptConfig = {
       ...this.config.defaultScriptConfig,
       code
     }
 
-    // 创建或获取执行上下文
+    // Create or get execution context
     let executionContext = undefined
     if (context) {
-      executionContext = this.contextManager.createContext('临时上下文', context)
+      executionContext = this.contextManager.createContext('temporary context', context)
     }
 
     try {
       const result = await this.executor.execute<T>(scriptConfig, executionContext)
 
-      // 清理临时上下文
+      // Clean up temporary context
       if (executionContext) {
         this.contextManager.deleteContext(executionContext.id)
       }
       return result
     } catch (error) {
-      // 清理临时上下文
+      // Clean up temporary context
       if (executionContext) {
         this.contextManager.deleteContext(executionContext.id)
       }
@@ -86,17 +86,17 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 使用模板执行
+   * Execute using template
    */
   async executeTemplate<T = any>(
     templateId: string,
     parameters: Record<string, any>
   ): Promise<ScriptExecutionResult<T>> {
     try {
-      // 根据模板生成代码
+      // Generate code based on template
       const code = this.templateManager.generateCode(templateId, parameters)
 
-      // 执行生成的代码
+      // Execute the generated code
       return await this.execute<T>(code)
     } catch (error) {
       throw error
@@ -104,7 +104,7 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 批量执行脚本
+   * Execute scripts in batches
    */
   async executeBatch<T = any>(
     scripts: Array<{ code: string; context?: Record<string, any> }>
@@ -114,27 +114,27 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 执行脚本并返回流式结果
+   * Execute the script and return streaming results
    */
   async executeStream<T = any>(
     code: string,
     context?: Record<string, any>,
     onUpdate?: (result: Partial<ScriptExecutionResult<T>>) => void
   ): Promise<ScriptExecutionResult<T>> {
-    // 创建脚本配置
+    // Create script configuration
     const scriptConfig: ScriptConfig = {
       ...this.config.defaultScriptConfig,
       code
     }
 
-    // 创建执行上下文
+    // Create execution context
     let executionContext = undefined
     if (context) {
-      executionContext = this.contextManager.createContext('流式上下文', context)
+      executionContext = this.contextManager.createContext('streaming context', context)
     }
 
     try {
-      // 如果提供了更新回调，先发送开始状态
+      // If an update callback is provided，Send start status first
       if (onUpdate) {
         onUpdate({
           success: false,
@@ -142,7 +142,7 @@ export class ScriptEngine implements IScriptEngine {
           logs: [
             {
               level: 'info',
-              message: '脚本开始执行...',
+              message: 'The script starts executing...',
               timestamp: Date.now()
             }
           ]
@@ -151,19 +151,19 @@ export class ScriptEngine implements IScriptEngine {
 
       const result = await this.executor.execute<T>(scriptConfig, executionContext)
 
-      // 发送最终结果
+      // Send final result
       if (onUpdate) {
         onUpdate(result)
       }
 
-      // 清理上下文
+      // clear context
       if (executionContext) {
         this.contextManager.deleteContext(executionContext.id)
       }
 
       return result
     } catch (error) {
-      // 清理上下文
+      // clear context
       if (executionContext) {
         this.contextManager.deleteContext(executionContext.id)
       }
@@ -173,21 +173,21 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 验证脚本语法
+   * Verify script syntax
    */
   validateScript(code: string): { valid: boolean; error?: string } {
     return this.executor.validateSyntax(code)
   }
 
   /**
-   * 检查脚本安全性
+   * Check script security
    */
   checkScriptSecurity(code: string): { safe: boolean; issues: string[] } {
     return this.sandbox.checkCodeSecurity(code)
   }
 
   /**
-   * 获取执行统计信息
+   * Get execution statistics
    */
   getExecutionStats() {
     return {
@@ -199,14 +199,14 @@ export class ScriptEngine implements IScriptEngine {
       contexts: {
         total: this.contextManager.getAllContexts().length,
         active: this.contextManager.getAllContexts().filter(
-          ctx => Date.now() - ctx.updatedAt < 24 * 60 * 60 * 1000 // 24小时内活跃
+          ctx => Date.now() - ctx.updatedAt < 24 * 60 * 60 * 1000 // 24Active within hours
         ).length
       }
     }
   }
 
   /**
-   * 获取按分类统计的模板数量
+   * Get the number of templates by category
    */
   private getTemplatesByCategory(): Record<string, number> {
     const templates = this.templateManager.getAllTemplates()
@@ -220,21 +220,21 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 获取引擎配置
+   * Get engine configuration
    */
   getConfig(): ScriptEngineConfig {
     return { ...this.config }
   }
 
   /**
-   * 更新引擎配置
+   * Update engine configuration
    */
   updateConfig(config: Partial<ScriptEngineConfig>): void {
     this.config = { ...this.config, ...config }
   }
 
   /**
-   * 预热引擎（执行一些初始化脚本以提高后续性能）
+   * Warm up engine（Execute some initialization scripts to improve subsequent performance）
    */
   async warmup(): Promise<void> {
     const warmupScripts = [
@@ -252,10 +252,10 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 清理资源
+   * Clean up resources
    */
   cleanup(): void {
-    // 清理所有上下文
+    // clear all context
     const contexts = this.contextManager.getAllContexts()
     contexts.forEach(context => {
       this.contextManager.deleteContext(context.id)
@@ -263,7 +263,7 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 导出引擎状态
+   * Export engine status
    */
   exportState(): any {
     return {
@@ -276,26 +276,26 @@ export class ScriptEngine implements IScriptEngine {
   }
 
   /**
-   * 导入引擎状态
+   * Import engine status
    */
   importState(state: any): boolean {
     try {
-      // 导入配置
+      // Import configuration
       if (state.config) {
         this.updateConfig(state.config)
       }
 
-      // 导入模板
+      // Import template
       if (state.templates && Array.isArray(state.templates)) {
         state.templates.forEach((template: any) => {
           if (!template.isSystem) {
-            // 只导入非系统模板
+            // Only import non-system templates
             this.templateManager.createTemplate(template)
           }
         })
       }
 
-      // 导入上下文
+      // import context
       if (state.contexts && Array.isArray(state.contexts)) {
         state.contexts.forEach((context: any) => {
           this.contextManager.createContext(context.name, context.variables)
@@ -309,11 +309,11 @@ export class ScriptEngine implements IScriptEngine {
 }
 
 /**
- * 默认脚本引擎实例
+ * Default script engine instance
  */
 export const defaultScriptEngine = new ScriptEngine()
 
-// 在开发环境下进行预热
+// Warm up in development environment
 if (process.env.NODE_ENV === 'development') {
   defaultScriptEngine.warmup().catch(console.error)
 }

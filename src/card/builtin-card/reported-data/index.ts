@@ -7,21 +7,21 @@ export default {
   type: 'builtin',
   component: defineAsyncComponent(() => import('./component.vue')),
   poster,
-  title: $t('card.reportedData.title'), // 需要在语言文件中添加 'page.dashboard.cards.reportedData' 键值对
+  title: $t('card.reportedData.title'), // Need to be added to the language file 'page.dashboard.cards.reportedData' key value pair
   preset: {
     dataSource: {
-      origin: 'device', // 数据源通常来自设备
-      isSupportTimeRange: true, // 通常需要支持时间范围
-      dataTimeRange: '1h', // 默认时间范围
-      isSupportAggregate: true, // 通常需要支持聚合
-      dataAggregateRange: '1m', // 默认聚合范围
+      origin: 'device', // The data source usually comes from the device
+      isSupportTimeRange: true, // Typically required to support time ranges
+      dataTimeRange: '1h', // Default time range
+      isSupportAggregate: true, // Typically required to support aggregation
+      dataAggregateRange: '1m', // Default aggregation scope
       systemSource: [],
-      deviceSource: [] // 默认设备源为空，由用户配置
+      deviceSource: [] // The default device source is empty，Configured by user
     },
     config: {},
     iCardViewDefault: {
-      w: 2, // 默认宽度
-      h: 2, // 默认高度
+      w: 2, // default width
+      h: 2, // Default height
       minW: 2,
       minH: 2
     }

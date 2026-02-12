@@ -1,91 +1,91 @@
-# GridV2 组件详细整改方案
+# GridV2 Detailed rectification plan for components
 
-**文档版本**: 1.0
-**创建日期**: 2025-10-18
-**整改优先级**: P0 (最高优先级)
-**预计工期**: 3-5 个工作日
-
----
-
-## 📋 目录
-
-1. [整改背景与目标](#1-整改背景与目标)
-2. [组件调用链分析](#2-组件调用链分析)
-3. [核心问题汇总](#3-核心问题汇总)
-4. [整改路线图](#4-整改路线图)
-5. [详细实施步骤](#5-详细实施步骤)
-6. [测试验证方案](#6-测试验证方案)
-7. [风险评估与回滚计划](#7-风险评估与回滚计划)
-8. [预期收益](#8-预期收益)
+**Document version**: 1.0
+**Creation date**: 2025-10-18
+**Rectification priority**: P0 (highest priority)
+**Estimated construction period**: 3-5 working days
 
 ---
 
-## 1. 整改背景与目标
+## 📋 Table of contents
 
-### 1.1 当前状况
+1. [Rectification background and goals](#1-Rectification background and goals)
+2. [Component call chain analysis](#2-Component call chain analysis)
+3. [Summary of core issues](#3-Summary of core issues)
+4. [Rectification roadmap](#4-Rectification roadmap)
+5. [Detailed implementation steps](#5-Detailed implementation steps)
+6. [Test verification plan](#6-Test verification plan)
+7. [Risk assessment and rollback planning](#7-Risk assessment and rollback planning)
+8. [expected return](#8-expected return)
 
-GridV2 组件 (`src/components/common/gridv2/GridV2.vue`) 是基于 GridStack 9.5.1 的封装组件,用于提供网格布局功能。但当前实现存在严重的架构缺陷:
+---
 
-- **代码规模**: 1396 行 (过度复杂)
-- **问题总数**: 12 个严重问题 (3个致命级, 5个严重级, 4个警告级)
-- **核心根因**: 对 GridStack 理解不足,大量重复实现已有功能
+## 1. Rectification background and goals
 
-### 1.2 整改目标
+### 1.1 current situation
 
-| 目标类型 | 具体指标 |
+GridV2 components (`src/components/common/gridv2/GridV2.vue`) is based on GridStack 9.5.1 packaged component,Used to provide grid layout functionality。However, the current implementation suffers from serious architectural flaws:
+
+- **code size**: 1396 OK (overly complex)
+- **total number of questions**: 12 a serious problem (3fatal level, 5severity level, 4warning level)
+- **core root cause**: right GridStack Lack of understanding,A large number of repeated implementations of existing functions
+
+### 1.2 Improvement goals
+
+| target type | Specific indicators |
 |---------|---------|
-| **代码质量** | 删除 300+ 行冗余代码,降低复杂度 40% |
-| **功能稳定性** | 修复组件重叠、刷新后布局变化、列数切换异常等问题 |
-| **性能提升** | 减少 50% DOM 操作,减少 90% 日志输出 |
-| **可维护性** | 建立清晰的 GridStack 配置映射机制,简化初始化流程 |
+| **Code quality** | delete 300+ lines of redundant code,Reduce complexity 40% |
+| **Functional stability** | Fix component overlap、Layout changes after refresh、Problems such as abnormal column number switching |
+| **Performance improvements** | reduce 50% DOM operate,reduce 90% Log output |
+| **maintainability** | establish clear GridStack Configure mapping mechanism,Simplify the initialization process |
 
-### 1.3 不改动的部分
+### 1.3 Unchanged part
 
-为降低风险,以下部分**不在本次整改范围**:
+to reduce risk,The following parts**Not within the scope of this rectification**:
 
-- ✅ Props/Emits 协议保持不变 (兼容 GridLayoutPlus 接口)
-- ✅ 默认插槽的使用方式保持不变
-- ✅ 父组件 GridLayoutPlusWrapper 的调用方式保持不变
+- ✅ Props/Emits Agreement remains unchanged (compatible GridLayoutPlus interface)
+- ✅ The default slot usage remains unchanged
+- ✅ parent component GridLayoutPlusWrapper The calling method remains unchanged
 
 ---
 
-## 2. 组件调用链分析
+## 2. Component call chain analysis
 
-### 2.1 完整调用链
+### 2.1 Complete call chain
 
 ```
-PanelEditorV2.vue (可视化编辑器根组件)
-  ├─ 职责: 编辑器模式管理、工具栏、左右侧面板
-  ├─ 配置: defaultRenderer = 'gridstack'
-  └─> 子组件: GridstackRenderer.vue
+PanelEditorV2.vue (Visual editor root component)
+  ├─ Responsibilities: Editor mode management、Toolbar、Left and right side panels
+  ├─ Configuration: defaultRenderer = 'gridstack'
+  └─> subcomponent: GridstackRenderer.vue
 
-GridstackRenderer.vue (渲染器选择组件)
-  ├─ 职责: 处理 gridstack 渲染器的数据源和事件
-  ├─ 配置: gridConfig (从父组件继承)
-  └─> 子组件: GridLayoutPlusWrapper.vue
+GridstackRenderer.vue (Renderer selection component)
+  ├─ Responsibilities: deal with gridstack Renderer data sources and events
+  ├─ Configuration: gridConfig (Inherit from parent component)
+  └─> subcomponent: GridLayoutPlusWrapper.vue
 
-GridLayoutPlusWrapper.vue (配置处理组件)
-  ├─ 职责: 将 VisualEditorWidget 转换为 GridLayoutPlusItem
-  ├─ 配置计算: colNum=24, preventCollision=true, verticalCompact=false
-  └─> 子组件: GridV2.vue
+GridLayoutPlusWrapper.vue (Configure processing components)
+  ├─ Responsibilities: Will VisualEditorWidget Convert to GridLayoutPlusItem
+  ├─ Configure calculations: colNum=24, preventCollision=true, verticalCompact=false
+  └─> subcomponent: GridV2.vue
 
-GridV2.vue (GridStack 封装组件) ⚠️ 本次整改对象
-  ├─ 职责: 封装 GridStack 9.5.1 库
-  ├─ 问题: 大量手动干预 GridStack 的内部机制
-  └─> 底层库: GridStack 9.5.1
+GridV2.vue (GridStack Encapsulated components) ⚠️ The object of this rectification
+  ├─ Responsibilities: Encapsulation GridStack 9.5.1 Library
+  ├─ question: A lot of manual intervention GridStack internal mechanism
+  └─> underlying library: GridStack 9.5.1
 ```
 
-### 2.2 配置传递路径
+### 2.2 Configure delivery path
 
 ```typescript
 // PanelEditorV2.vue (Line 1110)
 <GridstackRenderer
-  :grid-config="editorConfig.gridConfig"  // ← 编辑器级配置
+  :grid-config="editorConfig.gridConfig"  // ← Editor level configuration
 />
 
-// GridstackRenderer.vue (传递给 Wrapper)
+// GridstackRenderer.vue (passed to Wrapper)
 <GridLayoutPlusWrapper
-  :grid-config="gridConfig"  // ← 包含默认值的配置
+  :grid-config="gridConfig"  // ← Configuration with default values
 />
 
 // GridLayoutPlusWrapper.vue (Line 132-172)
@@ -94,116 +94,116 @@ const gridConfig = computed<GridLayoutPlusConfig>(() => ({
   rowHeight: 80,
   horizontalGap: 0,
   verticalGap: 0,
-  preventCollision: true,      // ⚠️ GridStack 不识别
-  verticalCompact: false,      // ⚠️ 需要映射到 float
+  preventCollision: true,      // ⚠️ GridStack Not recognized
+  verticalCompact: false,      // ⚠️ need to be mapped to float
   isDraggable: !isReadOnly.value,
   isResizable: !isReadOnly.value
 }))
 
-// GridV2.vue (Line 387-501) ← 配置映射逻辑 (错误)
+// GridV2.vue (Line 387-501) ← Configure mapping logic (mistake)
 function createOptionsFromProps(): GridStackOptions {
-  const shouldFloat = false  // ❌ 错误: 始终 false
+  const shouldFloat = false  // ❌ mistake: always false
   return {
     column: columnCount,
-    float: shouldFloat,  // ❌ 应该根据 verticalCompact 动态设置
+    float: shouldFloat,  // ❌ should be based on verticalCompact Dynamic settings
     // ...
   }
 }
 ```
 
-### 2.3 关键发现
+### 2.3 Key findings
 
-1. **配置不匹配**: `GridLayoutPlusConfig` 接口与 `GridStackOptions` 不完全对应
-   - `preventCollision` → GridStack 没有此选项 (应该通过 `float` 控制)
-   - `verticalCompact` → GridStack 使用 `float` (语义相反)
+1. **Configuration mismatch**: `GridLayoutPlusConfig` Interface with `GridStackOptions` Not entirely corresponding
+   - `preventCollision` → GridStack There is no such option (should pass `float` control)
+   - `verticalCompact` → GridStack use `float` (Opposite semantics)
 
-2. **配置映射错误** (Line 415-436):
+2. **Configuration mapping error** (Line 415-436):
    ```typescript
-   // 用户期望: verticalCompact: false → 不自动重排
-   // 当前实现: float: false → 会自动重排 ❌
-   // 正确映射: verticalCompact: false → float: true
+   // user expectations: verticalCompact: false → No automatic rearrangement
+   // Current implementation: float: false → Will automatically rearrange ❌
+   // Correct mapping: verticalCompact: false → float: true
    ```
 
 ---
 
-## 3. 核心问题汇总
+## 3. Summary of core issues
 
-基于 `CRITICAL_ISSUES_ANALYSIS.md` 和 `GRIDV2_ANALYSIS.md`,汇总核心问题:
+based on `CRITICAL_ISSUES_ANALYSIS.md` and `GRIDV2_ANALYSIS.md`,Summarize core issues:
 
-### 🔴 致命问题 (Critical)
+### 🔴 fatal problem (Critical)
 
-| 问题 | 位置 | 影响 | 根因 |
+| question | Location | Influence | root cause |
 |-----|------|------|------|
-| #1: 手动设置 left/top | 676-696, 714-730, 788-816, 1059-1095 | 组件位置错误、拖拽卡顿、列数切换后重叠 | 不信任 GridStack 的定位系统 |
-| #2: 自己实现重排算法 | 254-337 (80行) | 组件排列混乱、性能差 | 不了解 GridStack 的 `compact()` 方法 |
-| #3: 列数切换后手动定位 | 1055-1095 | 列数切换后重叠、碰撞检测失效 | 不理解 GridStack 的 `column()` 机制 |
+| #1: Manual setting left/top | 676-696, 714-730, 788-816, 1059-1095 | Wrong component location、dragging lag、Column number overlaps after switching | distrust GridStack positioning system |
+| #2: Implement the rearrangement algorithm yourself | 254-337 (80OK) | Components are arranged in confusion、Poor performance | Don't understand GridStack of `compact()` method |
+| #3: Manual positioning after switching the number of columns | 1055-1095 | Column number overlaps after switching、Collision detection failure | don't understand GridStack of `column()` mechanism |
 
-### 🟠 严重问题 (High)
+### 🟠 serious problem (High)
 
-| 问题 | 位置 | 影响 | 根因 |
+| question | Location | Influence | root cause |
 |-----|------|------|------|
-| #4: 手动注入列宽样式 | 355-379 | 内存泄漏 (多次切换后样式堆积) | 部分重复 GridStack 的 `styleInHead` |
-| #5: float 配置混乱 | 415-436, 889-1152 | 刷新后布局变化 (竖排变横排) | 不理解 float 的真实含义 |
-| #6: 手动修复容器类名 | 1031-1048 | 掩盖真正问题 | GridStack 应该自动更新类名 |
-| #7: 大量 console.log | 全文 150+ 处 | 生产环境控制台污染 | 未使用 debugLog 函数 |
-| #8: 重复 update() 调用 | 809-814 等多处 | 性能浪费、可能闪烁 | 手动设置 style 后又调用 update() |
+| #4: Manually inject column width styles | 355-379 | memory leak (Styles pile up after switching multiple times) | Partially repeated GridStack of `styleInHead` |
+| #5: float Configuration confusion | 415-436, 889-1152 | Layout changes after refresh (Change from vertical to horizontal) | don't understand float the true meaning of |
+| #6: Manually fix container class names | 1031-1048 | cover up the real problem | GridStack Class names should be updated automatically |
+| #7: A lot console.log | full text 150+ at | Production environment control panel pollution | Not used debugLog function |
+| #8: repeat update() call | 809-814 Many places | Wasted performance、May flash | Manual setting style 后又call update() |
 
-### 🟡 警告问题 (Medium)
+### 🟡 Warning question (Medium)
 
-| 问题 | 位置 | 影响 |
+| question | Location | Influence |
 |-----|------|------|
-| #9: 监听器循环更新风险 | 1256-1268 | 可能死循环 |
-| #10: makeWidget 时机问题 | 223-238 | DOM 不稳定时调用 |
-| #11: 间距实现不直观 | 1190-1221 | 设置 10px 实际显示 20px |
-| #12: 初始化流程复杂 | 506-880 | 多达 5 层异步,时序复杂 |
+| #9: Listener cycle update risk | 1256-1268 | Possible infinite loop |
+| #10: makeWidget Timing issue | 223-238 | DOM Called when unstable |
+| #11: Spacing implementation is not intuitive | 1190-1221 | set up 10px Actual display 20px |
+| #12: The initialization process is complicated | 506-880 | Up to 5 layer async,The timing is complex |
 
 ---
 
-## 4. 整改路线图
+## 4. Rectification roadmap
 
-### 阶段划分
+### Stage division
 
 ```
-[阶段一] 删除手动干预代码 (P0, 2天)
-    ├─ 删除所有手动设置 left/top 的代码
-    ├─ 删除自定义重排算法
-    └─ 删除手动修复类名的代码
+[Stage one] Remove manual intervention code (P0, 2sky)
+    ├─ Remove all manual settings left/top code
+    ├─ Remove custom reordering algorithm
+    └─ Remove code that manually fixes class names
 
-[阶段二] 修复配置映射 (P0, 1天)
-    ├─ 修复 verticalCompact → float 的映射
-    ├─ 修复 preventCollision 的处理
-    └─ 简化 injectColumnStyles 逻辑
+[Stage 2] Fix configuration mapping (P0, 1sky)
+    ├─ repair verticalCompact → float mapping
+    ├─ repair preventCollision processing
+    └─ simplify injectColumnStyles logic
 
-[阶段三] 简化初始化流程 (P1, 1天)
-    ├─ 合并多层异步延迟
-    ├─ 优化 makeWidget 时机
-    └─ 添加严格的循环防护
+[Stage three] Simplify the initialization process (P1, 1sky)
+    ├─ Combine multiple layers of asynchronous delays
+    ├─ optimization makeWidget opportunity
+    └─ Add strict loop protection
 
-[阶段四] 性能和日志优化 (P2, 0.5天)
-    ├─ 替换所有 console.log 为 debugLog
-    ├─ 删除重复 update() 调用
-    └─ 优化间距实现
+[Stage four] Performance and logging optimization (P2, 0.5sky)
+    ├─ Replace all console.log for debugLog
+    ├─ Remove duplicates update() call
+    └─ Optimize spacing implementation
 
-[阶段五] 测试验证 (P0, 0.5天)
-    └─ 24列布局、拖拽、删除、列数切换全流程测试
+[Stage five] Test verification (P0, 0.5sky)
+    └─ 24column layout、drag、delete、Column number switching full process test
 ```
 
 ---
 
-## 5. 详细实施步骤
+## 5. Detailed implementation steps
 
-### 5.1 阶段一: 删除手动干预代码 (P0)
+### 5.1 Stage one: Remove manual intervention code (P0)
 
-#### 步骤 1.1: 删除拖拽结束后的手动定位
+#### step 1.1: Delete manual positioning after dragging
 
-**位置**: Line 676-696
+**Location**: Line 676-696
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
 grid.on('dragstop', (_e: Event, el: GridItemHTMLElement) => {
   const node = el.gridstackNode
 
-  // 🔥 错误: 手动重新设置所有组件的left/top
+  // 🔥 mistake: Manually reset all componentsleft/top
   const currentColumn = grid.getColumn()
   const cellHeight = grid.getCellHeight()
 
@@ -212,182 +212,182 @@ grid.on('dragstop', (_e: Event, el: GridItemHTMLElement) => {
     const leftPercent = ((n.x ?? 0) / currentColumn) * 100
     const topPx = (n.y ?? 0) * cellHeight
 
-    item.style.left = `${leftPercent}%`      // ❌ 删除
-    item.style.top = `${topPx}px`            // ❌ 删除
-    item.style.position = 'absolute'         // ❌ 删除
+    item.style.left = `${leftPercent}%`      // ❌ delete
+    item.style.top = `${topPx}px`            // ❌ delete
+    item.style.position = 'absolute'         // ❌ delete
   })
 
   emit('item-moved', String(node.id), node.x ?? 0, node.y ?? 0)
 })
 ```
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 grid.on('dragstop', (_e: Event, el: GridItemHTMLElement) => {
   const node = el.gridstackNode
   if (!node) return
 
-  // ✅ 只需 emit 事件, GridStack 已经处理了定位
-  debugLog('拖拽结束:', node.id, node.x, node.y)
+  // ✅ Just emit event, GridStack Positioning has been processed
+  debugLog('End of drag:', node.id, node.x, node.y)
   emit('item-moved', String(node.id), node.x ?? 0, node.y ?? 0)
 
-  // ❌ 删除所有手动设置 left/top 的代码
-  // GridStack 内部已经正确设置了位置！
+  // ❌ Remove all manual settings left/top code
+  // GridStack The location has been set correctly internally！
 })
 ```
 
-**同样的修改应用到**:
-- Line 714-730 (缩放结束后)
-- Line 757-769 (删除后)
-- Line 788-816 (初始化时)
-- Line 1059-1095 (列数切换时)
+**The same modifications are applied to**:
+- Line 714-730 (After zooming ends)
+- Line 757-769 (After deletion)
+- Line 788-816 (during initialization)
+- Line 1059-1095 (When switching the number of columns)
 
 ---
 
-#### 步骤 1.2: 删除自定义重排算法
+#### step 1.2: Remove custom reordering algorithm
 
-**位置**: Line 254-337 (约 80 行)
+**Location**: Line 254-337 (about 80 OK)
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
-// 🔥 自己写的重排算法 (80行代码)
+// 🔥 Rearrangement algorithm written by myself (80lines of code)
 const needsCompact = newWidgetCount > 0 || removedWidgetCount > 0
 
 if (needsCompact) {
-  // 步骤1: 收集所有现有组件
+  // step1: Collect all existing components
   const allItems = grid.getGridItems()
   const nodes: Array<{ el: GridItemHTMLElement; node: GridStackNode }> = []
 
-  // 步骤2: 按y然后x排序
+  // step2: according toyThenxsort
   nodes.sort((a, b) => {
     if (a.node.y !== b.node.y) return (a.node.y ?? 0) - (b.node.y ?? 0)
     return (a.node.x ?? 0) - (b.node.x ?? 0)
   })
 
-  // 步骤3-7: 临时启用float, 批量更新, 重新计算位置... (70行)
-  // ❌ 全部删除
+  // step3-7: Temporarily enabledfloat, Batch update, Recalculate position... (70OK)
+  // ❌ Delete all
 }
 ```
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
-// ✅ 使用 GridStack 内置方法
+// ✅ use GridStack built-in methods
 const needsCompact = removedWidgetCount > 0
 
 if (needsCompact) {
-  debugLog(`删除了 ${removedWidgetCount} 个组件，触发自动重排`)
+  debugLog(`deleted ${removedWidgetCount} components，Trigger automatic reordering`)
 
-  // ⚠️ 注意: 只在用户期望自动填充空隙时调用 compact()
-  // 如果 verticalCompact: false, 则不应该调用 (保持用户布局)
+  // ⚠️ Notice: Only called when the user expects gaps to be filled automatically compact()
+  // if verticalCompact: false, then it should not be called (Maintain user layout)
   const shouldCompact = props.config?.verticalCompact !== false
   if (shouldCompact) {
-    grid.compact()  // 一行代码搞定
+    grid.compact()  // One line of code to do it
   }
 }
 
-// ❌ 删除 200+ 行自定义重排代码
+// ❌ delete 200+ Line custom reflow code
 ```
 
-**关键理解**:
-- `compact()` 是 GridStack 内置的优化过的算法
-- 不需要手动排序、计算位置、设置 inline style
-- 是否调用 `compact()` 应该根据用户配置决定
+**Key understanding**:
+- `compact()` yes GridStack Built-in optimized algorithms
+- No manual sorting required、Calculate position、set up inline style
+- Whether to call `compact()` Should be determined based on user configuration
 
 ---
 
-#### 步骤 1.3: 删除手动修复容器类名
+#### step 1.3: Remove manual fix container class name
 
-**位置**: Line 1031-1048
+**Location**: Line 1031-1048
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
-// === 步骤5: 检查并修复容器类名 ===
+// === step5: Check and fix container class names ===
 const expectedClass = `gs-${newCol}`
 
-// 清理所有旧的gs-XX类名
+// Clean out all the old onesgs-XXClass name
 const classList = Array.from(gridEl.value.classList)
 classList.forEach(className => {
   if (/^gs-\d+$/.test(className) && className !== expectedClass) {
-    gridEl.value!.classList.remove(className)  // ❌ 不应该需要手动修复
+    gridEl.value!.classList.remove(className)  // ❌ Should not require manual repair
   }
 })
 
-// 添加新类名（如果不存在）
+// Add new class name（if does not exist）
 if (!gridEl.value.classList.contains(expectedClass)) {
-  gridEl.value.classList.add(expectedClass)  // ❌ GridStack 应该自动添加
+  gridEl.value.classList.add(expectedClass)  // ❌ GridStack should be added automatically
 }
 ```
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
-// ✅ 删除所有手动修复类名的代码
-// GridStack.column() 方法会自动更新容器类名
+// ✅ Remove all code that manually fixes class names
+// GridStack.column() The method will automatically update the container class name
 
-// ⚠️ 如果类名没更新, 说明 GridStack 使用方式有误
-// 应该调查根本原因, 而不是手动修复
+// ⚠️ If the class name is not updated, illustrate GridStack Incorrect usage
+// The root cause should be investigated, instead of manual repair
 ```
 
 ---
 
-### 5.2 阶段二: 修复配置映射 (P0)
+### 5.2 Stage 2: Fix configuration mapping (P0)
 
-#### 步骤 2.1: 修复 float 配置映射
+#### step 2.1: repair float Configuration mapping
 
-**位置**: Line 415-436
+**Location**: Line 415-436
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
-// 🔥 错误的理解和映射
+// 🔥 Wrong understanding and mapping
 const shouldVerticalCompact = config.verticalCompact !== false
-const shouldFloat = false  // ❌ 始终使用 false
+const shouldFloat = false  // ❌ always use false
 
 const options: GridStackOptions = {
-  float: shouldFloat,  // ❌ 错误映射
+  float: shouldFloat,  // ❌ wrong mapping
   // ...
 }
 ```
 
-**GridStack float 的真实含义**:
+**GridStack float the true meaning of**:
 
-| float 值 | 含义 | 拖拽时 | compact()时 | 刷新后 |
+| float value | meaning | 拖拽hour | compact()hour | After refresh |
 |---------|------|--------|------------|--------|
-| `false` | 紧凑模式 | 自动推开其他组件 | ✅自动填充空隙 | 可能重排 |
-| `true` | 浮动模式 | 不推开其他组件 | ❌不填充空隙 | 保持布局 |
+| `false` | compact mode | Automatically push away other components | ✅Automatically fill gaps | possible rearrangement |
+| `true` | float mode | Does not push away other components | ❌Do not fill gaps | keep layout |
 
-**正确的映射关系**:
+**Correct mapping relationship**:
 
-| 用户配置 | 用户期望 | GridStack 配置 |
+| 用户Configuration | user expectations | GridStack Configuration |
 |---------|---------|---------------|
-| `verticalCompact: true` | 允许自动紧凑 | `float: false` |
-| `verticalCompact: false` | 保持用户布局 | `float: true` |
+| `verticalCompact: true` | Allows automatic compaction | `float: false` |
+| `verticalCompact: false` | Maintain user layout | `float: true` |
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 function createOptionsFromProps(): GridStackOptions {
   const config = props.config || {}
 
-  // ✅ 正确映射 verticalCompact 到 float
-  // verticalCompact: true  → float: false (允许自动紧凑)
-  // verticalCompact: false → float: true  (不自动紧凑，保持布局)
+  // ✅ Correct mapping verticalCompact arrive float
+  // verticalCompact: true  → float: false (Allows automatic compaction)
+  // verticalCompact: false → float: true  (Not automatically compact，keep layout)
   const shouldFloat = config.verticalCompact === false
 
   const options: GridStackOptions = {
     column: Number(config.colNum) || 24,
     cellHeight: Number(config.rowHeight) || 80,
     margin: 0,
-    float: shouldFloat,  // ✅ 根据 verticalCompact 动态设置
+    float: shouldFloat,  // ✅ according to verticalCompact Dynamic settings
 
     disableDrag: props.readonly || config.isDraggable === false,
     disableResize: props.readonly || config.isResizable === false,
     staticGrid: props.readonly || config.staticGrid === true,
 
-    // ... 其他配置
+    // ... Other configurations
   }
 
-  debugLog('Float映射:', {
+  debugLog('Floatmapping:', {
     verticalCompact: config.verticalCompact,
     float: shouldFloat,
-    说明: shouldFloat ? '保持用户布局' : '允许自动紧凑'
+    illustrate: shouldFloat ? 'Maintain user layout' : 'Allows automatic compaction'
   })
 
   return options
@@ -396,62 +396,62 @@ function createOptionsFromProps(): GridStackOptions {
 
 ---
 
-#### 步骤 2.2: 修复 preventCollision 配置
+#### step 2.2: repair preventCollision Configuration
 
-**位置**: Line 439-442
+**Location**: Line 439-442
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
-// ❌ 错误: 将 preventCollision 映射到 disableOneColumnMode
+// ❌ mistake: Will preventCollision mapped to disableOneColumnMode
 ...(config.preventCollision !== undefined ? { disableOneColumnMode: false } : {}),
 ```
 
-**问题分析**:
-- `preventCollision` 和 `disableOneColumnMode` 完全不相干
-- GridStack **没有** `preventCollision` 配置项
-- 碰撞检测是通过 `float` 控制的
+**Problem analysis**:
+- `preventCollision` and `disableOneColumnMode` completely irrelevant
+- GridStack **No** `preventCollision` Configuration items
+- Collision detection is passed `float` controlled
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
-// ✅ 删除错误的 preventCollision 映射
-// GridStack 的碰撞检测通过 float 控制:
-// - float: false → 拖拽时自动推开其他组件 (阻止重叠)
-// - float: true  → 允许自由放置 (可能重叠, 但仍受碰撞检测约束)
+// ✅ delete wrong preventCollision mapping
+// GridStack The collision detection passes float control:
+// - float: false → Automatically push other components away when dragging (Prevent overlap)
+// - float: true  → Allow free placement (May overlap, but still subject to collision detection)
 
-// ⚠️ 如果用户确实需要"完全禁止重叠"的行为,
-// 可以在拖拽事件中添加自定义验证 (不推荐)
+// ⚠️ If the user really needs"No overlap at all"behavior,
+// Custom validation can be added to the drag event (Not recommended)
 ```
 
 ---
 
-#### 步骤 2.3: 简化列宽样式注入
+#### step 2.3: Simplify column width style injection
 
-**位置**: Line 355-379
+**Location**: Line 355-379
 
-**当前问题**:
-- 多次切换列数后 `<head>` 中堆积大量 `<style>` 标签
-- 没有清理旧样式
+**Current issues**:
+- After switching the number of columns multiple times `<head>` accumulation in large quantities `<style>` Label
+- No cleanup of old styles
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 function injectColumnStyles(columnCount: number): void {
   const styleId = `gridstack-column-${columnCount}`
 
-  // 1. 清理所有旧的列宽样式（不是当前列数的）
+  // 1. Clean up all old column width styles（Not the current column number）
   document.querySelectorAll('style[id^="gridstack-column-"]').forEach(style => {
     if (style.id !== styleId) {
       style.remove()
-      debugLog('清理旧样式:', style.id)
+      debugLog('Clean up old styles:', style.id)
     }
   })
 
-  // 2. 如果当前样式已存在，跳过
+  // 2. If the current style already exists，jump over
   if (document.getElementById(styleId)) {
-    debugLog('样式已存在:', styleId)
+    debugLog('Style already exists:', styleId)
     return
   }
 
-  // 3. 只在 >12 列时需要注入（GridStack 默认支持 1-12 列）
+  // 3. only in >12 List时需要注入（GridStack Supported by default 1-12 List）
   if (columnCount > 12) {
     const rules: string[] = []
     for (let i = 1; i <= columnCount; i++) {
@@ -464,88 +464,88 @@ function injectColumnStyles(columnCount: number): void {
     style.textContent = rules.join('\n')
     document.head.appendChild(style)
 
-    debugLog(`已注入 ${columnCount} 列宽度样式`)
+    debugLog(`Injected ${columnCount} column width style`)
   } else {
-    debugLog(`${columnCount} 列由 GridStack 内置样式支持，无需注入`)
+    debugLog(`${columnCount} Listed by GridStack Built-in style support，No need to inject`)
   }
 }
 ```
 
 ---
 
-### 5.3 阶段三: 简化初始化流程 (P1)
+### 5.3 Stage three: Simplify the initialization process (P1)
 
-#### 步骤 3.1: 简化 initGrid() 函数
+#### step 3.1: simplify initGrid() function
 
-**位置**: Line 506-880
+**Location**: Line 506-880
 
-**当前问题**:
-- 多达 5 层异步 (同步 init → nextTick → setTimeout 100ms → setTimeout 100ms → window.resize)
-- 时序复杂, 难以调试
+**Current issues**:
+- Up to 5 layer async (synchronous init → nextTick → setTimeout 100ms → setTimeout 100ms → window.resize)
+- The timing is complex, Difficult to debug
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 async function initGrid(): Promise<void> {
   if (!gridEl.value || isInitialized) return
 
-  debugLog('初始化 GridStack')
+  debugLog('initialization GridStack')
 
-  // 1. 清理旧实例
+  // 1. Clean up old instances
   if (grid) {
     grid.destroy(false)
     grid = null
   }
 
-  // 2. 创建新实例
+  // 2. Create new instance
   const options = createOptionsFromProps()
   grid = GridStack.init(options, gridEl.value)
 
-  // 3. 注入样式（如果需要）
+  // 3. Inject style（if needed）
   const targetColumn = options.column || 12
   if (targetColumn > 12) {
     injectColumnStyles(targetColumn)
   }
 
-  // 4. 绑定事件
+  // 4. Binding events
   grid.on('change', handleChange)
   grid.on('dragstop', handleDragStop)
   grid.on('resizestop', handleResizeStop)
   grid.on('removed', handleRemoved)
 
-  // 5. 等待 Vue 完成渲染
+  // 5. wait Vue Complete rendering
   await nextTick()
 
-  // 6. 注册 widgets
+  // 6. register widgets
   await ensureNewWidgetsRegistered()
 
   isInitialized = true
 
-  debugLog('GridStack 初始化完成')
+  debugLog('GridStack Initialization completed')
 
-  // ❌ 删除所有 setTimeout 延迟和 window.resize 事件
-  // ❌ 删除手动设置 left/top 的代码
-  // GridStack 已经处理好了一切！
+  // ❌ Delete all setTimeout Delay and window.resize event
+  // ❌ Remove manual settings left/top code
+  // GridStack Everything has been taken care of！
 }
 ```
 
 ---
 
-#### 步骤 3.2: 优化 ensureNewWidgetsRegistered()
+#### step 3.2: optimization ensureNewWidgetsRegistered()
 
-**位置**: Line 165-347
+**Location**: Line 165-347
 
-**当前问题**:
-- Vue 的 v-for 渲染可能尚未完成, DOM 可能不稳定
-- 缺少对 DOM 就绪状态的检查
+**Current issues**:
+- Vue of v-for Rendering may not be complete yet, DOM May be unstable
+- missing pair DOM Readiness check
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 async function ensureNewWidgetsRegistered(): Promise<void> {
   if (!grid) return
 
-  debugLog('ensureNewWidgetsRegistered 被调用')
+  debugLog('ensureNewWidgetsRegistered called')
 
-  // 🔥 防抖处理（50ms）
+  // 🔥 Anti-shake processing（50ms）
   if (widgetRegistrationTimer) {
     clearTimeout(widgetRegistrationTimer)
   }
@@ -558,50 +558,50 @@ async function ensureNewWidgetsRegistered(): Promise<void> {
       }
 
       try {
-        // 等待 DOM 更新
+        // wait DOM renew
         await nextTick()
 
-        // 再等一帧，确保浏览器完成渲染
+        // wait one more frame，Make sure the browser has finished rendering
         await new Promise(r => requestAnimationFrame(r))
 
         const currentLayoutIds = new Set(props.layout.map(item => getItemId(item)))
 
-        // 移除旧 widgets
+        // Remove old widgets
         const existingNodes = grid.getGridItems()
         existingNodes.forEach((el: GridItemHTMLElement) => {
           const node = el.gridstackNode
           const nodeId = String(node?.id)
 
           if (node && !currentLayoutIds.has(nodeId)) {
-            debugLog('移除过时 widget:', nodeId)
+            debugLog('Remove obsolete widget:', nodeId)
             grid!.removeWidget(el, false)
           }
         })
 
-        // 注册新 widgets
+        // Register new widgets
         props.layout.forEach((item) => {
           const id = getItemId(item)
           const el = gridEl.value?.querySelector<HTMLElement>(`#${CSS.escape(id)}`) as GridItemHTMLElement | null
 
           if (el && !el.gridstackNode) {
-            // 🔥 检查元素是否真正在 DOM 中
+            // 🔥 Check if the element is actually in DOM middle
             if (!document.body.contains(el)) {
-              console.warn('[GridV2] 元素不在 DOM 中:', id)
+              console.warn('[GridV2] Element is not present DOM middle:', id)
               return
             }
 
             try {
               grid!.makeWidget(el)
-              debugLog('注册新 widget:', id)
+              debugLog('Register new widget:', id)
             } catch (err) {
-              console.error('[GridV2] makeWidget 失败:', id, err)
+              console.error('[GridV2] makeWidget fail:', id, err)
             }
           }
         })
 
-        debugLog('Widget 管理完成')
+        debugLog('Widget Management completed')
       } catch (err) {
-        console.error('[GridV2] Widget 管理失败:', err)
+        console.error('[GridV2] Widget management failure:', err)
       } finally {
         widgetRegistrationTimer = null
         resolve()
@@ -613,16 +613,16 @@ async function ensureNewWidgetsRegistered(): Promise<void> {
 
 ---
 
-#### 步骤 3.3: 添加循环防护
+#### step 3.3: Add loop guard
 
-**位置**: Line 1256-1268
+**Location**: Line 1256-1268
 
-**当前问题**:
-- 可能触发 layout 更新循环
+**Current issues**:
+- may trigger layout update loop
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
-// 添加 layout hash 比对，避免相同数据重复处理
+// Add to layout hash Compare，Avoid repeated processing of the same data
 let lastLayoutHash = ''
 
 watch(
@@ -630,10 +630,10 @@ watch(
   (newLayout) => {
     if (!isInitialized) return
 
-    // 计算 layout 的 hash，避免相同数据重复处理
+    // calculate layout of hash，Avoid repeated processing of the same data
     const newHash = JSON.stringify(newLayout)
     if (newHash === lastLayoutHash) {
-      debugLog('Layout 数据未变化，跳过更新')
+      debugLog('Layout Data has not changed，Skip updates')
       return
     }
     lastLayoutHash = newHash
@@ -650,25 +650,25 @@ watch(
 
 ---
 
-### 5.4 阶段四: 性能和日志优化 (P2)
+### 5.4 Stage four: Performance and logging optimization (P2)
 
-#### 步骤 4.1: 替换所有 console.log 为 debugLog
+#### step 4.1: Replace all console.log for debugLog
 
-**全文约 150+ 处**, 批量替换:
+**Full text about 150+ at**, Batch replacement:
 
 ```typescript
-// ❌ 当前（生产环境污染）
-console.log('🔍 [GridV2] ensureNewWidgetsRegistered 被调用')
-console.log('🔧 [GridV2] 步骤1: 准备列数切换')
+// ❌ current（Production environment pollution）
+console.log('🔍 [GridV2] ensureNewWidgetsRegistered called')
+console.log('🔧 [GridV2] step1: Prepare to switch the number of columns')
 
-// ✅ 修改后（可控调试输出）
-debugLog('ensureNewWidgetsRegistered 被调用')
-debugLog('步骤1: 准备列数切换')
+// ✅ After modification（Controllable debug output）
+debugLog('ensureNewWidgetsRegistered called')
+debugLog('step1: Prepare to switch the number of columns')
 ```
 
-**debugLog 函数实现**:
+**debugLog Function implementation**:
 ```typescript
-// 开发环境启用调试日志
+// Enable debug logs in the development environment
 const DEBUG = import.meta.env.DEV
 
 function debugLog(...args: unknown[]): void {
@@ -680,18 +680,18 @@ function debugLog(...args: unknown[]): void {
 
 ---
 
-#### 步骤 4.2: 删除重复 update() 调用
+#### step 4.2: Remove duplicates update() call
 
-**位置**: Line 809-814 等多处
+**Location**: Line 809-814 Many places
 
-**当前代码** (❌ 错误):
+**current code** (❌ mistake):
 ```typescript
-// 已经手动设置了 inline style
+// Already set manually inline style
 el.style.left = `${leftPercent}%`
 el.style.top = `${topPx}px`
 el.style.position = 'absolute'
 
-// 又调用 update() 设置相同的值 ❌
+// call again update() set the same value ❌
 grid!.update(el, {
   x: node.x,
   y: node.y,
@@ -700,42 +700,42 @@ grid!.update(el, {
 })
 ```
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
-// ✅ 方案1: 只调用 update(), 让 GridStack 处理一切
+// ✅ plan1: Just call update(), let GridStack handle everything
 grid.update(el, { x, y, w, h })
-// ❌ 不要手动设置 style
+// ❌ Don't set it manually style
 
-// ✅ 方案2: 完全信任 GridStack, 不调用 update()
-// GridStack 会在需要时自动更新
+// ✅ plan2: full trust GridStack, Not called update()
+// GridStack Will automatically update when needed
 ```
 
 ---
 
-#### 步骤 4.3: 优化间距实现（可选）
+#### step 4.3: Optimize spacing implementation（Optional）
 
-**位置**: Line 1190-1221
+**Location**: Line 1190-1221
 
-**当前问题**:
-- 使用 content padding 实现间距
-- 设置 10px 实际视觉间距是 20px (两个组件各 padding 10px)
+**Current issues**:
+- use content padding achieve spacing
+- set up 10px The actual visual spacing is 20px (Each of the two components padding 10px)
 
-**选项一: 使用 GridStack 的 margin**:
+**Option one: use GridStack of margin**:
 ```typescript
 const options: GridStackOptions = {
-  margin: horizontalGap,  // 假设水平垂直间距相同
+  margin: horizontalGap,  // Assuming the same horizontal and vertical spacing
   // ...
 }
 ```
 
-**选项二: 调整 CSS 算法**:
+**Option two: Adjustment CSS algorithm**:
 ```typescript
 const gridContainerInlineStyle = computed(() => {
   const config = props.config || {}
   let horizontalGap = config.horizontalGap ?? 0
   let verticalGap = config.verticalGap ?? 0
 
-  // ⚠️ padding 方式导致间距翻倍，需要除以 2
+  // ⚠️ padding method results in doubling the spacing，need to be divided by 2
   return {
     '--h-gap': `${horizontalGap / 2}px`,
     '--v-gap': `${verticalGap / 2}px`
@@ -745,40 +745,40 @@ const gridContainerInlineStyle = computed(() => {
 
 ---
 
-### 5.5 阶段五: 列数切换优化 (P0)
+### 5.5 Stage five: Column number switching optimization (P0)
 
-#### 步骤 5.1: 简化 updateColumns() 函数
+#### step 5.1: simplify updateColumns() function
 
-**位置**: Line 889-1152
+**Location**: Line 889-1152
 
-**当前代码**: 约 260 行，包含大量调试日志和手动干预
+**current code**: about 260 OK，Contains extensive debug logs and manual intervention
 
-**修改后代码** (✅ 正确):
+**Modified code** (✅ correct):
 ```typescript
 async function updateColumns(newCol: number): Promise<void> {
   if (!Number.isFinite(newCol) || !grid || !gridEl.value) return
 
   const currentCol = grid.getColumn()
   if (currentCol === newCol) {
-    debugLog('列数未变化，跳过更新')
+    debugLog('The number of columns has not changed，Skip updates')
     return
   }
 
   try {
-    debugLog('列数切换:', currentCol, '→', newCol)
+    debugLog('Column number switching:', currentCol, '→', newCol)
 
-    // 步骤1: 注入新列数样式
+    // step1: Inject new column number style
     injectColumnStyles(newCol)
 
-    // 步骤2: 使用 GridStack 官方 API 切换列数
-    // ⚠️ 使用 'moveScale' 策略，自动缩放组件宽度和位置
+    // step2: use GridStack official API Switch number of columns
+    // ⚠️ use 'moveScale' Strategy，Automatically scale component width and position
     grid.column(newCol, 'moveScale')
 
-    // 步骤3: 等待 GridStack 完成更新
+    // step3: wait GridStack Complete update
     await nextTick()
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    // 步骤4: 读取新布局并 emit
+    // step4: Read the new layout and emit
     const updatedLayout = Array.from(grid.getGridItems()).map((el: GridItemHTMLElement) => {
       const node = el.gridstackNode
       if (!node) return null
@@ -794,16 +794,16 @@ async function updateColumns(newCol: number): Promise<void> {
     emit('layout-change', updatedLayout)
     emit('update:layout', updatedLayout)
 
-    debugLog('列数切换完成')
+    debugLog('Column switching completed')
 
-    // ❌ 删除所有手动设置 left/top 的代码（行 1055-1095）
-    // ❌ 删除所有手动调用 update() 的代码
-    // ❌ 删除所有手动修复类名的代码
-    // GridStack 已经处理好了一切！
+    // ❌ Remove all manual settings left/top code（OK 1055-1095）
+    // ❌ Remove all manual calls update() code
+    // ❌ Remove all code that manually fixes class names
+    // GridStack Everything has been taken care of！
 
   } catch (err) {
-    console.error('❌ [GridV2] 列数切换失败:', err)
-    // 出错时强制重新初始化
+    console.error('❌ [GridV2] Column number switching failed:', err)
+    // Force reinitialization on error
     if (grid) {
       grid.destroy(false)
       grid = null
@@ -818,281 +818,281 @@ async function updateColumns(newCol: number): Promise<void> {
 
 ---
 
-## 6. 测试验证方案
+## 6. Test verification plan
 
-### 6.1 测试环境准备
+### 6.1 Test environment preparation
 
-1. **测试页面**: 使用已有的测试路径
-   - `/test/data-binding-system-integration` (数据绑定系统集成测试)
-   - 或创建新的 GridV2 专用测试页面
+1. **test page**: Use existing test path
+   - `/test/data-binding-system-integration` (Data binding system integration testing)
+   - or create new GridV2 Dedicated test page
 
-2. **测试配置**:
+2. **Test configuration**:
    ```typescript
    const testGridConfig = {
-     colNum: 24,           // 测试 >12 列的样式注入
+     colNum: 24,           // test >12 Column style injection
      rowHeight: 80,
-     horizontalGap: 10,    // 测试间距
+     horizontalGap: 10,    // Test spacing
      verticalGap: 10,
-     verticalCompact: false,  // 测试 float 映射
+     verticalCompact: false,  // test float mapping
      isDraggable: true,
      isResizable: true
    }
    ```
 
-### 6.2 功能测试清单
+### 6.2 Functional test checklist
 
-| 测试场景 | 验证点 | 预期结果 |
+| test scenario | verification point | expected results |
 |---------|--------|---------|
-| **初始渲染** | 24 列布局正确显示 | ✅ 组件宽度正确，无重叠 |
-| **拖拽移动** | 拖拽组件到新位置 | ✅ 拖拽流畅，位置准确，无卡顿 |
-| **缩放** | 缩放组件尺寸 | ✅ 缩放流畅，尺寸准确 |
-| **删除组件** | 删除一个组件 | ✅ 剩余组件保持位置（verticalCompact: false） |
-| **删除后重排** | 设置 verticalCompact: true 后删除 | ✅ 剩余组件自动填充空隙 |
-| **列数切换** | 12 列 ↔ 24 列 切换 | ✅ 组件宽度自动调整，无重叠 |
-| **刷新页面** | 保存布局后刷新 | ✅ 布局保持不变（竖排不变横排） |
-| **碰撞检测** | 拖拽组件到已占用位置 | ✅ 自动推开其他组件（float: false） |
-| **主题切换** | 切换暗色/亮色主题 | ✅ 样式变量正确应用 |
+| **initial rendering** | 24 Column layout displays correctly | ✅ Component width is correct，No overlap |
+| **Drag and move** | Drag the component to a new location | ✅ Drag and drop smoothly，Accurate location，No lag |
+| **Zoom** | Scale component size | ✅ Smooth zooming，Dimensions are accurate |
+| **Remove component** | Delete a component | ✅ Remaining components remain in place（verticalCompact: false） |
+| **Rearrange after deletion** | set up verticalCompact: true Delete later | ✅ Remaining components automatically fill gaps |
+| **Column number switching** | 12 List ↔ 24 List switch | ✅ Component width automatically adjusts，No overlap |
+| **refresh page** | Refresh after saving layout | ✅ The layout remains the same（Vertical arrangement remains unchanged horizontal arrangement） |
+| **Collision detection** | Drag the component to the occupied position | ✅ Automatically push away other components（float: false） |
+| **theme switching** | Toggle dark/Bright theme | ✅ Style variables are applied correctly |
 
-### 6.3 性能测试
+### 6.3 Performance testing
 
-1. **DOM 操作次数**:
-   - 使用 Chrome DevTools Performance 面板
-   - 记录拖拽一次触发的 DOM 更新次数
-   - **预期**: 减少 50% 以上
+1. **DOM Number of operations**:
+   - use Chrome DevTools Performance panel
+   - Record a trigger triggered by dragging DOM Update times
+   - **expected**: reduce 50% above
 
-2. **内存泄漏测试**:
-   - 重复切换列数 20 次 (12 ↔ 24)
-   - 检查 `<head>` 中的 `<style>` 标签数量
-   - **预期**: 最多 2 个 (gridstack-column-12 和 gridstack-column-24)
+2. **Memory leak testing**:
+   - Repeatedly switch the number of columns 20 Second-rate (12 ↔ 24)
+   - examine `<head>` in `<style>` Number of tags
+   - **expected**: most 2 indivual (gridstack-column-12 and gridstack-column-24)
 
-3. **控制台日志**:
-   - 生产环境构建后测试
-   - **预期**: 无 `[GridV2]` 开头的日志输出
+3. **console log**:
+   - Production environment post-build testing
+   - **expected**: none `[GridV2]` Log output at the beginning
 
-### 6.4 兼容性测试
+### 6.4 Compatibility testing
 
-1. **浏览器兼容**:
-   - Chrome (最新版)
-   - Firefox (最新版)
-   - Safari (最新版)
-   - Edge (最新版)
+1. **Browser compatible**:
+   - Chrome (Latest version)
+   - Firefox (Latest version)
+   - Safari (Latest version)
+   - Edge (Latest version)
 
-2. **响应式测试**:
-   - 桌面 (1920x1080)
-   - 平板 (768x1024)
-   - 移动 (375x667)
+2. **Responsive testing**:
+   - desktop (1920x1080)
+   - flat (768x1024)
+   - move (375x667)
 
-### 6.5 回归测试
+### 6.5 Regression testing
 
-**测试父组件功能是否正常**:
-- GridLayoutPlusWrapper 的事件传递
-- GridstackRenderer 的数据源绑定
-- PanelEditorV2 的编辑器功能
+**Test whether the parent component functions normally**:
+- GridLayoutPlusWrapper event delivery
+- GridstackRenderer data source binding
+- PanelEditorV2 Editor functions
 
 ---
 
-## 7. 风险评估与回滚计划
+## 7. Risk assessment and rollback planning
 
-### 7.1 风险识别
+### 7.1 Risk identification
 
-| 风险等级 | 风险描述 | 影响范围 | 缓解措施 |
+| risk level | Risk description | Scope of influence | Mitigation measures |
 |---------|---------|---------|---------|
-| 🔴 高 | 删除手动定位代码后组件位置错误 | 所有使用 GridV2 的页面 | 保留当前版本作为 GridV2.backup.vue |
-| 🟠 中 | float 映射修改后刷新行为变化 | 已保存的布局配置 | 提供配置迁移脚本 |
-| 🟡 低 | 性能优化导致的边界情况 | 特殊场景 | 增加边界情况测试 |
+| 🔴 high | Wrong component position after removing manual positioning code | All uses GridV2 the page | Keep the current version as GridV2.backup.vue |
+| 🟠 middle | float Refresh behavior changes after mapping modification | Saved layout configuration | Provide configuration migration script |
+| 🟡 Low | Edge cases caused by performance optimization | special scene | Add edge case testing |
 
-### 7.2 回滚计划
+### 7.2 rollback plan
 
-#### 快速回滚 (< 5 分钟)
+#### Quick rollback (< 5 minute)
 
-1. **备份当前版本**:
+1. **Back up current version**:
    ```bash
    cp src/components/common/gridv2/GridV2.vue src/components/common/gridv2/GridV2.backup.vue
    ```
 
-2. **Git 回滚命令**:
+2. **Git rollback command**:
    ```bash
-   # 如果发现问题，立即回滚到上一个稳定版本
+   # If problems are found，Immediately roll back to the previous stable version
    git checkout HEAD~1 -- src/components/common/gridv2/GridV2.vue
-   git commit -m "回滚 GridV2 整改（发现问题）"
+   git commit -m "rollback GridV2 Rectify（Found problem）"
    ```
 
-#### 分阶段发布策略
+#### Phased release strategy
 
-1. **阶段 0: 创建特性分支**
+1. **stage 0: Create a feature branch**
    ```bash
    git checkout -b feature/gridv2-refactor
    ```
 
-2. **阶段 1-4: 逐步提交**
-   - 每完成一个阶段，提交一次代码
-   - 提交信息清晰说明修改内容
-   - 例如: `feat(GridV2): 阶段一 - 删除手动定位代码`
+2. **stage 1-4: Submit step by step**
+   - Each stage completed，Submit code once
+   - Submit information clearly stating the modification content
+   - For example: `feat(GridV2): Stage one - Remove manual targeting code`
 
-3. **阶段 5: 测试验证**
-   - 在测试分支上完整测试
-   - 通过所有测试后再合并到主分支
+3. **stage 5: Test verification**
+   - Full test on test branch
+   - Merge to master branch after passing all tests
 
-4. **阶段 6: 灰度发布（可选）**
-   - 使用功能开关控制是否启用新版 GridV2
-   - 逐步放量，监控线上表现
+4. **stage 6: Grayscale release（Optional）**
+   - Use the function switch to control whether to enable the new version GridV2
+   - Gradually increase the volume，Monitor online performance
 
-### 7.3 应急预案
+### 7.3 emergency plan
 
-**如果整改后出现严重问题**:
+**If serious problems arise after rectification**:
 
-1. **立即措施**:
-   - 停止推广使用 GridV2
-   - 切换回旧版本（GridV2.backup.vue）
-   - 通知相关开发人员
+1. **Immediate measures**:
+   - Stop promoting and using GridV2
+   - Switch back to old version（GridV2.backup.vue）
+   - Notify relevant developers
 
-2. **问题分析**:
-   - 收集错误日志和用户反馈
-   - 分析问题根因
-   - 评估是修复还是完全回滚
+2. **Problem analysis**:
+   - Collect error logs and user feedback
+   - Analyze the root cause of the problem
+   - Evaluate whether to fix or fully roll back
 
-3. **修复流程**:
-   - 在特性分支上修复问题
-   - 重新测试验证
-   - 再次发布
+3. **Repair process**:
+   - Fix issues on feature branches
+   - Retest verification
+   - Publish again
 
 ---
 
-## 8. 预期收益
+## 8. expected return
 
-### 8.1 代码质量提升
+### 8.1 Code quality improvement
 
-| 指标 | 当前值 | 整改后 | 改善幅度 |
+| index | current value | After rectification | Improvement |
 |-----|--------|--------|---------|
-| 代码行数 | 1396 行 | ~800 行 | ↓ 43% |
-| 复杂度 (圈复杂度) | 高 | 中 | ↓ 40% |
-| 重复代码 | 300+ 行 | 0 | ↓ 100% |
-| TypeScript 类型覆盖 | 80% | 95% | ↑ 15% |
+| Lines of code | 1396 OK | ~800 OK | ↓ 43% |
+| complexity (圈complexity) | high | middle | ↓ 40% |
+| Duplicate code | 300+ OK | 0 | ↓ 100% |
+| TypeScript Type coverage | 80% | 95% | ↑ 15% |
 
-### 8.2 功能稳定性
+### 8.2 Functional stability
 
-| 问题 | 当前状态 | 整改后 |
+| question | Current status | After rectification |
 |-----|---------|--------|
-| 组件重叠 | ❌ 频繁出现 | ✅ 完全修复 |
-| 刷新后布局变化 | ❌ 竖排变横排 | ✅ 保持一致 |
-| 列数切换异常 | ❌ 组件重叠/错位 | ✅ 平滑切换 |
-| 拖拽卡顿 | ❌ 明显卡顿 | ✅ 流畅拖拽 |
-| 删除后错位 | ❌ 剩余组件跳动 | ✅ 按配置行为 |
+| Components overlap | ❌ appear frequently | ✅ Completely restored |
+| Layout changes after refresh | ❌ Change from vertical to horizontal | ✅ Be consistent |
+| Column number switching exception | ❌ Components overlap/dislocation | ✅ Smooth switching |
+| dragging lag | ❌ Obvious lag | ✅ Smooth dragging |
+| Dislocation after deletion | ❌ Remaining components bounce | ✅ Behavior by configuration |
 
-### 8.3 性能提升
+### 8.3 Performance improvements
 
-| 指标 | 当前值 | 整改后 | 改善幅度 |
+| index | current value | After rectification | Improvement |
 |-----|--------|--------|---------|
-| DOM 操作次数 (拖拽一次) | ~20 次 | ~10 次 | ↓ 50% |
-| 控制台日志数量 (开发环境) | 150+ 条 | ~20 条 | ↓ 87% |
-| 控制台日志数量 (生产环境) | 150+ 条 | 0 条 | ↓ 100% |
-| 内存占用 (切换列数 20 次) | 持续增长 | 稳定 | ✅ 修复泄漏 |
-| 初始化时间 | ~500ms | ~200ms | ↓ 60% |
+| DOM Number of operations (Drag once) | ~20 Second-rate | ~10 Second-rate | ↓ 50% |
+| Number of console logs (development environment) | 150+ strip | ~20 strip | ↓ 87% |
+| Number of console logs (production environment) | 150+ strip | 0 strip | ↓ 100% |
+| Memory usage (Switch number of columns 20 Second-rate) | continued growth | Stablize | ✅ fix leak |
+| initialization time | ~500ms | ~200ms | ↓ 60% |
 
-### 8.4 开发体验
+### 8.4 Development experience
 
-| 方面 | 改善内容 |
+| aspect | Improve content |
 |-----|---------|
-| **可维护性** | 代码简洁清晰，符合 GridStack 最佳实践 |
-| **可读性** | 删除冗余逻辑，注释清晰说明 GridStack 机制 |
-| **调试体验** | 生产环境无日志污染，开发环境可控调试输出 |
-| **新人友好** | 代码结构清晰，容易理解 GridStack 使用方式 |
-| **扩展性** | 基于官方 API，易于升级 GridStack 版本 |
+| **maintainability** | The code is concise and clear，conform to GridStack best practices |
+| **readability** | Remove redundant logic，Comments clearly explain GridStack mechanism |
+| **Debugging experience** | No log pollution in production environment，Development environment controllable debugging output |
+| **Newbie friendly** | The code structure is clear，easy to understand GridStack Usage |
+| **Scalability** | Based on official API，Easy to upgrade GridStack Version |
 
-### 8.5 用户体验
+### 8.5 user experience
 
-| 方面 | 改善内容 |
+| aspect | Improve content |
 |-----|---------|
-| **操作流畅度** | 拖拽/缩放无卡顿，响应迅速 |
-| **布局稳定性** | 刷新后布局保持一致，符合预期 |
-| **视觉一致性** | 组件间距准确，无重叠错位 |
-| **交互反馈** | 碰撞检测准确，自动推开逻辑符合直觉 |
+| **Operational fluency** | drag/Zoom without lag，Respond quickly |
+| **layout stability** | Layout remains consistent after refresh，As expected |
+| **visual consistency** | Accurate component spacing，No overlapping misalignment |
+| **interactive feedback** | Collision detection is accurate，Automatically pushing away logic is intuitive |
 
 ---
 
-## 9. 附录
+## 9. appendix
 
-### 9.1 GridStack 官方文档参考
+### 9.1 GridStack Official document reference
 
-- **官方网站**: https://gridstackjs.com/
-- **API 文档**: https://github.com/gridstack/gridstack.js/tree/master/doc
-- **Vue 示例**: https://github.com/gridstack/gridstack.js/tree/master/demo
+- **Official website**: https://gridstackjs.com/
+- **API document**: https://github.com/gridstack/gridstack.js/tree/master/doc
+- **Vue Example**: https://github.com/gridstack/gridstack.js/tree/master/demo
 
-### 9.2 关键概念速查
+### 9.2 Quick Check on Key Concepts
 
-#### float 配置
-
-```typescript
-// float: false (紧凑模式)
-// - 拖拽时自动推开其他组件
-// - compact() 会自动填充空隙
-// - 刷新后可能重新排列
-
-// float: true (浮动模式)
-// - 拖拽时不推开其他组件
-// - compact() 不填充空隙
-// - 刷新后保持原始布局
-```
-
-#### column() 方法
+#### float Configuration
 
 ```typescript
-// 切换列数的正确方式
-grid.column(24, 'moveScale')  // 自动缩放组件宽度和位置
-grid.column(24, 'move')       // 保持宽度，只调整位置
-grid.column(24, 'scale')      // 保持位置，只缩放宽度
-grid.column(24, 'none')       // 只更新列数，不移动组件
+// float: false (compact mode)
+// - Automatically push other components away when dragging
+// - compact() Gaps will be filled automatically
+// - May be rearranged after refresh
+
+// float: true (float mode)
+// - Do not push other components away when dragging
+// - compact() Do not fill gaps
+// - Keep original layout after refresh
 ```
 
-#### compact() 方法
+#### column() method
 
 ```typescript
-// 自动填充空隙
-grid.compact()           // 默认紧凑排列
-grid.compact('compact')  // 紧凑排列
-grid.compact('list')     // 列表排列
+// Correct way to switch number of columns
+grid.column(24, 'moveScale')  // Automatically scale component width and position
+grid.column(24, 'move')       // keep width，Only adjust position
+grid.column(24, 'scale')      // maintain position，scale width only
+grid.column(24, 'none')       // Only update the number of columns，Do not move components
 ```
 
-### 9.3 常见错误和解决方案
+#### compact() method
 
-| 错误现象 | 可能原因 | 解决方案 |
+```typescript
+// Automatically fill gaps
+grid.compact()           // Default compact arrangement
+grid.compact('compact')  // compact arrangement
+grid.compact('list')     // List arrangement
+```
+
+### 9.3 Common errors and solutions
+
+| Error phenomenon | Possible reasons | solution |
 |---------|---------|---------|
-| 组件宽度为 0 | 缺少列宽样式 | 调用 `injectColumnStyles()` |
-| 组件重叠 | float 配置错误 | 检查 `float` 值和 `verticalCompact` 映射 |
-| 拖拽卡顿 | 手动设置 inline style | 删除手动定位代码，信任 GridStack |
-| 刷新后布局变化 | float: false 导致 | 设置 `float: true` 保持布局 |
-| 列数切换后错位 | 手动干预 GridStack | 使用 `grid.column(newCol, 'moveScale')` |
+| The component width is 0 | Missing column width style | call `injectColumnStyles()` |
+| Components overlap | float Configuration error | examine `float` value sum `verticalCompact` mapping |
+| dragging lag | Manual setting inline style | Remove manual targeting code，trust GridStack |
+| Layout changes after refresh | float: false lead to | set up `float: true` keep layout |
+| Misalignment after column number switching | manual intervention GridStack | use `grid.column(newCol, 'moveScale')` |
 
 ---
 
-## 10. 总结
+## 10. Summarize
 
-### 核心原则
+### core principles
 
-1. **信任 GridStack**: 删除所有手动干预 GridStack 内部机制的代码
-2. **正确映射配置**: 理解 GridStack 配置的真实含义，正确映射用户配置
-3. **简化流程**: 删除不必要的异步延迟和复杂逻辑
-4. **性能优先**: 减少 DOM 操作，优化日志输出
+1. **trust GridStack**: Remove all manual intervention GridStack internal mechanism code
+2. **Correctly map configuration**: understand GridStack The true meaning of configuration，Correctly map user configuration
+3. **Simplify the process**: Remove unnecessary asynchronous delays and complex logic
+4. **Performance first**: reduce DOM operate，Optimize log output
 
-### 关键教训
+### Key lessons
 
-- ✅ 先系统学习第三方库的官方文档
-- ✅ 信任成熟库的内部机制，不要过度干预
-- ✅ 遇到问题先查官方 API，而不是自己实现
-- ✅ 理解配置的真实含义，避免错误映射
+- ✅ First, systematically study the official documentation of the third-party library
+- ✅ Trust the internal mechanisms of mature libraries，Don't over intervene
+- ✅ If you encounter any problems, check the official website first. API，rather than implement it yourself
+- ✅ Understand the true meaning of configuration，Avoid incorrect mapping
 
-### 整改后的 GridV2 特点
+### After rectification GridV2 Features
 
-- **简洁**: 从 1396 行减少到约 800 行
-- **稳定**: 修复所有已知的布局问题
-- **高效**: 减少 50% DOM 操作，消除内存泄漏
-- **易维护**: 代码清晰，符合 GridStack 最佳实践
+- **concise**: from 1396 rows reduced to approx. 800 OK
+- **Stablize**: Fix all known layout issues
+- **Efficient**: reduce 50% DOM operate，Eliminate memory leaks
+- **Easy to maintain**: Code clarity，conform to GridStack best practices
 
 ---
 
-**文档结束**
+**end of document**
 
-如有疑问或需要进一步说明，请参考:
-- `CRITICAL_ISSUES_ANALYSIS.md` - 问题详细分析
-- `GRIDV2_ANALYSIS.md` - 独立问题分析
-- GridStack 官方文档 - https://gridstackjs.com/
+If you have any questions or need further clarification，Please refer to:
+- `CRITICAL_ISSUES_ANALYSIS.md` - Detailed analysis of the problem
+- `GRIDV2_ANALYSIS.md` - independent problem analysis
+- GridStack Official documentation - https://gridstackjs.com/

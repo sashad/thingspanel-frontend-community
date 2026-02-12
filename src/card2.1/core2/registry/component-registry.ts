@@ -1,68 +1,68 @@
 /**
- * Card2.1 组件注册表
- * 简化的组件注册和管理系统
+ * Card2.1 component registry
+ * Simplified component registration and management system
  */
 
 import type { ComponentDefinition, IComponentRegistry } from '../types'
 import { propertyExposureManager } from '../property'
 
 /**
- * 组件注册表类
+ * Component registry class
  */
 export class ComponentRegistry implements IComponentRegistry {
   private components = new Map<string, ComponentDefinition>()
 
   /**
-   * 注册组件
+   * Register component
    */
   register(definition: ComponentDefinition): void {
     if (!definition.type) {
-      console.warn('❌ [ComponentRegistry] 组件注册失败：缺少 type 字段')
+      console.warn('❌ [ComponentRegistry] Component registration failed：Lack type Field')
       return
     }
 
     if (this.components.has(definition.type)) {
-      console.warn(`⚠️ [ComponentRegistry] 组件 ${definition.type} 已存在，将被覆盖`)
+      console.warn(`⚠️ [ComponentRegistry] components ${definition.type} Already exists，will be overwritten`)
     }
 
     this.components.set(definition.type, definition)
 
-    // 自动注册组件的属性白名单
+    // Automatically register component attribute whitelist
     if (definition.propertyWhitelist) {
       propertyExposureManager.registerPropertyWhitelist(definition.type, definition.propertyWhitelist)
     }
   }
 
   /**
-   * 获取组件定义
+   * Get component definition
    */
   get(type: string): ComponentDefinition | undefined {
     return this.components.get(type)
   }
 
   /**
-   * 获取所有组件
+   * Get all components
    */
   getAll(): ComponentDefinition[] {
     return Array.from(this.components.values())
   }
 
   /**
-   * 检查组件是否存在
+   * Check if the component exists
    */
   has(type: string): boolean {
     return this.components.has(type)
   }
 
   /**
-   * 清空注册表
+   * Clear registry
    */
   clear(): void {
     this.components.clear()
   }
 
   /**
-   * 获取组件的数据源键列表
+   * Get a list of data source keys for a component
    */
   getDataSourceKeys(type: string): string[] {
     const definition = this.get(type)
@@ -73,7 +73,7 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 获取组件的静态参数键列表
+   * Get the static parameter key list of the component
    */
   getStaticParamKeys(type: string): string[] {
     const definition = this.get(type)
@@ -84,7 +84,7 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 获取注册统计信息
+   * Get registration statistics
    */
   getStats() {
     const components = this.getAll()
@@ -101,12 +101,12 @@ export class ComponentRegistry implements IComponentRegistry {
   }
 
   /**
-   * 获取组件树结构
+   * Get component tree structure
    */
   getComponentTree() {
     const components = this.getAll()
 
-    // 构建分类树
+    // Build classification tree
     const categories: any[] = []
     const categoryMap = new Map<string, any>()
 
@@ -137,11 +137,11 @@ export class ComponentRegistry implements IComponentRegistry {
 }
 
 /**
- * 全局组件注册表实例
+ * Global component registry instance
  */
 export const componentRegistry = new ComponentRegistry()
 
 /**
- * 默认导出
+ * Default export
  */
 export default componentRegistry

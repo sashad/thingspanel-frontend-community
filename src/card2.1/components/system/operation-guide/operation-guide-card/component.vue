@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-    <!-- 卡片标题栏 -->
+    <!-- card title bar -->
     <div class="flex items-center p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <!-- 指引列表内容 -->
+    <!-- Guidance List Contents -->
     <div class="flex-1 p-4 overflow-hidden">
       <div v-if="guideList.length > 0" class="h-full overflow-y-auto scrollbar-thin">
         <div class="space-y-3">
@@ -23,7 +23,7 @@
             @click="navigateTo(item.link)"
           >
             <div class="flex items-start space-x-3">
-              <!-- 序号标识 -->
+              <!-- Serial number identification -->
               <div
                 class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
                 :style="{ backgroundColor: serialBgColor }"
@@ -31,9 +31,9 @@
                 {{ index + 1 }}
               </div>
 
-              <!-- 内容区域 -->
+              <!-- content area -->
               <div class="flex-1 min-w-0">
-                <!-- 标题 -->
+                <!-- title -->
                 <div class="flex items-center justify-between mb-1">
                   <h4
                     class="font-medium text-sm truncate"
@@ -50,7 +50,7 @@
                   </div>
                 </div>
 
-                <!-- 描述 -->
+                <!-- describe -->
                 <div
                   class="text-xs leading-relaxed line-clamp-2"
                   :style="{ color: descriptionColor }"
@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <!-- 无数据状态 -->
+      <!-- No data status -->
       <div v-else class="h-full flex flex-col items-center justify-center text-center">
         <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
           <Icon icon="mdi:book-open-outline" class="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -79,14 +79,14 @@
 
 <script setup lang="ts">
 /**
- * 操作指引卡片组件
- * 根据用户角色显示相应的操作指引列表
+ * Operation guide card component
+ * Display a list of corresponding operation guidelines based on user roles
  */
 import { computed, ref, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { $t } from '@/locales'
 
-// 组件属性（如果需要从外部传入配置）
+// Component properties（If you need to pass in configuration from outside）
 interface GuideItem {
   titleKey: string
   descriptionKey: string
@@ -101,10 +101,10 @@ interface GuideConfig {
   descriptionColor?: string
 }
 
-// 响应式数据
+// Responsive data
 const isAdmin = ref(false)
 
-// 默认配置
+// Default configuration
 const defaultConfig: GuideConfig = {
   guideList: [
     {
@@ -151,14 +151,14 @@ const defaultConfig: GuideConfig = {
 }
 
 /**
- * 检查用户角色
+ * Check user role
  */
 const checkUserRole = () => {
   try {
     const userInfoRaw = localStorage.getItem('userInfo')
     if (userInfoRaw) {
       const userInfo = JSON.parse(userInfoRaw)
-      // 检查角色数组是否包含 'SYS_ADMIN'
+      // Check if the roles array contains 'SYS_ADMIN'
       if (Array.isArray(userInfo?.roles) && userInfo.roles.includes('SYS_ADMIN')) {
         isAdmin.value = true
       } else {
@@ -168,12 +168,12 @@ const checkUserRole = () => {
       isAdmin.value = false
     }
   } catch (error) {
-    console.error('读取用户信息失败:', error)
+    console.error('Failed to read user information:', error)
     isAdmin.value = false
   }
 }
 
-// 计算属性
+// Computed properties
 const guideList = computed(() => {
   if (isAdmin.value) {
     return defaultConfig.guideListAdmin || []
@@ -187,7 +187,7 @@ const titleColor = computed(() => defaultConfig.titleColor || '#333639')
 const descriptionColor = computed(() => defaultConfig.descriptionColor || '#666')
 
 /**
- * 导航到指定链接
+ * Navigate to the specified link
  */
 const navigateTo = (link?: string) => {
   if (link && link !== '#') {
@@ -205,7 +205,7 @@ defineOptions({
 </script>
 
 <style scoped>
-/* 自定义滚动条样式 */
+/* Custom scroll bar style */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
 }
@@ -231,7 +231,7 @@ defineOptions({
   background-color: transparent;
 }
 
-/* 多行文本省略 */
+/* Multiple lines of text omitted */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -239,7 +239,7 @@ defineOptions({
   overflow: hidden;
 }
 
-/* 滚动条在火狐浏览器中的样式 */
+/* Scroll bar style in Firefox browser */
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: theme('colors.gray.300') transparent;

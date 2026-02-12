@@ -5,8 +5,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 /**
- * 提取所有 console.log 语句的位置和内容
- * 支持嵌套括号、字符串中的括号、模板字符串等复杂情况
+ * Extract all console.log The position and content of the statement
+ * Support nested brackets、brackets in string、Complex situations such as template strings
  */
 function findConsoleLogs(code) {
   const results = [];
@@ -54,19 +54,19 @@ function findConsoleLogs(code) {
     }
   }
   
-  return results.reverse(); // 反转数组，从后往前删除避免索引变化
+  return results.reverse(); // Reverse an array，Delete from back to front to avoid index changes
 }
 
 /**
- * 分析 console.log 的上下文环境，判断如何安全删除
+ * analyze console.log context，Determine how to delete safely
  */
 function analyzeConsoleLogContext(code, start, end) {
-  // 获取 console.log 前面的代码片段 (最多 300 个字符)
+  // Get console.log previous code snippet (most 300 characters)
   const beforeCode = code.substring(Math.max(0, start - 300), start);
-  // 获取 console.log 后面的代码片段 (最多 100 个字符)
+  // Get console.log code snippet behind (most 100 characters)
   const afterCode = code.substring(end, Math.min(code.length, end + 100));
   
-  // 检查是否在 try-catch-finally 块中
+  // Check if there is try-catch-finally block
   const tryBlockPatterns = [
     /try\s*\{\s*$/,                     // try {
     /catch\s*\([^)]*\)\s*\{\s*$/,      // catch (error) {
@@ -77,37 +77,37 @@ function analyzeConsoleLogContext(code, start, end) {
     pattern.test(beforeCode.trim())
   );
   
-  // 检查是否是 try-catch 块中的唯一语句
+  // Check if it is try-catch the only statement in the block
   const isTryCatchOnlyStatement = /try\s*\{\s*$/.test(beforeCode.trim()) && 
     /^\s*\}\s*catch/.test(afterCode);
   
   const isCatchOnlyStatement = /catch\s*\([^)]*\)\s*\{\s*$/.test(beforeCode.trim()) && 
     /^\s*\}/.test(afterCode);
   
-  // 检查是否在箭头函数中 - 更精确的匹配
+  // Check if in arrow function - more precise match
   const arrowFunctionPatterns = [
-    /=>\s*$/,                           // 基本箭头函数: () =>
-    /=>\s*console\.log/,                // 直接跟console.log
-    /"[^"]*=>\s*$/,                     // Vue模板中: @click="() => 
-    /'[^']*=>\s*$/,                     // Vue模板中: @click='() => 
+    /=>\s*$/,                           // basic arrow functions: () =>
+    /=>\s*console\.log/,                // Follow directlyconsole.log
+    /"[^"]*=>\s*$/,                     // Vuein template: @click="() => 
+    /'[^']*=>\s*$/,                     // Vuein template: @click='() => 
   ];
   
   const isInArrowFunction = arrowFunctionPatterns.some(pattern => 
     pattern.test(beforeCode)
   );
   
-  // 检查是否在 Vue 模板的事件处理器中
-  // 更精确的 Vue 事件处理器检测
+  // Check if there is Vue In the event handler of the template
+  // more precise Vue Event handler detection
   const vueEventPattern = /@\w+\s*=\s*["'][^"']*=>\s*console\.log/;
   const isInVueEventHandler = vueEventPattern.test(beforeCode + 'console.log');
   
-  // 检查 console.log 后是否直接跟着引号结束 (Vue 模板场景)
+  // examine console.log Whether to end directly with quotation marks? (Vue template scene)
   const endsWithQuote = /^\s*["']/.test(afterCode);
   
-  // 更通用的箭头函数检测 - 检查前面是否有 => 
+  // More general arrow function detection - Check if there is one in front => 
   const hasArrowBefore = /=>\s*$/.test(beforeCode.trim());
   
-  // 检查是否整行只有 console.log
+  // Check if the entire line has only console.log
   const lines = code.split('\n');
   let lineStart = code.lastIndexOf('\n', start - 1) + 1;
   let lineEnd = code.indexOf('\n', end);
@@ -120,13 +120,13 @@ function analyzeConsoleLogContext(code, start, end) {
   const lineWithoutLog = (beforeLogInLine + afterLogInLine).trim();
   const isFullLine = lineWithoutLog === '' || lineWithoutLog === ';';
   
-  // 检查是否在对象属性中
+  // Check if in object properties
   const isInObjectProperty = /:\s*$/.test(beforeCode.trim());
   
-  // 检查是否在函数调用的参数中
+  // Check if it is in the parameters of the function call
   const isInFunctionCall = /\(\s*$/.test(beforeCode.trim()) && /^\s*[,)]/.test(afterCode);
   
-  // 检查是否在注释中
+  // Check if it is in comments
   const isInComment = checkIfInComment(code, start, end);
   
   return {
@@ -143,21 +143,21 @@ function analyzeConsoleLogContext(code, start, end) {
     hasArrowBefore,
     lineStart,
     lineEnd,
-    beforeCode: beforeCode.slice(-80), // 调试用
-    afterCode: afterCode.slice(0, 40)  // 调试用
+    beforeCode: beforeCode.slice(-80), // for debugging
+    afterCode: afterCode.slice(0, 40)  // for debugging
   };
 }
 
 /**
- * 检查 console.log 是否在注释中
+ * examine console.log Is it in the annotation?
  */
 function checkIfInComment(code, start, end) {
-  // 找到 console.log 所在的行
+  // turn up console.log row
   const lineStart = code.lastIndexOf('\n', start - 1) + 1;
   const lineEnd = code.indexOf('\n', start);
   const currentLine = code.substring(lineStart, lineEnd === -1 ? code.length : lineEnd);
   
-  // 检查是否在单行注释中 // console.log(...)
+  // Check if in single line comment // console.log(...)
   const singleLineCommentIndex = currentLine.indexOf('//');
   if (singleLineCommentIndex !== -1) {
     const consoleLogInLineIndex = start - lineStart;
@@ -166,18 +166,18 @@ function checkIfInComment(code, start, end) {
     }
   }
   
-  // 检查是否在多行注释中 /* console.log(...) */
+  // Check if in multiline comment /* console.log(...) */
   const beforeConsoleLog = code.substring(0, start);
   const afterConsoleLog = code.substring(end);
   
-  // 向前查找最近的 /* 和 */
+  // Find nearest forward /* and */
   const lastMultiCommentStart = beforeConsoleLog.lastIndexOf('/*');
   const lastMultiCommentEnd = beforeConsoleLog.lastIndexOf('*/');
   
-  // 向后查找最近的 */
+  // Find the nearest backward */
   const nextMultiCommentEnd = afterConsoleLog.indexOf('*/');
   
-  // 如果最近的 /* 在最近的 */ 之后，且后面有对应的 */，说明在多行注释中
+  // If the latest /* in the recent */ after，And there are corresponding ones later */，Description in multi-line comments
   if (lastMultiCommentStart > lastMultiCommentEnd && nextMultiCommentEnd !== -1) {
     return true;
   }
@@ -186,8 +186,8 @@ function checkIfInComment(code, start, end) {
 }
 
 /**
- * 从代码中移除所有 console.log 语句
- * 智能处理各种语法结构，避免破坏代码
+ * Remove all console.log statement
+ * Intelligent processing of various grammatical structures，Avoid breaking code
  */
 function removeConsoleLogs(code) {
   const consoleLogs = findConsoleLogs(code);
@@ -197,53 +197,53 @@ function removeConsoleLogs(code) {
     const beforeLog = result.substring(0, log.start);
     const afterLog = result.substring(log.end);
     
-    // 分析上下文
+    // Analyze context
     const context = analyzeConsoleLogContext(result, log.start, log.end);
     
-    // 如果在注释中，跳过不处理
+    // if in comment，Skip and do not process
     if (context.isInComment) {
-      return; // 跳过这个 console.log，不做任何处理
+      return; // skip this console.log，No processing
     }
     
     if (context.isFullLine) {
-      // 整行只有 console.log，删除整行包括换行符
+      // The whole line only console.log，Delete entire line including newline character
       const lineStart = context.lineStart;
       const lineEnd = context.lineEnd + (context.lineEnd < result.length ? 1 : 0); // +1 for \n
       result = result.substring(0, lineStart) + result.substring(lineEnd);
     } else if (context.isTryCatchOnlyStatement) {
-      // try 块中只有 console.log，需要保持语法完整
+      // try There are only console.log，Need to keep syntax intact
       result = beforeLog + '// try block content removed' + afterLog;
     } else if (context.isCatchOnlyStatement) {
-      // catch 块中只有 console.log，需要保持语法完整
+      // catch There are only console.log，Need to keep syntax intact
       result = beforeLog + '// catch block content removed' + afterLog;
     } else if (context.isInTryBlock) {
-      // 在 try-catch 块中，但不是唯一语句，直接删除
+      // exist try-catch block，But not the only statement，Delete directly
       result = beforeLog + afterLog;
     } else if (context.hasArrowBefore && context.endsWithQuote) {
-      // 箭头函数 + 引号结尾的情况（主要是Vue模板）
-      // () => console.log(...)" 变成 () => {}"
+      // arrow function + Ending in quotation marks（MainlyVuetemplate）
+      // () => console.log(...)" become () => {}"
       result = beforeLog + '{}' + afterLog;
     } else if (context.hasArrowBefore) {
-      // 普通箭头函数，不在引号中
+      // ordinary arrow function，not in quotes
       result = beforeLog + 'void 0' + afterLog;
     } else if (context.isInVueEventHandler) {
-      // Vue 模板事件处理器的其他情况
+      // Vue Other cases of template event handlers
       result = beforeLog + '{}' + afterLog;
     } else if (context.isInArrowFunction) {
-      // 其他箭头函数情况的兜底
+      // A guide to other arrow function situations
       if (context.endsWithQuote) {
         result = beforeLog + '{}' + afterLog;
       } else {
         result = beforeLog + 'void 0' + afterLog;
       }
     } else if (context.isInObjectProperty) {
-      // 在对象属性中，替换为 undefined
+      // in object properties，Replace with undefined
       result = beforeLog + 'undefined' + afterLog;
     } else if (context.isInFunctionCall) {
-      // 在函数调用参数中，替换为 undefined
+      // in function call parameters，Replace with undefined
       result = beforeLog + 'undefined' + afterLog;
     } else {
-      // 其他情况，直接删除
+      // Other situations，Delete directly
       result = beforeLog + afterLog;
     }
   });
@@ -252,7 +252,7 @@ function removeConsoleLogs(code) {
 }
 
 /**
- * 递归获取指定目录下的所有文件
+ * Recursively retrieve all files in a specified directory
  */
 function getAllFiles(dir, fileTypes = ['.js', '.ts', '.vue']) {
   const files = [];
@@ -264,7 +264,7 @@ function getAllFiles(dir, fileTypes = ['.js', '.ts', '.vue']) {
       const fullPath = path.join(currentDir, entry.name);
       
       if (entry.isDirectory()) {
-        // 跳过 node_modules、dist、.git 等目录
+        // jump over node_modules、dist、.git etc. directory
         if (!['node_modules', 'dist', 'build', '.git', '.nuxt', '.next', 'coverage'].includes(entry.name)) {
           traverse(fullPath);
         }
@@ -282,7 +282,7 @@ function getAllFiles(dir, fileTypes = ['.js', '.ts', '.vue']) {
 }
 
 /**
- * 处理单个文件
+ * Process a single file
  */
 function processFile(filePath) {
   try {
@@ -292,7 +292,7 @@ function processFile(filePath) {
     if (originalContent !== cleanedContent) {
       fs.writeFileSync(filePath, cleanedContent, 'utf8');
       
-      // 统计删除的 console.log 数量
+      // Statistics deleted console.log quantity
       const originalLogs = findConsoleLogs(originalContent);
       const remainingLogs = findConsoleLogs(cleanedContent);
       const removedCount = originalLogs.length - remainingLogs.length;
@@ -302,24 +302,24 @@ function processFile(filePath) {
     
     return 0;
   } catch (error) {
-    console.error(`❌ 处理文件失败 ${filePath}:`, error.message);
+    console.error(`❌ Processing file failed ${filePath}:`, error.message);
     return 0;
   }
 }
 
 /**
- * 主函数
+ * main function
  */
 function main() {
   const projectRoot = process.cwd();
   
-  // 获取所有需要处理的文件
+  // Get all files that need to be processed
   const files = getAllFiles(projectRoot);
   
   let totalRemoved = 0;
   let processedFiles = 0;
   
-  // 处理每个文件
+  // Process each file
   files.forEach(filePath => {
     const removed = processFile(filePath);
     if (removed > 0) {
@@ -333,7 +333,7 @@ function main() {
   }
 }
 
-// 运行脚本
+// run script
 const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   main();

@@ -54,16 +54,16 @@ const deviceConfigList = async name => {
 }
 
 function transformDataToOptions(data) {
-  // 定义转换函数
+  // Define conversion function
   const transform = item => {
-    // 基本转换
+    // basic conversion
     const option = {
       label: item.group.name,
       value: item.group.id,
       children: undefined
     }
 
-    // 如果存在子项，则递归转换
+    // If there are subkeys，then recursive conversion
     if (item.children && item.children.length > 0) {
       option.children = item.children.map(transform)
     }
@@ -71,7 +71,7 @@ function transformDataToOptions(data) {
     return option
   }
 
-  // 对输入的数据应用转换函数
+  // Apply a transformation function to the input data
   return data.map(transform)
 }
 
@@ -180,7 +180,7 @@ const selectConfig = v => {
 }
 
 const handleDeleteDevice = () => {
-  // 二次确认删除
+  // Confirm deletion twice
   window.$dialog?.warning({
     title: $t('common.delete'),
     content: $t('common.confirmDelete'),
@@ -196,10 +196,10 @@ const deleteD = async (id: string) => {
   try {
     await deleteDevice({ id })
     window.$message?.success($t('common.deleteSuccess'))
-    // 关闭当前标签页
+    // Close current tab
     removeTab(currentTabId)
   } catch (error) {
-    console.error('删除设备失败:', error)
+    console.error('Failed to delete device:', error)
   }
 }
 </script>

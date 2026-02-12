@@ -160,40 +160,40 @@ function handleCloseEye(rowId: string) {
 }
 async function handleCopyKey(key: string) {
   let success = false
-  let errorMessage = $t('theme.configOperation.copyFail') || '复制失败' // 默认错误信息
+  let errorMessage = $t('theme.configOperation.copyFail') || 'Copy failed' // Default error message
 
-  // 优先尝试现代 Clipboard API
+  // Prioritize modern Clipboard API
   if (navigator.clipboard && navigator.clipboard.writeText) {
     try {
       await navigator.clipboard.writeText(key)
       success = true
-      window.$message?.success($t('theme.configOperation.copySuccess') || '复制成功')
-      return // 成功则直接返回
+      window.$message?.success($t('theme.configOperation.copySuccess') || 'Copied successfully')
+      return // Return directly if successful
     } catch (err) {
       console.error('navigator.clipboard.writeText failed:', err)
-      // 如果失败，检查是否因为非安全环境
+      // if failed，Check whether it is due to an unsafe environment
       if (window.isSecureContext === false) {
-        // 更新错误信息，明确指出 HTTPS 问题
-        errorMessage = $t('theme.configOperation.copyFailSecure') || '复制功能需要HTTPS或localhost环境'
+        // Update error message，clearly stated HTTPS question
+        errorMessage = $t('theme.configOperation.copyFailSecure') || 'Copy functionality requiresHTTPSorlocalhostenvironment'
       }
-      // 不return，继续尝试后备方法
+      // Noreturn，Keep trying fallback methods
     }
   } else {
-    // 如果 Clipboard API 不可用，检查是否因为非安全环境
+    // if Clipboard API Not available，Check whether it is due to an unsafe environment
     if (window.isSecureContext === false) {
-      errorMessage = $t('theme.configOperation.copyFailSecure') || '复制功能需要HTTPS或localhost环境'
+      errorMessage = $t('theme.configOperation.copyFailSecure') || 'Copy functionality requiresHTTPSorlocalhostenvironment'
       console.error('Clipboard API not available, likely due to non-secure context.')
     } else {
       console.error('Clipboard API not available.')
     }
   }
 
-  // 尝试后备方法 document.execCommand('copy')
+  // Try a fallback method document.execCommand('copy')
   if (process.env.NODE_ENV === 'development') {
   }
   const textArea = document.createElement('textarea')
   textArea.value = key
-  // 防止在屏幕上显示
+  // Prevent display on screen
   textArea.style.position = 'fixed'
   textArea.style.top = '-9999px'
   textArea.style.left = '-9999px'
@@ -201,31 +201,31 @@ async function handleCopyKey(key: string) {
 
   document.body.appendChild(textArea)
   textArea.select()
-  textArea.setSelectionRange(0, textArea.value.length) // 确保移动端也能选中
+  textArea.setSelectionRange(0, textArea.value.length) // Make sure the mobile version can also be selected
 
   try {
     success = document.execCommand('copy')
     if (success) {
-      window.$message?.success($t('theme.configOperation.copySuccess') || '复制成功')
+      window.$message?.success($t('theme.configOperation.copySuccess') || 'Copied successfully')
     } else {
       console.error("document.execCommand('copy') returned false.")
-      // 如果 execCommand 也失败了，并且已知是非安全环境，可以给出更具体的提示
+      // if execCommand also failed，and is known to be an unsafe environment，Can give more specific tips
       if (window.isSecureContext === false) {
         errorMessage =
-          $t('theme.configOperation.copyFailSecureFallback') || '复制失败，请尝试在HTTPS环境下操作或手动复制。'
+          $t('theme.configOperation.copyFailSecureFallback') || 'Copy failed，Please try atHTTPSenvironment or manual copying。'
       }
       window.$message?.error(errorMessage)
     }
   } catch (err) {
     console.error("Error during document.execCommand('copy'):", err)
-    // 异常情况，同样提示
+    // abnormal situation，Same tips
     if (window.isSecureContext === false) {
       errorMessage =
-        $t('theme.configOperation.copyFailSecureFallback') || '复制失败，请尝试在HTTPS环境下操作或手动复制。'
+        $t('theme.configOperation.copyFailSecureFallback') || 'Copy failed，Please try atHTTPSenvironment or manual copying。'
     }
     window.$message?.error(errorMessage)
   } finally {
-    // 无论成功失败，都移除临时元素
+    // Regardless of success or failure，Remove temporary elements
     document.body.removeChild(textArea)
   }
 }
@@ -281,7 +281,7 @@ const getPlatform = computed(() => {
   const { proxy }: any = getCurrentInstance()
   return proxy.getPlatform()
 })
-// 初始化
+// initialization
 init()
 </script>
 

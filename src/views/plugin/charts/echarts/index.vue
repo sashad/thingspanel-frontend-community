@@ -493,7 +493,7 @@ const radarOptions = ref<ECOption>({
       indicator: (() => {
         const res: { name: string; max: number }[] = []
         for (let i = 1; i <= 12; i += 1) {
-          res.push({ name: `${i}月`, max: 100 })
+          res.push({ name: `${i}moon`, max: 100 })
         }
         return res
       })(),

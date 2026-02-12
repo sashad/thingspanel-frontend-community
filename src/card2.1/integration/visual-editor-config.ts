@@ -1,15 +1,15 @@
 /**
- * Visual Editor 集成配置
- * 为 Card 2.1 组件提供编辑器集成的标准配置
+ * Visual Editor Integrated configuration
+ * for Card 2.1 Component provides standard configuration of editor integration
  */
 
 import type { ComponentDefinition } from '@/card2.1/types'
 import { getAllComponents, getCategories } from '@/card2.1/index'
 
-// ============ 编辑器组件转换器 ============
+// ============ Editor component converter ============
 
 /**
- * Card2Widget 接口定义（与Visual Editor兼容）
+ * Card2Widget Interface definition（andVisual Editorcompatible）
  */
 export interface Card2Widget {
   type: string
@@ -20,7 +20,7 @@ export interface Card2Widget {
   version?: string
   tags?: string[]
 
-  // 编辑器布局配置
+  // Editor layout configuration
   defaultLayout: {
     canvas: {
       width: number
@@ -29,8 +29,8 @@ export interface Card2Widget {
       y?: number
     }
     gridstack: {
-      w: number // 栅格宽度
-      h: number // 栅格高度
+      w: number // grid width
+      h: number // grid height
       minW?: number
       minH?: number
       maxW?: number
@@ -38,10 +38,10 @@ export interface Card2Widget {
     }
   }
 
-  // 默认属性配置
+  // Default property configuration
   defaultProperties: Record<string, any>
 
-  // 元数据
+  // metadata
   metadata: {
     isCard2Component: boolean
     card2ComponentId: string
@@ -56,12 +56,12 @@ export interface Card2Widget {
 }
 
 /**
- * 将 Card 2.1 ComponentDefinition 转换为 Visual Editor Widget
- * @param definition Card 2.1 组件定义
- * @returns Visual Editor 兼容的组件配置
+ * Will Card 2.1 ComponentDefinition Convert to Visual Editor Widget
+ * @param definition Card 2.1 Component definition
+ * @returns Visual Editor Compatible component configurations
  */
 export function convertToCard2Widget(definition: ComponentDefinition): Card2Widget {
-  // 计算默认布局尺寸
+  // Calculate default layout dimensions
   const defaultWidth = definition.config?.style?.width || definition.defaultSize?.width || 300
   const defaultHeight = definition.config?.style?.height || definition.defaultSize?.height || 200
 
@@ -74,7 +74,7 @@ export function convertToCard2Widget(definition: ComponentDefinition): Card2Widg
     version: definition.version,
     tags: definition.tags,
 
-    // 布局配置转换
+    // Layout configuration conversion
     defaultLayout: {
       canvas: {
         width: defaultWidth,
@@ -83,7 +83,7 @@ export function convertToCard2Widget(definition: ComponentDefinition): Card2Widg
         y: 0
       },
       gridstack: {
-        w: Math.ceil(defaultWidth / 100), // 假设每个栅格单元100px宽
+        w: Math.ceil(defaultWidth / 100), // Assume that each raster cell100pxWidth
         h: Math.ceil(defaultHeight / 100),
         minW: definition.minSize ? Math.ceil(definition.minSize.width / 100) : 2,
         minH: definition.minSize ? Math.ceil(definition.minSize.height / 100) : 2,
@@ -92,10 +92,10 @@ export function convertToCard2Widget(definition: ComponentDefinition): Card2Widg
       }
     },
 
-    // 默认属性配置
+    // Default property configuration
     defaultProperties: definition.config || {},
 
-    // 组件元数据
+    // Component metadata
     metadata: {
       isCard2Component: true,
       card2ComponentId: definition.type,
@@ -106,26 +106,26 @@ export function convertToCard2Widget(definition: ComponentDefinition): Card2Widg
   }
 }
 
-// ============ 可用组件转换 ============
+// ============ Available component conversions ============
 
 /**
- * 所有 Card 2.1 组件的 Visual Editor 兼容配置
+ * all Card 2.1 component Visual Editor Compatible configurations
  */
 export const AvailableCard2Widgets: Card2Widget[] = Object.values(Card2ComponentMap).map(convertToCard2Widget)
 
 /**
- * 按分类组织的组件配置
+ * Component configuration organized by category
  */
 export const Card2WidgetsByCategory: Record<string, Card2Widget[]> = Object.fromEntries(
   Object.entries(Card2Components).map(([category, definitions]) => [category, definitions.map(convertToCard2Widget)])
 )
 
-// ============ 编辑器集成工具函数 ============
+// ============ Editor integrated tool functions ============
 
 /**
- * 根据组件类型获取 Widget 配置
- * @param type 组件类型
- * @returns Widget 配置或 undefined
+ * Get based on component type Widget Configuration
+ * @param type Component type
+ * @returns Widget configure or undefined
  */
 export function getCard2Widget(type: string): Card2Widget | undefined {
   const definition = Card2ComponentMap[type]
@@ -133,75 +133,75 @@ export function getCard2Widget(type: string): Card2Widget | undefined {
 }
 
 /**
- * 检查是否为 Card 2.1 组件
- * @param type 组件类型
- * @returns 是否为 Card 2.1 组件
+ * Check if it is Card 2.1 components
+ * @param type Component type
+ * @returns Is it Card 2.1 components
  */
 export function isCard2Component(type: string): boolean {
   return type in Card2ComponentMap
 }
 
 /**
- * 获取组件的原始 Card 2.1 定义
- * @param type 组件类型
- * @returns 原始组件定义
+ * Get the original component Card 2.1 definition
+ * @param type Component type
+ * @returns Original component definition
  */
 export function getCard2Definition(type: string): ComponentDefinition | undefined {
   return Card2ComponentMap[type]
 }
 
 /**
- * 根据支持的数据源类型筛选组件
- * @param dataSourceType 数据源类型
- * @returns 支持该数据源的组件列表
+ * Filter components based on supported data source types
+ * @param dataSourceType Data source type
+ * @returns List of components that support this data source
  */
 export function getWidgetsByDataSource(dataSourceType: string): Card2Widget[] {
   return AvailableCard2Widgets.filter(widget => widget.metadata.supportedDataSources?.includes(dataSourceType))
 }
 
-// ============ 编辑器集成配置 ============
+// ============ Editor integration configuration ============
 
 /**
- * Visual Editor 集成的主配置
+ * Visual Editor Integrated master configuration
  */
 export const VisualEditorIntegrationConfig = {
-  // 组件相关
+  // Component related
   widgets: AvailableCard2Widgets,
   categories: Card2WidgetsByCategory,
   componentCount: ComponentStats.total,
 
-  // 工具函数
+  // Utility function
   getWidget: getCard2Widget,
   isCard2Component,
   getDefinition: getCard2Definition,
   getWidgetsByDataSource,
 
-  // 编辑器特定配置
+  // Editor specific configuration
   editorSettings: {
-    // 组件面板标题
-    panelTitle: 'Card 2.1 组件',
+    // Palette title
+    panelTitle: 'Card 2.1 components',
 
-    // 默认组件大小
+    // Default component size
     defaultComponentSize: {
       width: 300,
       height: 200
     },
 
-    // 栅格系统配置
+    // Grid system configuration
     gridConfig: {
       cellHeight: 100,
       cellWidth: 100,
-      // 默认无间距：从 [10, 10] 调整为 [0, 0]
+      // Default no spacing：from [10, 10] Adjust to [0, 0]
       margin: [0, 0],
       outerMargin: true,
       resizable: true,
       draggable: true
     },
 
-    // 支持的渲染器
+    // Supported renderers
     supportedRenderers: ['canvas', 'gridstack', 'grid-layout-plus'],
 
-    // 组件预览设置
+    // Component preview settings
     previewSettings: {
       showInteractionIndicator: true,
       enableDebugMode: true,
@@ -209,14 +209,14 @@ export const VisualEditorIntegrationConfig = {
     }
   },
 
-  // 版本信息
+  // Version information
   version: '2.1.0',
   compatibleEditorVersions: ['>=1.0.0'],
 
-  // 统计信息
+  // Statistics
   stats: ComponentStats
 }
 
-// ============ 默认导出 ============
+// ============ Default export ============
 
 export default VisualEditorIntegrationConfig

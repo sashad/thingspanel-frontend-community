@@ -1,6 +1,6 @@
 <!--
-  可视化编辑器主工具栏组件
-  统一管理公共工具栏和渲染器特有工具栏
+  Visual editor main toolbar component
+  Unified management of public toolbars and renderer-specific toolbars
 -->
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
@@ -42,31 +42,31 @@ interface Props {
 }
 
 interface Emits {
-  // 编辑状态控制
+  // Edit status control
   (e: 'mode-change', mode: 'edit' | 'preview'): void
   (e: 'renderer-change', rendererId: string): void
-  // 文档操作
+  // Document operations
   (e: 'save'): void
   (e: 'import'): void
   (e: 'export'): void
   (e: 'import-config', config: Record<string, any>): void
   (e: 'export-config'): void
-  // 编辑操作
+  // Edit operations
   (e: 'undo'): void
   (e: 'redo'): void
   (e: 'clear-all'): void
-  // 视图控制
+  // View control
   (e: 'zoom-in'): void
   (e: 'zoom-out'): void
   (e: 'reset-zoom'): void
   (e: 'fit-content'): void
   (e: 'center-view'): void
   (e: 'preview-mode'): void
-  // 面板配置
+  // Panel configuration
   (e: 'open-config'): void
   (e: 'toggle-left-drawer'): void
   (e: 'toggle-right-drawer'): void
-  // 配置变更
+  // Configuration changes
   (e: 'canvas-config-change', config: Record<string, any>): void
   (e: 'gridstack-config-change', config: Record<string, any>): void
 }
@@ -84,21 +84,21 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// 配置面板显示状态
+// Configuration panel display status
 const showConfigPanel = ref(false)
-// 数据源触发器面板显示状态
+// Data source trigger panel display status
 const showDataSourcePanel = ref(false)
 
-// 消息提示
+// Message prompt
 const message = useMessage()
 
-// 自定义行高状态
+// Custom row height status
 const customRowHeight = ref<number>(80)
 const isCustomRowHeight = computed(() => {
   return !rowHeightOptions.slice(0, -1).some(option => option.value === gridstackConfig.value.rowHeight)
 })
 
-// 主题支持 - 使用Naive UI主题系统
+// Theme support - useNaive UItheme system
 const themeVars = useThemeVars()
 const toolbarColors = computed(() => ({
   '--toolbar-bg': themeVars.value.bodyColor,
@@ -111,33 +111,33 @@ const toolbarColors = computed(() => ({
   '--modal-header-border': themeVars.value.dividerColor
 }))
 
-// 判断当前渲染器类型
+// Determine the current renderer type
 const isCanvasRenderer = computed(() => props.currentRenderer === 'canvas')
 const isGridstackRenderer = computed(() => props.currentRenderer === 'gridstack')
 const isVisualizationRenderer = computed(() => props.currentRenderer === 'visualization')
 
-// 网格列数预设选项
+// Grid column number default options
 const columnOptions = [
-  { label: '12列 - 标准小网格', value: 12 },
-  { label: '24列 - 标准网格', value: 24 },
-  { label: '48列 - 大网格', value: 48 },
-  { label: '60列 - 超密网格', value: 60 },
-  { label: '72列 - 高密网格', value: 72 },
-  { label: '84列 - 超高密网格', value: 84 },
-  { label: '96列 - 极致网格', value: 96 }
+  { label: '12List - Standard small grid', value: 12 },
+  { label: '24List - standard grid', value: 24 },
+  { label: '48List - large grid', value: 48 },
+  { label: '60List - ultra-dense grid', value: 60 },
+  { label: '72List - High density grid', value: 72 },
+  { label: '84List - ultra high density grid', value: 84 },
+  { label: '96List - Ultimate Grid', value: 96 }
 ]
 
-// 行高预设选项
+// Line height default options
 const rowHeightOptions = [
-  { label: '紧凑 - 30px', value: 30 },
-  { label: '小 - 50px', value: 50 },
-  { label: '标准 - 80px', value: 80 },
-  { label: '宽松 - 120px', value: 120 },
-  { label: '超宽松 - 150px', value: 150 },
-  { label: '自定义', value: -1 }
+  { label: 'compact - 30px', value: 30 },
+  { label: 'Small - 50px', value: 50 },
+  { label: 'standard - 80px', value: 80 },
+  { label: 'Loose - 120px', value: 120 },
+  { label: 'super loose - 150px', value: 150 },
+  { label: 'Customize', value: -1 }
 ]
 
-// 计算当前配置（提供默认值）
+// Calculate current configuration（Provide default value）
 const canvasConfig = computed(() => ({
   width: 1200,
   height: 800,
@@ -164,21 +164,21 @@ const visualizationConfig = computed(() => ({
   ...props.visualizationConfig
 }))
 
-// 编辑状态控制
+// Edit status control
 const handleModeChange = (mode: 'edit' | 'preview') => {
   emit('mode-change', mode)
 }
 const handleRendererChange = (rendererId: string) => emit('renderer-change', rendererId)
 
-// 文档操作
+// Document operations
 const handleSave = () => emit('save')
 
-// 编辑操作
+// Edit operations
 const handleUndo = () => emit('undo')
 const handleRedo = () => emit('redo')
 const handleClearAll = () => emit('clear-all')
 
-// 渲染器配置变更
+// Renderer configuration changes
 const handleCanvasConfigChange = (config: Record<string, any>) => {
   emit('canvas-config-change', config)
 }
@@ -191,30 +191,30 @@ const handleVisualizationConfigChange = (config: Record<string, any>) => {
   emit('visualization-config-change', config)
 }
 
-// 视图控制事件
+// view control events
 const handleZoomIn = () => emit('zoom-in')
 const handleZoomOut = () => emit('zoom-out')
 const handleResetZoom = () => emit('reset-zoom')
 const handleFitContent = () => emit('fit-content')
 const handleCenterView = () => emit('center-view')
 
-// 抽屉控制事件
+// Drawer control event
 const handleToggleLeftDrawer = () => emit('toggle-left-drawer')
 const handleToggleRightDrawer = () => emit('toggle-right-drawer')
 
-// 切换配置面板显示状态
+// Switch configuration panel display status
 const handleToggleRendererConfig = () => {
   showConfigPanel.value = !showConfigPanel.value
 }
 
-// 🚨 ESC键关闭弹窗 - 替代遮罩层点击
+// 🚨 ESCkey to close the pop-up window - Alternate mask layer click
 const handleKeyDown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && showConfigPanel.value) {
     showConfigPanel.value = false
   }
 }
 
-// 监听键盘事件
+// Listen for keyboard events
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
 })
@@ -223,16 +223,16 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeyDown)
 })
 
-// 切换数据源触发器面板显示状态
+// Toggle data source trigger panel display state
 const handleToggleDataSourcePanel = () => {
   showDataSourcePanel.value = !showDataSourcePanel.value
 }
 
-// 文件导入导出处理
+// File import and export processing
 const fileInputRef = ref<HTMLInputElement>()
 
 const handleImport = () => {
-  // 创建一个隐藏的文件输入元素
+  // Create a hidden file input element
   if (!fileInputRef.value) {
     const input = document.createElement('input')
     input.type = 'file'
@@ -258,11 +258,11 @@ const handleImport = () => {
 }
 
 const handleExport = () => {
-  // 触发导出事件，由父组件提供当前配置
+  // trigger export event，The current configuration is provided by the parent component
   emit('export-config')
 }
 
-// 获取配置面板标题
+// Get configuration panel title
 const getConfigTitle = () => {
   if (isCanvasRenderer.value) {
     return $t('visualEditor.canvasConfig')
@@ -277,9 +277,9 @@ const getConfigTitle = () => {
 
 <template>
   <div class="visual-editor-toolbar h-12 flex items-center relative" :style="toolbarColors">
-    <!-- 左侧：添加组件 -->
+    <!-- left side：Add component -->
     <div class="toolbar-left flex items-center gap-2">
-      <!-- 添加组件按钮 - 仅编辑模式显示 -->
+      <!-- Add component button - Only shown in edit mode -->
       <template v-if="mode === 'edit'">
         <NButton size="small" :type="showLeftDrawer ? 'primary' : 'default'" @click="handleToggleLeftDrawer">
           <template #icon>
@@ -288,7 +288,7 @@ const getConfigTitle = () => {
           {{ $t('visualEditor.addComponent') }}
         </NButton>
 
-        <!-- 渲染器选择 -->
+        <!-- Renderer selection -->
         <NDivider vertical />
         <span class="text-12px text-gray-500">{{ $t('visualEditor.renderer') }}:</span>
         <NSelect
@@ -301,12 +301,12 @@ const getConfigTitle = () => {
       </template>
     </div>
 
-    <!-- 右侧：操作按钮组 -->
+    <!-- right side：Action button group -->
     <div class="toolbar-right flex items-center">
       <NSpace align="center" :size="4">
-        <!-- 编辑模式下的功能 -->
+        <!-- Functions in edit mode -->
         <template v-if="mode === 'edit'">
-          <!-- 文档操作组 -->
+          <!-- Document Action Group -->
           <div class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -322,7 +322,7 @@ const getConfigTitle = () => {
                   </template>
                 </NButton>
               </template>
-              <span v-if="isCanvasRenderer">Canvas功能开发中，暂不支持保存</span>
+              <span v-if="isCanvasRenderer">CanvasFunction under development，Saving is not supported yet</span>
               <span v-else>{{ $t('visualEditor.shortcuts.save') }}</span>
             </NTooltip>
 
@@ -339,7 +339,7 @@ const getConfigTitle = () => {
             </NButton>
           </div>
 
-          <!-- 编辑操作组 -->
+          <!-- Edit action group -->
           <div class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -379,7 +379,7 @@ const getConfigTitle = () => {
             </NPopconfirm>
           </div>
 
-          <!-- Canvas视图控制组 - 仅Canvas模式显示 -->
+          <!-- Canvasview control group - onlyCanvasMode display -->
           <div v-if="isCanvasRenderer" class="btn-group">
             <NTooltip trigger="hover">
               <template #trigger>
@@ -415,14 +415,14 @@ const getConfigTitle = () => {
             </NTooltip>
           </div>
 
-          <!-- 配置按钮 -->
+          <!-- Configure button -->
           <NButton size="small" type="tertiary" @click="handleToggleRendererConfig">
             <template #icon>
               <SvgIcon icon="material-symbols:settings-outline" />
             </template>
           </NButton>
 
-          <!-- 数据源触发器管理按钮 -->
+          <!-- Data source trigger management button -->
           <NTooltip trigger="hover">
             <template #trigger>
               <NButton size="small" type="info" @click="handleToggleDataSourcePanel">
@@ -435,7 +435,7 @@ const getConfigTitle = () => {
           </NTooltip>
         </template>
 
-        <!-- 编辑/预览切换按钮 - 始终显示在最右侧 -->
+        <!-- edit/Preview toggle button - Always shown on the far right -->
         <NDivider vertical />
         <NButton
           size="small"
@@ -448,13 +448,13 @@ const getConfigTitle = () => {
             />
           </template>
           {{ mode === 'edit' ? $t('visualEditor.preview') : $t('visualEditor.edit') }}
-          <!-- 调试信息 -->
+          <!-- debugging information -->
           <span style="font-size: 10px; margin-left: 4px">({{ mode }})</span>
         </NButton>
       </NSpace>
     </div>
 
-    <!-- 渲染器配置面板 - 简洁半透明弹窗 -->
+    <!-- Renderer configuration panel - Simple translucent pop-up window -->
     <Teleport to="body">
       <div 
         v-if="showConfigPanel" 
@@ -462,15 +462,15 @@ const getConfigTitle = () => {
         @click.self="showConfigPanel = false"
       >
         <div class="config-modal-container">
-          <!-- 头部 -->
+          <!-- head -->
           <div class="config-modal-header">
             <h3>{{ getConfigTitle() }}</h3>
             <button class="close-btn" @click="showConfigPanel = false">×</button>
           </div>
           
-          <!-- 内容 -->
+          <!-- content -->
           <div class="config-modal-body">
-        <!-- Canvas 渲染器配置 -->
+        <!-- Canvas Renderer configuration -->
         <div v-if="isCanvasRenderer" class="canvas-config">
           <NForm label-placement="left" label-width="100">
             <NFormItem :label="$t('visualEditor.canvasWidth')">
@@ -479,7 +479,7 @@ const getConfigTitle = () => {
                 :min="800"
                 :max="4000"
                 :step="100"
-                placeholder="画布宽度"
+                placeholder="canvas width"
                 @update:value="handleCanvasConfigChange({ ...canvasConfig, width: $event })"
               />
             </NFormItem>
@@ -490,7 +490,7 @@ const getConfigTitle = () => {
                 :min="600"
                 :max="3000"
                 :step="100"
-                placeholder="画布高度"
+                placeholder="canvas height"
                 @update:value="handleCanvasConfigChange({ ...canvasConfig, height: $event })"
               />
             </NFormItem>
@@ -515,25 +515,25 @@ const getConfigTitle = () => {
                 :min="10"
                 :max="50"
                 :step="5"
-                placeholder="网格大小"
+                placeholder="grid size"
                 @update:value="handleCanvasConfigChange({ ...canvasConfig, gridSize: $event })"
               />
             </NFormItem>
           </NForm>
         </div>
 
-        <!-- Gridstack 渲染器配置 -->
+        <!-- Gridstack Renderer configuration -->
         <div v-else-if="isGridstackRenderer" class="gridstack-config">
           <NForm label-placement="left" label-width="100">
-            <!-- 网格基础配置 -->
+            <!-- Grid basic configuration -->
             <NDivider title-placement="left" style="margin: 12px 0">
-              <span class="text-14px font-medium text-gray-600">网格基础配置</span>
+              <span class="text-14px font-medium text-gray-600">Grid basic configuration</span>
             </NDivider>
             <NFormItem :label="$t('visualEditor.columns')">
               <NSelect
                 :value="gridstackConfig.colNum"
                 :options="columnOptions"
-                placeholder="选择网格列数"
+                placeholder="Select the number of grid columns"
                 @update:value="value => handleGridstackConfigChange({ ...gridstackConfig, colNum: value })"
               />
             </NFormItem>
@@ -543,7 +543,7 @@ const getConfigTitle = () => {
                 <NSelect
                   :value="isCustomRowHeight ? -1 : gridstackConfig.rowHeight"
                   :options="rowHeightOptions"
-                  placeholder="选择行高"
+                  placeholder="Select row height"
                   @update:value="value => {
                     if (value === -1) {
                       customRowHeight = gridstackConfig.rowHeight
@@ -558,7 +558,7 @@ const getConfigTitle = () => {
                   :min="20"
                   :max="300"
                   :step="10"
-                  placeholder="自定义行高"
+                  placeholder="Custom row height"
                   @update:value="value => handleGridstackConfigChange({ ...gridstackConfig, rowHeight: value })"
                 >
                   <template #suffix>px</template>
@@ -614,9 +614,9 @@ const getConfigTitle = () => {
               </NSpace>
             </NFormItem>
 
-            <!-- 交互行为配置 -->
+            <!-- Interactive behavior configuration -->
             <NDivider title-placement="left" style="margin: 16px 0 12px 0">
-              <span class="text-14px font-medium text-gray-600">交互行为配置</span>
+              <span class="text-14px font-medium text-gray-600">Interactive behavior configuration</span>
             </NDivider>
 
             <NFormItem :label="$t('visualEditor.draggable')">
@@ -642,7 +642,7 @@ const getConfigTitle = () => {
           </NForm>
         </div>
 
-        <!-- 可视化渲染器配置 -->
+        <!-- Visual renderer configuration -->
         <div v-else-if="isVisualizationRenderer" class="visualization-config">
           <NForm label-placement="left" label-width="100">
             <NFormItem :label="$t('visualEditor.theme')">
@@ -653,7 +653,7 @@ const getConfigTitle = () => {
                   { label: $t('visualEditor.darkTheme'), value: 'dark' },
                   { label: $t('visualEditor.lightTheme'), value: 'light' }
                 ]"
-                placeholder="选择主题"
+                placeholder="Select theme"
                 @update:value="handleVisualizationConfigChange({ ...visualizationConfig, theme: $event })"
               />
             </NFormItem>
@@ -678,7 +678,7 @@ const getConfigTitle = () => {
       </div>
     </Teleport>
 
-    <!-- 数据源触发器管理面板 - 模态弹窗 -->
+    <!-- Data source trigger management panel - Modal pop-up window -->
     <NModal
       v-model:show="showDataSourcePanel"
       :mask-closable="true"
@@ -727,7 +727,7 @@ const getConfigTitle = () => {
   margin-left: auto;
 }
 
-/* 按钮组样式 */
+/* Button group style */
 .btn-group {
   display: flex;
   align-items: center;
@@ -743,7 +743,7 @@ const getConfigTitle = () => {
   border-color: var(--toolbar-border);
 }
 
-/* 工具栏按钮悬停效果 */
+/* Toolbar button hover effect */
 .n-button {
   transition: all 0.2s ease;
 }
@@ -752,14 +752,14 @@ const getConfigTitle = () => {
   transform: translateY(-1px);
 }
 
-/* 分割线优化 */
+/* Split line optimization */
 .n-divider--vertical {
   height: 20px;
   margin: 0 8px;
   opacity: 0.6;
 }
 
-/* 🎨 普通弹窗样式 - 移除所有透明效果 */
+/* 🎨 Ordinary pop-up window style - Remove all transparency effects */
 .config-modal-overlay {
   position: fixed;
   top: 0;
@@ -771,7 +771,7 @@ const getConfigTitle = () => {
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  /* 恢复正常的鼠标事件 */
+  /* Restore normal mouse events */
   pointer-events: auto;
 }
 
@@ -788,7 +788,7 @@ const getConfigTitle = () => {
   overflow: hidden;
 }
 
-/* 深色主题适配 */
+/* Dark theme adaptation */
 [data-theme="dark"] .config-modal-container {
   background: #2d2d30;
   border: 1px solid #444;
@@ -845,14 +845,14 @@ const getConfigTitle = () => {
   padding: 20px;
   overflow-y: auto;
   background: transparent;
-  /* 确保滚动区域有足够空间 */
+  /* Make sure there is enough space in the scroll area */
   min-height: 0;
-  /* 添加自定义滚动条样式 */
+  /* Add custom scroll bar style */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-/* 自定义滚动条样式 */
+/* Custom scroll bar style */
 .config-modal-body::-webkit-scrollbar {
   width: 6px;
 }
@@ -870,7 +870,7 @@ const getConfigTitle = () => {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* 深色主题下的滚动条 */
+/* Scroll bar in dark theme */
 [data-theme="dark"] .config-modal-body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
 }
@@ -879,16 +879,16 @@ const getConfigTitle = () => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* 表单内容透明化增强 */
+/* Enhanced form content transparency */
 .config-modal-body .gridstack-config,
 .config-modal-body .canvas-config,
 .config-modal-body .visualization-config {
   background: transparent;
-  /* 确保底部有足够的空间 */
+  /* Make sure there is enough space at the bottom */
   padding-bottom: 20px;
 }
 
-/* 分隔线透明化 */
+/* Make dividers transparent */
 .config-modal-body :deep(.n-divider) {
   border-color: rgba(0, 0, 0, 0.03) !important;
   opacity: 0.6;
@@ -899,18 +899,18 @@ const getConfigTitle = () => {
   opacity: 0.4;
 }
 
-/* 表单组件透明化 */
+/* Make form components transparent */
 .config-modal-body .text-gray-600 {
   opacity: 0.7;
 }
 
-/* 选择器使用默认样式 - 无需强制覆盖 */
+/* Selector uses default style - No need to force coverage */
 
-/* 移除所有强制样式覆盖 */
+/* Remove all forced style overrides */
 
-/* 所有强制样式已移除，使用 Naive UI 默认样式 */
+/* All mandatory styles have been removed，use Naive UI Default style */
 
-/* 数据源触发器管理模态弹窗样式 */
+/* Data source trigger management modal pop-up window style */
 .data-source-trigger-modal {
   --n-border-radius: 12px;
 }
@@ -955,9 +955,9 @@ const getConfigTitle = () => {
   padding-top: 16px;
 }
 
-/* 响应式调整 */
+/* Responsive adjustments */
 @media (max-width: 1200px) {
-  /* 中等屏幕：隐藏部分按钮文本 */
+  /* medium screen：Hide part of button text */
   .btn-group .n-button .n-button__content {
     padding: 0 8px;
   }
@@ -970,7 +970,7 @@ const getConfigTitle = () => {
     min-height: 48px;
   }
 
-  /* 小屏幕：只显示图标 */
+  /* small screen：Show only icons */
   .toolbar-left span {
     display: none;
   }
@@ -989,14 +989,14 @@ const getConfigTitle = () => {
     max-height: 50vh;
   }
 
-  /* 如果空间太小，隐藏Canvas特有的控制 */
+  /* If the space is too small，hideCanvasUnique controls */
   .btn-group:has(+ .btn-group) {
     display: none;
   }
 }
 
 @media (max-width: 480px) {
-  /* 超小屏幕：进一步简化 */
+  /* super small screen：Simplify further */
   .toolbar-right .n-space {
     gap: 2px !important;
   }

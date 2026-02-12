@@ -1,49 +1,49 @@
 /**
- * 简化数据源系统类型定义
- * 基于学习现有系统后的简化设计
+ * Simplify data source system type definition
+ * Simplified design based on learning from existing systems
  */
 
-// ========== 组件数据需求类型 ==========
+// ========== Component data requirement type ==========
 
 /**
- * 组件数据需求声明 - 与Card2.1完全兼容
- * 支持Card2.1 ComponentDefinition中的 staticParams 和 dataSources
+ * Component Data Requirements Statement - andCard2.1Fully compatible
+ * supportCard2.1 ComponentDefinitionin staticParams and dataSources
  */
 export interface ComponentDataRequirement {
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 组件名称 */
+  /** Component name */
   componentName: string
-  /** 静态参数需求声明 - 与Card2.1 StaticParamRequirement对应 */
+  /** Static parameter requirement declaration - andCard2.1 StaticParamRequirementcorrespond */
   staticParams?: StaticParamRequirement[]
-  /** 数据源需求声明 - 与Card2.1 DataSourceRequirement对应 */
+  /** Data source requirement statement - andCard2.1 DataSourceRequirementcorrespond */
   dataSources: DataSourceRequirement[]
 }
 
 /**
- * 静态参数需求定义 - 与Card2.1完全一致
+ * Static parameter requirement definition - andCard2.1completely consistent
  */
 export interface StaticParamRequirement {
-  /** 参数唯一标识 */
+  /** Parameter unique identifier */
   key: string
-  /** 参数名称 */
+  /** Parameter name */
   name: string
-  /** 参数类型 */
+  /** Parameter type */
   type: 'string' | 'number' | 'boolean' | 'object' | 'array'
-  /** 参数描述 */
+  /** Parameter description */
   description: string
-  /** 默认值 */
+  /** default value */
   defaultValue?: any
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
-  /** 参数验证规则 */
+  /** Parameter validation rules */
   validation?: {
     min?: number
     max?: number
     pattern?: string
     options?: Array<{ label: string; value: any }>
   }
-  /** UI 渲染提示 */
+  /** UI Rendering tips */
   ui?: {
     component?: 'input' | 'select' | 'number' | 'switch' | 'textarea' | 'color' | 'slider'
     placeholder?: string
@@ -53,73 +53,73 @@ export interface StaticParamRequirement {
 }
 
 /**
- * 数据源需求声明 - 与Card2.1完全兼容的版本
+ * Data source requirement statement - andCard2.1Fully compatible version
  */
 export interface DataSourceRequirement {
-  /** 数据源唯一标识 - 与Card2.1 key对应 */
+  /** Data source unique identifier - andCard2.1 keycorrespond */
   key: string
-  /** 数据源名称 */
+  /** Data source name */
   name: string
-  /** 数据源描述 */
+  /** Data source description */
   description: string
-  /** 支持的数据源类型 - 与Card2.1对齐 */
+  /** Supported data source types - andCard2.1Alignment */
   supportedTypes: Array<'static' | 'api' | 'websocket' | 'mqtt' | 'database'>
-  /** 字段映射规则 - 与Card2.1 fieldMappings兼容 */
+  /** Field mapping rules - andCard2.1 fieldMappingscompatible */
   fieldMappings: Record<
     string,
     {
-      /** 目标字段名 */
+      /** Target field name */
       targetField: string
-      /** 字段类型 */
+      /** Field type */
       type: 'value' | 'object' | 'array'
-      /** 是否必填 */
+      /** Is it required? */
       required: boolean
-      /** 默认值 */
+      /** default value */
       defaultValue?: any
-      /** 数据转换函数 */
+      /** data conversion function */
       transform?: string
     }
   >
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
 
-  // ==== 向下兼容字段 - 支持原有简化格式 ====
-  /** 数据结构类型 - 向下兼容 */
+  // ==== backward compatibility fields - Support original simplified format ====
+  /** data structure type - backward compatible */
   structureType?: 'object' | 'array'
-  /** 字段需求 - 向下兼容 */
+  /** Field requirements - backward compatible */
   fields?: FieldRequirement[]
-  /** 数据源ID - 向下兼容 */
+  /** data sourceID - backward compatible */
   id?: string
 }
 
 /**
- * 字段需求声明 - 与Card2.1兼容的扩展版本
+ * Field requirement statement - andCard2.1Compatible extended version
  */
 export interface FieldRequirement {
-  /** 字段名 */
+  /** Field name */
   name: string
-  /** 字段类型 - 扩展支持Card2.1的类型系统 */
+  /** Field type - Extended supportCard2.1type system */
   type: 'string' | 'number' | 'boolean' | 'any' | 'object' | 'array'
-  /** 值类型 - 用于进一步细分类型 */
+  /** value type - Used to further subdivide types */
   valueType?: 'number' | 'string' | 'boolean' | 'any'
-  /** 是否必填 */
+  /** Is it required? */
   required: boolean
-  /** 字段描述 */
+  /** Field description */
   description: string
-  /** 示例值 */
+  /** Example value */
   example?: any
-  /** 默认值 - 与Card2.1 StaticParamRequirement兼容 */
+  /** default value - andCard2.1 StaticParamRequirementcompatible */
   defaultValue?: any
-  /** 嵌套结构定义 - 支持复杂对象和数组 */
+  /** Nested structure definition - Supports complex objects and arrays */
   structure?: DataSourceRequirement
-  /** 验证规则 - 与Card2.1兼容的验证配置 */
+  /** Validation rules - andCard2.1Compatible authentication configurations */
   validation?: {
     min?: number
     max?: number
     pattern?: string
     options?: Array<{ label: string; value: any }>
   }
-  /** UI渲染提示 - 支持Card2.1的UI配置 */
+  /** UIRendering tips - supportCard2.1ofUIConfiguration */
   ui?: {
     component?: 'input' | 'select' | 'number' | 'switch' | 'textarea' | 'color' | 'slider'
     placeholder?: string
@@ -128,110 +128,110 @@ export interface FieldRequirement {
   }
 }
 
-// ========== 数据源配置类型 ==========
+// ========== Data source configuration type ==========
 
 /**
- * 简化的数据源配置 - 输出给外部系统使用
- * 这是配置器生成的标准配置格式
+ * Simplified data source configuration - Output to external systems for use
+ * This is the standard configuration format generated by the configurator
  */
 export interface SimpleDataSourceConfig {
-  /** 配置ID */
+  /** ConfigurationID */
   id: string
-  /** 组件ID */
+  /** componentsID */
   componentId: string
-  /** 数据源定义列表 */
+  /** Data source definition list */
   dataSources: DataSourceDefinition[]
-  /** 触发器配置 - 复用Card2.1的优秀设计 */
+  /** Trigger configuration - ReuseCard2.1excellent design */
   triggers: TriggerConfig[]
-  /** 是否启用 */
+  /** Whether to enable */
   enabled: boolean
 }
 
 /**
- * 数据源定义
+ * Data source definition
  */
 export interface DataSourceDefinition {
-  /** 数据源ID */
+  /** data sourceID */
   id: string
-  /** 数据源类型 */
+  /** Data source type */
   type: 'static' | 'api' | 'websocket' | 'script'
-  /** 数据源配置 */
+  /** Data source configuration */
   config: any
-  /** 字段映射 - 学习自visual-editor的映射机制 */
+  /** Field mapping - learn fromvisual-editormapping mechanism */
   fieldMapping?: { [targetField: string]: string }
 }
 
 /**
- * 触发器配置 - 复用Card2.1的触发器系统
+ * Trigger configuration - ReuseCard2.1trigger system
  */
 export interface TriggerConfig {
-  /** 触发器类型 */
+  /** Trigger type */
   type: 'timer' | 'websocket' | 'event' | 'manual'
-  /** 触发器配置 */
+  /** Trigger configuration */
   config: TriggerConfigData
 }
 
 /**
- * 触发器配置数据
+ * Trigger configuration data
  */
 export interface TriggerConfigData {
-  // 定时器配置
+  // Timer configuration
   interval?: number
   immediate?: boolean
 
-  // WebSocket配置
+  // WebSocketConfiguration
   url?: string
   protocols?: string[]
 
-  // 事件配置
+  // event configuration
   eventName?: string
   target?: EventTarget
 }
 
-// ========== 组件数据类型 ==========
+// ========== Component data type ==========
 
 /**
- * 组件最终接收的数据格式
- * 这是执行器输出给组件的标准格式
+ * The final data format received by the component
+ * This is the standard format for executor output to components
  */
 export interface ComponentData {
   [dataSourceId: string]: {
-    /** 数据源类型 */
+    /** Data source type */
     type: string
-    /** 解析后的数据 */
+    /** parsed data */
     data: any
-    /** 最后更新时间 */
+    /** Last updated */
     lastUpdated?: number
-    /** 元数据 */
+    /** metadata */
     metadata?: any
   }
 }
 
 /**
- * 标准组件Props - 新组件使用的接口
+ * Standard componentsProps - The interface used by the new component
  */
 export interface StandardComponentProps {
-  /** 数据源配置 */
+  /** Data source configuration */
   dataSourceConfig?: ComponentData
 }
 
-// ========== 用户输入类型 ==========
+// ========== User input type ==========
 
 /**
- * 用户数据源输入
- * 用户在配置界面中输入的数据
+ * User data source input
+ * Data entered by the user in the configuration interface
  */
 export interface UserDataSourceInput {
-  /** 数据源ID */
+  /** data sourceID */
   dataSourceId: string
-  /** 数据源类型 */
+  /** Data source type */
   type: 'static' | 'api' | 'websocket' | 'script'
-  /** 用户输入的配置 */
+  /** User input configuration */
   config: DataSourceUserConfig
 }
 
 /**
- * 数据源用户配置
+ * Data source user configuration
  */
 export type DataSourceUserConfig =
   | StaticDataSourceConfig
@@ -240,103 +240,103 @@ export type DataSourceUserConfig =
   | ScriptDataSourceConfig
 
 /**
- * 静态数据源配置
+ * Static data source configuration
  */
 export interface StaticDataSourceConfig {
-  /** 静态数据 - JSON字符串或对象 */
+  /** static data - JSONstring or object */
   data: any
 }
 
 /**
- * API数据源配置
+ * APIData source configuration
  */
 export interface ApiDataSourceConfig {
-  /** API地址 */
+  /** APIaddress */
   url: string
-  /** HTTP方法 */
+  /** HTTPmethod */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  /** 请求头 */
+  /** Request header */
   headers?: Record<string, string>
-  /** 请求体 */
+  /** Request body */
   body?: any
-  /** 超时时间 */
+  /** timeout */
   timeout?: number
 }
 
 /**
- * WebSocket数据源配置
+ * WebSocketData source configuration
  */
 export interface WebSocketDataSourceConfig {
-  /** WebSocket地址 */
+  /** WebSocketaddress */
   url: string
-  /** 协议 */
+  /** protocol */
   protocols?: string[]
-  /** 重连间隔 */
+  /** reconnection interval */
   reconnectInterval?: number
 }
 
 /**
- * 脚本数据源配置
+ * Script data source configuration
  */
 export interface ScriptDataSourceConfig {
-  /** JavaScript脚本代码 */
+  /** JavaScriptscript code */
   script: string
-  /** 脚本上下文 */
+  /** script context */
   context?: Record<string, any>
 }
 
-// ========== 执行结果类型 ==========
+// ========== Execution result type ==========
 
 /**
- * 数据执行结果
+ * Data execution results
  */
 export interface ExecutionResult {
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 数据内容 */
+  /** Data content */
   data?: ComponentData
-  /** 错误信息 */
+  /** error message */
   error?: string
-  /** 执行时间（毫秒） */
+  /** Execution time（millisecond） */
   executionTime: number
-  /** 时间戳 */
+  /** Timestamp */
   timestamp: number
 }
 
 /**
- * 字段映射预览结果
+ * Field mapping preview results
  */
 export interface MappingPreviewResult {
-  /** 目标字段 */
+  /** target field */
   targetField: string
-  /** 源路径 */
+  /** source path */
   sourcePath: string
-  /** 映射后的值 */
+  /** mapped value */
   mappedValue: any
-  /** 是否成功 */
+  /** Is it successful? */
   success: boolean
-  /** 错误信息 */
+  /** error message */
   error?: string
 }
 
-// ========== 验证结果类型 ==========
+// ========== Validation result type ==========
 
 /**
- * 配置验证结果
+ * Configuration verification results
  */
 export interface ValidationResult {
-  /** 是否有效 */
+  /** Is it valid? */
   valid: boolean
-  /** 错误信息 */
+  /** error message */
   errors: string[]
-  /** 警告信息 */
+  /** warning message */
   warnings: string[]
 }
 
-// ========== 兼容性类型 ==========
+// ========== Compatibility type ==========
 
 /**
- * Visual Editor 兼容格式
+ * Visual Editor Compatible formats
  */
 export interface VisualEditorCompatibleProps {
   widgetConfiguration?: {
@@ -353,7 +353,7 @@ export interface VisualEditorCompatibleProps {
 }
 
 /**
- * Card2.1 兼容格式
+ * Card2.1 Compatible formats
  */
 export interface Card21CompatibleProps {
   rawDataSources?: {
@@ -365,105 +365,105 @@ export interface Card21CompatibleProps {
   }
 }
 
-// ========== 工具类型 ==========
+// ========== Tool type ==========
 
 /**
- * 数据源类型联合类型
+ * data source type union type
  */
 export type DataSourceType = 'static' | 'api' | 'websocket' | 'script'
 
 /**
- * 字段类型联合类型 - 扩展支持Card2.1兼容性
+ * field type union type - Extended supportCard2.1compatibility
  */
 export type FieldType = 'string' | 'number' | 'boolean' | 'any' | 'object' | 'array'
 
 /**
- * 字段值类型联合类型 - 用于细分基础类型
+ * field value type union type - Used to subdivide base types
  */
 export type FieldValueType = 'string' | 'number' | 'boolean' | 'any'
 
 /**
- * 触发器类型联合类型
+ * trigger type union type
  */
 export type TriggerType = 'timer' | 'websocket' | 'event' | 'manual'
 
 /**
- * 组件类型
+ * Component type
  */
 export type ComponentType = 'visual-editor' | 'card2.1' | 'standard'
 
 /**
- * Card2.1组件需求声明格式 - 直接引用Card2.1的类型
+ * Card2.1Component requirement statement format - direct quoteCard2.1type
  */
 export interface Card2ComponentRequirement {
-  /** 静态参数需求声明 */
+  /** Static parameter requirement declaration */
   staticParams?: any[]
-  /** 数据源需求声明 */
+  /** Data source requirement statement */
   dataSources?: any[]
 }
 
-// ========== 常量定义 ==========
+// ========== constant definition ==========
 
 /**
- * 系统常量
+ * System constants
  */
 export const SIMPLE_DATA_SOURCE_CONSTANTS = {
-  /** 最大数据源数量 */
+  /** Maximum number of data sources */
   MAX_DATA_SOURCES: 5,
 
-  /** 默认触发器间隔 */
+  /** Default trigger interval */
   DEFAULT_TRIGGER_INTERVAL: 30000,
 
-  /** 默认超时时间 */
+  /** Default timeout */
   DEFAULT_TIMEOUT: 10000,
 
-  /** 配置版本 */
+  /** Configuration version */
   CONFIG_VERSION: '2.0.0'
 } as const
 
-// ========== Card2.1兼容类型转换工具 ==========
+// ========== Card2.1Compatible type conversion tools ==========
 
 /**
- * Card2.1 StaticParamRequirement转换工具
+ * Card2.1 StaticParamRequirementconversion tool
  */
 export interface Card2StaticParamCompatibility {
   /**
-   * 将Card2.1 StaticParamRequirement转换为数据源系统StaticParamRequirement
+   * WillCard2.1 StaticParamRequirementConvert to data source systemStaticParamRequirement
    */
   fromCard2StaticParam(card2Param: any): StaticParamRequirement
 
   /**
-   * 将数据源系统StaticParamRequirement转换为Card2.1格式
+   * data source systemStaticParamRequirementConvert toCard2.1Format
    */
   toCard2StaticParam(staticParam: StaticParamRequirement): any
 }
 
 /**
- * Card2.1 DataSourceRequirement转换工具
+ * Card2.1 DataSourceRequirementconversion tool
  */
 export interface Card2DataSourceCompatibility {
   /**
-   * 将Card2.1 DataSourceRequirement转换为数据源系统格式
+   * WillCard2.1 DataSourceRequirementConvert to data source system format
    */
   fromCard2DataSource(card2DataSource: any): DataSourceRequirement
 
   /**
-   * 将数据源系统格式转换为Card2.1 DataSourceRequirement
+   * Convert data source system format toCard2.1 DataSourceRequirement
    */
   toCard2DataSource(dataSource: DataSourceRequirement): any
 }
 
 /**
- * 组件数据需求转换工具
+ * Component Data Requirements Conversion Tool
  */
 export interface ComponentRequirementCompatibility {
   /**
-   * 从Card2.1 ComponentDefinition提取数据需求
+   * fromCard2.1 ComponentDefinitionExtract data requirements
    */
   extractFromCard2Component(componentDef: any): ComponentDataRequirement
 
   /**
-   * 将ComponentDataRequirement转换为Card2.1兼容格式
+   * WillComponentDataRequirementConvert toCard2.1Compatible formats
    */
   adaptToCard2Component(requirement: ComponentDataRequirement): {
     staticParams?: any[]
@@ -472,10 +472,10 @@ export interface ComponentRequirementCompatibility {
 }
 
 /**
- * 字段类型映射表 - Card2.1与数据源系统之间的类型映射
+ * Field type mapping table - Card2.1Type mapping to and from the data source system
  */
 export const FIELD_TYPE_MAPPING = {
-  // Card2.1 -> 数据源系统
+  // Card2.1 -> Data source system
   card2ToDataSource: {
     value: 'any' as FieldType,
     object: 'object' as FieldType,
@@ -484,7 +484,7 @@ export const FIELD_TYPE_MAPPING = {
     number: 'number' as FieldType,
     boolean: 'boolean' as FieldType
   },
-  // 数据源系统 -> Card2.1
+  // Data source system -> Card2.1
   dataSourceToCard2: {
     string: 'value',
     number: 'value',

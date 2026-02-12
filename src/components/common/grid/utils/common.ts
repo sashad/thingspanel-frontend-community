@@ -1,19 +1,19 @@
 /**
- * Grid 通用工具函数
- * 包含ID生成、深度克隆、统计计算等通用功能
+ * Grid General utility functions
+ * IncludeIDgenerate、deep clone、General functions such as statistical calculations
  */
 
 import type { GridLayoutPlusItem } from '../gridLayoutPlusTypes'
 
 /**
- * 生成唯一ID
+ * generate uniqueID
  */
 export function generateId(prefix = 'item'): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
 /**
- * 深度克隆布局
+ * Deep clone layout
  */
 export function cloneLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[] {
   try {
@@ -25,7 +25,7 @@ export function cloneLayout(layout: GridLayoutPlusItem[]): GridLayoutPlusItem[] 
 }
 
 /**
- * 深度克隆网格项
+ * Deep clone grid items
  */
 export function cloneGridItem(item: GridLayoutPlusItem): GridLayoutPlusItem {
   try {
@@ -37,7 +37,7 @@ export function cloneGridItem(item: GridLayoutPlusItem): GridLayoutPlusItem {
 }
 
 /**
- * 计算布局统计信息
+ * Calculate layout statistics
  */
 export function getLayoutStats(
   layout: GridLayoutPlusItem[],
@@ -68,14 +68,14 @@ export function getLayoutStats(
     const totalRows = Math.max(...layout.map(item => item.y + item.h), 1)
     const totalCells = cols * totalRows
 
-    // 计算所有项目占用的网格单元总数
+    // Calculate the total number of grid cells occupied by all projects
     const occupiedCells = layout.reduce((sum, item) => sum + item.w * item.h, 0)
 
     const utilization = totalCells > 0 ? (occupiedCells / totalCells) * 100 : 0
     const density = totalItems > 0 ? occupiedCells / totalItems : 0
     const averageSize = totalItems > 0 ? occupiedCells / totalItems : 0
 
-    // 找到最大和最小的项目
+    // Find the largest and smallest item
     let largestItem = null
     let smallestItem = null
     let maxArea = 0
@@ -119,7 +119,7 @@ export function getLayoutStats(
 }
 
 /**
- * 过滤布局项目
+ * Filter layout items
  */
 export function filterLayout(
   layout: GridLayoutPlusItem[],
@@ -134,7 +134,7 @@ export function filterLayout(
 }
 
 /**
- * 搜索布局项目
+ * Search layout items
  */
 export function searchLayout(
   layout: GridLayoutPlusItem[],
@@ -165,11 +165,11 @@ export function searchLayout(
 }
 
 /**
- * 项目转换为CSS Grid区域定义
+ * Project converted toCSS GridArea definition
  */
 export function itemToGridArea(item: GridLayoutPlusItem): string {
   try {
-    // CSS Grid 的行和列从1开始计数
+    // CSS Grid rows and columns from1Start counting
     const rowStart = item.y + 1
     const rowEnd = item.y + item.h + 1
     const colStart = item.x + 1
@@ -183,7 +183,7 @@ export function itemToGridArea(item: GridLayoutPlusItem): string {
 }
 
 /**
- * 计算网格利用率
+ * Calculate grid utilization
  */
 export function calculateGridUtilization(layout: GridLayoutPlusItem[], cols: number, rows?: number): number {
   try {
@@ -201,7 +201,7 @@ export function calculateGridUtilization(layout: GridLayoutPlusItem[], cols: num
 }
 
 /**
- * 计算总行数
+ * Calculate the total number of rows
  */
 export function calculateTotalRows(layout: GridLayoutPlusItem[]): number {
   try {
@@ -214,7 +214,7 @@ export function calculateTotalRows(layout: GridLayoutPlusItem[]): number {
 }
 
 /**
- * 获取网格统计信息（详细版本）
+ * Get grid statistics（detailed version）
  */
 export function getGridStatistics(
   layout: GridLayoutPlusItem[],
@@ -236,7 +236,7 @@ export function getGridStatistics(
   try {
     const basic = getLayoutStats(layout, cols)
 
-    // 尺寸分布
+    // size distribution
     const sizeDistribution: Record<string, number> = {}
     const widthDistribution: Record<number, number> = {}
     const heightDistribution: Record<number, number> = {}
@@ -250,13 +250,13 @@ export function getGridStatistics(
       heightDistribution[item.h] = (heightDistribution[item.h] || 0) + 1
     }
 
-    // 位置分布
+    // Location distribution
     const totalRows = basic.totalRows
     const halfRows = totalRows / 2
     const topHalf = layout.filter(item => item.y < halfRows).length
     const bottomHalf = layout.length - topHalf
 
-    // 性能指标
+    // Performance indicators
     const fragmentation = calculateFragmentation(layout, cols)
     const compactness = calculateCompactness(layout, cols)
     const balance = calculateBalance(layout, cols)
@@ -295,7 +295,7 @@ export function getGridStatistics(
 }
 
 /**
- * 计算布局碎片化程度
+ * Calculate layout fragmentation
  */
 function calculateFragmentation(layout: GridLayoutPlusItem[], cols: number): number {
   try {
@@ -306,7 +306,7 @@ function calculateFragmentation(layout: GridLayoutPlusItem[], cols: number): num
       .fill(null)
       .map(() => Array(cols).fill(false))
 
-    // 标记占用的网格单元
+    // Mark occupied grid cells
     for (const item of layout) {
       for (let y = item.y; y < item.y + item.h; y++) {
         for (let x = item.x; x < item.x + item.w; x++) {
@@ -317,7 +317,7 @@ function calculateFragmentation(layout: GridLayoutPlusItem[], cols: number): num
       }
     }
 
-    // 计算空隙数量
+    // Calculate the number of gaps
     let gaps = 0
     let totalCells = 0
 
@@ -338,7 +338,7 @@ function calculateFragmentation(layout: GridLayoutPlusItem[], cols: number): num
 }
 
 /**
- * 计算布局紧凑度
+ * Calculate layout compactness
  */
 function calculateCompactness(layout: GridLayoutPlusItem[], cols: number): number {
   try {
@@ -356,7 +356,7 @@ function calculateCompactness(layout: GridLayoutPlusItem[], cols: number): numbe
 }
 
 /**
- * 计算布局平衡度
+ * Calculate layout balance
  */
 function calculateBalance(layout: GridLayoutPlusItem[], cols: number): number {
   try {
@@ -366,7 +366,7 @@ function calculateBalance(layout: GridLayoutPlusItem[], cols: number): number {
     const totalRows = Math.max(...layout.map(item => item.y + item.h))
     const centerY = totalRows / 2
 
-    // 计算重心
+    // Calculate center of gravity
     let weightedX = 0
     let weightedY = 0
     let totalWeight = 0
@@ -386,7 +386,7 @@ function calculateBalance(layout: GridLayoutPlusItem[], cols: number): number {
     const gravityX = weightedX / totalWeight
     const gravityY = weightedY / totalWeight
 
-    // 计算与中心的偏差
+    // Calculate deviation from center
     const deviationX = Math.abs(gravityX - centerX) / centerX
     const deviationY = Math.abs(gravityY - centerY) / centerY
     const totalDeviation = (deviationX + deviationY) / 2
@@ -399,7 +399,7 @@ function calculateBalance(layout: GridLayoutPlusItem[], cols: number): number {
 }
 
 /**
- * 数组去重
+ * Array deduplication
  */
 export function uniqueArray<T>(array: T[], keyFn?: (item: T) => string | number): T[] {
   try {
@@ -423,7 +423,7 @@ export function uniqueArray<T>(array: T[], keyFn?: (item: T) => string | number)
 }
 
 /**
- * 安全的数值解析
+ * Safe numerical parsing
  */
 export function parseNumber(value: any, defaultValue = 0): number {
   try {
@@ -443,14 +443,14 @@ export function parseNumber(value: any, defaultValue = 0): number {
 }
 
 /**
- * 限制数值在指定范围内
+ * Limit the value to a specified range
  */
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
 
 /**
- * 格式化文件大小
+ * Format file size
  */
 export function formatFileSize(bytes: number): string {
   try {
@@ -467,7 +467,7 @@ export function formatFileSize(bytes: number): string {
 }
 
 /**
- * 格式化持续时间
+ * Format duration
  */
 export function formatDuration(milliseconds: number): string {
   try {

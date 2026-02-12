@@ -10,9 +10,9 @@ defineOptions({ name: 'UploadFile' })
 const { proxy } = getCurrentInstance() as any
 export interface Props {
   modelValue: string
-  /** 选取文件的类型 */
+  /** Select file type */
   accept: string
-  /** 上传的文件类型 */
+  /** Uploaded file type */
   fileType: string[]
 }
 

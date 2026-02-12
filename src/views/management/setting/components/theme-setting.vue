@@ -48,7 +48,7 @@ async function handleSubmit() {
   const data: any = await editThemeSetting(formData)
   if (!data.error) {
     window.$message?.success(data.msg)
-    // 确保系统设置在应用启动时加载
+    // Make sure system settings are loaded when the app starts
     await sysSettingStore.initSysSetting()
     endLoading()
     await getGeneralSetting()

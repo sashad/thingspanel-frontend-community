@@ -1,8 +1,8 @@
 <template>
   <div class="data-source-trigger-panel">
-    <!-- 📊 数据源触发器控制面板 -->
+    <!-- 📊 Data source trigger control panel -->
     <n-card :bordered="false" size="small" class="trigger-control-card">
-      <!-- 🎮 面板头部控制区 -->
+      <!-- 🎮 Panel head control area -->
       <template #header>
         <n-space justify="space-between" align="center">
           <n-space align="center" :size="8">
@@ -22,9 +22,9 @@
             </n-badge>
           </n-space>
 
-          <!-- 全局控制按钮 -->
+          <!-- global control button -->
           <n-space :size="8">
-            <!-- 全部启动 -->
+            <!-- start all -->
             <n-button
               size="small"
               type="success"
@@ -38,7 +38,7 @@
               {{ $t('dataSource.trigger.startAll') }}
             </n-button>
 
-            <!-- 全部停止 -->
+            <!-- stop all -->
             <n-button
               size="small"
               type="error"
@@ -52,7 +52,7 @@
               {{ $t('dataSource.trigger.stopAll') }}
             </n-button>
 
-            <!-- 刷新状态 -->
+            <!-- refresh status -->
             <n-button size="small" type="default" :loading="refreshLoading" @click="refreshComponentStatus">
               <template #icon>
                 <n-icon><RefreshOutline /></n-icon>
@@ -62,9 +62,9 @@
         </n-space>
       </template>
 
-      <!-- 📋 数据源组件列表 -->
+      <!-- 📋 List of data source components -->
       <div class="components-list">
-        <!-- 空状态提示 -->
+        <!-- Empty status prompt -->
         <n-empty
           v-if="componentsWithDataSources.length === 0"
           :description="$t('dataSource.trigger.noComponents')"
@@ -82,7 +82,7 @@
           </template>
         </n-empty>
 
-        <!-- 组件数据源控制列表 -->
+        <!-- Component data source control list -->
         <n-space v-else vertical :size="8">
           <div v-for="component in componentsWithDataSources" :key="component.id" class="component-trigger-item">
             <n-card
@@ -94,10 +94,10 @@
                 'error-component': component.status === DataSourceStatus.ERROR
               }"
             >
-              <!-- 组件信息区 -->
+              <!-- Component information area -->
               <n-space justify="space-between" align="center">
                 <n-space align="center" :size="8">
-                  <!-- 状态指示器 -->
+                  <!-- status indicator -->
                   <n-tag :type="getStatusTagType(component.status)" size="small" round>
                     <template #icon>
                       <n-icon>
@@ -107,7 +107,7 @@
                     {{ getStatusText(component.status) }}
                   </n-tag>
 
-                  <!-- 组件基本信息 -->
+                  <!-- Component basic information -->
                   <div class="component-info">
                     <n-text strong style="font-size: 13px">
                       {{ component.name || component.type }}
@@ -117,9 +117,9 @@
                   </div>
                 </n-space>
 
-                <!-- 控制区域 -->
+                <!-- control area -->
                 <n-space align="center" :size="8">
-                  <!-- 轮询间隔设置 -->
+                  <!-- Polling interval settings -->
                   <n-input-number
                     v-model:value="component.trigger.interval"
                     size="small"
@@ -135,7 +135,7 @@
                     </template>
                   </n-input-number>
 
-                  <!-- 手动触发 -->
+                  <!-- manual trigger -->
                   <n-button
                     size="small"
                     type="info"
@@ -148,7 +148,7 @@
                     </template>
                   </n-button>
 
-                  <!-- 启动/停止切换 -->
+                  <!-- start up/Stop switching -->
                   <n-button
                     size="small"
                     :type="component.status === DataSourceStatus.RUNNING ? 'error' : 'success'"
@@ -163,7 +163,7 @@
                     {{ component.status === DataSourceStatus.RUNNING ? $t('common.stop') : $t('common.start') }}
                   </n-button>
 
-                  <!-- 更多操作 -->
+                  <!-- More actions -->
                   <n-dropdown :options="getComponentActions(component)" @select="handleComponentAction">
                     <n-button size="small" quaternary>
                       <template #icon>
@@ -174,14 +174,14 @@
                 </n-space>
               </n-space>
 
-              <!-- 数据源详情展开区 -->
+              <!-- Data source details expansion area -->
               <n-collapse-transition :show="component.showDetails">
                 <div
                   class="component-details"
                   style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color)"
                 >
                   <n-space vertical :size="8">
-                    <!-- 数据源配置信息 -->
+                    <!-- Data source configuration information -->
                     <div class="data-source-info">
                       <n-text depth="2" style="font-size: 12px">
                         {{ $t('dataSource.trigger.lastExecution') }}:
@@ -198,7 +198,7 @@
                       </n-text>
                     </div>
 
-                    <!-- 最近错误信息 -->
+                    <!-- Recent error messages -->
                     <div v-if="component.lastError" class="error-info">
                       <n-alert type="error" size="small">
                         <template #header>
@@ -208,7 +208,7 @@
                       </n-alert>
                     </div>
 
-                    <!-- 数据预览 -->
+                    <!-- Data preview -->
                     <div v-if="component.lastData" class="data-preview">
                       <n-text depth="2" style="font-size: 12px; margin-bottom: 4px">
                         {{ $t('dataSource.trigger.lastData') }}:
@@ -227,7 +227,7 @@
         </n-space>
       </div>
 
-      <!-- 📈 执行统计信息 -->
+      <!-- 📈 execution statistics -->
       <template #footer>
         <n-space justify="space-between" align="center" style="font-size: 11px">
           <n-space align="center" :size="16">
@@ -237,8 +237,8 @@
             <n-text depth="3">{{ $t('dataSource.trigger.stats.active') }}: {{ activeDataSourcesCount }}</n-text>
             <n-text depth="3">{{ $t('dataSource.trigger.stats.errors') }}: {{ errorDataSourcesCount }}</n-text>
             <n-divider vertical />
-            <n-text depth="3">全局轮询: {{ pollingStatistics.totalTasks }} 任务</n-text>
-            <n-text depth="3">总执行: {{ pollingStatistics.totalExecutions }} 次</n-text>
+            <n-text depth="3">global polling: {{ pollingStatistics.totalTasks }} Task</n-text>
+            <n-text depth="3">General execution: {{ pollingStatistics.totalExecutions }} Second-rate</n-text>
           </n-space>
           <n-space align="center" :size="8">
             <n-tag :type="pollingStatistics.globalTimerActive ? 'success' : 'default'" size="small" round>
@@ -247,7 +247,7 @@
                   <component :is="pollingStatistics.globalTimerActive ? CheckmarkCircleOutline : TimeOutline" />
                 </n-icon>
               </template>
-              {{ pollingStatistics.globalTimerActive ? '全局定时器运行中' : '全局定时器停止' }}
+              {{ pollingStatistics.globalTimerActive ? 'Global timer is running' : 'global timer stopped' }}
             </n-tag>
             <n-text depth="3">
               {{ $t('dataSource.trigger.stats.lastUpdate') }}:
@@ -262,8 +262,8 @@
 
 <script setup lang="ts">
 /**
- * 数据源触发器控制面板
- * 提供统一的数据源触发器管理界面，支持批量操作和实时状态监控
+ * Data source trigger control panel
+ * Provide a unified data source trigger management interface，Support batch operations and real-time status monitoring
  */
 
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
@@ -283,31 +283,31 @@ import {
   TimeOutline
 } from '@vicons/ionicons5'
 
-// 导入数据源管理器和全局轮询管理器
+// Import Data Source Manager and Global Poll Manager
 import { editorDataSourceManager, DataSourceStatus } from '@/components/visual-editor/core/EditorDataSourceManager'
 import type { ComponentDataSourceConfig } from '@/components/visual-editor/core/EditorDataSourceManager'
 import { useGlobalPollingManager } from '@/components/visual-editor/core/GlobalPollingManager'
 
-// 国际化和主题
+// Internationalization and themes
 const { t } = useI18n()
 const themeStore = useThemeStore()
 
-// 全局轮询管理器
+// Global Poll Manager
 const globalPollingManager = useGlobalPollingManager()
 
-// 响应式状态
+// Responsive state
 const componentsWithDataSources = ref<ComponentDataSourceConfig[]>([])
 const bulkOperationLoading = ref(false)
 const refreshLoading = ref(false)
 const lastUpdateTime = ref(Date.now())
 
-// 轮询任务统计
+// Polling task statistics
 const pollingStatistics = computed(() => globalPollingManager.getStatistics())
 
-// 定时刷新器
+// Scheduled refresher
 let refreshTimer: NodeJS.Timeout | null = null
 
-// 计算属性
+// Computed properties
 const activeDataSourcesCount = computed(() => {
   return componentsWithDataSources.value.filter(c => c.status === DataSourceStatus.RUNNING).length
 })
@@ -324,7 +324,7 @@ const allDataSourcesActive = computed(() => {
 })
 
 /**
- * 获取状态标签类型
+ * Get status label type
  */
 const getStatusTagType = (status: DataSourceStatus): string => {
   switch (status) {
@@ -340,7 +340,7 @@ const getStatusTagType = (status: DataSourceStatus): string => {
 }
 
 /**
- * 获取状态图标
+ * Get status icon
  */
 const getStatusIcon = (status: DataSourceStatus) => {
   switch (status) {
@@ -356,7 +356,7 @@ const getStatusIcon = (status: DataSourceStatus) => {
 }
 
 /**
- * 获取状态文本
+ * Get status text
  */
 const getStatusText = (status: DataSourceStatus): string => {
   switch (status) {
@@ -372,14 +372,14 @@ const getStatusText = (status: DataSourceStatus): string => {
 }
 
 /**
- * 更新轮询间隔
+ * Update polling interval
  */
 const updatePollingInterval = async (componentId: string, interval: number | null) => {
   if (!interval || interval < 1000) return
 
   try {
     await editorDataSourceManager.setPollingInterval(componentId, interval)
-    // 实时更新本地状态
+    // Update local status in real time
     const component = componentsWithDataSources.value.find(c => c.id === componentId)
     if (component && component.trigger) {
       component.trigger.interval = interval
@@ -390,7 +390,7 @@ const updatePollingInterval = async (componentId: string, interval: number | nul
 }
 
 /**
- * 手动触发数据源
+ * Manually trigger data sources
  */
 const manualTrigger = async (componentId: string) => {
   const component = componentsWithDataSources.value.find(c => c.id === componentId)
@@ -401,7 +401,7 @@ const manualTrigger = async (componentId: string) => {
     await editorDataSourceManager.triggerDataUpdate(componentId)
     window.$message?.success(t('dataSource.trigger.manualTriggerSuccess'))
 
-    // 刷新组件状态
+    // Refresh component status
     await refreshComponentStatus()
   } catch (error) {
     window.$message?.error(t('dataSource.trigger.manualTriggerError'))
@@ -411,7 +411,7 @@ const manualTrigger = async (componentId: string) => {
 }
 
 /**
- * 切换数据源启动/停止状态
+ * Start switching data sources/stop state
  */
 const toggleDataSource = async (componentId: string) => {
   const component = componentsWithDataSources.value.find(c => c.id === componentId)
@@ -427,7 +427,7 @@ const toggleDataSource = async (componentId: string) => {
       window.$message?.success(t('dataSource.trigger.startSuccess'))
     }
 
-    // 刷新状态
+    // refresh status
     await refreshComponentStatus()
   } catch (error) {
     window.$message?.error(t('dataSource.trigger.toggleError'))
@@ -437,7 +437,7 @@ const toggleDataSource = async (componentId: string) => {
 }
 
 /**
- * 启动所有数据源
+ * Start all data sources
  */
 const startAllDataSources = async () => {
   bulkOperationLoading.value = true
@@ -458,7 +458,7 @@ const startAllDataSources = async () => {
 }
 
 /**
- * 停止所有数据源
+ * Stop all data sources
  */
 const stopAllDataSources = async () => {
   bulkOperationLoading.value = true
@@ -479,16 +479,16 @@ const stopAllDataSources = async () => {
 }
 
 /**
- * 刷新组件状态
+ * Refresh component status
  */
 const refreshComponentStatus = async () => {
   refreshLoading.value = true
   try {
-    // 获取最新的组件配置和状态
+    // Get the latest component configuration and status
     const allConfigs = editorDataSourceManager.getAllComponentConfigs()
     const stats = editorDataSourceManager.getStatistics()
 
-    // 更新组件列表，并补充额外的UI状态
+    // Update component list，and add additionalUIstate
     componentsWithDataSources.value = Array.from(allConfigs.values()).map(config => ({
       ...config,
       showDetails: false,
@@ -505,7 +505,7 @@ const refreshComponentStatus = async () => {
 }
 
 /**
- * 获取组件操作菜单
+ * Get component operation menu
  */
 const getComponentActions = (component: ComponentDataSourceConfig) => {
   return [
@@ -523,7 +523,7 @@ const getComponentActions = (component: ComponentDataSourceConfig) => {
       key: 'viewLogs',
       props: {
         onClick: () => {
-          // TODO: 实现日志查看功能
+          // TODO: Implement log viewing function
           window.$message?.info(t('dataSource.trigger.logsNotImplemented'))
         }
       }
@@ -533,7 +533,7 @@ const getComponentActions = (component: ComponentDataSourceConfig) => {
       key: 'resetConfig',
       props: {
         onClick: () => {
-          // TODO: 实现配置重置功能
+          // TODO: Implement configuration reset function
           window.$message?.info(t('dataSource.trigger.resetNotImplemented'))
         }
       }
@@ -542,23 +542,23 @@ const getComponentActions = (component: ComponentDataSourceConfig) => {
 }
 
 /**
- * 处理组件操作
+ * Handle component operations
  */
 const handleComponentAction = (key: string, option: any) => {
-  // 操作已在菜单项的 onClick 中处理
+  // The operation is already in the menu item onClick medium processing
 }
 
 /**
- * 设置定时刷新
+ * Set scheduled refresh
  */
 const setupRefreshTimer = () => {
-  // 每5秒刷新一次状态
+  // Every5Refresh status once every second
   refreshTimer = setInterval(() => {
     refreshComponentStatus()
   }, 5000)
 }
 
-// 生命周期钩子
+// life cycle hooks
 onMounted(async () => {
   await refreshComponentStatus()
   setupRefreshTimer()
@@ -634,7 +634,7 @@ onUnmounted(() => {
   margin-top: 8px;
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 768px) {
   .component-card .n-space {
     flex-direction: column;
@@ -647,7 +647,7 @@ onUnmounted(() => {
   }
 }
 
-/* 主题适配 */
+/* Theme adaptation */
 [data-theme='dark'] .component-card.active-component {
   background-color: rgba(82, 196, 26, 0.05);
 }

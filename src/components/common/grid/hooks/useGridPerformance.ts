@@ -1,6 +1,6 @@
 /**
- * Grid 性能监控和优化 Hook
- * 提供性能指标监控和优化功能
+ * Grid Performance monitoring and optimization Hook
+ * Provide performance indicator monitoring and optimization functions
  */
 
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
@@ -8,39 +8,39 @@ import type { GridLayoutPlusItem, PerformanceConfig } from '../gridLayoutPlusTyp
 import { debounce, throttle } from '../gridLayoutPlusUtils'
 
 export interface UseGridPerformanceOptions {
-  /** 性能配置 */
+  /** Performance configuration */
   performanceConfig?: Partial<PerformanceConfig>
-  /** 是否启用性能监控 */
+  /** Whether to enable performance monitoring */
   enableMonitoring?: boolean
-  /** 性能数据收集间隔(ms) */
+  /** Performance data collection interval(ms) */
   monitoringInterval?: number
-  /** 是否自动优化 */
+  /** Whether to automatically optimize */
   autoOptimize?: boolean
 }
 
 export interface PerformanceMetrics {
-  /** 渲染时间(ms) */
+  /** render time(ms) */
   renderTime: number
-  /** 布局计算时间(ms) */
+  /** Layout calculation time(ms) */
   layoutTime: number
-  /** 项目数量 */
+  /** Number of items */
   itemCount: number
-  /** 内存使用量估算(KB) */
+  /** Memory usage estimate(KB) */
   memoryUsage: number
-  /** FPS值 */
+  /** FPSvalue */
   fps: number
-  /** 最后更新时间 */
+  /** Last updated */
   lastUpdated: number
 }
 
 /**
- * 网格性能管理Hook
- * 提供性能监控、优化建议和自动优化功能
+ * Grid performance managementHook
+ * Provide performance monitoring、Optimization suggestions and automatic optimization functions
  */
 export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
   const { performanceConfig = {}, enableMonitoring = true, monitoringInterval = 1000, autoOptimize = false } = options
 
-  // 性能配置
+  // Performance configuration
   const config = ref<PerformanceConfig>({
     debounceDelay: 100,
     throttleDelay: 16,
@@ -49,7 +49,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     ...performanceConfig
   })
 
-  // 性能指标
+  // Performance indicators
   const metrics = ref<PerformanceMetrics>({
     renderTime: 0,
     layoutTime: 0,
@@ -59,18 +59,18 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     lastUpdated: Date.now()
   })
 
-  // 性能监控状态
+  // Performance monitoring status
   const isMonitoring = ref(false)
   const performanceHistory = ref<PerformanceMetrics[]>([])
   const maxHistoryLength = 100
 
-  // FPS监控相关
+  // FPSMonitoring related
   let fpsFrameCount = 0
   let fpsStartTime = 0
   let animationFrameId = 0
   let monitoringTimer: NodeJS.Timeout | null = null
 
-  // 计算属性
+  // Computed properties
   const needsVirtualization = computed(() => {
     return metrics.value.itemCount >= config.value.virtualizationThreshold
   })
@@ -78,19 +78,19 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
   const performanceScore = computed(() => {
     const { renderTime, layoutTime, fps, itemCount } = metrics.value
 
-    // 基于多个指标计算性能得分 (0-100)
+    // Calculate performance scores based on multiple metrics (0-100)
     let score = 100
 
-    // 渲染时间惩罚
+    // Render time penalty
     if (renderTime > 16) score -= Math.min(30, (renderTime - 16) / 2)
 
-    // 布局计算时间惩罚
+    // Layout calculation time penalty
     if (layoutTime > 10) score -= Math.min(20, (layoutTime - 10) / 2)
 
-    // FPS惩罚
+    // FPSpunish
     if (fps < 60) score -= Math.min(25, (60 - fps) / 2)
 
-    // 项目数量惩罚
+    // Project quantity penalty
     if (itemCount > 50) score -= Math.min(25, (itemCount - 50) / 10)
 
     return Math.max(0, Math.floor(score))
@@ -101,35 +101,35 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     const { renderTime, layoutTime, itemCount } = metrics.value
 
     if (itemCount >= config.value.virtualizationThreshold && !config.value.enableVirtualization) {
-      suggestions.push('建议启用虚拟化以提高大数据集性能')
+      suggestions.push('It is recommended to enable virtualization to improve performance on large data sets')
     }
 
     if (renderTime > 16) {
-      suggestions.push('渲染时间过长，考虑减少DOM操作或启用防抖')
+      suggestions.push('Rendering takes too long，Consider reducingDOMOperate or enable anti-shake')
     }
 
     if (layoutTime > 10) {
-      suggestions.push('布局计算耗时较长，考虑优化布局算法')
+      suggestions.push('Layout calculation takes a long time，Consider optimizing layout algorithms')
     }
 
     if (metrics.value.fps < 45) {
-      suggestions.push('帧率较低，建议减少动画效果或优化渲染')
+      suggestions.push('lower frame rate，It is recommended to reduce animation effects or optimize rendering')
     }
 
     if (!config.value.enableLazyLoading && itemCount > 30) {
-      suggestions.push('考虑启用懒加载以改善初始加载性能')
+      suggestions.push('Consider enabling lazy loading to improve initial load performance')
     }
 
     return suggestions
   })
 
-  // 性能测量工具
+  // Performance measurement tools
   const measureRenderTime = async (renderFn: () => Promise<void> | void) => {
     const startTime = performance.now()
 
     try {
       await renderFn()
-      await nextTick() // 等待DOM更新完成
+      await nextTick() // waitDOMUpdate completed
     } catch (error) {
       console.error('[GridPerformance] Render function error:', error)
     }
@@ -161,13 +161,13 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     return layoutTime
   }
 
-  // 内存使用估算
+  // Memory usage estimate
   const estimateMemoryUsage = (layout: GridLayoutPlusItem[]) => {
     try {
-      // 简化的内存使用估算
-      const itemSize = 200 // 每个网格项大约200字节
-      const layoutSize = JSON.stringify(layout).length * 2 // 字符串大小的2倍
-      const totalSize = (layout.length * itemSize + layoutSize) / 1024 // 转换为KB
+      // Simplified memory usage estimates
+      const itemSize = 200 // Each grid item is approx.200byte
+      const layoutSize = JSON.stringify(layout).length * 2 // String size2times
+      const totalSize = (layout.length * itemSize + layoutSize) / 1024 // Convert toKB
 
       metrics.value.memoryUsage = totalSize
       return totalSize
@@ -177,7 +177,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     }
   }
 
-  // FPS监控
+  // FPSmonitor
   const measureFPS = () => {
     const now = performance.now()
 
@@ -199,7 +199,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     }
   }
 
-  // 性能监控控制
+  // Performance monitoring control
   const startMonitoring = () => {
     if (isMonitoring.value || !enableMonitoring) return
 
@@ -207,20 +207,20 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     fpsStartTime = 0
     fpsFrameCount = 0
 
-    // 开始FPS监控
+    // startFPSmonitor
     measureFPS()
 
-    // 定期收集性能数据
+    // Collect performance data regularly
     monitoringTimer = setInterval(() => {
       const currentMetrics = { ...metrics.value }
       performanceHistory.value.push(currentMetrics)
 
-      // 限制历史记录长度
+      // Limit history length
       if (performanceHistory.value.length > maxHistoryLength) {
         performanceHistory.value.shift()
       }
 
-      // 自动优化
+      // Automatic optimization
       if (autoOptimize && performanceScore.value < 60) {
         applyAutoOptimizations()
       }
@@ -247,19 +247,19 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     console.debug('[GridPerformance] Monitoring stopped')
   }
 
-  // 自动优化
+  // Automatic optimization
   const applyAutoOptimizations = () => {
     const { itemCount } = metrics.value
     let optimized = false
 
-    // 自动调整防抖延迟
+    // Automatically adjust anti-shake delay
     if (metrics.value.renderTime > 20 && config.value.debounceDelay < 200) {
       config.value.debounceDelay = Math.min(200, config.value.debounceDelay + 50)
       optimized = true
       console.debug(`[GridPerformance] Increased debounce delay to ${config.value.debounceDelay}ms`)
     }
 
-    // 自动启用懒加载
+    // Automatically enable lazy loading
     if (itemCount > 30 && !config.value.enableLazyLoading) {
       config.value.enableLazyLoading = true
       optimized = true
@@ -269,7 +269,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     return optimized
   }
 
-  // 创建防抖和节流函数
+  // Create debounce and throttling functions
   const createDebouncedFunction = <T extends (...args: any[]) => any>(fn: T, customDelay?: number) => {
     return debounce(fn, customDelay || config.value.debounceDelay)
   }
@@ -278,7 +278,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     return throttle(fn, customDelay || config.value.throttleDelay)
   }
 
-  // 性能报告
+  // performance report
   const getPerformanceReport = () => {
     const avgMetrics = performanceHistory.value.reduce(
       (acc, metric) => ({
@@ -307,7 +307,7 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
     }
   }
 
-  // 生命周期管理
+  // life cycle management
   onMounted(() => {
     if (enableMonitoring) {
       startMonitoring()
@@ -319,31 +319,31 @@ export function useGridPerformance(options: UseGridPerformanceOptions = {}) {
   })
 
   return {
-    // 配置
+    // Configuration
     config,
 
-    // 指标
+    // index
     metrics,
     performanceScore,
     needsVirtualization,
     optimizationSuggestions,
 
-    // 监控控制
+    // Monitoring and control
     isMonitoring,
     startMonitoring,
     stopMonitoring,
 
-    // 测量工具
+    // measuring tools
     measureRenderTime,
     measureLayoutTime,
     estimateMemoryUsage,
 
-    // 优化工具
+    // Optimization tools
     createDebouncedFunction,
     createThrottledFunction,
     applyAutoOptimizations,
 
-    // 报告
+    // Report
     getPerformanceReport,
     performanceHistory
   }

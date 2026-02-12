@@ -1,4 +1,4 @@
-/** 统一失败和成功的请求结果的数据类型 */
+/** Unify the data type of failed and successful request results */
 export async function handleServiceResult<T = any>(
   error: App.Service.RequestError | null,
   data: any,
@@ -21,7 +21,7 @@ export async function handleServiceResult<T = any>(
   }
 }
 
-/** 请求结果的适配器：用于接收适配器函数和请求结果 */
+/** Adapter for requesting results：Used to receive adapter functions and request results */
 export function adapter<T extends App.Service.ServiceAdapter>(
   adapterFun: T,
   ...args: App.Service.MultiRequestResult<Parameters<T>>

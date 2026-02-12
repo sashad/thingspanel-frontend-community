@@ -46,7 +46,7 @@ const renderInfoWindow = (evt: any, _res: any) => {
 }
 
 const showMarker = (markerArr, bounds) => {
-  // 如果没有标记点，直接使用默认中心点
+  // If there is no marked point，Use the default center point directly
   if (!markerArr || markerArr.length === 0) {
     const defaultCenter = new TMap.LatLng(39.98412, 116.307484)
     bounds.extend(defaultCenter)
@@ -55,7 +55,7 @@ const showMarker = (markerArr, bounds) => {
     return
   }
 
-  // 过滤掉无效的标记点
+  // Filter out invalid markers
   const validMarkers = markerArr.filter(marker => {
     const position = marker?.position
     return (
@@ -67,21 +67,21 @@ const showMarker = (markerArr, bounds) => {
   })
 
   if (validMarkers.length === 0) {
-    // 如果没有有效的标记点，使用默认中心点
+    // If there are no valid markers，Use default center point
     const defaultCenter = new TMap.LatLng(39.98412, 116.307484)
     bounds.extend(defaultCenter)
     map.setCenter(defaultCenter)
     map.setZoom(11)
   } else {
-    // 判断标注点是否在范围内
+    // Determine whether the label point is within the range
     validMarkers.forEach(item => {
       if (bounds.isEmpty() || !bounds.contains(item.position)) {
         bounds.extend(item.position)
       }
     })
-    // 设置地图可视范围
+    // Set map visibility range
     map.fitBounds(bounds, {
-      padding: 100 // 自适应边距
+      padding: 100 // adaptive margins
     })
   }
 }
@@ -91,7 +91,7 @@ async function renderMap() {
   await load(true)
   if (!domRef.value) return
 
-  // 初始化地图
+  // Initialize map
   if (!map) {
     map = new TMap.Map(domRef.value, {
       center: new TMap.LatLng(39.98412, 116.307484),
@@ -111,12 +111,12 @@ async function renderMap() {
     })
   }
 
-  // 清理旧的标记
+  // Clean up old markup
   if (multiMarker) {
     multiMarker.setMap(null)
   }
 
-  // 处理设备数据
+  // Process device data
   const markers: any = []
   if (props.devices && props.devices.length > 0) {
     props.devices.forEach(device => {
@@ -125,7 +125,7 @@ async function renderMap() {
         const latitude = Number(locations[1] || 0)
         const longitude = Number(locations[0] || 0)
 
-        // 验证经纬度是否在有效范围内
+        // Verify whether the latitude and longitude is within the valid range
         if (isValidCoordinate(latitude, longitude)) {
           markers.push({
             position: new TMap.LatLng(latitude, longitude),
@@ -137,7 +137,7 @@ async function renderMap() {
     })
   }
 
-  // 只有在有有效标记点时才创建 MultiMarker
+  // Only created if there is a valid marker MultiMarker
   if (markers.length > 0) {
     multiMarker = new TMap.MultiMarker({
       map,
@@ -152,7 +152,7 @@ async function renderMap() {
       geometries: markers
     })
 
-    // 添加点击事件
+    // Add click event
     multiMarker.on('click', (evt: any) => {
       if (!evt?.geometry?.data?.id) return
 
@@ -175,7 +175,7 @@ async function renderMap() {
           ignoreMapClick = false
         }, 10)
 
-        // 创建信息窗口
+        // Create information window
         if (!infoWindow) {
           infoWindow = new TMap.InfoWindow({
             map,
@@ -185,7 +185,7 @@ async function renderMap() {
           })
         }
 
-        // 创建并显示信息窗口内容
+        // Create and display information window contents
         const app = createApp({
           setup() {
             return () => renderInfoWindow(evt, res)

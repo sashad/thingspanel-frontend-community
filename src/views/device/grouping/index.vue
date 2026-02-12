@@ -16,7 +16,7 @@ const isRequestPending = ref(false)
 const data = ref([])
 const loading = ref(false)
 const currentPage = ref(1)
-const totalPages = ref(0) // 假设总页数为 5，实际应从后端获取
+const totalPages = ref(0) // Assume that the total number of pages is 5，It should actually be obtained from the backend
 const getDevice = async () => {
   loading.value = true
   const res = await getDeviceGroup({
@@ -28,10 +28,10 @@ const getDevice = async () => {
   totalPages.value = Math.ceil(res.data.total / 10)
   loading.value = false
 }
-// 使用 lodash 的 debounce 函数来延迟搜索请求的发送
+// use lodash of debounce function to delay the sending of search requests
 const debouncedSearch = debounce(async () => {
   if (isRequestPending.value) {
-    return // 如果当前有请求正在进行，则不执行新的请求
+    return // If there is currently a request in progress，New requests will not be executed
   }
 
   isRequestPending.value = true
@@ -47,9 +47,9 @@ const debouncedSearch = debounce(async () => {
   loading.value = false
   // eslint-disable-next-line require-atomic-updates
   isRequestPending.value = false
-}, 500) // 设置延迟为 500 毫秒
+}, 500) // Set delay to 500 millisecond
 
-// 监听输入变化并调用 debounced 函数
+// Monitor input changes and call debounced function
 const handleInput = () => {
   debouncedSearch()
 }

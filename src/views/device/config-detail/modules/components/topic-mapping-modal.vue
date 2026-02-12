@@ -48,7 +48,7 @@ const formData = ref<TopicMapping>({
   enabled: true
 })
 
-// 标识当前是否处于编辑数据填充阶段，避免初始化时误清空系统主题
+// Identifies whether it is currently in the editing data filling stage，Avoid accidentally clearing the system theme during initialization
 const isFillingFromEdit = ref(false)
 
 interface TopicOptionSource {
@@ -247,7 +247,7 @@ const rules = computed<FormRules>(() => ({
   ]
 }))
 
-// 控制弹窗显示
+// Control pop-up window display
 const modalVisible = computed({
   get() {
     return props.visible
@@ -257,7 +257,7 @@ const modalVisible = computed({
   }
 })
 
-// 监听编辑数据变化
+// Monitor edit data changes
 watch(
   () => props.editData,
   newData => {
@@ -275,7 +275,7 @@ watch(
         enabled: newData.enabled ?? true
       }
     } else {
-      // 重置表单
+      // Reset form
       formData.value = {
         mapping_name: '',
         direction: 'down',
@@ -287,7 +287,7 @@ watch(
         enabled: true
       }
     }
-    // 异步下一个 tick 后再关闭填充标志，确保 watcher 不清空系统主题
+    // asynchronous next tick and then close the fill flag，make sure watcher Do not clear system themes
     nextTick(() => {
       isFillingFromEdit.value = false
     })
@@ -295,7 +295,7 @@ watch(
   { immediate: true }
 )
 
-// 监听数据方向变化，重置系统主题
+// Monitor data direction changes，Reset system theme
 watch(
   () => formData.value.direction,
   () => {
@@ -313,7 +313,7 @@ watch(
   }
 )
 
-// 监听弹窗显示状态，关闭时重置表单
+// Monitor pop-up window display status，Reset form on close
 watch(
   () => props.visible,
   visible => {
@@ -335,7 +335,7 @@ watch(
   }
 )
 
-// 保存
+// save
 const handleSave = async () => {
   try {
     await formRef.value?.validate()
@@ -346,18 +346,18 @@ const handleSave = async () => {
   }
 }
 
-// 取消
+// Cancel
 const handleCancel = () => {
   modalVisible.value = false
 }
 
-// 格式化 Markdown 文本
+// format Markdown text
 const formatMarkdown = (text: string): string => {
   if (!text) return ''
-  // 首先转义所有花括号，防止被 Vue 当作插值表达式解析
+  // First escape all curly braces，prevent being Vue parsed as interpolation expression
   let result = text.replace(/\{/g, '&#123;').replace(/\}/g, '&#125;')
 
-  // 处理代码块（```...```），避免被其他规则影响
+  // Process code blocks（```...```），Avoid being affected by other rules
   const codeBlockPlaceholder = '__CODE_BLOCK_PLACEHOLDER__'
   const codeBlocks: string[] = []
   result = result.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -365,13 +365,13 @@ const formatMarkdown = (text: string): string => {
     codeBlocks.push(code.trim())
     return placeholder
   })
-  // 处理加粗文本
+  // Handle bold text
   result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  // 处理行内代码（不在代码块内的）
+  // Handle inline code（Not within a code block）
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>')
-  // 处理换行
+  // Handle newlines
   result = result.replace(/\n/g, '<br>')
-  // 恢复代码块
+  // Restore code block
   codeBlocks.forEach((code, index) => {
     result = result.replace(
       `${codeBlockPlaceholder}${index}`,
@@ -381,7 +381,7 @@ const formatMarkdown = (text: string): string => {
   return result
 }
 
-// 渲染系统主题标签（下拉选项中的显示）
+// Rendering system theme tags（Display in drop-down options）
 const renderTopicLabel: SelectRenderLabel = (option) => {
   const topicOption = option as { label: string; value: string; description: string }
   return h(
@@ -416,7 +416,7 @@ const renderTopicLabel: SelectRenderLabel = (option) => {
   )
 }
 
-// 渲染系统主题标签（选中后显示在输入框中）
+// Rendering system theme tags（Displayed in the input box after selection）
 const renderTopicTag: SelectRenderTag = ({ option }) => {
   const topicOption = option as { label: string; value: string; description: string }
   return h(

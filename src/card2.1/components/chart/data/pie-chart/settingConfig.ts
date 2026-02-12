@@ -1,35 +1,35 @@
 /**
- * 饼图组件配置接口
+ * Pie chart component configuration interface
  */
 export interface PieChartCustomize {
-  // 图表配置
-  title?: string // 图表标题
-  showLegend?: boolean // 显示图例
-  legendPosition?: 'top' | 'bottom' | 'left' | 'right' // 图例位置
+  // Chart configuration
+  title?: string // Chart title
+  showLegend?: boolean // Show legend
+  legendPosition?: 'top' | 'bottom' | 'left' | 'right' // legend position
 
-  // 饼图样式配置
-  radius?: [string, string] // 饼图半径 [内半径, 外半径]
-  isDonut?: boolean // 是否为环形图
-  roseType?: boolean | 'radius' | 'area' // 南丁格尔玫瑰图类型
+  // Pie chart style configuration
+  radius?: [string, string] // pie radius [inner radius, outer radius]
+  isDonut?: boolean // Is it a donut chart?
+  roseType?: boolean | 'radius' | 'area' // Nightingale Rose Chart Type
 
-  // 标签配置
-  showLabel?: boolean // 显示标签
-  labelPosition?: 'outside' | 'inside' | 'center' // 标签位置
-  showLabelLine?: boolean // 显示标签引导线
+  // Label configuration
+  showLabel?: boolean // show label
+  labelPosition?: 'outside' | 'inside' | 'center' // label position
+  showLabelLine?: boolean // Show label guides
 
-  // 颜色配置
-  colorScheme?: 'default' | 'warm' | 'cool' | 'pastel' | 'custom' // 颜色方案
-  customColors?: string[] // 自定义颜色数组
+  // Color configuration
+  colorScheme?: 'default' | 'warm' | 'cool' | 'pastel' | 'custom' // color scheme
+  customColors?: string[] // Custom color array
 
-  // 交互配置
-  enableHighlight?: boolean // 启用高亮效果
-  selectedMode?: boolean | 'single' | 'multiple' // 选中模式
-  selectedOffset?: number // 选中扇区的偏移距离
+  // Interactive configuration
+  enableHighlight?: boolean // Enable highlighting
+  selectedMode?: boolean | 'single' | 'multiple' // selected mode
+  selectedOffset?: number // Offset distance of selected sector
 
-  // 数据显示配置
-  showPercentage?: boolean // 显示百分比
-  minAngle?: number // 最小扇区角度
+  // Data display configuration
+  showPercentage?: boolean // Show percentage
+  minAngle?: number // Minimum sector angle
 
-  // 动画配置
-  animationDuration?: number // 动画时长
+  // Animation configuration
+  animationDuration?: number // Animation duration
 }

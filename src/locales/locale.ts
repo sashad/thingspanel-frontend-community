@@ -1,5 +1,5 @@
-// 使用 import.meta.globEager 替代大量 import
-// 这可以提高性能，并使代码更简洁
+// use import.meta.globEager Replace a lot of import
+// This can improve performance，and make the code more concise
 const modules = import.meta.glob('./langs/**/*.json', { eager: true })
 
 function getLangMessages(modules: Record<string, any>, lang: 'zh-cn' | 'en-us') {
@@ -10,10 +10,10 @@ function getLangMessages(modules: Record<string, any>, lang: 'zh-cn' | 'en-us') 
     if (path.startsWith(prefix)) {
       const content = modules[path].default
 
-      // 提取文件名作为命名空间
+      // Extract filename as namespace
       const fileName = path.replace(prefix, '').replace('.json', '')
 
-      // 特殊处理：某些文件保持扁平化结构以兼容现有代码
+      // special handling：Some files remain flat for compatibility with existing code
       const flatFiles = [
         'common',
         'card',
@@ -41,10 +41,10 @@ function getLangMessages(modules: Record<string, any>, lang: 'zh-cn' | 'en-us') 
       ]
 
       if (flatFiles.includes(fileName)) {
-        // 扁平化合并（保持现有行为）
+        // flat merge（maintain existing behavior）
         Object.assign(messages, content)
       } else {
-        // 使用文件名作为命名空间
+        // Use filename as namespace
         messages[fileName] = content
       }
     }

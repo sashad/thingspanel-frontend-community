@@ -50,7 +50,7 @@ const onlinejson = reactive({
   heartbeat: 0
 })
 
-// 图片上传相关
+// Image upload related
 const demoUrl = getDemoServerUrl()
 const url: any = ref(demoUrl)
 const imagePath: any = ref('')
@@ -61,15 +61,15 @@ const customRequest = ({ file, event }: { file: UploadFileInfo; event?: Progress
   const xhr = event.target as XMLHttpRequest
   const response = JSON.parse(xhr.response)
 
-  // 保存图片路径
+  // Save image path
   const relativePath = response.data.path.replace(/^\.\//, '')
   imagePath.value = `${url.value.replace('api/v1', '') + relativePath}`
 
-  // 直接保存图片路径到服务器
+  // Save the image path directly to the server
   saveImagePath(relativePath)
 }
 
-// 保存图片路径到服务器
+// Save image path to server
 const saveImagePath = async (relativePath: string) => {
   const { error }: any = await deviceConfigEdit({
     id: props.configInfo.id,
@@ -104,26 +104,26 @@ const copyOneTypeOneSecretDevicePassword = () => {
     return
   }
 
-  // 1. 创建一个 textarea 作为临时元素
+  // 1. Create a textarea as a temporary element
   const textarea = document.createElement('textarea')
   textarea.value = textToCopy
-  // 设置样式使其不可见且不影响布局
+  // Set the style so that it is invisible and does not affect the layout
   textarea.style.position = 'fixed'
   textarea.style.top = '-9999px'
   textarea.style.left = '-9999px'
-  // 确保元素是可编辑的（尽管readonly也可以，但默认状态通常更好）
+  // Make sure the element is editable（althoughreadonlyOK，But the default state is usually better）
   // textarea.setAttribute('readonly', '');
   document.body.appendChild(textarea)
 
-  // 2. 使用 clipboard.js 实例，但目标是这个 textarea
-  // 我们这里不直接将 clipboard 绑定到 textarea，而是利用其API来触发复制
-  // clipboard.js 通常需要一个触发元素，我们仍然用一个假的按钮
+  // 2. use clipboard.js Example，But the goal is this textarea
+  // Here we do not directly clipboard bind to textarea，But use itAPIto trigger replication
+  // clipboard.js Usually requires a trigger element，We still use a fake button
   const triggerElement = document.createElement('button')
-  document.body.appendChild(triggerElement) // 必须在DOM中才能绑定
+  document.body.appendChild(triggerElement) // must be inDOMmedium to bind
 
   const clipboard = new ClipboardJS(triggerElement, {
-    target: () => textarea, // 明确指定从 textarea 复制
-    // text: () => textToCopy, // 如果用 target, text 选项会被忽略
+    target: () => textarea, // Explicitly specify from textarea copy
+    // text: () => textToCopy, // If used target, text options will be ignored
     container: document.body
   })
 
@@ -151,22 +151,22 @@ const copyOneTypeOneSecretDevicePassword = () => {
     document.body.removeChild(triggerElement)
   }
 
-  // 3. 显式选择 textarea 中的文本
+  // 3. explicit selection textarea text in
   textarea.select()
-  textarea.setSelectionRange(0, textToCopy.length) // 兼容移动设备
-  textarea.focus() // 尝试给予焦点
+  textarea.setSelectionRange(0, textToCopy.length) // Compatible with mobile devices
+  textarea.focus() // try to give focus
 
-  // 4. 触发复制
+  // 4. Trigger replication
   triggerElement.click()
 
-  // 5. 为防止某些情况下事件未立即触发或清理过早，可以加一个小的延时
-  //    但这通常不应该是首选，如果 clipboard.js 工作正常，其事件应能处理。
-  //    如果以上仍然失败，可以考虑一个非常短的延时来执行 cleanup。
+  // 5. To prevent events from not triggering immediately or cleaning up prematurely in some cases，You can add a small delay
+  //    But this usually shouldn't be the first choice，if clipboard.js working fine，Its events should be able to handle。
+  //    If the above still fails，A very short delay can be considered for execution cleanup。
   // setTimeout(() => {
-  //   if (!success) { // 如果没有成功事件触发（理论上不应该）
+  //   if (!success) { // If there is no success event triggers（Theoretically it shouldn't）
   //     cleanup();
   //   }
-  // }, 100); // 100ms 应该足够
+  // }, 100); // 100ms should be enough
 }
 const onSubmit = async () => {
   onDialogVisble()
@@ -196,7 +196,7 @@ onMounted(() => {
   if (process.env.NODE_ENV === 'development') {
   }
   auto_register.value = props.configInfo?.auto_register === 1 || false
-  // 初始化图片路径
+  // Initialize image path
   imagePath.value = props.configInfo?.image_url ? `${url.value.replace('api/v1', '') + props.configInfo.image_url}` : ''
 })
 </script>

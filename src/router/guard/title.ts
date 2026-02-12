@@ -10,7 +10,7 @@ export function createDocumentTitleGuard(router: Router) {
     const appTitle = sysSettingStore.system_name === '' ? $t('title') : sysSettingStore.system_name
     let routeTitle = ''
 
-    // 处理登录页面的子路由
+    // Handle sub-routes for login page
     if (to.path?.startsWith('/login/')) {
       const path = to.path.split('/').pop()?.toLowerCase()
       switch (path) {
@@ -27,11 +27,11 @@ export function createDocumentTitleGuard(router: Router) {
           routeTitle = $t('page.login.pwdLogin.title')
       }
     } else {
-      // 其他路由的处理
+      // Processing of other routes
       routeTitle = i18nKey ? $t(i18nKey) : title
     }
 
-    // 组合完整标题：应用标题 - 路由标题
+    // Combine full title：Application title - Route header
     const documentTitle = routeTitle ? `${routeTitle}-${appTitle}` : appTitle
 
     useTitle(documentTitle)

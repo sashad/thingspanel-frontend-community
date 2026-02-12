@@ -1,42 +1,42 @@
 <template>
   <div class="real-world-example">
-    <n-card title="真实场景 WebSocket 数据流示例" size="small">
+    <n-card title="real scene WebSocket Data flow example" size="small">
       <n-space vertical>
-        <!-- 场景说明 -->
-        <n-alert type="success" title="生产环境使用场景">
+        <!-- Scene description -->
+        <n-alert type="success" title="Production environment usage scenarios">
           <template #default>
             <p>
-              <strong>场景</strong>
-              ：工厂温度监控系统
+              <strong>scene</strong>
+              ：Factory temperature monitoring system
             </p>
             <p>
-              <strong>设备</strong>
-              ：温度传感器 (device_001)
+              <strong>equipment</strong>
+              ：temperature sensor (device_001)
             </p>
             <p>
-              <strong>数据</strong>
-              ：实时温度数据，每5秒更新一次
+              <strong>data</strong>
+              ：Real-time temperature data，Every5Update once every second
             </p>
             <p>
-              <strong>显示</strong>
-              ：digit-indicator 组件实时显示温度
+              <strong>show</strong>
+              ：digit-indicator Components display temperature in real time
             </p>
           </template>
         </n-alert>
 
-        <!-- 设备状态 -->
-        <n-divider title-placement="left">设备状态</n-divider>
+        <!-- Device status -->
+        <n-divider title-placement="left">Device status</n-divider>
 
         <n-space>
           <n-tag :type="deviceStatus.type" size="large">
             {{ deviceStatus.text }}
           </n-tag>
-          <n-text>设备ID: device_001</n-text>
-          <n-text>指标: temperature</n-text>
+          <n-text>equipmentID: device_001</n-text>
+          <n-text>index: temperature</n-text>
         </n-space>
 
-        <!-- 实时数据显示 -->
-        <n-divider title-placement="left">实时数据显示</n-divider>
+        <!-- Real-time data display -->
+        <n-divider title-placement="left">Real-time data display</n-divider>
 
         <div class="dashboard">
           <div class="component-container">
@@ -44,18 +44,18 @@
           </div>
 
           <div class="data-panel">
-            <n-card title="数据详情" size="small">
+            <n-card title="Data details" size="small">
               <n-space vertical>
                 <div class="data-item">
-                  <n-text strong>当前温度:</n-text>
+                  <n-text strong>current temperature:</n-text>
                   {{ currentTemperature }}°C
                 </div>
                 <div class="data-item">
-                  <n-text strong>更新时间:</n-text>
+                  <n-text strong>Update time:</n-text>
                   {{ lastUpdateTime }}
                 </div>
                 <div class="data-item">
-                  <n-text strong>数据质量:</n-text>
+                  <n-text strong>Data quality:</n-text>
                   <n-tag :type="dataQuality.type" size="small">
                     {{ dataQuality.text }}
                   </n-tag>
@@ -65,22 +65,22 @@
           </div>
         </div>
 
-        <!-- 模拟控制 -->
-        <n-divider title-placement="left">模拟控制</n-divider>
+        <!-- Analog control -->
+        <n-divider title-placement="left">Analog control</n-divider>
 
         <n-space>
-          <n-button type="primary" :disabled="isSimulating" @click="startSimulation">开始模拟</n-button>
-          <n-button type="error" :disabled="!isSimulating" @click="stopSimulation">停止模拟</n-button>
-          <n-button type="warning" :disabled="!isSimulating" @click="sendAlert">发送告警</n-button>
+          <n-button type="primary" :disabled="isSimulating" @click="startSimulation">Start simulation</n-button>
+          <n-button type="error" :disabled="!isSimulating" @click="stopSimulation">Stop simulation</n-button>
+          <n-button type="warning" :disabled="!isSimulating" @click="sendAlert">Send alert</n-button>
         </n-space>
 
-        <!-- 数据历史 -->
-        <n-divider title-placement="left">数据历史</n-divider>
+        <!-- Data history -->
+        <n-divider title-placement="left">Data history</n-divider>
 
         <n-card size="small" class="history-card">
           <div class="history-header">
-            <n-text strong>最近10次数据更新</n-text>
-            <n-button size="small" @click="clearHistory">清空历史</n-button>
+            <n-text strong>recent10data updates</n-text>
+            <n-button size="small" @click="clearHistory">Clear history</n-button>
           </div>
           <div class="history-content">
             <div v-for="(record, index) in dataHistory" :key="index" class="history-item">
@@ -88,17 +88,17 @@
               <span class="history-value">{{ record.value }}°C</span>
               <span class="history-type">{{ record.type }}</span>
             </div>
-            <n-empty v-if="dataHistory.length === 0" description="暂无数据" size="small" />
+            <n-empty v-if="dataHistory.length === 0" description="No data yet" size="small" />
           </div>
         </n-card>
 
-        <!-- 系统日志 -->
-        <n-divider title-placement="left">系统日志</n-divider>
+        <!-- System log -->
+        <n-divider title-placement="left">System log</n-divider>
 
         <n-card size="small" class="log-card">
           <div class="log-header">
-            <n-text strong>WebSocket 连接日志</n-text>
-            <n-button size="small" @click="clearLogs">清空日志</n-button>
+            <n-text strong>WebSocket connection log</n-text>
+            <n-button size="small" @click="clearLogs">Clear log</n-button>
           </div>
           <div class="log-content">
             <div v-for="(log, index) in logs" :key="index" class="log-item" :class="log.type">
@@ -117,7 +117,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { NCard, NSpace, NDivider, NButton, NAlert, NText, NTag, NEmpty } from 'naive-ui'
 import digitIndicatorComponent from './component.vue'
 
-// 卡片数据
+// card data
 const cardData = ref({
   config: {
     color: '#ff4d4f',
@@ -129,30 +129,30 @@ const cardData = ref({
       {
         deviceId: 'device_001',
         metricsId: 'temperature',
-        metricsName: '温度',
+        metricsName: 'temperature',
         metricsType: 'telemetry'
       }
     ]
   }
 })
 
-// 组件引用
+// component reference
 const digitIndicatorRef = ref<any>(null)
 
-// 状态管理
+// Status management
 const isSimulating = ref(false)
-const deviceStatus = ref({ type: 'success', text: '在线' })
+const deviceStatus = ref({ type: 'success', text: 'online' })
 const currentTemperature = ref(25.0)
 const lastUpdateTime = ref('--')
-const dataQuality = ref({ type: 'success', text: '良好' })
+const dataQuality = ref({ type: 'success', text: 'good' })
 
-// 数据历史
+// Data history
 const dataHistory = ref<Array<{ timestamp: string; value: number; type: string }>>([])
 
-// 日志
+// log
 const logs = ref<Array<{ timestamp: string; message: string; type: string }>>([])
 
-// 模拟定时器
+// Analog timer
 let simulationTimer: any = null
 
 const addLog = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
@@ -175,15 +175,15 @@ const formatTime = (timestamp: string) => {
   return new Date(timestamp).toLocaleTimeString()
 }
 
-// 模拟数据生成
+// Simulation data generation
 const generateTemperature = () => {
-  // 生成20-30度之间的随机温度
+  // generate20-30Random temperature between degrees
   const baseTemp = 25
   const variation = (Math.random() - 0.5) * 10
   return Math.round((baseTemp + variation) * 10) / 10
 }
 
-// 发送数据到组件
+// Send data to component
 const sendDataToComponent = (temperature: number, type: string = 'normal') => {
   if (!digitIndicatorRef.value) return
 
@@ -193,75 +193,75 @@ const sendDataToComponent = (temperature: number, type: string = 'normal') => {
 
   digitIndicatorRef.value.updateData('device_001', 'temperature', data)
 
-  // 更新状态
+  // update status
   currentTemperature.value = temperature
   lastUpdateTime.value = new Date().toLocaleTimeString()
 
-  // 添加到历史记录
+  // Add to history
   dataHistory.value.unshift({
     timestamp: new Date().toISOString(),
     value: temperature,
     type: type
   })
 
-  // 保持最近10条记录
+  // keep recent10records
   if (dataHistory.value.length > 10) {
     dataHistory.value = dataHistory.value.slice(0, 10)
   }
 
-  addLog(`温度数据更新: ${temperature}°C (${type})`, 'success')
+  addLog(`Temperature data update: ${temperature}°C (${type})`, 'success')
 }
 
-// 开始模拟
+// Start simulation
 const startSimulation = () => {
   if (isSimulating.value) return
 
   isSimulating.value = true
-  deviceStatus.value = { type: 'success', text: '在线' }
-  dataQuality.value = { type: 'success', text: '良好' }
+  deviceStatus.value = { type: 'success', text: 'online' }
+  dataQuality.value = { type: 'success', text: 'good' }
 
-  addLog('开始温度数据模拟', 'info')
+  addLog('Start temperature data simulation', 'info')
 
-  // 立即发送一次数据
+  // Send data once immediately
   const initialTemp = generateTemperature()
   sendDataToComponent(initialTemp, 'initial')
 
-  // 每5秒发送一次数据
+  // Every5Send data once every second
   simulationTimer = setInterval(() => {
     const temp = generateTemperature()
     sendDataToComponent(temp, 'normal')
   }, 5000)
 }
 
-// 停止模拟
+// Stop simulation
 const stopSimulation = () => {
   if (!isSimulating.value) return
 
   isSimulating.value = false
-  deviceStatus.value = { type: 'error', text: '离线' }
-  dataQuality.value = { type: 'error', text: '无数据' }
+  deviceStatus.value = { type: 'error', text: 'Offline' }
+  dataQuality.value = { type: 'error', text: 'No data' }
 
   if (simulationTimer) {
     clearInterval(simulationTimer)
     simulationTimer = null
   }
 
-  addLog('停止温度数据模拟', 'warning')
+  addLog('Stop temperature data simulation', 'warning')
 }
 
-// 发送告警
+// Send alert
 const sendAlert = () => {
   if (!isSimulating.value) return
 
-  const alertTemp = 35.0 // 高温告警
+  const alertTemp = 35.0 // High temperature alarm
   sendDataToComponent(alertTemp, 'alert')
 
-  dataQuality.value = { type: 'error', text: '告警' }
-  addLog(`温度告警: ${alertTemp}°C`, 'error')
+  dataQuality.value = { type: 'error', text: 'Alarm' }
+  addLog(`Temperature alarm: ${alertTemp}°C`, 'error')
 }
 
 onMounted(() => {
-  addLog('温度监控系统已启动', 'success')
+  addLog('Temperature monitoring system is activated', 'success')
 })
 
 onUnmounted(() => {

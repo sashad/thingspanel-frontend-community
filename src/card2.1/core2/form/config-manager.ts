@@ -1,17 +1,17 @@
 /**
- * 配置管理器
- * 简化的配置模式检测和管理功能
+ * configuration manager
+ * Simplified configuration mode detection and management capabilities
  */
 
 import type { Component } from 'vue'
 import type { TSConfig, ConfigMode, FormField, FormGroup } from '../types'
 
 /**
- * 配置管理器类
+ * Configuration manager class
  */
 export class ConfigManager {
   /**
-   * 检测配置模式
+   * Detect configuration mode
    */
   static detectConfigMode(vueConfig?: Component, tsConfig?: TSConfig): ConfigMode {
     const hasVueConfig = !!vueConfig
@@ -24,35 +24,35 @@ export class ConfigManager {
     } else if (hasTSConfig) {
       return 'standard'
     } else {
-      return 'standard' // 默认模式
+      return 'standard' // Default mode
     }
   }
 
   /**
-   * 验证 TS 配置
+   * verify TS Configuration
    */
   static validateTSConfig(tsConfig?: TSConfig): { valid: boolean; errors: string[] } {
     const errors: string[] = []
 
     if (!tsConfig) {
-      return { valid: true, errors: [] } // 可选配置
+      return { valid: true, errors: [] } // Optional configuration
     }
 
     if (!tsConfig.fields) {
-      errors.push('TSConfig 必须包含 fields 属性')
+      errors.push('TSConfig must contain fields property')
     } else if (!Array.isArray(tsConfig.fields)) {
-      errors.push('TSConfig.fields 必须是数组')
+      errors.push('TSConfig.fields Must be an array')
     } else {
-      // 验证字段配置
+      // Validate field configuration
       tsConfig.fields.forEach((field, index) => {
         if (!field.type) {
-          errors.push(`字段 ${index} 缺少 type 属性`)
+          errors.push(`Field ${index} Lack type property`)
         }
         if (!field.label) {
-          errors.push(`字段 ${index} 缺少 label 属性`)
+          errors.push(`Field ${index} Lack label property`)
         }
         if (!field.field) {
-          errors.push(`字段 ${index} 缺少 field 属性`)
+          errors.push(`Field ${index} Lack field property`)
         }
       })
     }
@@ -64,17 +64,17 @@ export class ConfigManager {
   }
 
   /**
-   * 验证 Vue 配置
+   * verify Vue Configuration
    */
   static validateVueConfig(vueConfig?: Component): { valid: boolean; errors: string[] } {
     const errors: string[] = []
 
     if (!vueConfig) {
-      return { valid: true, errors: [] } // 可选配置
+      return { valid: true, errors: [] } // Optional configuration
     }
 
     if (typeof vueConfig !== 'object' && typeof vueConfig !== 'function') {
-      errors.push('VueConfig 必须是有效的 Vue 组件')
+      errors.push('VueConfig must be valid Vue components')
     }
 
     return {
@@ -84,7 +84,7 @@ export class ConfigManager {
   }
 
   /**
-   * 合并配置验证结果
+   * Merge configuration verification results
    */
   static validateConfigs(tsConfig?: TSConfig, vueConfig?: Component): { valid: boolean; errors: string[] } {
     const tsValidation = this.validateTSConfig(tsConfig)
@@ -97,23 +97,23 @@ export class ConfigManager {
   }
 
   /**
-   * 获取配置模式描述
+   * Get configuration mode description
    */
   static getModeDescription(mode: ConfigMode): string {
     switch (mode) {
       case 'standard':
-        return '标准配置模式：使用 TypeScript 配置定义表单'
+        return 'Standard configuration mode：use TypeScript Configuration definition form'
       case 'vue-component':
-        return 'Vue 组件模式：使用自定义 Vue 组件渲染配置界面'
+        return 'Vue Component pattern：Use custom Vue Component rendering configuration interface'
       case 'hybrid':
-        return '混合模式：同时使用 TypeScript 配置和 Vue 组件'
+        return 'blend mode：Use at the same time TypeScript configuration and Vue components'
       default:
-        return '未知配置模式'
+        return 'Unknown configuration mode'
     }
   }
 
   /**
-   * 检查配置是否为空
+   * Check if the configuration is empty
    */
   static isEmptyConfig(tsConfig?: TSConfig, vueConfig?: Component): boolean {
     const hasFields = tsConfig?.fields && tsConfig.fields.length > 0
@@ -123,35 +123,35 @@ export class ConfigManager {
   }
 
   /**
-   * 生成默认的 TS 配置
+   * generate default TS Configuration
    */
   static generateDefaultTSConfig(componentType: string): TSConfig {
     return {
-      title: `${componentType} 配置`,
-      description: `${componentType} 组件的基础配置项`,
+      title: `${componentType} Configuration`,
+      description: `${componentType} Basic configuration items of components`,
       fields: [
         {
           type: 'input',
-          label: '组件名称',
+          label: 'Component name',
           field: 'name',
-          group: '基础设置',
-          placeholder: '请输入组件名称',
+          group: 'Basic settings',
+          placeholder: 'Please enter the component name',
           defaultValue: componentType,
           required: true
         },
         {
           type: 'textarea',
-          label: '组件描述',
+          label: 'Component description',
           field: 'description',
-          group: '基础设置',
-          placeholder: '请输入组件描述'
+          group: 'Basic settings',
+          placeholder: 'Please enter a component description'
         }
       ],
       groups: [
         {
           name: 'basic',
-          label: '基础设置',
-          description: '组件的基本配置项',
+          label: 'Basic settings',
+          description: 'Basic configuration items of components',
           fields: ['name', 'description'],
           collapsible: false,
           defaultExpanded: true
@@ -161,14 +161,14 @@ export class ConfigManager {
   }
 
   /**
-   * 标准化表单字段
+   * Standardized form fields
    */
   static normalizeFormField(field: Partial<FormField>): FormField {
     return {
       type: field.type || 'input',
-      label: field.label || '未命名字段',
+      label: field.label || 'unnamed field',
       field: field.field || '',
-      group: field.group || '基础设置',
+      group: field.group || 'Basic settings',
       placeholder: field.placeholder || '',
       defaultValue: field.defaultValue,
       required: field.required || false,
@@ -180,12 +180,12 @@ export class ConfigManager {
   }
 
   /**
-   * 标准化表单分组
+   * Standardized form grouping
    */
   static normalizeFormGroup(group: Partial<FormGroup>): FormGroup {
     return {
       name: group.name || 'default',
-      label: group.label || '默认分组',
+      label: group.label || 'Default grouping',
       description: group.description || '',
       fields: group.fields || [],
       collapsible: group.collapsible !== undefined ? group.collapsible : true,
@@ -195,6 +195,6 @@ export class ConfigManager {
 }
 
 /**
- * 默认导出
+ * Default export
  */
 export default ConfigManager

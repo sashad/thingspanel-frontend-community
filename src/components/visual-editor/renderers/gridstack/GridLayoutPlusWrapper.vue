@@ -1,10 +1,10 @@
 <template>
   <div ref="gridWrapperEl" class="grid-layout-plus-wrapper-editor">
     <!--
-      将原先的 GridLayoutPlus 替换为 GridV2
-      - GridV2 保持与 GridLayoutPlus 完全一致的 Props 接口
-      - 支持默认插槽并传出 { item }，现有模板可无缝复用
-      - 用于 props/idKey 链路调试，不触发原网格事件
+      change the original GridLayoutPlus Replace with GridV2
+      - GridV2 keep with GridLayoutPlus completely consistent Props interface
+      - Supports default slots and outgoing { item }，Existing templates can be seamlessly reused
+      - used for props/idKey Link debugging，Does not trigger original grid events
     -->
     <GridV2
       v-model:layout="layout"
@@ -17,7 +17,7 @@
       @item-moved="onDragStop"
     >
       <template #default="{ item }">
-        <!-- 关键：允许事件冒泡到 GridStack（整卡片 mousedown 触发拖拽） -->
+        <!-- key：Allow events to bubble up to GridStack（whole card mousedown Trigger drag） -->
         <NodeWrapper
           :node="item.raw"
           :node-id="item.raw.id"
@@ -52,7 +52,7 @@
 import { ref, computed, watch, shallowRef, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { nanoid } from 'nanoid'
-// 替换导入：从 common/gridv2 引入 GridV2；类型仍从 common/grid 复用
+// replace import：from common/gridv2 introduce GridV2；The type is still from common/grid Reuse
 import { GridV2 } from '@/components/common/gridv2'
 import type { GridLayoutPlusItem, GridLayoutPlusConfig } from '@/components/common/grid'
 import { useEditorStore } from '@/store/modules/editor'
@@ -66,11 +66,11 @@ const props = withDefaults(defineProps<{
   graphData: any
   readonly?: boolean
   staticGrid?: boolean
-  // 将 any 改为 Partial<GridLayoutPlusConfig>，避免不必要的 any
+  // Will any Change to Partial<GridLayoutPlusConfig>，avoid unnecessary any
   gridConfig?: Partial<GridLayoutPlusConfig>
-  // 新增：控制是否显示标题
+  // New：Control whether the title is displayed
   showWidgetTitles?: boolean
-  // 新增：可配置主键字段名，默认 'i'
+  // New：Configurable primary key field name，default 'i'
   idKey?: string
 }>(), {
   readonly: false,
@@ -83,11 +83,11 @@ const emit = defineEmits(['node-select', 'request-settings'])
 
 const router = useRouter()
 
-// 使用原始 store
+// Use original store
 const editorStore = useEditorStore()
 const widgetStore = useWidgetStore()
 
-// 适配旧接口方法
+// Adapt old interface methods
 const selectNode = (nodeId: string) => {
   if (nodeId) {
     widgetStore.selectNodes([nodeId])
@@ -97,7 +97,7 @@ const selectNode = (nodeId: string) => {
 }
 
 const isCard2Component = (nodeId: string) => {
-  // 简单的Card2组件检测
+  // simpleCard2Component detection
   const node = editorStore.nodes.find(n => n.id === nodeId)
   return node?.type.includes('card2') || node?.type.includes('Card2') || false
 }
@@ -131,25 +131,25 @@ const contextMenu = ref<{
 
 const gridConfig = computed<GridLayoutPlusConfig>(() => {
   const config = {
-    colNum: 24, // 🔥 修复：统一默认为24列
+    colNum: 24, // 🔥 repair：The unified default is24List
     rowHeight: 80,
-    // 🔥 写死间距配置为8px，不再从外部配置
+    // 🔥 The hard-coded spacing is configured as8px，No longer configured externally
     horizontalGap: 8,
     verticalGap: 8,
     margin: [8, 8] as [number, number],
     isDraggable: !isReadOnly.value && !props.staticGrid,
     isResizable: !isReadOnly.value && !props.staticGrid,
     responsive: false,
-    preventCollision: true, // 🔥 阻止组件重叠（关键配置）
-    verticalCompact: false, // 🔥 禁用垂直压缩，保持用户拖拽的布局不变
+    preventCollision: true, // 🔥 Prevent components from overlapping（Key configuration）
+    verticalCompact: false, // 🔥 Disable vertical compression，Keep the layout that the user dragged and dropped unchanged
     isMirrored: false,
-    autoSize: false, // 🔥 禁用自动调整大小，让父容器处理滚动
+    autoSize: false, // 🔥 Disable automatic resizing，Let the parent container handle scrolling
     useCssTransforms: true,
     breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
-    cols: { lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }, // 🔥 修复：调整断点列数以匹配24列基准
+    cols: { lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }, // 🔥 repair：Adjust breakpoint column number to match24column basis
     useStyleCursor: true,
     restoreOnDrag: false,
-    // 🔥 合并外部配置，但排除间距相关配置
+    // 🔥 Merge external configuration，But exclude spacing related configurations
     ...(props.gridConfig ? {
       colNum: props.gridConfig.colNum,
       rowHeight: props.gridConfig.rowHeight,
@@ -159,7 +159,7 @@ const gridConfig = computed<GridLayoutPlusConfig>(() => {
     } : {})
   }
 
-  // 确保开关配置正确应用
+  // Ensure switch configuration is applied correctly
   if (props.gridConfig) {
     if (props.gridConfig.isDraggable !== undefined) {
       config.isDraggable = !isReadOnly.value && !props.staticGrid && props.gridConfig.isDraggable
@@ -173,7 +173,7 @@ const gridConfig = computed<GridLayoutPlusConfig>(() => {
     }
   }
 
-  // 调试日志
+  // debug log
   return config
 })
 
@@ -184,14 +184,14 @@ interface ExtendedGridLayoutPlusItem extends GridLayoutPlusItem {
 const nodesToLayout = (nodes: VisualEditorWidget[]): ExtendedGridLayoutPlusItem[] => {
   const key = props.idKey || 'i'
   return nodes.map(node => {
-    // 🔥 修复：在编辑模式下，优先保证组件可交互
-    // 只有在明确禁用（值为 false）时才禁用交互，undefined 时默认允许
+    // 🔥 repair：in edit mode，Prioritize ensuring that components are interactive
+    // Only if explicitly disabled（The value is false）Interaction is disabled only when，undefined Allowed by default
     const effectiveStatic = props.staticGrid || (props.gridConfig?.staticGrid ?? false)
 
-    // ✅ 检查节点是否被锁定
+    // ✅ Check if node is locked
     const isLocked = (node as any)._isLocked === true
 
-    // ✅ 如果节点被锁定，禁止拖动和调整大小
+    // ✅ If the node is locked，Disable dragging and resizing
     const allowDrag = !isReadOnly.value && !effectiveStatic && !isLocked && (props.gridConfig?.isDraggable !== false)
     const allowResize = !isReadOnly.value && !effectiveStatic && !isLocked && (props.gridConfig?.isResizable !== false)
 
@@ -201,14 +201,14 @@ const nodesToLayout = (nodes: VisualEditorWidget[]): ExtendedGridLayoutPlusItem[
       y: node.layout?.gridstack?.y ?? 0,
       w: node.layout?.gridstack?.w ?? 4,
       h: node.layout?.gridstack?.h ?? 2,
-      static: effectiveStatic || isLocked, // ✅ 锁定的组件设置为 static
+      static: effectiveStatic || isLocked, // ✅ Locked components are set to static
       isDraggable: allowDrag,
       isResizable: allowResize,
-      locked: isLocked, // ✅ 添加 locked 属性
+      locked: isLocked, // ✅ Add to locked property
       type: node.type,
       raw: node
     } as ExtendedGridLayoutPlusItem
-    // 写回自定义主键，保证双字段一致
+    // Write back custom primary key，Ensure double fields are consistent
     if (key !== 'i') {
       ;(item as any)[key] = item.i
     }
@@ -227,12 +227,12 @@ watch(
   { immediate: true, deep: true }
 )
 
-// 🔥 监听交互相关配置，保持布局项行为同步
+// 🔥 Monitoring interaction related configuration，Keep layout item behavior synchronized
 watch(
   () => [props.staticGrid, props.gridConfig?.staticGrid, props.gridConfig?.isDraggable, props.gridConfig?.isResizable],
   ([staticGridOverride, configStatic, configDraggable, configResizable]) => {
-    // 🔥 修复：使用与 nodesToLayout 相同的逻辑
-    // 只有在明确禁用（值为 false）时才禁用交互，undefined 时默认允许
+    // 🔥 repair：Use with nodesToLayout same logic
+    // Only if explicitly disabled（The value is false）Interaction is disabled only when，undefined Allowed by default
     const effectiveStatic = Boolean(staticGridOverride || configStatic)
     const allowDrag = !props.readonly && !effectiveStatic && (configDraggable !== false)
     const allowResize = !props.readonly && !effectiveStatic && (configResizable !== false)
@@ -248,12 +248,12 @@ watch(
 )
 
 const onLayoutChange = (newLayout: ExtendedGridLayoutPlusItem[]) => {
-  // 🔥 在预览模式下不更新布局信息，避免意外的位置变化
+  // 🔥 Layout information is not updated in preview mode，Avoid unexpected location changes
   if (props.readonly || props.staticGrid) {
     return
   }
 
-  // 更新所有节点的布局信息
+  // Update the layout information of all nodes
   newLayout.forEach(item => {
     updateNodeLayout(item)
   })
@@ -292,7 +292,7 @@ const handleNodeSelect = (nodeId: string) => {
 
 const handleInteraction = (widget: VisualEditorWidget) => {
   if (props.readonly) {
-    // 只在预览模式下触发交互
+    // Only trigger interactions in preview mode
     const { onClick } = widget.interaction || {}
     if (!onClick) return
 
@@ -328,12 +328,12 @@ const handleContextMenuSelect = (action: string) => {
 
   switch (action) {
     case 'copy': {
-      // 🔥 使用智能深拷贝，自动处理Vue响应式对象
+      // 🔥 Use smart deep copy，Automatic processingVueReactive objects
       const newNode = smartDeepClone(widget)
       newNode.id = `${newNode.type}_${nanoid()}`
 
-      // ✅ 复制时移除锁定状态，让用户可以立即调整位置
-      // 参考 Figma、Sketch、Adobe XD 等设计工具的行业惯例
+      // ✅ Remove lock state when copying，Allow users to instantly adjust their position
+      // refer to Figma、Sketch、Adobe XD Industry practices for design tools such as
       delete (newNode as any)._isLocked
 
       if (newNode.layout?.gridstack) {
@@ -349,20 +349,20 @@ const handleContextMenuSelect = (action: string) => {
       emit('request-settings', widget.id)
       break
     case 'lock':
-      // ✅ 锁定组件：设置 _isLocked 标记
+      // ✅ Lock components：set up _isLocked mark
       if (widget) {
-        // 设置锁定标记
+        // Set lock flag
         ;(widget as any)._isLocked = true
-        // 触发状态更新，watch会自动重新计算layout
+        // Trigger status update，watchwill be automatically recalculatedlayout
         editorStore.updateNode(widget.id, { ...widget })
       }
       break
     case 'unlock':
-      // ✅ 解锁组件：移除 _isLocked 标记
+      // ✅ Unlock components：Remove _isLocked mark
       if (widget) {
-        // 移除锁定标记
+        // Remove lock mark
         ;(widget as any)._isLocked = false
-        // 触发状态更新，watch会自动重新计算layout
+        // Trigger status update，watchwill be automatically recalculatedlayout
         editorStore.updateNode(widget.id, { ...widget })
       }
       break
@@ -375,11 +375,11 @@ const closeContextMenu = () => {
 }
 
 /**
- * 处理标题更新
- * 当NodeWrapper中的标题被编辑时调用
+ * Handle title updates
+ * whenNodeWrapperCalled when the title in is edited
  */
 const handleTitleUpdate = (nodeId: string, newTitle: string) => {
-  // NodeWrapper已经处理了配置更新，这里只需要记录日志
+  // NodeWrapperConfiguration updates have been processed，Just record the logs here
 }
 </script>
 

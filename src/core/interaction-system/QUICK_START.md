@@ -1,22 +1,22 @@
-# 🚀 交互系统快速入门指南
+# 🚀 Interactive System Quick Start Guide
 
-欢迎使用ThingsPanel核心交互系统！这份指南将帮助你在5分钟内快速上手。
+WelcomeThingsPanelcore interactive system！This guide will help you in5Get started quickly in minutes。
 
-## 📚 前置知识
+## 📚 prerequisite knowledge
 
-在开始之前，请确保你熟悉以下技术：
+before starting，Please make sure you are familiar with the following techniques：
 
 - ✅ Vue 3 Composition API
-- ✅ TypeScript 基础语法
-- ✅ Naive UI 组件库
-- ✅ ThingsPanel Card 2.1 系统
+- ✅ TypeScript basic grammar
+- ✅ Naive UI Component library
+- ✅ ThingsPanel Card 2.1 system
 
-## ⚡ 快速安装
+## ⚡ Quick installation
 
-### 1. 导入核心组件
+### 1. Import core components
 
 ```typescript
-// 导入主要组件
+// Import main components
 import { 
   InteractionSettingsForm,
   InteractionResponseEditor,
@@ -24,22 +24,22 @@ import {
   InteractionPreview 
 } from '@/core/interaction-system'
 
-// 导入类型定义
+// Import type definition
 import type { 
   InteractionConfig,
   InteractionResponse 
 } from '@/card2.1/core/interaction-types'
 ```
 
-### 2. 基础集成
+### 2. Basic integration
 
 ```vue
 <template>
   <div class="component-settings">
-    <!-- 其他配置... -->
+    <!-- Other configurations... -->
     
-    <!-- 🎯 交互配置区域 -->
-    <n-collapse-item title="交互配置" name="interaction">
+    <!-- 🎯 Interactive configuration area -->
+    <n-collapse-item title="Interactive configuration" name="interaction">
       <InteractionSettingsForm
         v-model="interactionConfigs"
         :component-id="currentComponentId"
@@ -55,100 +55,100 @@ import { ref } from 'vue'
 import { InteractionSettingsForm } from '@/core/interaction-system'
 import type { InteractionConfig } from '@/card2.1/core/interaction-types'
 
-// 交互配置数据
+// Interactive configuration data
 const interactionConfigs = ref<InteractionConfig[]>([])
 const currentComponentId = ref('my-component-001')
 const currentComponentType = ref('chart-component')
 
-// 处理交互配置变化
+// Handling interactive configuration changes
 const handleInteractionChange = (configs: InteractionConfig[]) => {
-  console.log('交互配置已更新:', configs)
-  // 保存到组件配置或发送到服务器
+  console.log('Interaction configuration updated:', configs)
+  // Save to component configuration or send to server
 }
 </script>
 ```
 
-## 🎯 5分钟实战示例
+## 🎯 5Minute practical example
 
-### 示例1：点击跳转功能
+### Example1：Click to jump function
 
-创建一个点击组件跳转到外部链接的交互：
+Create an interaction that jumps to an external link by clicking on the component：
 
 ```typescript
 const jumpInteraction: InteractionConfig = {
-  event: 'click',                    // 点击触发
+  event: 'click',                    // Click trigger
   enabled: true,
   priority: 1,
-  name: '跳转到官网',
+  name: 'Jump to official website',
   responses: [{
-    action: 'navigateToUrl',         // URL跳转动作
-    value: 'https://thingspanel.io', // 目标链接
-    target: '_blank'                 // 新窗口打开
+    action: 'navigateToUrl',         // URLjump action
+    value: 'https://thingspanel.io', // target link
+    target: '_blank'                 // New window opens
   }]
 }
 
-// 应用到组件
+// Apply to components
 interactionConfigs.value.push(jumpInteraction)
 ```
 
-### 示例2：数据变化触发
+### Example2：Data change trigger
 
-当温度超过30度时显示警告：
+When the temperature exceeds30Display warning when：
 
 ```typescript
 const temperatureWarning: InteractionConfig = {
-  event: 'dataChange',               // 数据变化触发
-  watchedProperty: 'temperature',    // 监听温度属性
-  condition: {                       // 执行条件
+  event: 'dataChange',               // Data change trigger
+  watchedProperty: 'temperature',    // Monitor temperature properties
+  condition: {                       // Execution conditions
     type: 'comparison',
     operator: 'greaterThan',
     value: 30
   },
   enabled: true,
-  priority: 2,                       // 高优先级
-  name: '温度警告',
+  priority: 2,                       // high priority
+  name: 'temperature warning',
   responses: [{
-    action: 'updateComponentData',   // 更新组件数据
+    action: 'updateComponentData',   // Update component data
     targetComponentId: 'warning-panel-001',
     targetProperty: 'visible',
     updateValue: true,
     updateMode: 'replace'
   }, {
-    action: 'changeBackgroundColor', // 同时改变背景色
-    value: '#ffebee',               // 淡红色警告
+    action: 'changeBackgroundColor', // Also change background color
+    value: '#ffebee',               // light red warning
     duration: 500
   }]
 }
 
-// 应用到组件
+// Apply to components
 interactionConfigs.value.push(temperatureWarning)
 ```
 
-### 示例3：悬停效果
+### Example3：hover effect
 
-鼠标悬停时改变背景色：
+Change background color on mouseover：
 
 ```typescript
 const hoverEffect: InteractionConfig = {
-  event: 'hover',                    // 悬停触发
+  event: 'hover',                    // Hover trigger
   enabled: true,
-  name: '悬停高亮',
+  name: 'Hover highlight',
   responses: [{
-    action: 'changeBackgroundColor', // 改变背景色
-    value: '#f0f8ff',               // 淡蓝色
-    duration: 300                   // 300ms过渡
+    action: 'changeBackgroundColor', // change background color
+    value: '#f0f8ff',               // light blue
+    duration: 300                   // 300mstransition
   }]
 }
 ```
 
-## 🛠️ 常用代码片段
+## 🛠️ Common code snippets
 
-### 配置表单集成
+### Configure form integration
 
 ```vue
 <template>
-  <!-- 完整的配置面板 -->
-  <n-card title="交互设置" size="small">
+  <!-- Complete configuration panel -->
+  <n-card title="Interaction settings" size="small">
     <InteractionSettingsForm
       v-model="interactions"
       :component-id="componentId"
@@ -157,11 +157,11 @@ const hoverEffect: InteractionConfig = {
       @change="handleChange"
       @validate="handleValidate"
     >
-      <!-- 自定义工具栏 -->
+      <!-- Customize toolbar -->
       <template #toolbar>
         <n-space>
-          <n-button @click="openPreview">预览效果</n-button>
-          <n-button @click="openTemplates">选择模板</n-button>
+          <n-button @click="openPreview">Preview effect</n-button>
+          <n-button @click="openTemplates">Select template</n-button>
         </n-space>
       </template>
     </InteractionSettingsForm>
@@ -169,12 +169,12 @@ const hoverEffect: InteractionConfig = {
 </template>
 ```
 
-### 模板选择器
+### template selector
 
 ```vue
 <template>
-  <!-- 模板选择对话框 -->
-  <n-modal v-model:show="showTemplates" title="选择交互模板">
+  <!-- Template selection dialog -->
+  <n-modal v-model:show="showTemplates" title="Select interaction template">
     <n-card style="width: 800px">
       <InteractionTemplateSelector
         @select="applyTemplate"
@@ -190,19 +190,19 @@ const showTemplates = ref(false)
 const applyTemplate = (template: InteractionConfig) => {
   interactions.value.push({
     ...template,
-    name: `${template.name} (模板)`
+    name: `${template.name} (template)`
   })
   showTemplates.value = false
 }
 </script>
 ```
 
-### 预览功能
+### Preview function
 
 ```vue
 <template>
-  <!-- 预览对话框 -->
-  <n-modal v-model:show="showPreview" title="交互效果预览">
+  <!-- Preview dialog -->
+  <n-modal v-model:show="showPreview" title="Interaction effect preview">
     <n-card style="width: 900px; height: 600px">
       <InteractionPreview
         :interactions="interactions"
@@ -214,13 +214,13 @@ const applyTemplate = (template: InteractionConfig) => {
 </template>
 ```
 
-## 🎨 样式定制
+## 🎨 Style customization
 
-### 主题集成
+### Theme integration
 
 ```vue
 <style scoped>
-/* 集成ThingsPanel主题系统 */
+/* integratedThingsPaneltheme system */
 .interaction-panel {
   background: var(--card-color);
   border: 1px solid var(--border-color);
@@ -228,7 +228,7 @@ const applyTemplate = (template: InteractionConfig) => {
   padding: 16px;
 }
 
-/* 交互配置项样式 */
+/* Interaction configuration item style */
 .interaction-item {
   transition: all 0.3s ease;
   border: 1px solid var(--border-color);
@@ -239,7 +239,7 @@ const applyTemplate = (template: InteractionConfig) => {
   box-shadow: 0 2px 8px var(--primary-color-hover);
 }
 
-/* 响应式布局 */
+/* Responsive layout */
 @media (max-width: 768px) {
   .interaction-panel {
     padding: 12px;
@@ -248,28 +248,28 @@ const applyTemplate = (template: InteractionConfig) => {
 </style>
 ```
 
-## 📊 调试技巧
+## 📊 Debugging Tips
 
-### 1. 开启调试日志
+### 1. Enable debug logging
 
 ```typescript
-// 在开发环境开启详细日志
+// Enable detailed logging in the development environment
 if (process.env.NODE_ENV === 'development') {
   window.__INTERACTION_DEBUG__ = true
 }
 
-// 监听交互执行
+// Monitor interactive execution
 interactionManager.on('execute', (event) => {
-  console.log('[交互执行]', event.config, event.result)
+  console.log('[Interactive execution]', event.config, event.result)
 })
 ```
 
-### 2. 使用Vue DevTools
+### 2. useVue DevTools
 
-在Vue DevTools中查看交互状态：
+existVue DevToolsCheck the interaction status in：
 
 ```typescript
-// 暴露调试信息到开发者工具
+// Expose debugging information to developer tools
 const { expose } = getCurrentInstance()
 expose({
   interactions: interactionConfigs,
@@ -281,38 +281,38 @@ expose({
 })
 ```
 
-### 3. 错误边界处理
+### 3. error boundary handling
 
 ```typescript
 const handleInteractionError = (error: Error, config: InteractionConfig) => {
-  console.error('交互执行失败:', {
+  console.error('Interactive execution failed:', {
     error: error.message,
     config: config,
     timestamp: new Date().toISOString()
   })
   
-  // 发送错误报告
+  // Send error report
   if (process.env.NODE_ENV === 'production') {
     errorReporter.report('INTERACTION_ERROR', { error, config })
   }
 }
 ```
 
-## 🔧 性能优化
+## 🔧 Performance optimization
 
-### 1. 延迟加载
+### 1. Lazy loading
 
 ```typescript
-// 异步加载交互组件
+// Load interactive components asynchronously
 const InteractionSettingsForm = defineAsyncComponent(() => 
   import('@/core/interaction-system/components/InteractionSettingsForm.vue')
 )
 ```
 
-### 2. 配置缓存
+### 2. Configure cache
 
 ```typescript
-// 缓存交互配置
+// Caching interaction configuration
 const configCache = new Map<string, InteractionConfig[]>()
 
 const getCachedConfig = (componentId: string) => {
@@ -324,10 +324,10 @@ const getCachedConfig = (componentId: string) => {
 }
 ```
 
-### 3. 批量更新
+### 3. Batch update
 
 ```typescript
-// 使用nextTick批量处理配置更新
+// usenextTickProcess configuration updates in batches
 const batchUpdateConfigs = useDebounceFn((configs: InteractionConfig[]) => {
   nextTick(() => {
     interactionManager.batchUpdate(configs)
@@ -335,14 +335,14 @@ const batchUpdateConfigs = useDebounceFn((configs: InteractionConfig[]) => {
 }, 300)
 ```
 
-## 📱 移动端适配
+## 📱 Mobile terminal adaptation
 
-### 响应式配置
+### Responsive configuration
 
 ```vue
 <template>
   <div class="interaction-mobile-wrapper">
-    <!-- 移动端使用简化版组件 -->
+    <!-- Use simplified version of components on mobile terminal -->
     <InteractionCardWizard
       v-if="isMobile"
       v-model="interactions"
@@ -350,7 +350,7 @@ const batchUpdateConfigs = useDebounceFn((configs: InteractionConfig[]) => {
       :component-type="componentType"
     />
     
-    <!-- 桌面端使用完整版组件 -->
+    <!-- Use the full version of the component on desktop -->
     <InteractionSettingsForm
       v-else
       v-model="interactions"
@@ -373,34 +373,34 @@ const isMobile = breakpoints.smaller('tablet')
 </script>
 ```
 
-## 🚨 常见问题
+## 🚨 FAQ
 
-### Q1: 交互配置不生效？
+### Q1: Interactive configuration does not take effect？
 
 ```typescript
-// 检查交互管理器注册状态
-console.log('组件交互配置:', interactionManager.getComponentConfigs(componentId))
+// Check interaction manager registration status
+console.log('Component interaction configuration:', interactionManager.getComponentConfigs(componentId))
 
-// 检查属性暴露配置
-console.log('属性暴露信息:', propertyExposureRegistry.getComponentExposure(componentType))
+// Check property exposure configuration
+console.log('Property exposure information:', propertyExposureRegistry.getComponentExposure(componentType))
 ```
 
-### Q2: 跨组件交互失败？
+### Q2: Cross-component interaction failed？
 
 ```typescript
-// 检查目标组件是否存在
+// Check if target component exists
 const availableComponents = visualEditorState.getAvailableComponents()
 const targetExists = availableComponents.find(comp => comp.id === targetComponentId)
 
 if (!targetExists) {
-  console.error('目标组件不存在:', targetComponentId)
+  console.error('Target component does not exist:', targetComponentId)
 }
 ```
 
-### Q3: 模板导入失败？
+### Q3: Template import failed？
 
 ```typescript
-// 验证模板格式
+// Validate template format
 const validateTemplate = (template: any): boolean => {
   return !!(
     template.name &&
@@ -411,27 +411,27 @@ const validateTemplate = (template: any): boolean => {
 }
 ```
 
-## 🎯 下一步
+## 🎯 Next step
 
-现在你已经掌握了基础用法，可以：
+Now you have mastered the basic usage，Can：
 
-1. 📖 阅读 [完整API文档](./API.md)
-2. 🏗️ 查看 [架构设计文档](./README.md)
-3. 🎨 学习 [高级定制技巧](./ADVANCED.md)
-4. 🧪 参考 [测试用例](./tests/)
+1. 📖 read [wholeAPIdocument](./API.md)
+2. 🏗️ Check [Architecture design documents](./README.md)
+3. 🎨 study [Advanced customization skills](./ADVANCED.md)
+4. 🧪 refer to [test case](./tests/)
 
-## 💡 专业提示
+## 💡 Pro Tips
 
-- ✨ 使用模板系统快速创建常用交互
-- ⚡ 利用条件执行减少不必要的计算
-- 🎯 优先使用内置动作类型，避免过度自定义
-- 📊 开发时始终开启预览功能验证效果
-- 🛠️ 为复杂交互编写单元测试
-
----
-
-**🎉 恭喜！你已经完成了交互系统的快速入门。开始创建令人惊艳的交互体验吧！**
+- ✨ Use the template system to quickly create common interactions
+- ⚡ Use conditional execution to reduce unnecessary calculations
+- 🎯 Prefer built-in action types，Avoid over-customization
+- 📊 Always turn on the preview function during development to verify the effect
+- 🛠️ Write unit tests for complex interactions
 
 ---
 
-*快速入门指南 | 版本：v1.0 | 预计阅读时间：5分钟*
+**🎉 Congratulations！You have completed the quick start of the interactive system。Start creating amazing interactive experiences！**
+
+---
+
+*Quick start guide | Version：v1.0 | Estimated reading time：5minute*

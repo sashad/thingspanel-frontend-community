@@ -96,9 +96,9 @@ function getSiderCollapsedWidth() {
   return w
 }
 
-// 移动端动态标题
+// Mobile dynamic title
 const mobileTitle = computed(() => {
-  // 使用Vue Router的当前路由
+  // useVue Routerthe current route of
   if (route.meta?.i18nKey) {
     return $t(route.meta.i18nKey as string)
   }
@@ -108,14 +108,14 @@ const mobileTitle = computed(() => {
   return 'ThingsPanel'
 })
 
-// 是否显示返回按钮
+// Whether to display the return button
 const showBackButton = computed(() => {
-  // 首页不显示返回按钮
+  // Home page does not display return button
   const noBackRoutes = ['home', 'root', 'login']
   return !noBackRoutes.includes(route.name as string)
 })
 
-// 返回功能
+// return function
 function handleBack() {
   router.go(-1)
 }
@@ -124,66 +124,66 @@ setupMixMenuContext()
 
 /**
  * ===========================================
- * 物联网设备状态实时监控系统 (SSE)
+ * Internet of Things equipment status real-time monitoring system (SSE)
  * ===========================================
  * 
- * 功能说明：
- * 1. 通过Server-Sent Events与后端建立长连接
- * 2. 实时接收设备上线/下线状态变化通知
- * 3. 在全局范围内显示设备状态变化通知
- * 4. 播放音效提醒用户注意设备状态变化
+ * Function description：
+ * 1. passServer-Sent EventsEstablish a long connection with the backend
+ * 2. Real-time receiving equipment goes online/Offline status change notification
+ * 3. Display device status change notifications globally
+ * 4. Play sound effects to remind users to pay attention to device status changes
  * 
- * 技术实现：
- * - 使用EventSourcePolyfill确保浏览器兼容性
- * - 自动重连机制处理网络中断
- * - 完整的错误处理和日志记录
- * - 组件销毁时自动清理连接资源
+ * Technical implementation：
+ * - useEventSourcePolyfillEnsure browser compatibility
+ * - Automatic reconnection mechanism handles network interruptions
+ * - Complete error handling and logging
+ * - Automatically clean up connection resources when components are destroyed
  */
 
 /**
  * ===========================================
- * 全局设备状态监控系统
+ * Global equipment status monitoring system
  * ===========================================
  *
- * 功能说明：
- * 1. 全局设备状态实时监控，覆盖整个应用
- * 2. 当设备上线/下线时，显示通知并播放提示音
- * 3. 提供用户友好的设备状态变化提醒
- * 4. 与页面级监控系统配合，实现完整的状态同步
+ * Function description：
+ * 1. Real-time monitoring of global equipment status，Cover the entire application
+ * 2. When the device comes online/When offline，Show notifications and play alerts
+ * 3. Provide user-friendly reminders of device status changes
+ * 4. Works with page-level monitoring systems，Achieve complete state synchronization
  *
- * 技术特点：
- * - 显示弹窗通知 + 播放音效（全局提醒）
- * - 智能重连机制，确保连接稳定性
- * - 完整的错误处理和数据验证
- * - 组件卸载时自动清理资源
- * - 网络状态检测和优雅降级
+ * Technical features：
+ * - Show pop-up notification + Play sound effects（Global reminder）
+ * - Intelligent reconnection mechanism，Ensure connection stability
+ * - Complete error handling and data validation
+ * - Automatically clean up resources when components are uninstalled
+ * - Network status detection and graceful degradation
  */
 
-// EventSource 连接实例，用于全局设备状态监控
+// EventSource Connection instance，For global device status monitoring
 let eventSource: EventSourcePolyfill | null = null
-// 重连尝试次数计数器
+// Reconnection attempt counter
 let reconnectAttempts = 0
-// 最大重连尝试次数限制
+// Maximum number of reconnection attempts
 const MAX_RECONNECT_ATTEMPTS = 5
-// 重连延迟配置（毫秒）- 指数退避策略
+// Reconnect delay configuration（millisecond）- exponential backoff strategy
 const RECONNECT_DELAYS = [2000, 5000, 10000, 20000, 30000]
-// 连接状态标识
+// connection status identifier
 let isConnecting = false
-// 重连定时器
+// Reconnect timer
 let reconnectTimer: NodeJS.Timeout | null = null
-// 最后错误时间，用于避免频繁错误日志
+// last error time，Used to avoid frequent error logging
 let lastErrorTime = 0
-const ERROR_LOG_THROTTLE = 10000 // 10秒内只记录一次相同错误
+const ERROR_LOG_THROTTLE = 10000 // 10Only log the same error once per second
 
 /**
- * 检查网络连接状态
+ * Check network connection status
  */
 const checkNetworkStatus = (): boolean => {
   return navigator.onLine !== false
 }
 
 /**
- * 节流错误日志记录
+ * Throttle error logging
  */
 const logErrorThrottled = (message: string, error?: any) => {
   const now = Date.now()
@@ -194,94 +194,94 @@ const logErrorThrottled = (message: string, error?: any) => {
 }
 
 /**
- * 创建全局设备状态监控EventSource连接
- * 建立与后端的实时通信连接，用于接收设备状态变化事件
+ * Create global device status monitoringEventSourceconnect
+ * Establish a real-time communication connection with the backend，Used to receive device status change events
  */
 const createEventSource = () => {
-  // 防止重复连接
+  // Prevent duplicate connections
   if (isConnecting || eventSource?.readyState === EventSource.OPEN) {
     return
   }
 
   try {
-    // 检查网络状态
+    // Check network status
     if (!checkNetworkStatus()) {
       return
     }
 
-    // 获取用户认证token，用于SSE连接身份验证
+    // Get user authenticationtoken，used forSSEConnection authentication
     const token = localStg.get('token')
     if (!token) {
-      logger.warn('未找到用户token，跳过EventSource连接创建')
+      logger.warn('User not foundtoken，jump overEventSourceConnection creation')
       return
     }
 
     isConnecting = true
 
-    // 清理之前的连接，避免重复连接
+    // Clean up previous connections，Avoid duplicate connections
     if (eventSource) {
       eventSource.close()
       eventSource = null
     }
 
-    // 清除之前的重连定时器
+    // Clear previous reconnection timer
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
       reconnectTimer = null
     }
     /**
-     * 创建EventSource连接
-     * 根据环境配置自动选择正确的SSE端点
+     * createEventSourceconnect
+     * Automatically select the correct one based on environment configurationSSEendpoint
      */
     eventSource = new EventSourcePolyfill(getSSEEndpoint(import.meta.env), {
-      heartbeatTimeout: 3 * 60 * 1000, // 心跳超时时间：3分钟
+      heartbeatTimeout: 3 * 60 * 1000, // Heartbeat timeout：3minute
       headers: {
-        'x-token': token // 传递用户认证token
+        'x-token': token // Pass user authenticationtoken
       }
     })
     
     /**
-     * 连接成功回调
-     * 重置重连计数器，记录连接成功状态
+     * Connection success callback
+     * Reset reconnection counter，Record connection success status
      */
     eventSource.onopen = () => {
       isConnecting = false
       reconnectAttempts = 0
-      logger.info('设备状态监控SSE连接建立成功')
+      logger.info('Equipment status monitoringSSEConnection established successfully')
     }
     
     /**
-     * 监听设备在线状态变化事件
-     * 当设备上线或下线时，服务器会推送'device_online'事件
+     * Monitor device online status change events
+     * When a device comes online or goes offline，The server will push'device_online'event
      */
     eventSource.addEventListener(
       'device_online',
       event => {
         try {
-          // 数据安全验证：检查事件数据是否存在
+          // Data security verification：Check if event data exists
           if (!event.data) {
-            logger.warn('接收到空的设备状态事件数据')
+            logger.warn('Empty device status event data received')
             return
           }
           
-          // 解析JSON格式的设备状态数据
+          // parseJSONformat device status data
           const data = JSON.parse(event.data)
           
-          // 验证设备数据的必要字段
+          // Required fields to validate device data
           if (!data.device_name || typeof data.device_name !== 'string') {
-            logger.warn('设备状态事件数据无效，缺少有效的设备名称:', data)
+            logger.warn('Device status event data is invalid，Missing valid device name:', data)
             return
           }
           
           /**
-           * 根据设备状态显示不同类型的通知
-           * is_online: true = 设备上线，false = 设备下线
+           * Show different types of notifications based on device status
+           * is_online: true = Device online，false = Equipment offline
            */
           if (data.is_online) {
-            // 设备上线通知（成功类型，绿色）
+            // Device online notification（success type，green）
             window.$notification?.success({
               title: `${data.device_name}${$t('card.deviceConnected')}`,
-              duration: 5000, // 显示5秒
+              duration: 5000, // show5Second
               action: () =>
                 h(
                   NButton,
@@ -289,7 +289,7 @@ const createEventSource = () => {
                     text: true,
                     type: 'default',
                     onClick: () => {
-                      // 点击通知跳转到设备详情页
+                      // Click the notification to jump to the device details page
                       routerPushByKey('device_details', {
                         query: {
                           d_id: data.device_id
@@ -303,10 +303,10 @@ const createEventSource = () => {
                 )
             })
           } else {
-            // 设备下线通知（信息类型，蓝色）
+            // Device offline notification（Information type，blue）
             window.$notification?.info({
               title: `${data.device_name}${$t('card.deviceDisconnected')}`,
-              duration: 5000, // 显示5秒
+              duration: 5000, // show5Second
               action: () =>
                 h(
                   NButton,
@@ -314,7 +314,7 @@ const createEventSource = () => {
                     text: true,
                     type: 'default',
                     onClick: () => {
-                      // 点击通知跳转到设备详情页
+                      // Click the notification to jump to the device details page
                       routerPushByKey('device_details', {
                         query: {
                           d_id: data.device_id
@@ -330,51 +330,51 @@ const createEventSource = () => {
           }
           
           /**
-           * 播放设备状态变化提示音
-           * 使用异步播放，避免阻塞UI线程
-           * 处理浏览器自动播放策略限制
+           * Play device status change prompts
+           * Use asynchronous play，avoid blockingUIthread
+           * Handle browser autoplay policy restrictions
            */
           try {
 
-            // 上下线区分提示音
+            // Prompt tone for distinguishing between upper and lower lines
             const audio = new Audio(data.is_online ? onlineAlert : offLineAlert)
-            // 设置音频属性以符合浏览器策略
-            audio.volume = 0.5 // 设置适中的音量
-            audio.preload = 'auto' // 预加载音频
+            // Set audio properties to comply with browser policy
+            audio.volume = 0.5 // Set a moderate volume
+            audio.preload = 'auto' // Preload audio
             
             audio.play().catch(audioError => {
-              // 静默处理自动播放被阻止的情况，这是正常的浏览器行为
+              // Silently handle situations where autoplay is blocked，This is normal browser behavior
               if (audioError.name === 'NotAllowedError') {
                 return
               }
-              // 其他音频错误才记录警告
-              logger.warn('播放设备状态变化提示音失败:', audioError)
+              // Warnings are logged only for other audio errors
+              logger.warn('Failed to play device status change prompt sound:', audioError)
             })
           } catch (audioError) {
-            logger.warn('创建音频对象失败:', audioError)
+            logger.warn('Failed to create audio object:', audioError)
           }
           
         } catch (parseError) {
-          logger.error('解析设备状态事件数据失败:', parseError, '原始数据:', event.data)
+          logger.error('Failed to parse device status event data:', parseError, 'raw data:', event.data)
         }
       },
       false
     )
     
     /**
-     * 错误处理和智能重连机制
+     * Error handling and intelligent reconnection mechanism
      */
     eventSource.onerror = (error) => {
       isConnecting = false
-      logErrorThrottled('EventSource连接错误:', error)
+      logErrorThrottled('EventSourceConnection error:', error)
 
-      // 立即清理当前连接
+      // Immediately clear the current connection
       if (eventSource) {
         eventSource.close()
         eventSource = null
       }
 
-      // 智能重连：使用预定义的延迟时间
+      // Smart reconnection：Use predefined delay time
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         reconnectAttempts += 1
         const delay = RECONNECT_DELAYS[Math.min(reconnectAttempts - 1, RECONNECT_DELAYS.length - 1)]
@@ -383,16 +383,16 @@ const createEventSource = () => {
           if (checkNetworkStatus()) {
             createEventSource()
           } else {
-            // 网络不可用时，延长重连间隔
+            // When the network is unavailable，Extend reconnection interval
             reconnectTimer = setTimeout(() => {
               createEventSource()
-            }, 60000) // 1分钟后重试
+            }, 60000) // 1Try again in minutes
           }
         }, delay)
       } else {
-        // 达到最大重连次数后，每5分钟尝试一次
+        // After reaching the maximum number of reconnections，Every5Try once every minute
         reconnectTimer = setTimeout(() => {
-          reconnectAttempts = 0 // 重置计数器
+          reconnectAttempts = 0 // reset counter
           createEventSource()
         }, 5 * 60 * 1000)
       }
@@ -400,44 +400,44 @@ const createEventSource = () => {
     
   } catch (error) {
     isConnecting = false
-    logger.error('创建设备状态监控EventSource连接失败:', error)
+    logger.error('Create device status monitoringEventSourceConnection failed:', error)
   }
 }
 
 /**
- * 清理EventSource连接
- * 确保组件销毁时正确释放连接资源，避免内存泄漏
+ * clean upEventSourceconnect
+ * Ensure connection resources are released correctly when components are destroyed，Avoid memory leaks
  */
 const cleanupEventSource = () => {
-  // 清理EventSource连接
+  // clean upEventSourceconnect
   if (eventSource) {
     eventSource.close()
     eventSource = null
-    logger.info('设备状态监控SSE连接已清理')
+    logger.info('Equipment status monitoringSSEConnection cleared')
   }
   
-  // 清理重连定时器
+  // Clear reconnect timer
   if (reconnectTimer) {
     clearTimeout(reconnectTimer)
     reconnectTimer = null
   }
   
-  // 重置状态
+  // reset state
   isConnecting = false
   reconnectAttempts = 0
 }
 
 /**
- * 组件挂载时建立设备状态监控连接
- * 在用户进入系统后立即开始监控设备状态变化
+ * Establish a device status monitoring connection when the component is mounted
+ * Start monitoring device status changes immediately after the user enters the system
  */
 onMounted(() => {
   // createEventSource()
 })
 
 /**
- * 组件卸载时清理连接
- * 确保用户离开或组件销毁时正确清理资源
+ * Clean up connections when components are uninstalled
+ * Ensure resources are properly cleaned up when the user leaves or the component is destroyed
  */
 onUnmounted(() => {
   // cleanupEventSource()
@@ -445,11 +445,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- 移动端布局 -->
+  <!-- Mobile layout -->
   <div v-if="appStore.isMobile" class="mobile-layout">
-    <!-- iOS风格头部 -->
+    <!-- iOSstyle header -->
     <header v-if="0" class="ios-header">
-      <!-- 返回按钮 -->
+      <!-- back button -->
       <div 
         v-if="showBackButton" 
         class="ios-back-btn" 
@@ -460,11 +460,11 @@ onUnmounted(() => {
         </NIcon>
       </div>
       
-      <!-- 标题 -->
+      <!-- title -->
       <h1 class="ios-title">{{ mobileTitle }}</h1>
     </header>
 
-    <!-- 主内容区域 -->
+    <!-- main content area -->
     <main :id="LAYOUT_SCROLL_EL_ID" class="mobile-main">
       <GlobalContent :show-padding="true" />
     </main>
@@ -472,7 +472,7 @@ onUnmounted(() => {
     <ThemeDrawer />
   </div>
 
-  <!-- 桌面端布局 -->
+  <!-- Desktop layout -->
   <AdminLayout
     v-else
     v-model:sider-collapse="appStore.siderCollapse"
@@ -515,12 +515,12 @@ onUnmounted(() => {
   @include scrollbar();
 }
 
-// 移动端布局样式
+// Mobile layout style
 .mobile-layout {
   @apply h-screen flex flex-col bg-layout;
 }
 
-// iOS风格头部
+// iOSstyle header
 .ios-header {
   @apply fixed top-0 left-0 right-0 z-50 relative;
   height: 44px;
@@ -549,7 +549,7 @@ onUnmounted(() => {
       opacity: 0.3;
     }
 
-    // 确保触摸区域足够大
+    // Make sure the touch area is large enough
     &::before {
       content: '';
       position: absolute;
@@ -567,7 +567,7 @@ onUnmounted(() => {
     font-weight: 600;
     color: #000;
     margin: 0;
-    // 为返回按钮留出空间
+    // Leave space for the back button
     padding: 0 44px;
   }
 }
@@ -578,7 +578,7 @@ onUnmounted(() => {
   @include scrollbar();
 }
 
-// 深色模式支持
+// Dark mode support
 [data-theme='dark'] {
   .ios-header {
     background: rgba(0, 0, 0, 0.8);

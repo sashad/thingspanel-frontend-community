@@ -29,22 +29,22 @@ const naiveDateLocale = computed(() => {
 })
 
 /**
- * 🔥 修复：禁用全局全屏监听器
+ * 🔥 repair：Disable global full screen listener
  *
- * 原逻辑问题：当退出子元素全屏时，会误触发整个页面全屏
- * 现在：注释掉这个监听器，让各个组件自己管理全屏状态
+ * original logic problem：When exiting a child element full screen，Will mistakenly trigger the entire page to full screen
+ * Now：Comment out this listener，Let each component manage the full-screen state by itself
  *
- * 原代码：
+ * Original code：
  * const handleFullScreenChange = () => {
  *   if (!document.fullscreenElement) {
  *     if (isFullscreen) {
- *       toggle()  // ❌ 会导致退出编辑器全屏后，立即进入页面全屏
+ *       toggle()  // ❌ Will cause the editor to exit full screen after，Enter page full screen now
  *     }
  *   }
  * }
  */
 
-// 注释掉全局全屏监听器
+// Comment out the global full screen listener
 // onMounted(() => {
 //   document.addEventListener('fullscreenchange', handleFullScreenChange)
 // })

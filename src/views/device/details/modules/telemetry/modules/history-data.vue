@@ -32,10 +32,10 @@ interface HistoryData {
 }
 const { loading, startLoading, endLoading } = useLoading()
 
-// 获取当前具体时间的毫秒数
+// Get the milliseconds of the current specific time
 const end_time = dayjs().endOf('day').valueOf()
 
-// 获取上一天当前时刻的毫秒数
+// Get the number of milliseconds at the current time of the previous day
 const start_time = dayjs().subtract(1, 'day').startOf('day').valueOf()
 const params = reactive<Params>({
   device_id: props.deviceId,
@@ -69,7 +69,7 @@ const pagination = reactive({
   }
 })
 
-// 定义函数
+// define function
 const getTelemetryHistoryData = async () => {
   if (!props.deviceId && !props.theKey) {
     tableData.value = []
@@ -96,10 +96,10 @@ const getTelemetryHistoryData = async () => {
 
 const message = useMessage()
 
-// 然后定义变量
+// Then define the variables
 const dateRange = ref<[number, number] | null>([params.start_time, params.end_time])
 
-// 修复类型实例化过深的问题
+// Fix the problem of type instantiation being too deep
 const columns = [
   {
     title: $t('common.time'),
@@ -124,7 +124,7 @@ const checkDateRange = value => {
     dateRange.value = null
     message.error($t('common.withinOneMonth'))
   } else {
-    // 直接使用用户选择的时间
+    // Directly use the time selected by the user
     params.start_time = start
     params.end_time = end
     params.export_excel = false

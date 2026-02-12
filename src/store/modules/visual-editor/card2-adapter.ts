@@ -1,13 +1,13 @@
 /**
- * Card 2.1 Visual Editor 适配器
- * 统一Card2.1系统与Visual Editor的集成，解决集成复杂性问题
+ * Card 2.1 Visual Editor adapter
+ * unifiedCard2.1System andVisual EditorIntegration，Addressing integration complexity
  */
 
 import { useUnifiedEditorStore } from '@/store/modules/visual-editor/unified-editor'
 import { useDataFlowManager } from '@/store/modules/visual-editor/data-flow-manager'
 import type { WidgetDefinition, DataSourceConfiguration, ComponentConfiguration } from '@/store/modules/visual-editor/unified-editor'
 
-// Card 2.1 相关类型定义
+// Card 2.1 Related type definitions
 export interface ComponentDefinition {
   type: string
   name: string
@@ -62,58 +62,58 @@ export interface ComponentRequirement {
 }
 
 /**
- * Card 2.1 适配器类
- * 🔥 统一Card2.1与Visual Editor的集成，消除复杂的转换逻辑
+ * Card 2.1 Adapter class
+ * 🔥 unifiedCard2.1andVisual EditorIntegration，Eliminate complex conversion logic
  */
 export class Card2VisualEditorAdapter {
   private editorStore = useUnifiedEditorStore()
   private dataFlowManager = useDataFlowManager()
-  private card2System: any = null // Card 2.1 系统实例
+  private card2System: any = null // Card 2.1 System instance
 
   constructor() {
     this.initializeCard2Integration()
   }
 
-  // ==================== Card 2.1 系统集成 ====================
+  // ==================== Card 2.1 System integration ====================
 
   /**
-   * 初始化Card2.1集成
+   * initializationCard2.1integrated
    */
   private async initializeCard2Integration(): Promise<void> {
     try {
-      // 动态加载Card2.1系统（避免循环依赖）
+      // dynamic loadingCard2.1system（Avoid circular dependencies）
       const { useComponentTree } = await import('@/card2.1/hooks')
-      this.card2System = useComponentTree({ autoInit: false }) // 设置为false，手动控制初始化
+      this.card2System = useComponentTree({ autoInit: false }) // set tofalse，Manual control initialization
 
-      // 立即初始化
+      // Initialize immediately
       await this.card2System.initialize()
     } catch (error) {}
   }
 
   /**
-   * 注册Card2.1组件到Visual Editor
+   * registerCard2.1component toVisual Editor
    */
   registerCard2Component(definition: ComponentDefinition): void {
-    // 1. 转换为Visual Editor格式
+    // 1. Convert toVisual EditorFormat
     const widgetDefinition = this.adaptComponentDefinition(definition)
 
-    // 2. 注册到统一存储
+    // 2. Register to unified storage
     this.editorStore.registerWidget(widgetDefinition)
     this.editorStore.registerCard2Component(definition)
   }
 
   /**
-   * 批量注册Card2.1组件
+   * Batch registrationCard2.1components
    */
   registerCard2Components(definitions: ComponentDefinition[]): void {
     definitions.forEach(def => this.registerCard2Component(def))
   }
 
-  // ==================== 组件定义转换 ====================
+  // ==================== Component definition conversion ====================
 
   /**
-   * 转换Card2.1组件定义为Visual Editor格式
-   * 🔥 统一的组件定义转换逻辑
+   * ConvertCard2.1The component is defined asVisual EditorFormat
+   * 🔥 Unified component definition conversion logic
    */
   private adaptComponentDefinition(card2Def: ComponentDefinition): WidgetDefinition {
     return {
@@ -123,27 +123,27 @@ export class Card2VisualEditorAdapter {
       version: card2Def.version,
       component: card2Def.component,
 
-      // 分类信息
+      // Classified information
       category: card2Def.category,
       mainCategory: card2Def.mainCategory,
       subCategory: card2Def.subCategory,
       icon: card2Def.icon,
 
-      // 作者和权限
+      // Author and permissions
       author: card2Def.author,
       permission: card2Def.permission,
       tags: card2Def.tags || [],
 
-      // 标准化的默认布局
+      // Standardized default layout
       defaultLayout: this.createStandardLayout(card2Def),
 
-      // 标准化的属性配置
+      // Standardized attribute configuration
       defaultProperties: this.extractDefaultProperties(card2Def),
 
-      // 数据源配置
+      // Data source configuration
       dataSources: this.adaptDataSources(card2Def.dataSources || []),
 
-      // 适配器元数据
+      // Adapter metadata
       metadata: {
         source: 'card2',
         adapter: 'Card2VisualEditorAdapter',
@@ -157,7 +157,7 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 创建标准化的默认布局
+   * Create a standardized default layout
    */
   private createStandardLayout(card2Def: ComponentDefinition): Record<string, any> {
     const config = card2Def.config || {}
@@ -172,7 +172,7 @@ export class Card2VisualEditorAdapter {
         y: 0
       },
       gridstack: {
-        w: Math.ceil(defaultWidth / 150), // 转换为网格单位
+        w: Math.ceil(defaultWidth / 150), // Convert to grid units
         h: Math.ceil(defaultHeight / 150),
         x: 0,
         y: 0,
@@ -189,7 +189,7 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 提取默认属性配置
+   * Extract default property configuration
    */
   private extractDefaultProperties(card2Def: ComponentDefinition): ComponentConfiguration {
     const config = card2Def.config || {}
@@ -206,22 +206,22 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 适配数据源定义
+   * Adapt data source definition
    */
   private adaptDataSources(dataSources: DataSourceDefinition[]): DataSourceDefinition[] {
     return dataSources.map(ds => ({
       ...ds,
-      // 确保数据源配置的完整性
+      // Ensure the integrity of the data source configuration
       supportedTypes: ds.supportedTypes.length > 0 ? ds.supportedTypes : ['static'],
       fieldMappings: ds.fieldMappings || {}
     }))
   }
 
-  // ==================== 数据绑定集成 ====================
+  // ==================== Data binding integration ====================
 
   /**
-   * 创建Card2.1数据绑定
-   * 🔥 统一的数据绑定创建逻辑
+   * createCard2.1data binding
+   * 🔥 Unified data binding creation logic
    */
   async createDataBinding(
     widgetId: string,
@@ -232,18 +232,18 @@ export class Card2VisualEditorAdapter {
     }
 
     try {
-      // 1. 获取组件定义
+      // 1. Get component definition
       const card2Definition = this.editorStore.card2Components.get(widgetId)
       if (!card2Definition) {
         return null
       }
 
-      // 2. 创建组件需求
+      // 2. Create component requirements
       const requirement = this.createComponentRequirement(card2Definition, dataSourceConfig)
 
-      // 3. 注册到需求管理器（如果可用）
-      // 注意：使用实际可用的API
-      // 4. 创建数据绑定
+      // 3. Register to Requirements Manager（if available）
+      // Notice：Use what is actually availableAPI
+      // 4. Create data binding
       const binding: ReactiveDataBinding = {
         id: `${widgetId}_binding`,
         componentId: widgetId,
@@ -252,7 +252,7 @@ export class Card2VisualEditorAdapter {
         lastUpdate: new Date()
       }
 
-      // 5. 存储到统一状态
+      // 5. Store to unified state
       this.editorStore.createDataBinding(widgetId, binding)
       return binding
     } catch (error) {
@@ -261,26 +261,26 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 更新Card2.1数据绑定
+   * renewCard2.1data binding
    */
   async updateDataBinding(widgetId: string, dataSourceConfig: DataSourceConfiguration): Promise<void> {
-    // 删除旧的绑定
+    // Delete old binding
     this.destroyDataBinding(widgetId)
 
-    // 创建新的绑定
+    // Create new binding
     await this.createDataBinding(widgetId, dataSourceConfig)
   }
 
   /**
-   * 销毁Card2.1数据绑定
+   * destroyCard2.1data binding
    */
   destroyDataBinding(widgetId: string): void {
-    // 从统一状态删除
+    // Remove from unified status
     this.editorStore.dataBindings.delete(widgetId)
   }
 
   /**
-   * 创建组件需求定义
+   * Create component requirement definitions
    */
   private createComponentRequirement(
     card2Definition: ComponentDefinition,
@@ -288,14 +288,14 @@ export class Card2VisualEditorAdapter {
   ): ComponentRequirement {
     const requirement: ComponentRequirement = {}
 
-    // 根据组件的数据源定义创建需求
+    // Create requirements based on the component's data source definition
     if (card2Definition.dataSources) {
       card2Definition.dataSources.forEach(ds => {
-        // 检查是否有对应的数据源配置
+        // Check whether there is a corresponding data source configuration
         const configBinding = dataSourceConfig.bindings?.[ds.key]
         if (configBinding) {
           requirement[ds.key] = {
-            type: 'object', // 简化类型处理
+            type: 'object', // Simplified type handling
             required: ds.required,
             description: ds.description,
             mapping: ds.fieldMappings || {},
@@ -310,7 +310,7 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 提取默认值
+   * Extract default value
    */
   private extractDefaultValue(dataSource: DataSourceDefinition): any {
     if (dataSource.fieldMappings) {
@@ -320,13 +320,13 @@ export class Card2VisualEditorAdapter {
     return null
   }
 
-  // ==================== 运行时数据处理 ====================
+  // ==================== Runtime data processing ====================
 
   /**
-   * 处理Card2.1组件的运行时数据更新
+   * deal withCard2.1Runtime data updates for components
    */
   handleRuntimeDataUpdate(widgetId: string, data: any): void {
-    // 通过数据流管理器更新运行时数据
+    // Update runtime data via Data Flow Manager
     this.dataFlowManager.handleUserAction({
       type: 'SET_RUNTIME_DATA',
       targetId: widgetId,
@@ -335,7 +335,7 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 获取Card2.1组件的当前数据
+   * GetCard2.1The current data of the component
    */
   getComponentCurrentData(widgetId: string): any {
     const runtimeData = this.editorStore.getRuntimeData(widgetId)
@@ -343,37 +343,37 @@ export class Card2VisualEditorAdapter {
     return runtimeData
   }
 
-  // ==================== 生命周期管理 ====================
+  // ==================== life cycle management ====================
 
   /**
-   * 组件添加到画布时的处理
+   * Processing when components are added to the canvas
    */
   onComponentAdded(widgetId: string, componentType: string): void {
-    // 检查是否是Card2.1组件
+    // Check if it isCard2.1components
     const card2Definition = this.editorStore.card2Components.get(componentType)
     if (card2Definition) {
-      // 初始化Card2.1组件的默认配置
+      // initializationCard2.1The default configuration of the component
       this.initializeCard2ComponentConfig(widgetId, card2Definition)
     }
   }
 
   /**
-   * 组件从画布移除时的处理
+   * Handling when a component is removed from the canvas
    */
   onComponentRemoved(widgetId: string): void {
-    // 清理Card2.1相关资源
+    // clean upCard2.1Related resources
     this.destroyDataBinding(widgetId)
   }
 
   /**
-   * 初始化Card2.1组件配置
+   * initializationCard2.1Component configuration
    */
   private initializeCard2ComponentConfig(widgetId: string, card2Definition: ComponentDefinition): void {
-    // 设置默认的组件配置
+    // Set default component configuration
     const defaultConfig = this.extractDefaultProperties(card2Definition)
     this.editorStore.setComponentConfiguration(widgetId, defaultConfig)
 
-    // 如果有数据源定义，创建默认的数据源配置
+    // If there is a data source definition，Create a default data source configuration
     if (card2Definition.dataSources && card2Definition.dataSources.length > 0) {
       const defaultDataSourceConfig: DataSourceConfiguration = {
         type: 'static',
@@ -386,7 +386,7 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 创建默认的数据绑定
+   * Create default data binding
    */
   private createDefaultBindings(dataSources: DataSourceDefinition[]): Record<string, any> {
     const bindings: Record<string, any> = {}
@@ -405,39 +405,39 @@ export class Card2VisualEditorAdapter {
     return bindings
   }
 
-  // ==================== 工具方法 ====================
+  // ==================== Tool method ====================
 
   /**
-   * 检查组件是否为Card2.1组件
+   * 检查components是否为Card2.1components
    */
   isCard2Component(widgetId: string): boolean {
     return this.editorStore.card2Components.has(widgetId)
   }
 
   /**
-   * 获取所有已注册的Card2.1组件
+   * Get all registeredCard2.1components
    */
   getAllCard2Components(): ComponentDefinition[] {
     return Array.from(this.editorStore.card2Components.values())
   }
 
   /**
-   * 获取Card2.1组件数量
+   * GetCard2.1Number of components
    */
   getCard2ComponentCount(): number {
     return this.editorStore.card2ComponentCount
   }
 
   /**
-   * 确保Card2.1系统已初始化
+   * make sureCard2.1System has been initialized
    */
   private async ensureInitialized(): Promise<void> {
     if (this.card2System) {
-      return // 已经初始化
+      return // Already initialized
     }
-    // 等待一段时间让异步初始化完成
+    // Wait for some time for asynchronous initialization to complete
     let retries = 0
-    const maxRetries = 50 // 最多等待5秒
+    const maxRetries = 50 // most wait5Second
 
     while (!this.card2System && retries < maxRetries) {
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -445,17 +445,17 @@ export class Card2VisualEditorAdapter {
     }
 
     if (!this.card2System) {
-      // 尝试重新初始化
+      // Try to reinitialize
       await this.initializeCard2Integration()
     }
   }
 
   /**
-   * 获取Card2.1组件实例
-   * 🔥 委托给Card2.1系统的getComponent方法
+   * GetCard2.1Component instance
+   * 🔥 entrusted toCard2.1systematicgetComponentmethod
    */
   async getComponent(componentType: string): Promise<any> {
-    // 等待初始化完成
+    // Wait for initialization to complete
     await this.ensureInitialized()
 
     if (!this.card2System) {
@@ -470,8 +470,8 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 获取Card2.1组件定义
-   * 🔥 委托给Card2.1系统的getComponentDefinition方法
+   * GetCard2.1Component definition
+   * 🔥 entrusted toCard2.1systematicgetComponentDefinitionmethod
    */
   getComponentDefinition(componentType: string): any {
     if (!this.card2System) {
@@ -486,19 +486,19 @@ export class Card2VisualEditorAdapter {
   }
 
   /**
-   * 获取Card2.1系统实例
+   * GetCard2.1System instance
    */
   getCard2System(): any {
     return this.card2System
   }
 }
 
-// ==================== 单例模式 ====================
+// ==================== Singleton pattern ====================
 
 let card2AdapterInstance: Card2VisualEditorAdapter | null = null
 
 /**
- * 获取Card2.1适配器实例（单例）
+ * GetCard2.1adapter instance（Singleton）
  */
 export function useCard2Adapter(): Card2VisualEditorAdapter {
   if (!card2AdapterInstance) {
@@ -509,7 +509,7 @@ export function useCard2Adapter(): Card2VisualEditorAdapter {
 }
 
 /**
- * 重置Card2.1适配器实例（测试用）
+ * resetCard2.1adapter instance（for testing）
  */
 export function resetCard2Adapter(): void {
   card2AdapterInstance = null

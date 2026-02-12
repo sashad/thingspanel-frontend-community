@@ -1,13 +1,13 @@
 <template>
   <div class="configuration-panel">
-    <!-- 选中组件时显示配置界面 -->
+    <!-- Display the configuration interface when selecting a component -->
     <div v-if="selectedWidget" class="config-container">
       <div class="widget-header">
         <h3 class="widget-title">{{ selectedWidget.type }}</h3>
         <span class="widget-id">{{ selectedWidget.id }}</span>
       </div>
 
-      <!-- 配置标签页 -->
+      <!-- Configure tab page -->
       <n-tabs v-model:value="activeTab" type="line" class="config-tabs">
         <n-tab-pane
           v-for="layer in visibleConfigLayers"
@@ -30,17 +30,17 @@
       </n-tabs>
     </div>
 
-    <!-- 未选中组件时的提示 -->
+    <!-- Prompt when component is not selected -->
     <div v-else class="no-selection">
-      <n-empty description="请选择一个组件进行配置" />
+      <n-empty description="Please select a component to configure" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * 🔥 ConfigurationPanel - 统一配置架构版本
- * 基于新的统一配置架构，作为配置的显示和编辑界面
+ * 🔥 ConfigurationPanel - Unified configuration architecture version
+ * Based on the new unified configuration architecture，As a configuration display and editing interface
  */
 
 import { ref, computed, watch } from 'vue'
@@ -59,35 +59,35 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false
 })
 
-// 组合式函数
+// Combined functions
 const { t } = useI18n()
 
-// 当前活跃的标签页
+// Currently active tabs
 const activeTab = ref('base')
 
-// 根据选中组件获取可见的配置层
+// Get the visible configuration layer based on the selected component
 const visibleConfigLayers = computed(() => {
   if (!props.selectedWidget) return []
 
-  // 获取该组件类型支持的配置层
+  // Get the configuration layer supported by this component type
   return getVisibleConfigLayers(props.selectedWidget.id, props.selectedWidget)
 })
 
 
-// 监听组件选择变化，重置到基础标签页
+// Monitor component selection changes，Reset to base tab
 watch(() => props.selectedWidget, async (newWidget) => {
   if (newWidget) {
-    // 确保默认选择的标签页存在
+    // Make sure the default selected tab exists
     const firstAvailableTab = visibleConfigLayers.value[0]?.name || 'base'
     activeTab.value = firstAvailableTab
 
-    // 🔥 尝试刷新组件定义（如果缺失configComponent）
+    // 🔥 Try refreshing the component definition（if missingconfigComponent）
     if (!newWidget.metadata?.card2Definition?.configComponent) {
       try {
         const { refreshComponentDefinitions } = await import('./component-registry')
         await refreshComponentDefinitions(newWidget)
       } catch (error) {
-        console.warn('⚠️ [ConfigurationPanel] 组件定义刷新失败:', error)
+        console.warn('⚠️ [ConfigurationPanel] Component definition refresh failed:', error)
       }
     }
   }
@@ -152,7 +152,7 @@ watch(() => props.selectedWidget, async (newWidget) => {
 }
 
 .config-form {
-  /* 内容容器，不需要特殊样式 */
+  /* content container，No special styling required */
 }
 
 .no-selection {

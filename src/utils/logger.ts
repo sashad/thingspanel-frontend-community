@@ -1,9 +1,9 @@
 /**
- * 统一调试日志系统 - 增强版
- * 支持开发/生产环境切换，避免生产环境中的调试信息污染
+ * Unified debugging log system - Enhanced version
+ * Support development/Production environment switch，Avoid debugging information pollution in production environments
  */
 
-// 日志级别枚举
+// Log level enum
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -11,7 +11,7 @@ export enum LogLevel {
   ERROR = 3
 }
 
-// 日志配置接口
+// Log configuration interface
 interface LoggerConfig {
   enabled: boolean
   level: LogLevel
@@ -19,7 +19,7 @@ interface LoggerConfig {
   timestamp?: boolean
 }
 
-// 默认配置：开发环境启用所有日志，生产环境只启用警告和错误
+// Default configuration：Enable all logs in the development environment，Production environment only enables warnings and errors
 const DEFAULT_CONFIG: LoggerConfig = {
   enabled: import.meta.env.DEV,
   level: import.meta.env.DEV ? LogLevel.DEBUG : LogLevel.WARN,
@@ -37,21 +37,21 @@ export default class Logger {
   }
 
   /**
-   * 更新日志配置
+   * Update log configuration
    */
   updateConfig(config: Partial<LoggerConfig>) {
     this.config = { ...this.config, ...config }
   }
 
   /**
-   * 检查日志级别是否启用
+   * Check if log level is enabled
    */
   private isLevelEnabled(level: LogLevel): boolean {
     return this.config.enabled && level >= this.config.level
   }
 
   /**
-   * 格式化日志前缀
+   * Format log prefix
    */
   private formatPrefix(level: string): string {
     const prefix = this.config.prefix || '[App]'
@@ -61,7 +61,7 @@ export default class Logger {
   }
 
   /**
-   * Debug级别日志 - 只在开发环境显示
+   * Debuglevel log - Only shown in development environment
    */
   debug(...args: any[]): void {
     if (this.isLevelEnabled(LogLevel.DEBUG)) {
@@ -71,7 +71,7 @@ export default class Logger {
   }
 
   /**
-   * Info级别日志
+   * Infolevel log
    */
   info(...args: any[]): void {
     if (this.isLevelEnabled(LogLevel.INFO)) {
@@ -80,7 +80,7 @@ export default class Logger {
   }
 
   /**
-   * Warning级别日志
+   * Warninglevel log
    */
   warn(...args: any[]): void {
     if (this.isLevelEnabled(LogLevel.WARN)) {
@@ -89,7 +89,7 @@ export default class Logger {
   }
 
   /**
-   * Error级别日志
+   * Errorlevel log
    */
   error(...args: any[]): void {
     if (this.isLevelEnabled(LogLevel.ERROR)) {
@@ -98,14 +98,14 @@ export default class Logger {
   }
 
   /**
-   * 条件日志 - 只有当条件为true时才输出
+   * condition log - Only if the condition istrueOutput only when
    */
   debugIf(condition: boolean, ...args: any[]): void {
     if (condition) this.debug(...args)
   }
 
   /**
-   * 性能计时开始
+   * Performance timing starts
    */
   time(label: string): void {
     if (this.isLevelEnabled(LogLevel.DEBUG)) {
@@ -114,7 +114,7 @@ export default class Logger {
   }
 
   /**
-   * 性能计时结束
+   * Performance timer ends
    */
   timeEnd(label: string): void {
     if (this.isLevelEnabled(LogLevel.DEBUG)) {
@@ -123,18 +123,18 @@ export default class Logger {
   }
 }
 
-// 创建日志器工厂函数
+// Create a logger factory function
 export const createLogger = (moduleName: string, config?: Partial<LoggerConfig>) => new Logger(moduleName, config)
 
-// 创建全局默认日志器
+// Create a global default logger
 export const logger = new Logger()
 
-// 为常用模块创建专用日志器
+// Create dedicated loggers for commonly used modules
 export const dataSourceLogger = createLogger('DataSource')
 export const httpLogger = createLogger('HTTP')
 export const componentLogger = createLogger('Component')
 export const visualEditorLogger = createLogger('VisualEditor')
 export const propertyBindingLogger = createLogger('PropertyBinding')
 
-// 导出类型
+// Export type
 export type { LoggerConfig }

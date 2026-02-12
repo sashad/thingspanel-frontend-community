@@ -16,15 +16,15 @@ const props = defineProps<{
 const formRef = ref<ICardFormIns>()
 const tabValue = ref('builtin')
 const tabList = [
-  { tab: '系统', type: 'builtin' },
-  { tab: '设备', type: 'device' },
-  { tab: '插件', type: 'plugin' },
-  { tab: '图表', type: 'chart' }
+  { tab: 'system', type: 'builtin' },
+  { tab: 'equipment', type: 'device' },
+  { tab: 'plug-in', type: 'plugin' },
+  { tab: 'chart', type: 'chart' }
 ]
 const state = reactive({
   curCardData: null as null | Record<string, any>
 })
-// $emit是内置变量 不可以使用$emit 作为变量名
+// $emitis a built-in variable Not available$emit as variable name
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
   (e: 'save', value: any): void
@@ -243,7 +243,7 @@ onMounted(() => {
           "
         >
           <NTabPane v-for="item1 in tabList" :key="item1.type" class="h-full" :name="item1.type" :tab="item1.tab">
-            <div v-if="item1.tab === '设备'">
+            <div v-if="item1.tab === 'equipment'">
               <NSelect
                 v-model:value="deviceSelectId"
                 :placeholder="$t('generate.select-device')"
@@ -261,7 +261,7 @@ onMounted(() => {
               ></NSelect>
             </div>
             <n-scrollbar style="height: 100%; padding: 4px">
-              <div v-if="item1.tab === '设备'">
+              <div v-if="item1.tab === 'equipment'">
                 <n-grid :x-gap="10" :y-gap="10" cols="1 240:1 480:2 720:3">
                   <n-gi v-for="item in webChartConfig" :key="item.data.cardId" class="min-w-240px">
                     <div
@@ -408,22 +408,22 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* 滚动条的宽度 */
+/* scroll bar width */
 #panel_view::-webkit-scrollbar {
   width: 4px;
 }
 
-/* 滚动条的轨道 */
+/* scroll bar track */
 #panel_view::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-/* 滚动条的滑块 */
+/* Scroll bar slider */
 #panel_view::-webkit-scrollbar-thumb {
   background: #888;
 }
 
-/* 滚动条的滑块：鼠标悬停 */
+/* Scroll bar slider：mouseover */
 #panel_view::-webkit-scrollbar-thumb:hover {
   background: #555;
 }

@@ -1,6 +1,6 @@
 /**
- * 🔥 交互执行引擎
- * 负责执行交互动作，实现组件间的双向绑定
+ * 🔥 interactive execution engine
+ * Responsible for performing interactive actions，Implement two-way binding between components
  */
 
 import { useEditorStore } from '@/store/modules/editor'
@@ -38,14 +38,14 @@ export interface InteractionEvent {
 }
 
 /**
- * 🔥 创建交互执行引擎
+ * 🔥 Create an interactive execution engine
  */
 export function createInteractionEngine() {
   const editorStore = useEditorStore()
   const message = useMessage()
 
   /**
-   * 🔥 执行跳转动作
+   * 🔥 perform jump action
    */
   const executeJumpAction = (action: InteractionAction) => {
     try {
@@ -62,48 +62,48 @@ export function createInteractionEngine() {
           }
         }
       } else {
-        // 兼容旧格式
+        // Compatible with older formats
         const url = action.updateValue || ''
         const target = action.targetProperty || '_blank'
         window.open(url, target)
       }
     } catch (error) {
-      console.error('🔥 [InteractionEngine] 跳转执行失败:', error)
-      message.error(`跳转失败: ${error.message}`)
+      console.error('🔥 [InteractionEngine] Jump execution failed:', error)
+      message.error(`Jump failed: ${error.message}`)
     }
   }
 
   /**
-   * 🔥 执行属性修改动作
+   * 🔥 Execute attribute modification action
    */
   const executeModifyAction = (action: InteractionAction) => {
     try {
       const { targetComponentId, targetProperty, updateValue } = action.modifyConfig || action
 
       if (!targetComponentId || !targetProperty) {
-        throw new Error('缺少目标组件ID或属性名')
+        throw new Error('Missing target componentIDor attribute name')
       }
 
 
-      // 找到目标组件节点
+      // Find the target component node
       const targetNode = editorStore.nodes.find(node => node.id === targetComponentId)
       if (!targetNode) {
-        throw new Error(`目标组件未找到: ${targetComponentId}`)
+        throw new Error(`Target component not found: ${targetComponentId}`)
       }
 
-      // 🔥 更新目标组件的属性
-      // 首先尝试更新unifiedConfig中的component配置
+      // 🔥 Update the properties of the target component
+      // Try updating firstunifiedConfigincomponentConfiguration
       const currentMetadata = targetNode.metadata || {}
       const currentUnifiedConfig = currentMetadata.unifiedConfig || {}
       const currentComponent = currentUnifiedConfig.component || {}
 
-      // 更新组件配置
+      // Update component configuration
       const updatedComponent = {
         ...currentComponent,
         [targetProperty]: updateValue
       }
 
-      // 更新节点
+      // Update node
       editorStore.updateNode(targetComponentId, {
         properties: {
           ...targetNode.properties,
@@ -119,26 +119,26 @@ export function createInteractionEngine() {
         }
       })
 
-      // 🔥 额外处理：如果目标组件有useCard2Props，直接调用其属性暴露方法
+      // 🔥 additional processing：If the target component hasuseCard2Props，Directly call its property exposure method
       try {
         const targetElement = document.querySelector(`[data-component-id="${targetComponentId}"]`)
         if (targetElement && (targetElement as any)?.__vueParentComponent?.exposed?.updateConfig) {
           ;(targetElement as any).__vueParentComponent.exposed.updateConfig('component', updatedComponent)
         }
       } catch (error) {
-        console.warn(`🔥 [InteractionEngine] 直接更新组件配置失败:`, error)
+        console.warn(`🔥 [InteractionEngine] Direct update of component configuration failed:`, error)
       }
 
-      message.success(`属性已更新: ${targetProperty} = ${updateValue}`)
+      message.success(`Property updated: ${targetProperty} = ${updateValue}`)
 
     } catch (error) {
-      console.error('🔥 [InteractionEngine] 属性修改失败:', error)
-      message.error(`属性修改失败: ${error.message}`)
+      console.error('🔥 [InteractionEngine] Property modification failed:', error)
+      message.error(`Property modification failed: ${error.message}`)
     }
   }
 
   /**
-   * 🔥 执行单个交互动作
+   * 🔥 Perform a single interaction
    */
   const executeAction = (action: InteractionAction) => {
 
@@ -154,13 +154,13 @@ export function createInteractionEngine() {
         break
 
       default:
-        console.warn(`🔥 [InteractionEngine] 未知的交互动作类型: ${action.action}`)
-        message.warning(`未知的交互动作: ${action.action}`)
+        console.warn(`🔥 [InteractionEngine] Unknown interaction type: ${action.action}`)
+        message.warning(`Unknown interaction: ${action.action}`)
     }
   }
 
   /**
-   * 🔥 执行交互事件
+   * 🔥 Execute interactive events
    */
   const executeInteraction = (interaction: InteractionEvent, triggerData?: any) => {
     if (!interaction.enabled) {
@@ -168,21 +168,21 @@ export function createInteractionEngine() {
     }
 
 
-    // 检查条件是否满足（用于dataChange事件）
+    // Check whether the conditions are met（used fordataChangeevent）
     if (interaction.event === 'dataChange' && interaction.condition && triggerData !== undefined) {
       if (!checkCondition(interaction.condition, triggerData)) {
         return
       }
     }
 
-    // 执行所有响应动作
+    // Perform all response actions
     interaction.responses.forEach(action => {
       executeAction(action)
     })
   }
 
   /**
-   * 🔥 检查条件是否满足
+   * 🔥 Check whether the conditions are met
    */
   const checkCondition = (condition: InteractionEvent['condition'], value: any): boolean => {
     if (!condition) return true
@@ -199,17 +199,17 @@ export function createInteractionEngine() {
           return checkExpressionCondition(value, condition.value)
 
         default:
-          console.warn(`🔥 [InteractionEngine] 未知的条件类型: ${condition.type}`)
+          console.warn(`🔥 [InteractionEngine] Unknown condition type: ${condition.type}`)
           return true
       }
     } catch (error) {
-      console.error(`🔥 [InteractionEngine] 条件检查失败:`, error)
+      console.error(`🔥 [InteractionEngine] Condition check failed:`, error)
       return false
     }
   }
 
   /**
-   * 🔥 检查比较条件
+   * 🔥 Check comparison conditions
    */
   const checkComparisonCondition = (operator: string, actualValue: any, expectedValue: any): boolean => {
     switch (operator) {
@@ -232,17 +232,17 @@ export function createInteractionEngine() {
       case 'endsWith':
         return String(actualValue).endsWith(String(expectedValue))
       default:
-        console.warn(`🔥 [InteractionEngine] 未知的比较操作符: ${operator}`)
+        console.warn(`🔥 [InteractionEngine] unknown comparison operator: ${operator}`)
         return false
     }
   }
 
   /**
-   * 🔥 检查范围条件
+   * 🔥 Check range conditions
    */
   const checkRangeCondition = (value: any, rangeValue: string): boolean => {
     try {
-      // 简单的范围格式：min-max 或 >min 或 <max
+      // Simple range format：min-max or >min or <max
       const numValue = Number(value)
 
       if (rangeValue.includes('-')) {
@@ -258,44 +258,44 @@ export function createInteractionEngine() {
 
       return false
     } catch (error) {
-      console.error(`🔥 [InteractionEngine] 范围条件解析失败:`, error)
+      console.error(`🔥 [InteractionEngine] Range condition parsing failed:`, error)
       return false
     }
   }
 
   /**
-   * 🔥 检查表达式条件
+   * 🔥 Check expression conditions
    */
   const checkExpressionCondition = (value: any, expression: string): boolean => {
     try {
-      // 简单的表达式求值（仅支持基本运算，安全考虑）
-      // 这里可以扩展为更复杂的表达式引擎
+      // Simple expression evaluation（Only supports basic operations，security considerations）
+      // This can be expanded to a more complex expression engine
       const safeExpression = expression.replace(/value/g, String(value))
 
-      // 基本的数学表达式评估
+      // Basic mathematical expression evaluation
       if (/^[\d\s+\-*/.()><=!&|]+$/.test(safeExpression)) {
         return Function(`"use strict"; return (${safeExpression})`)()
       }
 
       return false
     } catch (error) {
-      console.error(`🔥 [InteractionEngine] 表达式条件评估失败:`, error)
+      console.error(`🔥 [InteractionEngine] Expression condition evaluation failed:`, error)
       return false
     }
   }
 
   /**
-   * 🔥 注册组件属性监听器
+   * 🔥 Register component property listener
    */
   const registerPropertyWatcher = (componentId: string, propertyName: string, interactions: InteractionEvent[]) => {
-    // 找到目标组件
+    // Find the target component
     const targetNode = editorStore.nodes.find(node => node.id === componentId)
     if (!targetNode) {
-      console.warn(`🔥 [InteractionEngine] 注册属性监听失败，组件未找到: ${componentId}`)
+      console.warn(`🔥 [InteractionEngine] Failed to register attribute monitoring，Component not found: ${componentId}`)
       return
     }
 
-    // 🔥 通过Card2Props的watchProperty方法注册监听器
+    // 🔥 passCard2PropsofwatchPropertyMethod to register a listener
     try {
       const targetElement = document.querySelector(`[data-component-id="${componentId}"]`)
       if (targetElement && (targetElement as any)?.__vueParentComponent?.exposed?.watchProperty) {
@@ -303,7 +303,7 @@ export function createInteractionEngine() {
           propertyName,
           (newValue: any, oldValue: any) => {
 
-            // 执行相关的交互
+            // Perform related interactions
             interactions.forEach(interaction => {
               if (interaction.event === 'dataChange' && interaction.watchedProperty === propertyName) {
                 executeInteraction(interaction, newValue)
@@ -315,7 +315,7 @@ export function createInteractionEngine() {
         return unwatch
       }
     } catch (error) {
-      console.error(`🔥 [InteractionEngine] 属性监听器注册失败:`, error)
+      console.error(`🔥 [InteractionEngine] Property listener registration failed:`, error)
     }
 
     return null
@@ -330,6 +330,6 @@ export function createInteractionEngine() {
 }
 
 /**
- * 🔥 全局交互引擎实例
+ * 🔥 Global interaction engine instance
  */
 export const interactionEngine = createInteractionEngine()

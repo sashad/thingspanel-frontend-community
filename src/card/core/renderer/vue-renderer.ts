@@ -1,6 +1,6 @@
 /**
- * Vue渲染器实现
- * 基于Vue 3的组件渲染器
+ * VueRenderer implementation
+ * based onVue 3component renderer
  */
 
 import { createApp, App, Component, ref, reactive, onMounted, onUnmounted, h } from 'vue'
@@ -9,34 +9,34 @@ import type { IComponentInstance } from '../types/component'
 import type { IDataNode } from '../types/index'
 
 /**
- * Vue渲染器配置
+ * VueRenderer configuration
  */
 interface VueRendererConfig extends IRendererConfig {
-  /** 全局组件 */
+  /** global components */
   globalComponents?: Record<string, Component>
-  /** 全局指令 */
+  /** global directive */
   globalDirectives?: Record<string, any>
-  /** 插件 */
+  /** plug-in */
   plugins?: Array<{ install: (_app: App) => void }>
-  /** 开发模式 */
+  /** development mode */
   devMode?: boolean
 }
 
 /**
- * Vue渲染器实现类
+ * VueRenderer implementation class
  */
 export class VueRenderer implements IRenderer {
-  /** 渲染器类型 */
+  /** Renderer type */
   readonly type = 'vue'
-  /** 渲染器配置 */
+  /** Renderer configuration */
   private config: VueRendererConfig
-  /** Vue应用实例缓存 */
+  /** VueApplication instance cache */
   private apps = new Map<string, App>()
-  /** 组件实例缓存 */
+  /** Component instance cache */
   private componentInstances = new Map<string, any>()
-  /** 事件监听器 */
+  /** event listener */
   private eventListeners = new Map<string, Set<(event: IRendererEvent) => void>>()
-  /** 钩子函数 */
+  /** hook function */
   private hooks: IRendererHooks = {}
 
   constructor(config: VueRendererConfig = {}) {
@@ -52,26 +52,26 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 渲染组件实例
-   * @param instance 组件实例
-   * @param context 渲染上下文
+   * Render component instance
+   * @param instance Component instance
+   * @param context rendering context
    */
   async render(instance: IComponentInstance, context: IRenderContext): Promise<void> {
     try {
-      // 调用渲染前钩子
+      // Call pre-render hook
       await this.hooks.beforeRender?.(instance, context)
 
-      // 创建Vue应用
+      // createVueapplication
       const app = this.createVueApp(instance, context)
 
-      // 挂载到容器
+      // Mount to container
       const mountedApp = app.mount(context.container)
 
-      // 缓存应用和组件实例
+      // Caching application and component instances
       this.apps.set(instance.id, app)
       this.componentInstances.set(instance.id, mountedApp)
 
-      // 触发渲染完成事件
+      // Trigger render completion event
       this.emitEvent('rendered', {
         type: 'rendered',
         instanceId: instance.id,
@@ -79,15 +79,15 @@ export class VueRenderer implements IRenderer {
         timestamp: Date.now()
       })
 
-      // 调用渲染后钩子
+      // Calling post-render hooks
       await this.hooks.afterRender?.(instance, context)
 
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[VueRenderer] 渲染失败:`, error)
+      console.error(`[VueRenderer] Rendering failed:`, error)
 
-      // 触发错误事件
+      // trigger error event
       this.emitEvent('error', {
         type: 'error',
         instanceId: instance.id,
@@ -101,32 +101,32 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 更新组件实例
-   * @param instance 组件实例
-   * @param data 更新数据
-   * @param context 渲染上下文
+   * Update component instance
+   * @param instance Component instance
+   * @param data Update data
+   * @param context rendering context
    */
   async update(instance: IComponentInstance, data: any, context: IRenderContext): Promise<void> {
     try {
-      // 调用更新前钩子
+      // Call the pre-update hook
       await this.hooks.beforeUpdate?.(instance, data, context)
 
       const componentInstance = this.componentInstances.get(instance.id)
       if (!componentInstance) {
-        throw new Error(`组件实例 ${instance.id} 不存在`)
+        throw new Error(`Component instance ${instance.id} does not exist`)
       }
 
-      // 更新组件数据
+      // Update component data
       if (componentInstance.updateData && typeof componentInstance.updateData === 'function') {
         await componentInstance.updateData(data)
       } else if (componentInstance.$refs?.component?.updateData) {
         await componentInstance.$refs.component.updateData(data)
       } else {
-        // 直接更新响应式数据
+        // Directly update responsive data
         Object.assign(componentInstance.data || {}, data)
       }
 
-      // 触发更新完成事件
+      // Trigger update completion event
       this.emitEvent('updated', {
         type: 'updated',
         instanceId: instance.id,
@@ -135,38 +135,38 @@ export class VueRenderer implements IRenderer {
         timestamp: Date.now()
       })
 
-      // 调用更新后钩子
+      // Call post-update hook
       await this.hooks.afterUpdate?.(instance, data, context)
 
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[VueRenderer] 更新失败:`, error)
+      console.error(`[VueRenderer] Update failed:`, error)
       throw error
     }
   }
 
   /**
-   * 销毁组件实例
-   * @param instance 组件实例
-   * @param context 渲染上下文
+   * Destroy component instance
+   * @param instance Component instance
+   * @param context rendering context
    */
   async destroy(instance: IComponentInstance, context: IRenderContext): Promise<void> {
     try {
-      // 调用销毁前钩子
+      // Call the pre-destruction hook
       await this.hooks.beforeDestroy?.(instance, context)
 
       const app = this.apps.get(instance.id)
       if (app) {
-        // 卸载Vue应用
+        // uninstallVueapplication
         app.unmount()
         this.apps.delete(instance.id)
       }
 
-      // 清理组件实例
+      // Clean up component instance
       this.componentInstances.delete(instance.id)
 
-      // 触发销毁完成事件
+      // Trigger the destruction completion event
       this.emitEvent('destroyed', {
         type: 'destroyed',
         instanceId: instance.id,
@@ -174,21 +174,21 @@ export class VueRenderer implements IRenderer {
         timestamp: Date.now()
       })
 
-      // 调用销毁后钩子
+      // Call post-destruction hook
       await this.hooks.afterDestroy?.(instance, context)
 
       if (process.env.NODE_ENV === 'development') {
       }
     } catch (error) {
-      console.error(`[VueRenderer] 销毁失败:`, error)
+      console.error(`[VueRenderer] Destruction failed:`, error)
       throw error
     }
   }
 
   /**
-   * 添加事件监听器
-   * @param eventType 事件类型
-   * @param listener 监听器函数
+   * Add event listener
+   * @param eventType event type
+   * @param listener listener function
    */
   addEventListener(eventType: string, listener: (event: IRendererEvent) => void): void {
     if (!this.eventListeners.has(eventType)) {
@@ -198,9 +198,9 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 移除事件监听器
-   * @param eventType 事件类型
-   * @param listener 监听器函数
+   * Remove event listener
+   * @param eventType event type
+   * @param listener listener function
    */
   removeEventListener(eventType: string, listener: (event: IRendererEvent) => void): void {
     const listeners = this.eventListeners.get(eventType)
@@ -210,24 +210,24 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 设置钩子函数
-   * @param hooks 钩子函数对象
+   * Set hook function
+   * @param hooks hook function object
    */
   setHooks(hooks: Partial<IRendererHooks>): void {
     this.hooks = { ...this.hooks, ...hooks }
   }
 
   /**
-   * 获取渲染器配置
-   * @returns 配置对象
+   * Get renderer configuration
+   * @returns Configuration object
    */
   getConfig(): VueRendererConfig {
     return { ...this.config }
   }
 
   /**
-   * 更新渲染器配置
-   * @param config 新配置
+   * Update renderer configuration
+   * @param config New configuration
    */
   updateConfig(config: Partial<VueRendererConfig>): void {
     this.config = { ...this.config, ...config }
@@ -236,19 +236,19 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 销毁渲染器
+   * Destroy renderer
    */
   cleanup(): void {
-    // 销毁所有Vue应用
+    // Destroy allVueapplication
     this.apps.forEach((app, instanceId) => {
       try {
         app.unmount()
       } catch (error) {
-        console.error(`[VueRenderer] 销毁应用 ${instanceId} 失败:`, error)
+        console.error(`[VueRenderer] Destroy application ${instanceId} fail:`, error)
       }
     })
 
-    // 清理缓存
+    // clear cache
     this.apps.clear()
     this.componentInstances.clear()
     this.eventListeners.clear()
@@ -258,43 +258,43 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 创建Vue应用
-   * @param instance 组件实例
-   * @param context 渲染上下文
-   * @returns Vue应用实例
+   * createVueapplication
+   * @param instance Component instance
+   * @param context rendering context
+   * @returns VueApplication examples
    */
   private createVueApp(instance: IComponentInstance, context: IRenderContext): App {
-    // 创建根组件
+    // Create root component
     const RootComponent = this.createRootComponent(instance)
 
-    // 创建Vue应用
+    // createVueapplication
     const app = createApp(RootComponent)
 
-    // 配置全局组件
+    // Configure global components
     if (this.config.globalComponents) {
       Object.entries(this.config.globalComponents).forEach(([name, component]) => {
         app.component(name, component)
       })
     }
 
-    // 配置全局指令
+    // Configure global directives
     if (this.config.globalDirectives) {
       Object.entries(this.config.globalDirectives).forEach(([name, directive]) => {
         app.directive(name, directive)
       })
     }
 
-    // 安装插件
+    // Install plugin
     if (this.config.plugins) {
       this.config.plugins.forEach(plugin => {
         app.use(plugin)
       })
     }
 
-    // 配置错误处理
+    // Configure error handling
     if (this.config.enableErrorBoundary) {
       app.config.errorHandler = (error, _vm, info) => {
-        console.error('[VueRenderer] Vue错误:', error, info)
+        console.error('[VueRenderer] Vuemistake:', error, info)
         this.emitEvent('error', {
           type: 'error',
           instanceId: instance.id,
@@ -305,7 +305,7 @@ export class VueRenderer implements IRenderer {
       }
     }
 
-    // 开发模式配置
+    // Development mode configuration
     if (this.config.devMode) {
       app.config.devtools = this.config.enableDevtools
     }
@@ -314,9 +314,9 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 创建根组件
-   * @param instance 组件实例
-   * @returns Vue组件
+   * Create root component
+   * @param instance Component instance
+   * @returns Vuecomponents
    */
   private createRootComponent(instance: IComponentInstance): Component {
     const { definition, config, data } = instance
@@ -324,19 +324,19 @@ export class VueRenderer implements IRenderer {
     return {
       name: `Card_${definition.meta.id}`,
       setup() {
-        // 创建响应式数据
+        // Create responsive data
         const cardData = ref(data)
         const cardConfig = reactive(config)
         const isLoading = ref(false)
         const error = ref<Error | null>(null)
 
-        // 数据更新方法
+        // Data update method
         const updateData = async (newData: IDataNode | IDataNode[]) => {
           try {
             isLoading.value = true
             error.value = null
 
-            // 调用组件逻辑的数据处理方法
+            // Call the data processing method of the component logic
             if (definition.logic.processData) {
               const processedData = await definition.logic.processData(newData, cardConfig)
               cardData.value = processedData
@@ -345,18 +345,18 @@ export class VueRenderer implements IRenderer {
             }
           } catch (err) {
             error.value = err as Error
-            console.error('[VueRenderer] 数据更新失败:', err)
+            console.error('[VueRenderer] Data update failed:', err)
           } finally {
             isLoading.value = false
           }
         }
 
-        // 配置更新方法
+        // Configuration update method
         const updateConfig = (newConfig: any) => {
           Object.assign(cardConfig, newConfig)
         }
 
-        // 生命周期钩子
+        // life cycle hooks
         onMounted(async () => {
           try {
             await definition.logic.onMounted?.({
@@ -366,7 +366,7 @@ export class VueRenderer implements IRenderer {
               updateConfig
             })
           } catch (err) {
-            console.error('[VueRenderer] 组件挂载失败:', err)
+            console.error('[VueRenderer] Component mounting failed:', err)
           }
         })
 
@@ -379,11 +379,11 @@ export class VueRenderer implements IRenderer {
               updateConfig
             })
           } catch (err) {
-            console.error('[VueRenderer] 组件卸载失败:', err)
+            console.error('[VueRenderer] Component uninstallation failed:', err)
           }
         })
 
-        // 暴露方法给外部调用
+        // Expose methods to external calls
         return {
           cardData,
           cardConfig,
@@ -394,13 +394,13 @@ export class VueRenderer implements IRenderer {
         }
       },
       render() {
-        // 获取对应的Vue视图组件
+        // Get the correspondingVueview component
         const VueView = definition.views.vue
         if (!VueView) {
-          throw new Error(`组件 ${definition.meta.id} 没有Vue视图实现`)
+          throw new Error(`components ${definition.meta.id} NoVueView implementation`)
         }
 
-        // 渲染Vue组件
+        // renderingVuecomponents
         return h(VueView, {
           data: this.cardData,
           config: this.cardConfig,
@@ -414,9 +414,9 @@ export class VueRenderer implements IRenderer {
   }
 
   /**
-   * 触发事件
-   * @param eventType 事件类型
-   * @param event 事件对象
+   * trigger event
+   * @param eventType event type
+   * @param event event object
    */
   private emitEvent(eventType: string, event: IRendererEvent): void {
     const listeners = this.eventListeners.get(eventType)
@@ -425,15 +425,15 @@ export class VueRenderer implements IRenderer {
         try {
           listener(event)
         } catch (error) {
-          console.error(`[VueRenderer] 事件监听器执行失败:`, error)
+          console.error(`[VueRenderer] Event listener execution failed:`, error)
         }
       })
     }
   }
 }
 
-// 创建默认Vue渲染器实例
+// create defaultVueRenderer instance
 export const vueRenderer = new VueRenderer()
 
-// 导出类型
+// Export type
 export type { VueRendererConfig }

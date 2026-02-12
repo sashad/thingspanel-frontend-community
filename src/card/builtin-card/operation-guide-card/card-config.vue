@@ -117,22 +117,22 @@ const createDefaultGuideItem = (): GuideItem => {
 </template>
 
 <style scoped>
-/* 调整 NFormItemGi 内的 label 和 picker 对齐 */
+/* Adjustment NFormItemGi within label and picker Alignment */
 .config-item :deep(.n-form-item-label) {
   padding: 0;
-  line-height: normal; /* 调整行高避免过高 */
-  margin-bottom: 4px; /* label 和 picker 间加一点距离 */
-  text-align: left; /* 确保左对齐 */
-  /* 添加固定宽度和溢出处理 */
-  width: 80px; /* 或根据实际最长标签调整 max-width */
+  line-height: normal; /* Adjust row height to avoid being too high */
+  margin-bottom: 4px; /* label and picker add a little distance between */
+  text-align: left; /* Make sure to align left */
+  /* Add fixed width and overflow handling */
+  width: 80px; /* Or adjust according to the actual longest label max-width */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .config-item :deep(.n-form-item-blank) {
-  width: 100%; /* 让颜色选择器占满 */
+  width: 100%; /* Make the color picker full */
 }
 
-/* 可以保留一些全局样式或移除 */
+/* Some global styles can be kept or removed */
 </style>

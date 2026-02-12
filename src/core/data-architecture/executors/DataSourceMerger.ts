@@ -1,7 +1,7 @@
 /**
- * 第三层：数据源合并器 (DataSourceMerger)
- * 职责：将多个数据项合并成数据源最终数据
- * 已集成 script-engine 安全脚本执行系统
+ * third floor：data source combiner (DataSourceMerger)
+ * Responsibilities：Combine multiple data items into the final data from the data source
+ * Integrated script-engine Secure Script Execution System
  */
 
 import { defaultScriptEngine } from '@/core/script-engine'
@@ -9,51 +9,51 @@ import { defaultScriptEngine } from '@/core/script-engine'
 export type MergeStrategy =
   | {
       type: 'object'
-      /** 拼接成大对象 */
+      /** Splicing into large objects */
     }
   | {
       type: 'array'
-      /** 拼接成大数组 */
+      /** Spliced ​​into a large array */
     }
   | {
       type: 'select'
-      /** 选择其中一个数据项 */
+      /** Select one of the data items */
       selectedIndex?: number
     }
   | {
       type: 'script'
-      /** 自定义脚本处理list */
+      /** Custom script processinglist */
       script: string
     }
 
 /**
- * 数据源合并器接口
+ * Data source combiner interface
  */
 export interface IDataSourceMerger {
   /**
-   * 根据策略合并数据项
-   * @param items 处理后的数据项列表
-   * @param strategy 合并策略
-   * @returns 合并后的数据源最终数据，出错时返回 {}
+   * Merge data items based on policy
+   * @param items List of processed data items
+   * @param strategy merge strategy
+   * @returns The final data of the merged data source，Return on error {}
    */
   mergeDataItems(items: any[], strategy: MergeStrategy): Promise<any>
 }
 
 /**
- * 数据源合并器实现类
+ * Data source combiner implementation class
  */
 export class DataSourceMerger implements IDataSourceMerger {
   /**
-   * 数据项合并主方法
+   * Data item merge main method
    */
   async mergeDataItems(items: any[], strategy: MergeStrategy): Promise<any> {
     try {
-      // 前置依赖检查：必须有数据项才能合并
+      // Pre-dependency checking：There must be data items to merge
       if (!items || items.length === 0) {
         return {}
       }
 
-      // 智能默认策略选择
+      // Intelligent default policy selection
       const finalStrategy = this.selectDefaultStrategy(items, strategy)
       switch (finalStrategy.type) {
         case 'object':
@@ -72,17 +72,17 @@ export class DataSourceMerger implements IDataSourceMerger {
           return {}
       }
     } catch (error) {
-      return {} // 统一错误处理：返回空对象
+      return {} // Unified error handling：Return empty object
     }
   }
 
   /**
-   * 智能默认策略选择
-   * 单项时使用默认策略，多项时使用指定策略
+   * Intelligent default policy selection
+   * Use default strategy for single item，Use the specified strategy when there are multiple items
    */
   private selectDefaultStrategy(items: any[], strategy: MergeStrategy): MergeStrategy {
-    // 🔥 修复：无论单项还是多项，都使用用户指定的策略
-    // 如果没有指定策略，则使用默认的 object 策略
+    // 🔥 repair：Whether single or multiple，Both use user-specified policies
+    // If no policy is specified，then use the default object Strategy
     if (!strategy || !strategy.type) {
       return { type: 'object' }
     }
@@ -90,8 +90,8 @@ export class DataSourceMerger implements IDataSourceMerger {
   }
 
   /**
-   * 合并为大对象
-   * 将多个数据项按索引或键合并到一个对象中
+   * merge into large object
+   * Combine multiple data items into one object by index or key
    */
   private async mergeAsObject(items: any[]): Promise<any> {
     try {
@@ -99,11 +99,11 @@ export class DataSourceMerger implements IDataSourceMerger {
 
       items.forEach((item, index) => {
         if (item !== null && item !== undefined) {
-          // 如果数据项本身是对象，展开其属性
+          // If the data item itself is an object，Expand its properties
           if (typeof item === 'object' && !Array.isArray(item)) {
             Object.assign(result, item)
           } else {
-            // 否则按索引放入结果对象
+            // Otherwise place the result object by index
             result[`item_${index}`] = item
           }
         }
@@ -116,15 +116,15 @@ export class DataSourceMerger implements IDataSourceMerger {
   }
 
   /**
-   * 🔥 新增：选择其中一个数据项
-   * 根据用户指定的索引返回特定的数据项
+   * 🔥 New：Select one of the data items
+   * Returns a specific data item based on a user-specified index
    */
   private async selectOne(items: any[], selectedIndex?: number): Promise<any> {
     try {
-      // 默认选择第一个数据项（索引0）
+      // The first data item is selected by default（index0）
       const index = selectedIndex ?? 0
 
-      // 边界检查
+      // Boundary checking
       if (index < 0 || index >= items.length) {
         return items[0] ?? {}
       }
@@ -137,8 +137,8 @@ export class DataSourceMerger implements IDataSourceMerger {
   }
 
   /**
-   * 合并为大数组
-   * 将多个数据项拼接成一个数组
+   * merge into large array
+   * Concatenate multiple data items into an array
    */
   private async mergeAsArray(items: any[]): Promise<any[]> {
     try {
@@ -146,11 +146,11 @@ export class DataSourceMerger implements IDataSourceMerger {
 
       for (const item of items) {
         if (item !== null && item !== undefined) {
-          // 如果数据项本身是数组，展开其元素
+          // If the data item itself is an array，expand its elements
           if (Array.isArray(item)) {
             result.push(...item)
           } else {
-            // 否则直接添加到结果数组
+            // Otherwise add it directly to the result array
             result.push(item)
           }
         }
@@ -163,32 +163,32 @@ export class DataSourceMerger implements IDataSourceMerger {
   }
 
   /**
-   * 通过自定义脚本合并 (使用 script-engine 安全执行)
-   * 传入数据项列表，让用户脚本处理
+   * Merge via custom script (use script-engine Safe execution)
+   * Incoming data item list，Let user script handle it
    */
   private async mergeByScript(items: any[], script: string): Promise<any> {
     try {
-      // 创建脚本执行上下文
+      // Create script execution context
       const scriptContext = {
         items
-        // script-engine 已内置 JSON, console, Math, Date, Array, Object 等
+        // script-engine Already built in JSON, console, Math, Date, Array, Object wait
       }
 
-      // 使用 script-engine 安全执行脚本
+      // use script-engine Safe execution of scripts
       const result = await defaultScriptEngine.execute(script, scriptContext)
 
       if (result.success) {
         return result.data !== undefined ? result.data : {}
       } else {
-        return {} // 脚本失败时返回空对象
+        return {} // Returns an empty object when the script fails
       }
     } catch (error) {
-      return {} // 脚本失败时返回空对象
+      return {} // Returns an empty object when the script fails
     }
   }
 
   /**
-   * 验证合并策略的有效性
+   * Verify the effectiveness of the merge strategy
    */
   validateMergeStrategy(strategy: MergeStrategy): boolean {
     if (!strategy || !strategy.type) {
@@ -208,8 +208,8 @@ export class DataSourceMerger implements IDataSourceMerger {
   }
 
   /**
-   * 获取推荐的合并策略
-   * 基于数据项的类型推荐最佳合并策略
+   * Get recommended merge strategies
+   * Recommend the best merge strategy based on the type of data items
    */
   getRecommendedStrategy(items: any[]): MergeStrategy {
     if (!items || items.length === 0) {
@@ -220,19 +220,19 @@ export class DataSourceMerger implements IDataSourceMerger {
       return { type: 'object' }
     }
 
-    // 如果所有数据项都是数组，推荐array合并
+    // If all data items are arrays，recommendarraymerge
     const allArrays = items.every(item => Array.isArray(item))
     if (allArrays) {
       return { type: 'array' }
     }
 
-    // 如果所有数据项都是对象，推荐object合并
+    // If all data items are objects，recommendobjectmerge
     const allObjects = items.every(item => item && typeof item === 'object' && !Array.isArray(item))
     if (allObjects) {
       return { type: 'object' }
     }
 
-    // 默认使用array合并
+    // Used by defaultarraymerge
     return { type: 'array' }
   }
 }

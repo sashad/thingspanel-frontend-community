@@ -1,61 +1,61 @@
 /**
- * 设备模板相关类型定义
+ * Device template related type definitions
  */
 
-// ==================== 基础类型 ====================
+// ==================== base type ====================
 
 /**
- * 数据类型枚举
+ * Data type enumeration
  */
 export type DataType = 'String' | 'Number' | 'Boolean' | 'Enum'
 
 /**
- * 读写标识
+ * Read and write identification
  */
 export type ReadWriteFlag = 'R' | 'RW'
 
 /**
- * 参数类型
+ * Parameter type
  */
 export type ParamType = 'String' | 'Number' | 'Boolean' | 'Enum'
 
-// ==================== 模板基本信息 ====================
+// ==================== Template basic information ====================
 
 /**
- * 设备模板基本信息
+ * Basic information about device templates
  */
 export interface DeviceTemplate {
   id?: string
   name: string
-  label: string // 标签（逗号分隔）
-  path: string // 封面图片路径
+  label: string // Label（comma separated）
+  path: string // Cover image path
   author: string
   version: string
   description: string
-  web_chart_config?: string // Web图表配置（JSON字符串）
-  app_chart_config?: string // APP图表配置（JSON字符串）
+  web_chart_config?: string // WebChart configuration（JSONstring）
+  app_chart_config?: string // APPChart configuration（JSONstring）
   created_at?: string
   updated_at?: string
 }
 
 /**
- * 模板表单数据（前端使用）
+ * Template form data（Front-end use）
  */
 export interface TemplateFormData {
   id?: string
   name: string
-  templateTags: string[] // 前端标签数组
-  label: string // 后端标签字符串
+  templateTags: string[] // frontend tag array
+  label: string // Backend tag string
   path: string
   author: string
   version: string
   description: string
 }
 
-// ==================== 枚举配置 ====================
+// ==================== Enum configuration ====================
 
 /**
- * 枚举项配置
+ * Enumeration item configuration
  */
 export interface EnumConfig {
   value_type: 'String' | 'Number' | 'Boolean'
@@ -64,17 +64,17 @@ export interface EnumConfig {
 }
 
 /**
- * 命令参数枚举配置
+ * Command parameter enumeration configuration
  */
 export interface CommandEnumConfig {
   value: string | number | boolean
   desc: string
 }
 
-// ==================== 遥测数据 ====================
+// ==================== telemetry data ====================
 
 /**
- * 遥测数据定义
+ * Telemetry data definition
  */
 export interface TelemetryData {
   id?: string
@@ -85,11 +85,11 @@ export interface TelemetryData {
   read_write_flag: ReadWriteFlag
   unit: string
   description: string
-  additional_info: string // JSON字符串
+  additional_info: string // JSONstring
 }
 
 /**
- * 遥测表单数据（前端使用）
+ * Telemetry form data（Front-end use）
  */
 export interface TelemetryFormData {
   id?: string
@@ -97,35 +97,35 @@ export interface TelemetryFormData {
   data_name: string
   data_identifier: string
   data_type: DataType
-  read_write_flag: 'R-只读' | 'RW-读/写'
+  read_write_flag: 'R-只read' | 'RW-read/Write'
   unit: string
   description: string
-  additional_info: EnumConfig[] // 枚举配置数组
+  additional_info: EnumConfig[] // Enum configuration array
 }
 
-// ==================== 属性数据 ====================
+// ==================== attribute data ====================
 
 /**
- * 属性数据定义（与遥测结构相同）
+ * Attribute data definition（Same as telemetry structure）
  */
 export type AttributeData = TelemetryData
 export type AttributeFormData = TelemetryFormData
 
-// ==================== 事件数据 ====================
+// ==================== event data ====================
 
 /**
- * 事件参数定义
+ * Event parameter definition
  */
 export interface EventParam {
   id?: number
   data_name: string
   data_identifier: string
-  read_write_flag: DataType // 实际是数据类型
+  read_write_flag: DataType // Actually the data type
   description: string
 }
 
 /**
- * 事件数据定义
+ * event data definition
  */
 export interface EventData {
   id?: string
@@ -133,12 +133,12 @@ export interface EventData {
   data_name: string
   data_identifier: string
   description: string
-  params: string // JSON字符串
-  paramsOrigin?: string // 编辑时保存原始JSON
+  params: string // JSONstring
+  paramsOrigin?: string // Save original while editingJSON
 }
 
 /**
- * 事件表单数据（前端使用）
+ * event form data（Front-end use）
  */
 export interface EventFormData {
   id?: string
@@ -149,10 +149,10 @@ export interface EventFormData {
   params: EventParam[]
 }
 
-// ==================== 命令数据 ====================
+// ==================== command data ====================
 
 /**
- * 命令参数定义
+ * Command parameter definition
  */
 export interface CommandParam {
   id?: number
@@ -160,12 +160,12 @@ export interface CommandParam {
   data_identifier: string
   param_type: ParamType
   description: string
-  data_type?: 'String' | 'Number' | 'Boolean' // 仅Enum类型需要
+  data_type?: 'String' | 'Number' | 'Boolean' // onlyEnumtype required
   enum_config?: CommandEnumConfig[]
 }
 
 /**
- * 命令数据定义
+ * Command data definition
  */
 export interface CommandData {
   id?: string
@@ -173,12 +173,12 @@ export interface CommandData {
   data_name: string
   data_identifier: string
   description: string
-  params: string // JSON字符串
+  params: string // JSONstring
   paramsOrigin?: string
 }
 
 /**
- * 命令表单数据（前端使用）
+ * command form data（Front-end use）
  */
 export interface CommandFormData {
   id?: string
@@ -189,10 +189,10 @@ export interface CommandFormData {
   params: CommandParam[]
 }
 
-// ==================== 分页查询 ====================
+// ==================== Page query ====================
 
 /**
- * 分页查询参数
+ * Pagination query parameters
  */
 export interface PageQuery {
   page: number
@@ -201,17 +201,17 @@ export interface PageQuery {
 }
 
 /**
- * 分页响应数据
+ * Paginated response data
  */
 export interface PageResponse<T> {
   list: T[]
   total: number
 }
 
-// ==================== API响应 ====================
+// ==================== APIresponse ====================
 
 /**
- * 通用API响应
+ * UniversalAPIresponse
  */
 export interface ApiResponse<T = any> {
   data: T

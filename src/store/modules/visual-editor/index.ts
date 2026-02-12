@@ -1,9 +1,9 @@
 /**
- * Visual Editor 统一数据管理模块入口
- * 🔥 新架构的统一导出，替代所有分散的数据管理组件
+ * Visual Editor Unified data management module entrance
+ * 🔥 Unified export of new architecture，Replaces all fragmented data management components
  */
 
-// 导入核心状态管理
+// Import core state management
 import {
   useUnifiedEditorStore,
   type UnifiedEditorState,
@@ -13,7 +13,7 @@ import {
   type InteractionConfiguration
 } from './unified-editor'
 
-// 重新导出给外部使用
+// Re-export for external use
 export {
   useUnifiedEditorStore,
   type UnifiedEditorState,
@@ -23,7 +23,7 @@ export {
   type InteractionConfiguration
 }
 
-// 导入配置服务
+// Import configuration service
 import {
   useConfigurationService,
   resetConfigurationService,
@@ -32,7 +32,7 @@ import {
   type ConfigurationMigration
 } from './configuration-service'
 
-// 导入数据流管理
+// Import data flow management
 import {
   useDataFlowManager,
   resetDataFlowManager,
@@ -45,7 +45,7 @@ import {
   type DataFlowContext
 } from './data-flow-manager'
 
-// 导入Card 2.1 集成适配器
+// importCard 2.1 integrated adapter
 import {
   useCard2Adapter,
   resetCard2Adapter,
@@ -57,7 +57,7 @@ import {
   type ComponentRequirement
 } from './card2-adapter'
 
-// 重新导出配置服务
+// Re-export the configuration service
 export {
   useConfigurationService,
   resetConfigurationService,
@@ -66,7 +66,7 @@ export {
   type ConfigurationMigration
 }
 
-// 重新导出数据流管理
+// Re-export data flow management
 export {
   useDataFlowManager,
   resetDataFlowManager,
@@ -79,7 +79,7 @@ export {
   type DataFlowContext
 }
 
-// 重新导出Card 2.1 集成适配器
+// Re-exportCard 2.1 integrated adapter
 export {
   useCard2Adapter,
   resetCard2Adapter,
@@ -92,8 +92,8 @@ export {
 }
 
 /**
- * 统一的 Visual Editor 系统类
- * 🔥 这是新架构的核心协调器，替代原有的分散管理
+ * unified Visual Editor System class
+ * 🔥 This is the core coordinator of the new architecture，Replace the original decentralized management
  */
 export class UnifiedVisualEditorSystem {
   public store: ReturnType<typeof useUnifiedEditorStore> | null = null
@@ -107,7 +107,7 @@ export class UnifiedVisualEditorSystem {
   constructor() {}
 
   /**
-   * 延迟初始化各个服务
+   * Lazy initialization of individual services
    */
   private initializeServices(): void {
     if (this.servicesInitialized) return
@@ -121,7 +121,7 @@ export class UnifiedVisualEditorSystem {
   }
 
   /**
-   * 初始化系统
+   * Initialize the system
    */
   async initialize(): Promise<void> {
     if (this.initialized && this.store && this.configService && this.dataFlowManager && this.card2Adapter) {
@@ -132,24 +132,24 @@ export class UnifiedVisualEditorSystem {
       this.initialized = false
     }
     try {
-      // 0. 先初始化各个服务
+      // 0. Initialize each service first
       this.initializeServices()
 
-      // 1. 初始化配置服务
+      // 1. Initialize configuration service
       await this.initializeConfigurationService()
 
-      // 2. 初始化数据流管理
+      // 2. Initialize data flow management
       this.initializeDataFlowManager()
 
-      // 3. 初始化Card2.1适配器
+      // 3. initializationCard2.1adapter
       await this.initializeCard2Adapter()
 
-      // 4. 设置系统事件监听
+      // 4. Set up system event monitoring
       this.setupSystemEventListeners()
 
-      // 5. 验证所有服务都已正确初始化
+      // 5. Verify that all services have been initialized correctly
       if (!this.store || !this.configService || !this.dataFlowManager || !this.card2Adapter) {
-        throw new Error('服务初始化验证失败：某些服务为null')
+        throw new Error('Service initialization verification failed：Some services arenull')
       }
 
       this.initialized = true
@@ -159,19 +159,19 @@ export class UnifiedVisualEditorSystem {
   }
 
   /**
-   * 初始化配置服务
+   * Initialize configuration service
    */
   private async initializeConfigurationService(): Promise<void> {
     if (!this.configService) {
-      throw new Error('配置服务未初始化')
+      throw new Error('Configuration service not initialized')
     }
 
-    // 注册配置迁移
+    // Register configuration migration
     this.configService.registerMigration({
       fromVersion: '1.0.0',
       toVersion: '1.1.0',
       migrate: config => {
-        // 示例迁移逻辑
+        // Sample migration logic
         return {
           ...config,
           metadata: {
@@ -184,51 +184,51 @@ export class UnifiedVisualEditorSystem {
   }
 
   /**
-   * 初始化数据流管理
+   * Initialize data flow management
    */
   private initializeDataFlowManager(): void {
     if (!this.dataFlowManager) {
-      throw new Error('数据流管理器未初始化')
+      throw new Error('Data flow manager not initialized')
     }
 
-    // 注册自定义副作用处理器
+    // Register a custom side effect handler
     this.dataFlowManager.registerSideEffect({
       name: 'SystemStateSync',
-      condition: () => true, // 监听所有操作
+      condition: () => true, // Monitor all operations
       execute: action => {
-        // 系统状态同步逻辑
+        // System status synchronization logic
       }
     })
   }
 
   /**
-   * 初始化Card2.1适配器
+   * initializationCard2.1adapter
    */
   private async initializeCard2Adapter(): Promise<void> {
-    // Card2.1适配器会自动初始化
-    // 这里可以添加额外的初始化逻辑
+    // Card2.1The adapter will automatically initialize
+    // Additional initialization logic can be added here
   }
 
   /**
-   * 设置系统事件监听
+   * Set up system event monitoring
    */
   private setupSystemEventListeners(): void {
     if (!this.configService || !this.dataFlowManager) {
-      throw new Error('服务未初始化，无法设置事件监听')
+      throw new Error('Service not initialized，Unable to set up event listening')
     }
 
-    // 监听配置变更
+    // Listen for configuration changes
     this.configService.onConfigurationChange(event => {})
 
-    // 监听数据流更新
+    // Monitor data stream updates
     this.dataFlowManager.onDataFlowUpdate(action => {})
 
-    // 监听错误事件
+    // Listen for error events
     this.dataFlowManager.onError((action, error) => {})
   }
 
   /**
-   * 获取系统状态
+   * Get system status
    */
   getSystemStatus(): {
     initialized: boolean
@@ -257,18 +257,18 @@ export class UnifiedVisualEditorSystem {
   }
 
   /**
-   * 保存所有配置
+   * Save all configurations
    */
   async saveAll(): Promise<void> {
     if (!this.configService) {
-      throw new Error('配置服务未初始化')
+      throw new Error('Configuration service not initialized')
     }
 
     await this.configService.saveAllConfigurations()
   }
 
   /**
-   * 清理系统资源
+   * Clean up system resources
    */
   cleanup(): void {
     if (this.store) {
@@ -280,13 +280,13 @@ export class UnifiedVisualEditorSystem {
   }
 }
 
-// ==================== 单例模式 ====================
+// ==================== Singleton pattern ====================
 
 let unifiedEditorSystemInstance: UnifiedVisualEditorSystem | null = null
 
 /**
- * 获取统一Visual Editor系统实例（单例）
- * 🔥 这是新架构的主要入口点
+ * get unityVisual EditorSystem instance（Singleton）
+ * 🔥 This is the main entry point for the new architecture
  */
 export function useUnifiedVisualEditorSystem(): UnifiedVisualEditorSystem {
   if (!unifiedEditorSystemInstance) {
@@ -297,7 +297,7 @@ export function useUnifiedVisualEditorSystem(): UnifiedVisualEditorSystem {
 }
 
 /**
- * 重置统一Visual Editor系统实例（测试用）
+ * reset unityVisual EditorSystem instance（for testing）
  */
 export function resetUnifiedVisualEditorSystem(): void {
   if (unifiedEditorSystemInstance) {
@@ -306,17 +306,17 @@ export function resetUnifiedVisualEditorSystem(): void {
   unifiedEditorSystemInstance = null
 }
 
-// ==================== 便捷 Hook ====================
+// ==================== Convenient Hook ====================
 
 /**
  * Visual Editor Hook
- * 🔥 提供简化的API给组件使用
+ * 🔥 Provide simplifiedAPIUsed by components
  */
 export function useVisualEditor() {
   const system = useUnifiedVisualEditorSystem()
 
   return {
-    // 状态访问 - 🔥 使用 computed 确保总是返回最新的服务实例
+    // status access - 🔥 use computed Ensure the latest service instance is always returned
     get store() {
       return system.store
     },
@@ -330,16 +330,16 @@ export function useVisualEditor() {
       return system.card2Adapter
     },
 
-    // 系统操作
+    // System operation
     initialize: () => system.initialize(),
     saveAll: () => system.saveAll(),
     getStatus: () => system.getSystemStatus(),
     cleanup: () => system.cleanup(),
 
-    // 快捷操作
+    // Quick operation
     addNode: async (node: any) => {
       if (!system.dataFlowManager) {
-        throw new Error('数据流管理器未初始化，请先调用 initialize()')
+        throw new Error('Data flow manager not initialized，Please call first initialize()')
       }
       return system.dataFlowManager.handleUserAction({
         type: 'ADD_NODE',
@@ -349,7 +349,7 @@ export function useVisualEditor() {
 
     updateNode: async (nodeId: string, updates: any) => {
       if (!system.dataFlowManager) {
-        throw new Error('数据流管理器未初始化，请先调用 initialize()')
+        throw new Error('Data flow manager not initialized，Please call first initialize()')
       }
       return system.dataFlowManager.handleUserAction({
         type: 'UPDATE_NODE',
@@ -360,7 +360,7 @@ export function useVisualEditor() {
 
     removeNode: async (nodeId: string) => {
       if (!system.dataFlowManager) {
-        throw new Error('数据流管理器未初始化，请先调用 initialize()')
+        throw new Error('Data flow manager not initialized，Please call first initialize()')
       }
       return system.dataFlowManager.handleUserAction({
         type: 'REMOVE_NODE',
@@ -370,7 +370,7 @@ export function useVisualEditor() {
 
     updateConfiguration: async (widgetId: string, section: any, config: any) => {
       if (!system.dataFlowManager) {
-        throw new Error('数据流管理器未初始化，请先调用 initialize()')
+        throw new Error('Data flow manager not initialized，Please call first initialize()')
       }
       return system.dataFlowManager.handleUserAction({
         type: 'UPDATE_CONFIGURATION',
@@ -381,7 +381,7 @@ export function useVisualEditor() {
 
     selectNodes: async (ids: string[]) => {
       if (!system.dataFlowManager) {
-        throw new Error('数据流管理器未初始化，请先调用 initialize()')
+        throw new Error('Data flow manager not initialized，Please call first initialize()')
       }
       return system.dataFlowManager.handleUserAction({
         type: 'SELECT_NODES',
@@ -389,7 +389,7 @@ export function useVisualEditor() {
       })
     },
 
-    // 状态查询
+    // Status query
     getSelectedNodes: () => {
       if (!system.store) {
         return []
@@ -398,13 +398,13 @@ export function useVisualEditor() {
     },
     getConfiguration: (widgetId: string) => {
       if (!system.configService) {
-        throw new Error('配置服务未初始化，请先调用 initialize()')
+        throw new Error('Configuration service not initialized，Please call first initialize()')
       }
       return system.configService.getConfiguration(widgetId)
     },
     getRuntimeData: (widgetId: string) => {
       if (!system.configService) {
-        throw new Error('配置服务未初始化，请先调用 initialize()')
+        throw new Error('Configuration service not initialized，Please call first initialize()')
       }
       return system.configService.getRuntimeData(widgetId)
     }
@@ -412,29 +412,29 @@ export function useVisualEditor() {
 }
 
 /**
- * 迁移辅助工具
- * 帮助从旧系统迁移到新系统
+ * Migration aid
+ * Help with migration from old to new systems
  */
 export const MigrationHelper = {
   /**
-   * 从旧的编辑器存储迁移数据
+   * Migrate data from old editor store
    */
   migrateFromOldStore(oldStoreData: any): void {
     const system = useUnifiedVisualEditorSystem()
 
-    // 迁移节点数据
+    // Migrate node data
     if (oldStoreData.nodes) {
       oldStoreData.nodes.forEach((node: any) => {
         system.store.addNode(node)
       })
     }
 
-    // 迁移选中状态
+    // Migrate selected state
     if (oldStoreData.selectedIds) {
       system.store.selectNodes(oldStoreData.selectedIds)
     }
 
-    // 迁移配置数据
+    // Migrate configuration data
     if (oldStoreData.configurations) {
       Object.entries(oldStoreData.configurations).forEach(([widgetId, config]: [string, any]) => {
         system.configService.setConfiguration(widgetId, config)
@@ -443,10 +443,10 @@ export const MigrationHelper = {
   },
 
   /**
-   * 检查是否需要迁移
+   * Check if migration is required
    */
   needsMigration(): boolean {
-    // 检查是否存在旧的存储数据
+    // Check if old stored data exists
     return localStorage.getItem('old_editor_data') !== null
   }
 }

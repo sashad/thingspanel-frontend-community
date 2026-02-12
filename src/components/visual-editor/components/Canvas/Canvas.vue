@@ -18,7 +18,7 @@
     >
       <component :is="getWidgetComponent(node.type)" v-bind="node.properties" />
 
-      <!-- 选中时显示调整大小的控制点 -->
+      <!-- Show resize control points when selected -->
       <div v-if="selectedIds.includes(node.id)" class="resize-handles">
         <div
           v-for="handle in resizeHandles"
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- 右键菜单 -->
+    <!-- right click menu -->
     <ContextMenu
       :show="contextMenu.show"
       :x="contextMenu.x"
@@ -53,14 +53,14 @@ import BarChartChartWidget from '@/components/visual-editor/widgets/chart/BarCha
 import ContextMenu from '@/components/visual-editor/components/Canvas/ContextMenu.vue'
 import type { GraphData } from '@/components/visual-editor/types'
 
-// 🔥 使用新的统一架构
+// 🔥 Use the new unified architecture
 const unifiedEditor = useVisualEditor()
 
-// 适配旧接口
+// Adapt to old interface
 const nodes = computed(() => unifiedEditor.store.nodes)
 const selectedIds = computed(() => unifiedEditor.store.selectedIds)
 
-// 适配方法
+// Adaptation method
 const selectNode = (nodeId: string) => {
   if (nodeId) {
     unifiedEditor.store.selectNodes([nodeId])
@@ -87,15 +87,15 @@ const widgetComponents = {
   text: TextWidget,
   image: ImageWidget,
   'bar-chart': BarChartWidget,
-  'line-chart': BarChartWidget, // 暂时复用柱状图
-  'pie-chart': BarChartWidget, // 暂时复用柱状图
+  'line-chart': BarChartWidget, // Temporarily reuse histogram
+  'pie-chart': BarChartWidget, // Temporarily reuse histogram
   'digit-indicator': DigitIndicatorWidget,
-  // 真实的chart-card组件
+  // realchart-cardcomponents
   'chart-digit-indicator': DigitIndicatorChartWidget,
   'chart-bar': BarChartChartWidget
 }
 
-// 拖拽状态
+// drag state
 const isDragging = ref(false)
 const isResizing = ref(false)
 const dragStartPos = ref({ x: 0, y: 0 })
@@ -103,22 +103,22 @@ const dragNodeId = ref<string | null>(null)
 const resizeNodeId = ref<string | null>(null)
 const resizeDirection = ref<string>('')
 
-// 网格设置
+// Grid settings
 const GRID_SIZE = 10
 
-// 网格吸附函数
+// grid adsorption function
 const snapToGrid = (value: number) => {
   return Math.round(value / GRID_SIZE) * GRID_SIZE
 }
 
-// 右键菜单状态
+// Right-click menu status
 const contextMenu = ref({
   show: false,
   x: 0,
   y: 0
 })
 
-// 调整大小的控制点
+// Resize control points
 const resizeHandles = [
   { position: 'nw' },
   { position: 'n' },
@@ -148,23 +148,23 @@ const handleCanvasClick = () => {
 
 const handleNodeClick = (id: string, event?: MouseEvent) => {
   if (event?.ctrlKey || event?.metaKey) {
-    // Ctrl/Cmd + 点击：多选
+    // Ctrl/Cmd + Click：Multiple choice
     const currentSelected = selectedIds.value
     if (currentSelected.includes(id)) {
-      // 取消选择
+      // Deselect
       const newSelected = currentSelected.filter(nodeId => nodeId !== id)
       unifiedEditor.store.selectNodes(newSelected)
     } else {
-      // 添加到选择
+      // add to selection
       unifiedEditor.store.selectNodes([...currentSelected, id])
     }
   } else {
-    // 普通点击：单选
+    // Normal click：Single choice
     selectNode(id)
   }
 }
 
-// 拖拽移动功能
+// Drag and drop function
 const handleNodeMouseDown = (nodeId: string, event: MouseEvent) => {
   event.preventDefault()
   isDragging.value = true
@@ -174,14 +174,14 @@ const handleNodeMouseDown = (nodeId: string, event: MouseEvent) => {
     y: event.clientY
   }
 
-  // 选中节点
+  // Select node
   selectNode(nodeId)
 
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
 }
 
-// 调整大小功能
+// resize function
 const handleResizeStart = (nodeId: string, direction: string, event: MouseEvent) => {
   event.preventDefault()
   isResizing.value = true
@@ -203,7 +203,7 @@ const handleMouseMove = async (event: MouseEvent) => {
   const deltaY = event.clientY - dragStartPos.value.y
 
   if (isDragging.value && dragNodeId.value) {
-    // 拖拽移动
+    // Drag and move
     const node = nodes.value.find(n => n.id === dragNodeId.value)
     if (node) {
       const newX = Math.max(0, node.x + deltaX)
@@ -216,12 +216,12 @@ const handleMouseMove = async (event: MouseEvent) => {
       dragStartPos.value = { x: event.clientX, y: event.clientY }
     }
   } else if (isResizing.value && resizeNodeId.value) {
-    // 调整大小
+    // resize
     const node = nodes.value.find(n => n.id === resizeNodeId.value)
     if (node) {
       const updates: Partial<GraphData> = {}
 
-      // 根据调整方向计算新的位置和大小
+      // Calculate new position and size based on resize direction
       if (resizeDirection.value.includes('n')) {
         const newY = Math.max(0, node.y + deltaY)
         const newHeight = Math.max(20, node.height - deltaY)
@@ -260,7 +260,7 @@ const handleMouseUp = () => {
   document.removeEventListener('mouseup', handleMouseUp)
 }
 
-// 拖放创建组件
+// Drag and drop to create components
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
   const widgetType = event.dataTransfer?.getData('text/plain')
@@ -269,14 +269,14 @@ const handleDrop = async (event: DragEvent) => {
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
 
-    // 创建新组件
+    // Create new component
     await addWidget(widgetType, { x, y })
   }
 }
 
-// 清理事件监听
+// Clean up event listening
 onMounted(() => {
-  // 防止页面滚动时的事件冲突
+  // Prevent event conflicts when scrolling the page
   document.addEventListener('selectstart', e => {
     if (isDragging.value || isResizing.value) {
       e.preventDefault()
@@ -289,7 +289,7 @@ onUnmounted(() => {
   document.removeEventListener('mouseup', handleMouseUp)
 })
 
-// 右键菜单处理
+// Right-click menu processing
 const handleCanvasContextMenu = (event: MouseEvent) => {
   contextMenu.value = {
     show: true,
@@ -299,7 +299,7 @@ const handleCanvasContextMenu = (event: MouseEvent) => {
 }
 
 const handleNodeContextMenu = (nodeId: string, event: MouseEvent) => {
-  // 如果节点未选中，先选中它
+  // If the node is not selected，Select it first
   if (!selectedIds.value.includes(nodeId)) {
     selectNode(nodeId)
   }
@@ -318,40 +318,40 @@ const closeContextMenu = () => {
 const handleContextMenuAction = (action: string) => {
   switch (action) {
     case 'copy':
-      // TODO: 实现复制功能
+      // TODO: Implement copy function
       break
     case 'delete':
-      // 删除选中的组件
+      // Delete selected components
       selectedIds.value.forEach(id => {
         stateManager.removeNode(id)
       })
       break
     case 'layer':
-      // TODO: 实现图层管理
+      // TODO: Implement layer management
       break
     case 'lock':
-      // 锁定选中的组件
+      // Lock selected components
       if (selectedIds.value.length > 0) {
         const nodeId = selectedIds.value[0]
         const node = stateManager.getNode(nodeId)
         if (node) {
-          // 设置锁定标记
+          // Set lock flag
           node._isLocked = true
-          // 更新节点，触发响应式更新
+          // Update node，Trigger responsive updates
           stateManager.updateNode(nodeId, { ...node })
         }
       }
       closeContextMenu()
       break
     case 'unlock':
-      // 解锁选中的组件
+      // Unlock selected components
       if (selectedIds.value.length > 0) {
         const nodeId = selectedIds.value[0]
         const node = stateManager.getNode(nodeId)
         if (node) {
-          // 移除锁定标记
+          // Remove lock mark
           node._isLocked = false
-          // 更新节点，触发响应式更新
+          // Update node，Trigger responsive updates
           stateManager.updateNode(nodeId, { ...node })
         }
       }
@@ -389,7 +389,7 @@ const handleContextMenuAction = (action: string) => {
   border-color: var(--n-primary-color);
 }
 
-/* 调整大小控制点容器 */
+/* Resize control point container */
 .resize-handles {
   position: absolute;
   top: -4px;
@@ -399,7 +399,7 @@ const handleContextMenuAction = (action: string) => {
   pointer-events: none;
 }
 
-/* 调整大小控制点 */
+/* Resize control points */
 .resize-handle {
   position: absolute;
   width: 8px;
@@ -411,7 +411,7 @@ const handleContextMenuAction = (action: string) => {
   z-index: 10;
 }
 
-/* 控制点位置 */
+/* control point location */
 .resize-handle-nw {
   top: 0;
   left: 0;
@@ -468,7 +468,7 @@ const handleContextMenuAction = (action: string) => {
   transform: translate(50%, 50%);
 }
 
-/* 拖拽时的样式 */
+/* Style when dragging */
 .canvas-node.dragging {
   transition: none;
   z-index: 1000;

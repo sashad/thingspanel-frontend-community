@@ -1,8 +1,8 @@
 <template>
   <div class="excalidraw-toolbar-container">
-    <!-- 主工具栏 - 浮动式设计 -->
+    <!-- Main toolbar - floating design -->
     <div class="floating-toolbar" :class="{ 'is-dragging': isDragging }">
-      <!-- 基础绘图工具组 -->
+      <!-- Basic drawing tool set -->
       <div class="tool-group">
         <n-tooltip trigger="hover" placement="bottom">
           <template #trigger>
@@ -16,7 +16,7 @@
               </svg>
             </button>
           </template>
-          选择工具
+          Select tool
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -34,13 +34,13 @@
               </svg>
             </button>
           </template>
-          手型工具（平移）
+          Hand tools（Pan）
         </n-tooltip>
       </div>
 
       <div class="tool-separator"></div>
 
-      <!-- 形状工具组 -->
+      <!-- Shape tool set -->
       <div class="tool-group">
         <n-tooltip trigger="hover" placement="bottom">
           <template #trigger>
@@ -54,7 +54,7 @@
               </svg>
             </button>
           </template>
-          矩形
+          rectangle
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -69,7 +69,7 @@
               </svg>
             </button>
           </template>
-          菱形
+          diamond
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -84,13 +84,13 @@
               </svg>
             </button>
           </template>
-          椭圆
+          oval
         </n-tooltip>
       </div>
 
       <div class="tool-separator"></div>
 
-      <!-- 线条工具组 -->
+      <!-- Line tool set -->
       <div class="tool-group">
         <n-tooltip trigger="hover" placement="bottom">
           <template #trigger>
@@ -105,7 +105,7 @@
               </svg>
             </button>
           </template>
-          箭头
+          arrow
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -120,13 +120,13 @@
               </svg>
             </button>
           </template>
-          直线
+          straight line
         </n-tooltip>
       </div>
 
       <div class="tool-separator"></div>
 
-      <!-- 绘制工具组 -->
+      <!-- Drawing tool set -->
       <div class="tool-group">
         <n-tooltip trigger="hover" placement="bottom">
           <template #trigger>
@@ -141,7 +141,7 @@
               </svg>
             </button>
           </template>
-          画笔
+          brush
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -158,13 +158,13 @@
               </svg>
             </button>
           </template>
-          文本
+          text
         </n-tooltip>
       </div>
 
       <div class="tool-separator"></div>
 
-      <!-- 其他工具组 -->
+      <!-- Other tool sets -->
       <div class="tool-group">
         <n-tooltip trigger="hover" placement="bottom">
           <template #trigger>
@@ -180,7 +180,7 @@
               </svg>
             </button>
           </template>
-          图片
+          picture
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="bottom">
@@ -197,16 +197,16 @@
               </svg>
             </button>
           </template>
-          橡皮擦
+          Eraser
         </n-tooltip>
       </div>
     </div>
 
-    <!-- 属性工具栏 - 浮动在主工具栏下方 -->
+    <!-- Properties toolbar - Floats below the main toolbar -->
     <div class="property-toolbar" v-if="showPropertyToolbar">
-      <!-- 笔画样式 -->
+      <!-- stroke style -->
       <div class="property-group">
-        <span class="property-label">描边</span>
+        <span class="property-label">Stroke</span>
         <div class="stroke-style-buttons">
           <button
             class="property-button"
@@ -240,9 +240,9 @@
 
       <div class="property-separator"></div>
 
-      <!-- 填充样式 -->
+      <!-- Fill style -->
       <div class="property-group">
-        <span class="property-label">填充</span>
+        <span class="property-label">filling</span>
         <div class="fill-style-buttons">
           <button
             class="property-button fill-none"
@@ -283,9 +283,9 @@
 
       <div class="property-separator"></div>
 
-      <!-- 线条粗细 -->
+      <!-- line thickness -->
       <div class="property-group">
-        <span class="property-label">粗细</span>
+        <span class="property-label">Thickness</span>
         <div class="stroke-width-buttons">
           <button
             class="property-button"
@@ -319,9 +319,9 @@
 
       <div class="property-separator"></div>
 
-      <!-- 透明度 -->
+      <!-- transparency -->
       <div class="property-group">
-        <span class="property-label">透明度</span>
+        <span class="property-label">transparency</span>
         <n-slider
           v-model:value="opacity"
           :min="0"
@@ -335,7 +335,7 @@
       </div>
     </div>
 
-    <!-- 操作工具栏 - 右侧浮动 -->
+    <!-- Action toolbar - Float right -->
     <div class="action-toolbar">
       <n-tooltip trigger="hover" placement="left">
         <template #trigger>
@@ -346,7 +346,7 @@
             </svg>
           </button>
         </template>
-        撤销
+        Cancel
       </n-tooltip>
 
       <n-tooltip trigger="hover" placement="left">
@@ -357,7 +357,7 @@
             </svg>
           </button>
         </template>
-        重做
+        Redo
       </n-tooltip>
 
       <div class="action-separator"></div>
@@ -373,7 +373,7 @@
             </svg>
           </button>
         </template>
-        放大
+        enlarge
       </n-tooltip>
 
       <n-tooltip trigger="hover" placement="left">
@@ -386,7 +386,7 @@
             </svg>
           </button>
         </template>
-        缩小
+        zoom out
       </n-tooltip>
 
       <n-tooltip trigger="hover" placement="left">
@@ -399,7 +399,7 @@
             </svg>
           </button>
         </template>
-        重置缩放
+        Reset zoom
       </n-tooltip>
     </div>
   </div>
@@ -407,19 +407,19 @@
 
 <script setup lang="ts">
 /**
- * Excalidraw 风格的浮动工具栏
+ * Excalidraw styled floating toolbar
  *
- * 特点：
- * - 极简设计，浮动在Canvas上方
- * - 无边框按钮，圆角设计
- * - 分组布局，清晰的视觉层次
- * - 实时属性调整
- * - 手绘风格图标
+ * Features：
+ * - minimalist design，floating onCanvasabove
+ * - Borderless button，Rounded corner design
+ * - Group layout，clear visual hierarchy
+ * - Real-time attribute adjustment
+ * - Hand drawn style icon
  */
 
 import { ref, computed, watch } from 'vue'
 
-// 工具状态
+// tool status
 const currentTool = ref('select')
 const strokeStyle = ref('solid')
 const fillStyle = ref('none')
@@ -427,16 +427,16 @@ const strokeWidth = ref('bold')
 const opacity = ref(100)
 const isDragging = ref(false)
 
-// 编辑状态
+// Edit status
 const canUndo = ref(false)
 const canRedo = ref(false)
 
-// 显示状态
+// Show status
 const showPropertyToolbar = computed(() => {
   return ['rectangle', 'diamond', 'ellipse', 'arrow', 'line', 'pencil'].includes(currentTool.value)
 })
 
-// 事件定义
+// event definition
 const emit = defineEmits<{
   'tool-change': [tool: string]
   'stroke-style-change': [style: string]
@@ -451,7 +451,7 @@ const emit = defineEmits<{
 }>()
 
 /**
- * 设置当前工具
+ * Set current tool
  */
 function setTool(tool: string) {
   currentTool.value = tool
@@ -459,7 +459,7 @@ function setTool(tool: string) {
 }
 
 /**
- * 设置描边样式
+ * Set stroke style
  */
 function setStrokeStyle(style: string) {
   strokeStyle.value = style
@@ -467,7 +467,7 @@ function setStrokeStyle(style: string) {
 }
 
 /**
- * 设置填充样式
+ * Set fill style
  */
 function setFillStyle(style: string) {
   fillStyle.value = style
@@ -475,7 +475,7 @@ function setFillStyle(style: string) {
 }
 
 /**
- * 设置线条粗细
+ * Set line thickness
  */
 function setStrokeWidth(width: string) {
   strokeWidth.value = width
@@ -483,7 +483,7 @@ function setStrokeWidth(width: string) {
 }
 
 /**
- * 设置透明度
+ * Set transparency
  */
 function setOpacity(value: number) {
   opacity.value = value
@@ -491,43 +491,43 @@ function setOpacity(value: number) {
 }
 
 /**
- * 撤销操作
+ * Undo operation
  */
 function undo() {
   emit('undo')
 }
 
 /**
- * 重做操作
+ * redo operation
  */
 function redo() {
   emit('redo')
 }
 
 /**
- * 放大
+ * enlarge
  */
 function zoomIn() {
   emit('zoom-in')
 }
 
 /**
- * 缩小
+ * zoom out
  */
 function zoomOut() {
   emit('zoom-out')
 }
 
 /**
- * 重置缩放
+ * Reset zoom
  */
 function resetZoom() {
   emit('reset-zoom')
 }
 
-// 监听工具变化，自动调整属性面板显示
+// Monitor tool changes，Automatically adjust property panel display
 watch(currentTool, (newTool) => {
-  // 不同工具可能有不同的默认属性
+  // Different tools may have different default properties
   if (newTool === 'text') {
     fillStyle.value = 'none'
     strokeStyle.value = 'solid'
@@ -549,7 +549,7 @@ watch(currentTool, (newTool) => {
   pointer-events: none;
 }
 
-/* 主工具栏 */
+/* Main toolbar */
 .floating-toolbar {
   display: flex;
   align-items: center;
@@ -576,14 +576,14 @@ watch(currentTool, (newTool) => {
   cursor: grabbing;
 }
 
-/* 工具组 */
+/* tool set */
 .tool-group {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* 工具按钮 */
+/* Tool button */
 .tool-button {
   display: flex;
   align-items: center;
@@ -614,7 +614,7 @@ watch(currentTool, (newTool) => {
   background: #4a4f53;
 }
 
-/* 工具分隔符 */
+/* Tool separator */
 .tool-separator {
   width: 1px;
   height: 24px;
@@ -622,7 +622,7 @@ watch(currentTool, (newTool) => {
   margin: 0 4px;
 }
 
-/* 属性工具栏 */
+/* Properties toolbar */
 .property-toolbar {
   display: flex;
   align-items: center;
@@ -638,7 +638,7 @@ watch(currentTool, (newTool) => {
   font-size: 13px;
 }
 
-/* 属性组 */
+/* attribute group */
 .property-group {
   display: flex;
   align-items: center;
@@ -652,7 +652,7 @@ watch(currentTool, (newTool) => {
   min-width: 40px;
 }
 
-/* 属性按钮 */
+/* Properties button */
 .property-button {
   display: flex;
   align-items: center;
@@ -676,7 +676,7 @@ watch(currentTool, (newTool) => {
   color: #212529;
 }
 
-/* 样式按钮组 */
+/* Style button group */
 .stroke-style-buttons,
 .fill-style-buttons,
 .stroke-width-buttons {
@@ -684,14 +684,14 @@ watch(currentTool, (newTool) => {
   gap: 2px;
 }
 
-/* 属性分隔符 */
+/* attribute separator */
 .property-separator {
   width: 1px;
   height: 20px;
   background: rgba(0, 0, 0, 0.1);
 }
 
-/* 透明度显示 */
+/* Transparency display */
 .opacity-value {
   font-size: 11px;
   color: #6c757d;
@@ -699,7 +699,7 @@ watch(currentTool, (newTool) => {
   text-align: center;
 }
 
-/* 操作工具栏 */
+/* Action toolbar */
 .action-toolbar {
   position: absolute;
   top: 20px;
@@ -717,7 +717,7 @@ watch(currentTool, (newTool) => {
   pointer-events: auto;
 }
 
-/* 操作按钮 */
+/* Action button */
 .action-button {
   display: flex;
   align-items: center;
@@ -742,14 +742,14 @@ watch(currentTool, (newTool) => {
   cursor: not-allowed;
 }
 
-/* 操作分隔符 */
+/* Operation separator */
 .action-separator {
   height: 1px;
   background: rgba(0, 0, 0, 0.1);
   margin: 4px 0;
 }
 
-/* 暗色主题适配 */
+/* Dark theme adaptation */
 .dark .floating-toolbar,
 .dark .property-toolbar,
 .dark .action-toolbar {
@@ -793,7 +793,7 @@ watch(currentTool, (newTool) => {
   color: #adb5bd;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .excalidraw-toolbar-container {
     top: 10px;
@@ -822,7 +822,7 @@ watch(currentTool, (newTool) => {
   }
 }
 
-/* 动画效果 */
+/* Animation effects */
 @keyframes fadeInUp {
   from {
     opacity: 0;

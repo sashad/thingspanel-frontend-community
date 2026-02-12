@@ -1,47 +1,47 @@
-# State Display 组件 Card 2.1 迁移配置文档
+# State Display components Card 2.1 Migrate configuration documents
 
-## 组件概述
+## Component overview
 
-State Display 组件是一个状态显示卡片，用于显示设备的状态信息。通过图标和颜色变化来直观地表示设备的当前状态（激活/非激活）。
+State Display The component is a status display card，Used to display device status information。Visually represent the current status of the device through icons and color changes（activation/inactive）。
 
-## 当前实现分析
+## Current implementation analysis
 
-### 组件配置 (index.ts)
-- **组件ID**: `chart-state`
-- **组件类型**: `chart`
-- **标题**: `$t('card.statusCard')` (状态卡片)
-- **数据源**: 设备来源，支持1个数据源
-- **默认布局**: 3x2 (最小高度1)
+### Component configuration (index.ts)
+- **componentsID**: `chart-state`
+- **Component type**: `chart`
+- **title**: `$t('card.statusCard')` (status card)
+- **data source**: Equipment source，support1data sources
+- **default layout**: 3x2 (minimum height1)
 
-### 组件实现 (component.vue)
-- **数据获取**: 从设备属性数据中获取状态值
-- **状态计算**: 根据配置的激活值判断当前状态
-- **图标显示**: 支持自定义激活/非激活状态的图标
-- **颜色配置**: 支持自定义激活/非激活状态的颜色
-- **响应式**: 使用 ResizeObserver 动态调整字体大小
-- **数据类型**: 支持 string、number、boolean 类型的状态值
+### Component implementation (component.vue)
+- **data acquisition**: Get status value from device property data
+- **State calculation**: Determine the current status based on the configured activation value
+- **Icon display**: Support custom activation/Inactive icon
+- **Color configuration**: Support custom activation/Inactive color
+- **Responsive**: use ResizeObserver Dynamically adjust font size
+- **data type**: support string、number、boolean type status value
 
-## Card 2.1 迁移配置
+## Card 2.1 Migrate configuration
 
-### 组件定义
+### Component definition
 ```typescript
 export const stateDisplayCard: CardDefinition = {
   id: 'state-display',
-  name: '状态显示',
+  name: 'status display',
   category: 'information',
-  description: '显示设备状态信息的卡片组件，支持图标和颜色自定义',
+  description: 'Card component that displays device status information，Support icon and color customization',
   version: '2.1.0',
   
-  // 数据源配置
+  // Data source configuration
   dataSource: {
     type: 'device',
     required: true,
     maxSources: 1,
     supportedMetrics: ['attributes'],
-    description: '设备属性数据源'
+    description: 'Device attribute data source'
   },
   
-  // 布局配置
+  // layout configuration
   layout: {
     defaultSize: { width: 3, height: 2 },
     minSize: { width: 1, height: 1 },
@@ -49,49 +49,49 @@ export const stateDisplayCard: CardDefinition = {
     resizable: true
   },
   
-  // 配置选项
+  // Configuration options
   configSchema: {
     activeIconName: {
       type: 'string',
       default: 'BulbOutline',
-      title: '激活状态图标',
-      description: '设备激活时显示的图标名称'
+      title: 'activation status icon',
+      description: 'The name of the icon displayed when the device is activated'
     },
     inactiveIconName: {
       type: 'string', 
       default: 'Bulb',
-      title: '非激活状态图标',
-      description: '设备非激活时显示的图标名称'
+      title: 'Inactive status icon',
+      description: 'The name of the icon displayed when the device is inactive'
     },
     activeColor: {
       type: 'color',
       default: '#FFA500',
-      title: '激活状态颜色',
-      description: '设备激活时的图标颜色'
+      title: 'Activation state color',
+      description: 'The color of the icon when the device is activated'
     },
     inactiveColor: {
       type: 'color',
       default: '#808080', 
-      title: '非激活状态颜色',
-      description: '设备非激活时的图标颜色'
+      title: 'Inactive state color',
+      description: 'Icon color when device is inactive'
     },
     active0: {
       type: 'string',
-      title: '激活值',
-      description: '表示激活状态的数据值'
+      title: 'activation value',
+      description: 'Data value representing activation status'
     },
     active1: {
       type: 'string',
-      title: '非激活值', 
-      description: '表示非激活状态的数据值'
+      title: 'inactive value', 
+      description: 'A data value representing an inactive state'
     }
   }
 }
 ```
 
-### 数据源映射
+### Data source mapping
 ```typescript
-// 原始数据源结构
+// Original data source structure
 interface OriginalDataSource {
   deviceSource: [{
     deviceId: string;
@@ -102,7 +102,7 @@ interface OriginalDataSource {
   }];
 }
 
-// Card 2.1 数据源结构  
+// Card 2.1 Data source structure  
 interface Card21DataSource {
   device: {
     id: string;
@@ -115,7 +115,7 @@ interface Card21DataSource {
   };
 }
 
-// 映射函数
+// mapping function
 function mapDataSource(original: OriginalDataSource): Card21DataSource {
   const deviceSource = original.deviceSource[0];
   return {
@@ -132,67 +132,67 @@ function mapDataSource(original: OriginalDataSource): Card21DataSource {
 }
 ```
 
-### 实现要点
+### Implementation points
 
-1. **状态计算逻辑**
-   - 支持多种数据类型的状态判断
-   - 可配置激活/非激活的判断值
-   - 默认非零值为激活状态
+1. **State calculation logic**
+   - Support status judgment of multiple data types
+   - Configurable activation/Inactive judgment value
+   - Default non-zero value is active state
 
-2. **图标系统**
-   - 集成 ionicons5 图标库
-   - 支持动态图标切换
-   - 图标颜色可配置
+2. **icon system**
+   - integrated ionicons5 Icon library
+   - Support dynamic icon switching
+   - Icon color configurable
 
-3. **响应式设计**
-   - 使用 ResizeObserver 监听容器大小变化
-   - 动态调整字体和图标大小
-   - 保持良好的视觉比例
+3. **Responsive design**
+   - use ResizeObserver Monitor container size changes
+   - Dynamically adjust font and icon sizes
+   - Maintain good visual proportions
 
-4. **数据更新**
-   - 支持 WebSocket 实时数据更新
-   - 监听配置变化自动重新计算状态
-   - 暴露 updateData 方法供外部调用
+4. **Data update**
+   - support WebSocket Real-time data updates
+   - Monitor configuration changes and automatically recalculate status
+   - exposed updateData Methods for external calls
 
-## 迁移检查清单
+## Migration checklist
 
-- [ ] 验证数据源映射正确性
-- [ ] 确认状态计算逻辑
-- [ ] 测试图标显示和切换
-- [ ] 验证颜色配置功能
-- [ ] 检查响应式布局
-- [ ] 测试实时数据更新
-- [ ] 验证多种数据类型支持
-- [ ] 确认配置表单功能
+- [ ] Verify data source mapping correctness
+- [ ] Confirm status calculation logic
+- [ ] Test icon display and switching
+- [ ] Verify color configuration functionality
+- [ ] Check out responsive layout
+- [ ] Test real-time data updates
+- [ ] Verify multiple data types support
+- [ ] Confirm configuration form function
 
-## 迁移步骤
+## Migration steps
 
-1. **创建 Card 2.1 组件定义**
-   - 定义组件元数据和配置架构
-   - 设置数据源要求和布局约束
+1. **create Card 2.1 Component definition**
+   - Define component metadata and configuration schema
+   - Set data source requirements and layout constraints
 
-2. **实现数据源适配器**
-   - 创建数据源映射函数
-   - 处理不同数据类型的状态值
+2. **Implement data source adapter**
+   - Create data source mapping function
+   - Handle status values ​​of different data types
 
-3. **迁移组件逻辑**
-   - 保持状态计算逻辑
-   - 适配新的数据源结构
-   - 维护图标和颜色配置
+3. **Migrate component logic**
+   - Maintain state calculation logic
+   - Adapt to new data source structures
+   - Maintain icons and color configurations
 
-4. **更新配置表单**
-   - 适配 Card 2.1 配置架构
-   - 保持现有配置选项
-   - 优化用户体验
+4. **Update configuration form**
+   - adaptation Card 2.1 Configuration architecture
+   - Keep existing configuration options
+   - Optimize user experience
 
-5. **测试验证**
-   - 功能测试：状态显示、图标切换、颜色变化
-   - 兼容性测试：不同数据类型、设备类型
-   - 性能测试：响应式调整、数据更新
+5. **Test verification**
+   - Functional testing：status display、Icon switch、color change
+   - Compatibility testing：different data types、Device type
+   - Performance testing：Responsive adjustments、Data update
 
-## 相关文档
+## Related documents
 
-- [Card 2.1 架构文档](../architecture/card21-architecture.md)
-- [数据源映射指南](../guides/data-source-mapping.md)
-- [组件配置架构](../architecture/component-config-schema.md)
-- [图标系统文档](../guides/icon-system.md)
+- [Card 2.1 Architecture documentation](../architecture/card21-architecture.md)
+- [Data Source Mapping Guide](../guides/data-source-mapping.md)
+- [Component configuration architecture](../architecture/component-config-schema.md)
+- [Icon system documentation](../guides/icon-system.md)

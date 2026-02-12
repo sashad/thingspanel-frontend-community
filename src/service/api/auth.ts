@@ -16,7 +16,7 @@ export function fetchGetUserInfo() {
   return request.get<Api.Auth.UserInfo>('/user/detail')
 }
 
-// 登出接口
+// Logout interface
 export function logout() {
   return request.get('/user/logout')
 }
@@ -48,7 +48,7 @@ export function fetchEmailCodeByEmail(email: string) {
     }
   })
 }
-/** 获取用户列表 */
+/** Get user list */
 export const fetchUserList = async (params: any) => {
   const data = await request.get<Api.UserManagement.Data | null>('/user', {
     params
@@ -56,31 +56,31 @@ export const fetchUserList = async (params: any) => {
   return data
 }
 
-/** 添加用户 */
+/** Add user */
 export const addUser = async (params: any) => {
   const data = await request.post<Api.BaseApi.Data>('/user', params)
   return data
 }
 
-/** 编辑用户 */
+/** Edit user */
 export const editUser = async (params: any) => {
   // delete params.password;
   const data = await request.put<Api.BaseApi.Data>('/user', params)
   return data
 }
 
-/** 删除用户 */
+/** Delete user */
 export const delUser = async (id: string) => {
   const data = await request.delete<Api.BaseApi.Data>(`/user/${id}`)
   return data
 }
 
-/** 切换用户 */
+/** Switch user */
 export const transformUser = async (params: any) => {
   const data = await request.post<Api.Auth.LoginToken>(`/user/transform`, params)
   return data
 }
-/** 修改密码 */
+/** Change password */
 export const editUserPassWord = async (params: any) => {
   const data = await request.post<Api.BaseApi.Data>(`/reset/password`, params)
   return data
@@ -94,15 +94,15 @@ export const fetchHomeData = async (params: any) => {
 }
 
 export function registerByEmail(data: {
-  email: string // 邮箱
-  verify_code: string // 邮箱验证码
-  password: string // 用户密码
-  phone_prefix: string // 手机前缀
-  phone_number: string // 手机号码
+  email: string // Mail
+  verify_code: string // Email verification code
+  password: string // User password
+  phone_prefix: string // Mobile phone prefix
+  phone_number: string // phone number
 }) {
   return request.post('/tenant/email/register', data, {
     headers: {
-      'Content-Type': 'application/json' // 设置请求体类型为 application/json
+      'Content-Type': 'application/json' // Set the request body type to application/json
     }
   })
 }

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
- * 简化版设备参数添加组件
- * 使用最简单的表单而不是复杂的设备选择器
+ * Simplified version of device parameter adding component
+ * Use the simplest form instead of complex device selectors
  */
 import { ref } from 'vue'
 import { NButton, NSpace, NInput, NFormItem, NForm, NText } from 'naive-ui'
 import { $t } from '@/locales'
 
-// Emits 接口
+// Emits interface
 interface Emits {
   (e: 'add', params: any[]): void
   (e: 'cancel'): void
@@ -15,28 +15,28 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// 简化的表单数据
+// Simplified form data
 const formData = ref({
   paramKey: '',
   paramValue: '',
   deviceName: ''
 })
 
-// 添加按钮处理函数
+// Add button handler function
 const handleAdd = () => {
-  // 简单校验
+  // Simple verification
   if (!formData.value.paramKey.trim()) {
-    window.$message?.warning('请输入参数名')
+    window.$message?.warning('Please enter parameter name')
     return
   }
 
-  // 创建简单的参数对象
+  // Create a simple parameter object
   const newParam = {
     key: formData.value.paramKey.trim(),
     value: formData.value.paramValue.trim() || `{${formData.value.paramKey.trim()}}`,
     type: 'device',
     source: {
-      deviceName: formData.value.deviceName.trim() || '设备',
+      deviceName: formData.value.deviceName.trim() || 'equipment',
       paramKey: formData.value.paramKey.trim()
     }
   }
@@ -44,7 +44,7 @@ const handleAdd = () => {
   emit('add', [newParam])
 }
 
-// 取消按钮处理函数
+// Cancel button handler function
 const handleCancel = () => {
   emit('cancel')
 }
@@ -53,19 +53,19 @@ const handleCancel = () => {
 <template>
   <div class="add-parameter-from-device">
     <div class="p-4">
-      <n-text depth="3" style="margin-bottom: 16px; display: block">简化版设备参数添加 - 直接输入参数信息</n-text>
+      <n-text depth="3" style="margin-bottom: 16px; display: block">Simplified version of device parameter addition - Directly enter parameter information</n-text>
 
       <n-form size="small" label-placement="left" label-width="80">
-        <n-form-item label="参数名" required>
-          <n-input v-model:value="formData.paramKey" placeholder="如: deviceId, temperature 等" clearable />
+        <n-form-item label="Parameter name" required>
+          <n-input v-model:value="formData.paramKey" placeholder="like: deviceId, temperature wait" clearable />
         </n-form-item>
 
-        <n-form-item label="参数值">
-          <n-input v-model:value="formData.paramValue" placeholder="留空将自动生成 {参数名} 格式" clearable />
+        <n-form-item label="Parameter value">
+          <n-input v-model:value="formData.paramValue" placeholder="Leave blank to automatically generate {Parameter name} Format" clearable />
         </n-form-item>
 
-        <n-form-item label="设备名">
-          <n-input v-model:value="formData.deviceName" placeholder="可选，用于描述" clearable />
+        <n-form-item label="Device name">
+          <n-input v-model:value="formData.deviceName" placeholder="Optional，used to describe" clearable />
         </n-form-item>
       </n-form>
     </div>

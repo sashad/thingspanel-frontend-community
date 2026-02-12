@@ -1,10 +1,10 @@
 import { onMounted, ref } from 'vue'
 
 /**
- * 绘制图形验证码
+ * Draw graphic verification code
  *
- * @param width - 图形宽度
- * @param height - 图形高度
+ * @param width - Graphic width
+ * @param height - Graphic height
  */
 export default function useImageVerify(width = 152, height = 40) {
   const domRef = ref<HTMLCanvasElement>()

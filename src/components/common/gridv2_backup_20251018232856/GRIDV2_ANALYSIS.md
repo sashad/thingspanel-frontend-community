@@ -1,42 +1,42 @@
-# GridV2 组件问题分析（独立结论）
+# GridV2 Component problem analysis（independent conclusion）
 
-本文针对 `src/components/common/gridv2/GridV2.vue` 的实现，独立分析当前“组件排列错乱/重叠”和“对 GridStack 使用不熟导致重复造轮子”的问题根因，并给出修复建议。未依赖同目录已有文档内容。
+This article is aimed at `src/components/common/gridv2/GridV2.vue` realization，Independent analysis of the current“Components are arranged out of order/overlapping”and“right GridStack Unfamiliar use leads to reinventing the wheel”root cause of the problem，and give repair suggestions。Does not rely on existing document content in the same directory。
 
-## 主要症状
-- 多列（>12 列，尤其 24/50 列）下，首次渲染或切换列数后组件宽度异常、重叠或错位。
-- 删除组件后，剩余组件位置错乱或出现“瞬移”；拖拽/缩放后视觉与数据不同步。
-- 更新 `layout` 时偶发重复事件、状态抖动，拖拽体验卡顿。
+## Main symptoms
+- 多List（>12 List，especially 24/50 List）Down，Component width is abnormal after rendering for the first time or switching the number of columns、Overlapping or misaligned。
+- After removing the component，The remaining components are out of place or appear“Teleport”；drag/Visual and data are out of sync after zooming。
+- renew `layout` recurring events、Status jitter，Dragging experience is stuck。
 
-## 根因定位（关键点）
-- 错误的列宽样式选择器与类名处理
-  - 手动注入选择器为 `.gs-${n} > .grid-stack-item[...]`（见 GridV2.vue:369），但 GridStack 的标准是容器类名 `grid-stack grid-stack-${n}`。同时还清理了不存在的 `gs-\d+` 类（约 526 行附近）。这会导致 >12 列时宽度规则未生效，引发布局错乱。
-- 反模式的内联定位与重复布局逻辑
-  - 多处手动设置 `style.left/top/position` 并频繁 `grid.update(...)`（如 329/330/331、690/691/692、804/805/806 等），与 GridStack 内部布局机制冲突，触发多次 reflow 与事件连锁，导致抖动和错位。
-- 选项映射错误与语义误解
-  - 未把 `config.preventCollision` 传递给 GridStack，反而条件性地设置了 `disableOneColumnMode`（见 439–442），与需求完全不相干；对 `float / verticalCompact / compact()` 的语义理解相互矛盾，删除时又调用 `compact()`（745），破坏用户布局期望。
-- 列数切换策略和 API 使用不当
-  - 使用 `grid.column(newCol, 'none')` 并自实现“行填充重排 + 内联定位”流程（约 950–1150）。这与 GridStack 已内置的列数切换与重排能力相冲突，易导致状态不同步。
-- 节点注册/移除时机不当
-  - 对 v-for 生成的 DOM 再次 `makeWidget`/`removeWidget`（231/197），与 Vue 生命周期和 GridStack 的 `addWidget/removeWidget` 正确用法不一致，可能产生幽灵节点、重复事件与内存风险。
-- 间距策略不一致
-  - 将 `margin` 固定为 0，改用 content padding 落实现距，导致视觉边界与碰撞区域不一致，影响命中/碰撞判断与期望布局效果。
+## root cause location（Key points）
+- Wrong column width style selector and class name handling
+  - Manually injecting the selector is `.gs-${n} > .grid-stack-item[...]`（See GridV2.vue:369），but GridStack The standard is the container class name `grid-stack grid-stack-${n}`。At the same time, the non-existent ones were also cleaned up. `gs-\d+` kind（about 526 near the line）。This will result in >12 Column width rule does not take effect，Causing layout confusion。
+- Anti-patterns of inline positioning and repeated layout logic
+  - Multiple manual settings `style.left/top/position` and frequently `grid.update(...)`（like 329/330/331、690/691/692、804/805/806 wait），and GridStack Internal layout mechanism conflict，trigger multiple times reflow and事件连锁，causing jitter and misalignment。
+- Option mapping errors and semantic misunderstandings
+  - Not yet `config.preventCollision` passed to GridStack，Instead, it is set conditionally `disableOneColumnMode`（See 439–442），Completely irrelevant to needs；right `float / verticalCompact / compact()` The semantic understanding of，Called again when deleting `compact()`（745），Subvert user layout expectations。
+- Column number switching strategy and API Improper use
+  - use `grid.column(newCol, 'none')` and self-implementing“Row fill rearrangement + Inline positioning”process（about 950–1150）。This is related to GridStack Built-in column switching conflicts with reordering capabilities，It is easy to cause the state to be out of sync。
+- Node registration/Improper timing of removal
+  - right v-for 生成of DOM again `makeWidget`/`removeWidget`（231/197），and Vue life cycle and GridStack of `addWidget/removeWidget` Inconsistent correct usage，May generate ghost nodes、重复事件and内存风险。
+- Inconsistent spacing strategy
+  - Will `margin` fixed to 0，Use instead content padding implement distance，Causes the visual boundary to be inconsistent with the collision area，Affect hit/Collision judgment and expected layout effect。
 
-## 建议修复路线
-1) 让 GridStack 完全接管尺寸与定位
-   - 移除所有对项内联 `left/top/position:absolute` 的手动设置与批量同步逻辑；保留 `styleInHead: true`，让官方样式注入生效。
-2) 修正列宽样式与类名
-   - 删除 `injectColumnStyles()` 与 `.gs-${n}` 相关逻辑；不要清理 `gs-\d+`；依赖 GridStack 的 `.grid-stack.grid-stack-${n}` 规则。
-3) 正确映射配置
-   - 显式传入 `preventCollision`；避免把它映射到 `disableOneColumnMode`。谨慎使用 `float` 与 `compact()`，不要自相矛盾。
-4) 列数切换与布局
-   - 使用 `grid.column(newCol, 'moveScale' | 'compact')` 等官方策略；切换后仅读取节点数据回写，不自行重排/定位。
-5) 节点管理
-   - 初次 `GridStack.init()` 读取 DOM；动态新增用 `addWidget()`，删除用 `removeWidget()`；去掉对 v-for 节点的重复 `makeWidget`。
-6) 间距
-   - 优先使用 GridStack `margin`（支持数组/像素）。如必须用 content padding，应统一到一处并评估碰撞命中影响。
+## Suggested repair route
+1) let GridStack Fully taken over sizing and positioning
+   - Remove all pairs inline `left/top/position:absolute` Manual settings and batch synchronization logic；reserve `styleInHead: true`，Let official style injection take effect。
+2) Correct column width style and class name
+   - delete `injectColumnStyles()` and `.gs-${n}` Relevant logic；Don't clean up `gs-\d+`；rely GridStack of `.grid-stack.grid-stack-${n}` rule。
+3) Correctly map configuration
+   - Explicitly passed in `preventCollision`；avoid mapping it to `disableOneColumnMode`。Use with caution `float` and `compact()`，Don't contradict yourself。
+4) Column switching and layout
+   - use `grid.column(newCol, 'moveScale' | 'compact')` Wait for the official strategy；Only read node data and write back after switching，Does not rearrange itself/position。
+5) Node management
+   - first time `GridStack.init()` read DOM；Dynamically add new items `addWidget()`，For deletion `removeWidget()`；Remove the pair v-for Duplication of nodes `makeWidget`。
+6) spacing
+   - priority use GridStack `margin`（Support array/Pixel）。If necessary use content padding，Should be unified into one place and impact of collision hits evaluated。
 
-## 快速验证建议
-- 在 24 列布局下，去除自定义注入与内联定位后，切换列数、拖拽、删除均应保持稳定且不重叠；开启 `preventCollision: true` 验证碰撞是否符合预期。
+## Quick verification suggestions
+- exist 24 under column layout，After removing custom injection and inline positioning，Switch number of columns、drag、Deletions should all remain stable and non-overlapping；turn on `preventCollision: true` Verify that collisions are as expected。
 
 ---
-如需，我可基于以上路线提交一版“最小封装改造”，删除自定义布局与样式注入逻辑，仅保留 props/emits 兼容层，显著减少错乱与维护成本。
+If required，I can submit a version based on the above route“Minimal package modification”，Remove custom layout and style injection logic，Only keep props/emits Compatibility layer，Dramatically reduce confusion and maintenance costs。

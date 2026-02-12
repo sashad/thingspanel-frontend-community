@@ -19,7 +19,7 @@ import { $t } from '@/locales'
 import onlineRateIcon from './online-rate.png'
 import wifiIcon from './wifi.png'
 
-// Register ECharts components - 已移至 echarts-manager 统一管理
+// Register ECharts components - Moved to echarts-manager Unified management
 // use([TooltipComponent, LegendComponent, ToolboxComponent, GridComponent, LineChart, CanvasRenderer])
 
 type EChartsOption = ComposeOption<

@@ -1,81 +1,86 @@
 /**
- * 面板编辑器轮询管理组合式函数
- * 负责轮询任务的初始化、管理和控制
+ * Panel editor polling manages combined functions
+ * Responsible for initialization of polling tasks、management and control
  */
 
 import { computed } from 'vue'
 
 /**
- * 轮询管理相关函数集合
+ * Collection of polling management related functions
  */
 export function usePanelPollingManager(dependencies: {
   pollingManager: any
   stateManager: any
   configurationManager: any
-  editorDataSourceManager?: any // 🔥 修复：设为可选参数，兼容新架构
+  editorDataSourceManager?: any // 🔥 repair：Set as optional parameter，Compatible with new architecture
 }) {
-  // 全局轮询开关状态
+  // Global polling switch status
   const globalPollingEnabled = computed(() => dependencies.pollingManager.isGlobalPollingEnabled())
   const pollingStats = computed(() => dependencies.pollingManager.getStatistics())
 
   /**
-   * 初始化轮询任务并启用全局轮询
-   * 扫描所有组件，为启用轮询的组件创建轮询任务
+   * Initialize polling task and enable global polling
+   * Scan all components，Create a polling task for a polling-enabled component
    */
   const initializePollingTasksAndEnable = () => {
     try {
-      // 🔥 修复重复定时器漏洞：先清除所有现有任务
+      // 🔥 Fix repeat timer vulnerability：Clear all existing tasks first
       dependencies.pollingManager.clearAllTasks()
 
-      // 获取所有组件的轮询配置
-      const allComponents = dependencies.stateManager.nodes
+      // Get polling configuration for all components
+      const allComponents = dependencies.stateManager.nodes
+
       allComponents.forEach(component => {
         const componentId = component.id
-        // 从 ConfigurationManager 读取组件级别的轮询配置
+        // from ConfigurationManager Read component-level polling configuration
         const config = dependencies.configurationManager.getConfiguration(componentId)
-
+
+
         let pollingConfig = config?.component?.polling
 
-        // 🔥 关键修复：预览模式下自动启用轮询（如果组件有数据源）
-        if (!pollingConfig && config?.dataSource) {          pollingConfig = {
+        // 🔥 critical fix：Automatically enable polling in preview mode（If the component has a data source）
+        if (!pollingConfig && config?.dataSource) {
+          pollingConfig = {
             enabled: true,
             interval: 30000,
             immediate: true
           }
 
-          // 保存轮询配置到组件配置中
+          // Save polling configuration to component configuration
           dependencies.configurationManager.updateConfiguration(componentId, 'component.polling', pollingConfig)
         }
 
-        if (pollingConfig && pollingConfig.enabled) {
+        if (pollingConfig && pollingConfig.enabled) {
+
           const interval = pollingConfig.interval || 30000
 
-          // 创建轮询任务（但不自动启动）
+          // Create polling task（but does not start automatically）
           const taskId = dependencies.pollingManager.addTask({
             componentId: componentId,
-            componentName: `组件-${component.type}`,
+            componentName: `components-${component.type}`,
             interval: interval,
             callback: async () => {
               try {
-                // 🔥 直接调用组件执行器，这个应该是正确的方式
-                // 🔥 直接使用 VisualEditorBridge 调用，这个是确定有效的方法
+                // 🔥 Call component executor directly，This should be the correct way
+                // 🔥 Use directly VisualEditorBridge call，This is a sure and effective method
                 try {
-                  // 导入 VisualEditorBridge 并调用
+                  // import VisualEditorBridge and call
                   const { getVisualEditorBridge } = await import('@/core/data-architecture/VisualEditorBridge')
                   const visualEditorBridge = getVisualEditorBridge()
 
-                  // 获取组件配置
+                  // Get component configuration
                   const config = dependencies.configurationManager.getConfiguration(componentId)
                   if (!config || !config.dataSource) {
-                    console.error(`⚠️ [PanelPollingManager] 组件数据源配置不存在: ${componentId}`)
+                    console.error(`⚠️ [PanelPollingManager] Component data source configuration does not exist: ${componentId}`)
                     return
                   }
-
-                  // 获取组件类型
+
+
+                  // Get component type
                   const component = dependencies.stateManager.nodes.find(n => n.id === componentId)
                   const componentType = component?.type || 'unknown'
 
-                  // 🔥 关键修复：轮询执行前先清除组件缓存，强制重新获取数据
+                  // 🔥 critical fix：Clear component cache before polling execution，Force data retrieval
                   const { simpleDataBridge } = await import('@/core/data-architecture/SimpleDataBridge')
                   simpleDataBridge.clearComponentCache(componentId)
 
@@ -83,49 +88,53 @@ export function usePanelPollingManager(dependencies: {
                     componentId,
                     componentType,
                     config.dataSource
-                  )                } catch (bridgeError) {
-                  console.error(`❌ [PanelPollingManager] VisualEditorBridge 调用失败: ${componentId}`, bridgeError)
-                  console.error(`⚠️ [PanelPollingManager] 轮询执行失败: ${componentId}`)
+                  )
+                } catch (bridgeError) {
+                  console.error(`❌ [PanelPollingManager] VisualEditorBridge call failed: ${componentId}`, bridgeError)
+                  console.error(`⚠️ [PanelPollingManager] Poll execution failed: ${componentId}`)
                 }
               } catch (error) {
-                console.error(`❌ [PanelPollingManager] 轮询执行错误: ${componentId}`, error)
+                console.error(`❌ [PanelPollingManager] Polling execution error: ${componentId}`, error)
               }
             },
-            autoStart: false // 统一不自动启动，由全局开关控制
+            autoStart: false // Unification does not start automatically，Controlled by global switch
           })
-
-          // 启动这个任务
+
+
+          // Start this task
           dependencies.pollingManager.startTask(taskId)
-        } else {        }
+        } else {
+        }
       })
 
-      // 最终轮询任务统计
-      const finalStats = dependencies.pollingManager.getStatistics()
-      // 🔛 启用全局轮询开关
+      // Final polling task statistics
+      const finalStats = dependencies.pollingManager.getStatistics()
+
+      // 🔛 Enable global polling switch
       dependencies.pollingManager.enableGlobalPolling()
     } catch (error) {
-      console.error('❌ [PanelPollingManager] 初始化轮询任务失败:', error)
+      console.error('❌ [PanelPollingManager] Failed to initialize polling task:', error)
     }
   }
 
   /**
-   * 处理轮询控制器切换事件
-   * 当轮询开关状态改变时触发
+   * Handling polling controller switching events
+   * Triggered when polling switch state changes
    */
   const handlePollingToggle = (enabled: boolean) => {
     if (process.env.NODE_ENV === 'development') {
     }
 
     if (enabled) {
-      // 启用时需要先初始化轮询任务
+      // When enabled, the polling task needs to be initialized first.
       initializePollingTasksAndEnable()
     }
-    // 关闭时 PollingController 组件内部已经处理了
+    // when closed PollingController The component has been processed internally
   }
 
   /**
-   * 轮询启用事件处理
-   * 当轮询成功启用时触发
+   * Polling enables event handling
+   * Fires when polling is successfully enabled
    */
   const handlePollingEnabled = () => {
     if (process.env.NODE_ENV === 'development') {
@@ -133,18 +142,18 @@ export function usePanelPollingManager(dependencies: {
   }
 
   /**
-   * 轮询禁用事件处理
-   * 当轮询被禁用时触发
+   * Polling disables event handling
+   * Fires when polling is disabled
    */
   const handlePollingDisabled = () => {
   }
 
   return {
-    // 状态变量
+    // state variables
     globalPollingEnabled,
     pollingStats,
 
-    // 轮询管理函数
+    // Polling management function
     initializePollingTasksAndEnable,
     handlePollingToggle,
     handlePollingEnabled,

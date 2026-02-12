@@ -21,11 +21,11 @@ import { $t } from '@/locales'
 import ProvinceCityDistrictSelector from '@/components/common/ProvinceCityDistrictSelector.vue'
 
 export interface Props {
-  /** 弹窗可见性 */
+  /** Popup visibility */
   visible: boolean
-  /** 弹窗类型 add: 新增 edit: 编辑 */
+  /** Popup type add: New edit: edit */
   type?: 'add' | 'edit'
-  /** 编辑的表格行数据 */
+  /** Edited table row data */
   editData?: UserManagement.User | null
 }
 
@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'update:visible', visible: boolean): void
 
-  /** 点击协议 */
+  /** Click Agreement */
   (e: 'success'): void
 }
 
@@ -66,42 +66,42 @@ const customUserStatusOptions = computed(() => {
   })
 })
 
-// 计算完整的手机号
+// Calculate complete mobile phone number
 const fullPhoneNumber = computed(() => {
   return `${formModel.country_code}${formModel.phone_only}`
 })
 
-// 时区选项
+// Time zone options
 const timezoneOptions = [
-  { label: 'Asia/Shanghai (北京时间)', value: 'Asia/Shanghai' },
-  { label: 'Asia/Tokyo (东京时间)', value: 'Asia/Tokyo' },
-  { label: 'Asia/Seoul (首尔时间)', value: 'Asia/Seoul' },
-  { label: 'Asia/Singapore (新加坡时间)', value: 'Asia/Singapore' },
-  { label: 'Asia/Hong_Kong (香港时间)', value: 'Asia/Hong_Kong' },
-  { label: 'Asia/Bangkok (曼谷时间)', value: 'Asia/Bangkok' },
-  { label: 'Asia/Dubai (迪拜时间)', value: 'Asia/Dubai' },
-  { label: 'Asia/Kolkata (印度时间)', value: 'Asia/Kolkata' },
-  { label: 'Europe/London (伦敦时间)', value: 'Europe/London' },
-  { label: 'Europe/Paris (巴黎时间)', value: 'Europe/Paris' },
-  { label: 'Europe/Berlin (柏林时间)', value: 'Europe/Berlin' },
-  { label: 'Europe/Moscow (莫斯科时间)', value: 'Europe/Moscow' },
-  { label: 'America/New_York (纽约时间)', value: 'America/New_York' },
-  { label: 'America/Los_Angeles (洛杉矶时间)', value: 'America/Los_Angeles' },
-  { label: 'America/Chicago (芝加哥时间)', value: 'America/Chicago' },
-  { label: 'America/Toronto (多伦多时间)', value: 'America/Toronto' },
-  { label: 'Australia/Sydney (悉尼时间)', value: 'Australia/Sydney' },
-  { label: 'Australia/Melbourne (墨尔本时间)', value: 'Australia/Melbourne' },
-  { label: 'Pacific/Auckland (奥克兰时间)', value: 'Pacific/Auckland' },
-  { label: 'UTC (协调世界时)', value: 'UTC' }
+  { label: 'Asia/Shanghai (Beijing time)', value: 'Asia/Shanghai' },
+  { label: 'Asia/Tokyo (Tokyo time)', value: 'Asia/Tokyo' },
+  { label: 'Asia/Seoul (Seoul time)', value: 'Asia/Seoul' },
+  { label: 'Asia/Singapore (Singapore time)', value: 'Asia/Singapore' },
+  { label: 'Asia/Hong_Kong (Hong Kong time)', value: 'Asia/Hong_Kong' },
+  { label: 'Asia/Bangkok (Bangkok time)', value: 'Asia/Bangkok' },
+  { label: 'Asia/Dubai (dubai time)', value: 'Asia/Dubai' },
+  { label: 'Asia/Kolkata (indian time)', value: 'Asia/Kolkata' },
+  { label: 'Europe/London (london time)', value: 'Europe/London' },
+  { label: 'Europe/Paris (paris time)', value: 'Europe/Paris' },
+  { label: 'Europe/Berlin (Berlin time)', value: 'Europe/Berlin' },
+  { label: 'Europe/Moscow (Moscow time)', value: 'Europe/Moscow' },
+  { label: 'America/New_York (new york time)', value: 'America/New_York' },
+  { label: 'America/Los_Angeles (Los Angeles time)', value: 'America/Los_Angeles' },
+  { label: 'America/Chicago (chicago time)', value: 'America/Chicago' },
+  { label: 'America/Toronto (toronto time)', value: 'America/Toronto' },
+  { label: 'Australia/Sydney (Sydney time)', value: 'Australia/Sydney' },
+  { label: 'Australia/Melbourne (Melbourne time)', value: 'Australia/Melbourne' },
+  { label: 'Pacific/Auckland (Auckland time)', value: 'Pacific/Auckland' },
+  { label: 'UTC (coordinated universal time)', value: 'UTC' }
 ]
 
-// 语言选项
+// Language options
 const languageOptions = [
-  { label: '中文', value: 'zh-CN' },
+  { label: 'Chinese', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
 ]
 
-// 国家区号选项
+// Country code options
 const countryCodeOptions = [
   { label: '+86', value: '+86' },
   { label: '+1', value: '+1' },
@@ -148,9 +148,9 @@ const countryCodeOptions = [
   { label: '+886', value: '+886' }
 ]
 
-// 处理省市区选择变化
+// Handling province and city selection changes
 const handleAddressChange = (value: { province: string; city: string; district: string }) => {
-  // 更新表单模型中的地址数据
+  // Update address data in form model
   formModel.address.province = value.province
   formModel.address.city = value.city
   formModel.address.district = value.district
@@ -189,19 +189,19 @@ type FormModel = Pick<UserManagement.User, 'email' | 'name' | 'phone_number' | '
 const formModel = reactive<FormModel>(createDefaultFormModel())
 
 const rules = ref({})
-// 手机号数字校验规则
+// Mobile phone number verification rules
 const phoneNumberRule: FormItemRule = {
   validator: (rule, value) => {
     if (!value) return true
-    // 只允许数字
+    // Only numbers allowed
     if (!/^\d+$/.test(value)) {
       return new Error($t('form.phone.invalid'))
     }
-    // // 长度校验（根据区号调整）
+    // // Length check（Adjust according to area code）
     // const minLength = formModel.country_code === '+86' ? 11 : 7
     // const maxLength = formModel.country_code === '+86' ? 11 : 15
     // if (value.length < minLength || value.length > maxLength) {
-    //   return new Error(`手机号长度应在${minLength}-${maxLength}位之间`)
+    //   return new Error(`The length of mobile phone number should be within${minLength}-${maxLength}between bits`)
     // }
     return true
   },
@@ -263,16 +263,16 @@ function createDefaultFormModel(): FormModel {
   }
 }
 
-// 解析手机号，拆分为区号和手机号部分
+// Parse mobile phone number，Split into area code and mobile phone number parts
 function parsePhoneNumber(phoneNumber: string): { country_code: string; phone_only: string } {
   if (!phoneNumber) {
     return { country_code: '+86', phone_only: '' }
   }
 
-  // 移除所有空格和特殊字符，只保留数字和+号
+  // Remove all spaces and special characters，Only keep numbers and+Number
   const cleanPhone = phoneNumber.replace(/[^\d+]/g, '')
 
-  // 按长度匹配区号（从长到短匹配，避免误匹配）
+  // Match area codes by length（Match from long to short，Avoid mismatches）
   const sortedCountryCodes = countryCodeOptions.map(option => option.value).sort((a, b) => b.length - a.length)
 
   for (const code of sortedCountryCodes) {
@@ -284,7 +284,7 @@ function parsePhoneNumber(phoneNumber: string): { country_code: string; phone_on
     }
   }
 
-  // 如果没有匹配到区号，默认使用+86
+  // If no area code is matched，Used by default+86
   return {
     country_code: '+86',
     phone_only: cleanPhone
@@ -304,7 +304,7 @@ function handleUpdateFormModelByModalType() {
     },
     edit: () => {
       if (props.editData) {
-        // 从后端数据中提取地址字段（地址字段在 address 对象中）
+        // Extract address fields from backend data（The address field is in address in object）
         const editDataAny = props.editData as any
         const addressData = editDataAny.address || {
           province: '',
@@ -313,10 +313,10 @@ function handleUpdateFormModelByModalType() {
           detailed_address: ''
         }
 
-        // 解析现有手机号，拆分为区号和手机号部分
+        // Parse existing mobile phone number，Split into area code and mobile phone number parts
         const phoneData = parsePhoneNumber(editDataAny.phone_number || '')
 
-        // 编辑模式下不需要构建级联选择器的值，因为我们使用的是独立的省市区字段
+        // There is no need to build values ​​for cascading selectors in edit mode，Because we are using independent province and city fields
         const editFormData = {
           ...editDataAny,
           password: '',
@@ -332,7 +332,7 @@ function handleUpdateFormModelByModalType() {
         }
         handleUpdateFormModel(editFormData)
 
-        // 编辑模式下地址数据已经直接设置到表单模型中
+        // In edit mode, the address data has been set directly into the form model.
       }
     }
   }
@@ -343,12 +343,12 @@ function handleUpdateFormModelByModalType() {
 async function handleSubmit() {
   await formRef.value?.validate()
 
-  // 准备提交的数据，确保地址字段正确
+  // Prepare data for submission，Make sure the address fields are correct
   const submitData = {
     ...formModel
   }
 
-  // 移除不需要提交的字段
+  // Remove fields that do not need to be submitted
   delete (submitData as any).confirmPwd
 
   let data: any
@@ -373,7 +373,7 @@ watch(
   }
 )
 
-// 监听区号和手机号变化，更新完整手机号
+// Monitor area code and mobile phone number changes，Update complete mobile number
 watch(
   () => [formModel.country_code, formModel.phone_only],
   () => {
@@ -399,9 +399,9 @@ watch(
               v-model:value="formModel.country_code"
               :options="countryCodeOptions"
               class="w-24"
-              :placeholder="'区号'"
+              :placeholder="'area code'"
             />
-            <NInput v-model:value="formModel.phone_only" :placeholder="'请输入手机号'" class="flex-1" />
+            <NInput v-model:value="formModel.phone_only" :placeholder="'Please enter mobile phone number'" class="flex-1" />
           </div>
         </NFormItemGridItem>
         <NFormItemGridItem :span="12" :label="$t('page.manage.user.organization')" path="organization">

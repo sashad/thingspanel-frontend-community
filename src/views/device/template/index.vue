@@ -22,7 +22,7 @@ import AdvancedListLayout from '@/components/list-page/index.vue'
 import ItemCard from '@/components/dev-card-item/index.vue'
 import TemplateModal from './components/template-modal.vue'
 import { useBoolean, useLoading } from '~/packages/hooks/src'
-// 导入SvgIcon组件，使用项目标准图标系统
+// importSvgIconcomponents，Use the project standard icon system
 import SvgIcon from '@/components/custom/svg-icon.vue'
 import { getDemoServerUrl } from '@/utils/common/tool'
 
@@ -33,7 +33,7 @@ const { bool: visible, setTrue: openModal, setFalse: closeModal } = useBoolean()
 const demoUrl = getDemoServerUrl()
 const url: any = ref(demoUrl)
 
-// 查询参数
+// query parameters
 const queryParams = reactive({
   page: 1,
   page_size: 10,
@@ -46,13 +46,13 @@ const getPath = (path: string) => {
   return `${url.value.replace('api/v1', '') + relativePath}`
 }
 
-// 数据
+// data
 const deviceTemplateList = ref([] as any[])
 const dataTotal = ref(0)
 const modalType = ref<'add' | 'edit'>('add')
 const templateId = ref<string>('')
 
-// 获取数据
+// Get data
 const getData = async () => {
   startLoading()
   try {
@@ -69,27 +69,27 @@ const getData = async () => {
   }
 }
 
-// 搜索处理
+// Search processing
 const handleQuery = async () => {
   queryParams.page = 1
   await getData()
 }
 
-// 重置搜索
+// Reset search
 const handleReset = async () => {
   queryParams.page = 1
   queryParams.name = ''
   await getData()
 }
 
-// 新建模板
+// Create new template
 const handleAddNew = () => {
   modalType.value = 'add'
   templateId.value = ''
   openModal()
 }
 
-// 编辑模板
+// Edit template
 const handleEdit = (id: string) => {
   if (process.env.NODE_ENV === 'development') {
   }
@@ -98,7 +98,7 @@ const handleEdit = (id: string) => {
   openModal()
 }
 
-// 删除模板
+// Delete template
 const handleRemove = async (id: string) => {
   try {
     const { error } = await deleteDeviceTemplate(id)
@@ -112,7 +112,7 @@ const handleRemove = async (id: string) => {
   }
 }
 
-// 表格列定义
+// table column definition
 const columns = computed(() => [
   {
     title: $t('route.device_template'),
@@ -207,31 +207,31 @@ const columns = computed(() => [
   }
 ])
 
-// 分页处理
+// Pagination
 const handlePageChange = (page: number) => {
   queryParams.page = page
   getData()
 }
 
-// 分页大小处理
+// Page size handling
 const handlePageSizeChange = (pageSize: number) => {
   queryParams.page_size = pageSize
   queryParams.page = 1
   getData()
 }
 
-// 刷新数据
+// Refresh data
 const handleRefresh = () => {
   getData()
 }
 
-// 可用视图配置
+// Available view configurations
 const availableViews = [
   { key: 'card', icon: GridOutline, label: 'common.viewCard' },
   { key: 'list', icon: ListOutline, label: 'common.viewList' }
 ]
 
-// 处理标签数组
+// Process tag array
 const getTagArray = (labelStr: string) => {
   if (!labelStr) return []
   return labelStr
@@ -240,7 +240,7 @@ const getTagArray = (labelStr: string) => {
     .map(tag => tag.trim())
 }
 
-// 获取显示的标签（最多显示3个）
+// Get the displayed label（Show most3indivual）
 const getDisplayTags = (labelStr: string) => {
   const tags = getTagArray(labelStr)
   return {
@@ -250,11 +250,11 @@ const getDisplayTags = (labelStr: string) => {
   }
 }
 
-// 组件挂载时获取数据
+// Get data when component is mounted
 onMounted(() => {
   getData()
 
-  // 处理URL参数中的编辑请求
+  // deal withURLEdit request in parameters
   const idParam = route.query?.id
   if (typeof idParam === 'string' && idParam) {
     setTimeout(() => {
@@ -273,14 +273,14 @@ onMounted(() => {
     @add-new="handleAddNew"
     @refresh="handleRefresh"
   >
-    <!-- 左侧操作按钮 -->
+    <!-- Left operation button -->
     <template #header-left>
       <div class="flex gap-2">
         <NButton type="primary" @click="handleAddNew">+ {{ $t('generate.add-device-function-template') }}</NButton>
       </div>
     </template>
 
-    <!-- 搜索表单内容 -->
+    <!-- Search form content -->
     <template #search-form-content>
       <div class="flex gap-4 items-center">
         <NInput
@@ -304,7 +304,7 @@ onMounted(() => {
       </div>
     </template>
 
-    <!-- 卡片视图 -->
+    <!-- card view -->
     <template #card-view>
       <n-spin :show="loading">
         <div v-if="deviceTemplateList.length === 0 && !loading" class="empty-state">
@@ -319,7 +319,7 @@ onMounted(() => {
                 :subtitle="item.description || '--'"
                 @click="handleEdit(item.id)"
               >
-                <!-- 底部内容 - 标签靠右显示 -->
+                <!-- bottom content - Labels are displayed to the right -->
                 <template #footer>
                   <div class="card-footer-content">
                     <div class="tags-section">
@@ -343,7 +343,7 @@ onMounted(() => {
                   </div>
                 </template>
 
-                <!-- 底部图标 - 固定40x40正方形 -->
+                <!-- bottom icon - fixed40x40square -->
                 <template #footer-icon>
                   <div class="footer-icon-container">
                     <img v-if="item.path" :src="getPath(item.path)" alt="device type icon" class="template-image" />
@@ -357,7 +357,7 @@ onMounted(() => {
       </n-spin>
     </template>
 
-    <!-- 列表视图 -->
+    <!-- list view -->
     <template #list-view>
       <NDataTable
         :columns="columns"
@@ -371,7 +371,7 @@ onMounted(() => {
       />
     </template>
 
-    <!-- 底部分页 -->
+    <!-- bottom pagination -->
     <template #footer>
       <NPagination
         v-model:page="queryParams.page"
@@ -386,7 +386,7 @@ onMounted(() => {
     </template>
   </AdvancedListLayout>
 
-  <!-- 模板弹窗 -->
+  <!-- Template pop-up window -->
   <TemplateModal v-model:visible="visible" :type="modalType" :template-id="templateId" :get-table-data="getData" />
 </template>
 
@@ -398,7 +398,7 @@ onMounted(() => {
   min-height: 300px;
 }
 
-// 新的footer样式 - 标签靠右对齐
+// newfooterstyle - Align labels to the right
 .card-footer-content {
   width: 100%;
   display: flex;
@@ -434,7 +434,7 @@ onMounted(() => {
   font-style: italic;
 }
 
-// 图标容器 - 固定40x40正方形
+// icon container - fixed40x40square
 .footer-icon-container {
   width: 40px;
   height: 40px;
@@ -452,7 +452,7 @@ onMounted(() => {
   object-position: center;
 }
 
-// 保留原有的卡片样式
+// Keep the original card style
 .card-content {
   flex: 1;
   display: flex;
@@ -480,9 +480,9 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-// 优化卡片在不同屏幕下的显示
+// Optimize the display of cards on different screens
 
-// 响应式优化
+// Responsive optimization
 @media (max-width: 640px) {
   .tag-item,
   .more-tag {

@@ -1,6 +1,6 @@
 /**
- * 数据流管理器
- * 统一处理用户操作 → 状态更新 → 视图刷新的完整数据流
+ * data flow manager
+ * Unified processing of user operations → status update → Complete data flow for view refresh
  */
 
 import { useUnifiedEditorStore } from '@/store/modules/visual-editor/unified-editor'
@@ -8,7 +8,7 @@ import { useConfigurationService } from '@/store/modules/visual-editor/configura
 import type { GraphData, WidgetConfiguration } from '@/store/modules/visual-editor/unified-editor'
 
 /**
- * 用户操作类型定义
+ * User operation type definition
  */
 export interface UserAction {
   type: ActionType
@@ -27,7 +27,7 @@ export type ActionType =
   | 'BATCH_UPDATE'
 
 /**
- * 操作验证结果
+ * Operation verification results
  */
 export interface ActionValidationResult {
   valid: boolean
@@ -36,7 +36,7 @@ export interface ActionValidationResult {
 }
 
 /**
- * 副作用处理器接口
+ * Side Effect Handler Interface
  */
 export interface SideEffectHandler {
   name: string
@@ -45,7 +45,7 @@ export interface SideEffectHandler {
 }
 
 /**
- * 数据流上下文
+ * data flow context
  */
 export interface DataFlowContext {
   store: ReturnType<typeof useUnifiedEditorStore>
@@ -55,8 +55,8 @@ export interface DataFlowContext {
 }
 
 /**
- * 数据流管理器
- * 🔥 统一的数据流控制中心，解决数据流混乱问题
+ * data flow manager
+ * 🔥 Unified data flow control center，Solve the problem of data flow confusion
  */
 export class DataFlowManager {
   private store = useUnifiedEditorStore()
@@ -69,11 +69,11 @@ export class DataFlowManager {
     this.registerDefaultSideEffects()
   }
 
-  // ==================== 核心数据流处理 ====================
+  // ==================== core data stream processing ====================
 
   /**
-   * 处理用户操作
-   * 🔥 所有用户操作的统一入口
+   * Handle user actions
+   * 🔥 Unified entrance for all user operations
    */
   async handleUserAction(action: UserAction): Promise<void> {
     if (this.isProcessing) {
@@ -83,22 +83,22 @@ export class DataFlowManager {
     this.isProcessing = true
 
     try {
-      // 1. 验证操作
+      // 1. Verify operation
       const validationResult = this.validateAction(action)
       if (!validationResult.valid) {
         throw new Error(validationResult.error)
       }
 
-      // 2. 更新状态
+      // 2. update status
       await this.updateState(action)
 
-      // 3. 触发副作用
+      // 3. Trigger side effects
       await this.triggerSideEffects(action)
 
-      // 4. 通知视图更新
+      // 4. Notify view updates
       this.notifyViewUpdate(action)
     } catch (error) {
-      // 触发错误恢复
+      // Trigger error recovery
       await this.handleError(action, error as Error)
 
       throw error
@@ -108,10 +108,10 @@ export class DataFlowManager {
   }
 
   /**
-   * 批量处理用户操作
+   * Batch processing of user actions
    */
   async handleBatchActions(actions: UserAction[]): Promise<void> {
-    // 批量操作使用事务模式
+    // Batch operations use transaction mode
     this.store.setLoading(true)
 
     try {
@@ -125,10 +125,10 @@ export class DataFlowManager {
     }
   }
 
-  // ==================== 状态更新逻辑 ====================
+  // ==================== Status update logic ====================
 
   /**
-   * 根据操作类型更新状态
+   * Update status based on action type
    */
   private async updateState(action: UserAction): Promise<void> {
     switch (action.type) {
@@ -165,7 +165,7 @@ export class DataFlowManager {
   }
 
   /**
-   * 处理添加节点操作
+   * Handle adding node operation
    */
   private handleAddNode(action: UserAction): void {
     const node = action.data as GraphData
@@ -173,55 +173,55 @@ export class DataFlowManager {
   }
 
   /**
-   * 处理更新节点操作
-   * 🔥 关键修复：同时更新节点状态和配置系统
+   * Handle update node operations
+   * 🔥 critical fix：Simultaneously update node status and configuration system
    */
   private async handleUpdateNode(action: UserAction): Promise<void> {
     if (!action.targetId) {
-      throw new Error('更新节点操作需要targetId')
+      throw new Error('Update node operation requirestargetId')
     }
 
     if (process.env.NODE_ENV === 'development') {
     }
 
-    // 1. 更新store中的节点状态
+    // 1. renewstorenode status in
     this.store.updateNode(action.targetId, action.data)
 
-    // 🔥 关键修复：如果更新包含properties，同时更新配置系统
+    // 🔥 critical fix：If the update containsproperties，Also update the configuration system
     if (action.data && action.data.properties) {
       if (process.env.NODE_ENV === 'development') {
       }
 
       try {
-        // 获取更新后的完整节点数据
+        // Get updated complete node data
         const updatedNode = this.store.nodes.find(n => n.id === action.targetId)
         if (updatedNode) {
-          // 将节点的properties同步到配置系统的component配置中
+          // Change the node'spropertiesSynchronized to the configuration systemcomponentConfiguring
           await this.syncNodePropertiesToConfiguration(action.targetId, updatedNode.properties)
         }
       } catch (error) {
-        console.error(`❌ [DataFlowManager] 配置系统同步失败`, {
+        console.error(`❌ [DataFlowManager] Configuration system synchronization failed`, {
           componentId: action.targetId,
           error: error instanceof Error ? error.message : error
         })
-        // 不抛出错误，避免阻断节点更新
+        // Don't throw an error，Avoid blocking node updates
       }
     }
   }
 
   /**
-   * 处理删除节点操作
+   * Handle deletion of nodes
    */
   private handleRemoveNode(action: UserAction): void {
     if (!action.targetId) {
-      throw new Error('删除节点操作需要targetId')
+      throw new Error('Delete node operation requirestargetId')
     }
 
     this.store.removeNode(action.targetId)
   }
 
   /**
-   * 处理选择节点操作
+   * Handle select node operations
    */
   private handleSelectNodes(action: UserAction): void {
     const nodeIds = action.data as string[]
@@ -229,11 +229,11 @@ export class DataFlowManager {
   }
 
   /**
-   * 处理更新配置操作
+   * Handle update configuration operations
    */
   private async handleUpdateConfiguration(action: UserAction): Promise<void> {
     if (!action.targetId) {
-      throw new Error('更新配置操作需要targetId')
+      throw new Error('Update configuration operation requirestargetId')
     }
 
     const { section, config } = action.data as {
@@ -241,23 +241,23 @@ export class DataFlowManager {
       config: any
     }
 
-    // 使用配置服务更新配置
+    // Update configuration using configuration service
     this.configService.updateConfigurationSection(action.targetId, section, config)
   }
 
   /**
-   * 处理设置运行时数据操作
+   * Handling setup runtime data operations
    */
   private handleSetRuntimeData(action: UserAction): void {
     if (!action.targetId) {
-      throw new Error('设置运行时数据操作需要targetId')
+      throw new Error('Set up runtime data operation requirementstargetId')
     }
 
     this.configService.setRuntimeData(action.targetId, action.data)
   }
 
   /**
-   * 处理批量更新操作
+   * Handle batch update operations
    */
   private async handleBatchUpdate(action: UserAction): Promise<void> {
     const updates = action.data as Array<{
@@ -270,43 +270,43 @@ export class DataFlowManager {
   }
 
   /**
-   * 🔥 新增：将节点属性同步到配置系统
-   * 这是修复属性绑定链路的关键方法
-   * @param componentId 组件ID
-   * @param properties 节点属性对象
+   * 🔥 New：Synchronize node properties to configuration system
+   * This is the key way to fix property binding links
+   * @param componentId componentsID
+   * @param properties node attribute object
    */
   private async syncNodePropertiesToConfiguration(componentId: string, properties: Record<string, any>): Promise<void> {
     if (process.env.NODE_ENV === 'development') {
     }
 
     try {
-      // 获取当前配置
+      // Get current configuration
       const currentConfig = this.configService.getConfiguration(componentId)
       if (process.env.NODE_ENV === 'development') {
       }
 
       if (!currentConfig) {
-        // 如果没有配置，创建默认配置
+        // If not configured，Create default configuration
         if (process.env.NODE_ENV === 'development') {
         }
         this.configService.initializeConfiguration(componentId)
       }
 
-      // 🔥 关键：将properties更新到component配置节中
-      // 这样配置变更事件就会被触发
+      // 🔥 key：Willpropertiesupdated tocomponentIn the configuration section
+      // This configuration change event will be triggered
       if (process.env.NODE_ENV === 'development') {
       }
 
-      // 使用updateConfigurationSection触发配置变更事件
+      // useupdateConfigurationSectionTrigger configuration change event
       this.configService.updateConfigurationSection(componentId, 'component', {
-        ...properties // 将所有properties作为component配置
+        ...properties // will allpropertiesascomponentConfiguration
       })
 
       if (process.env.NODE_ENV === 'development') {
       }
 
     } catch (error) {
-      console.error(`❌ [DataFlowManager] syncNodePropertiesToConfiguration 失败`, {
+      console.error(`❌ [DataFlowManager] syncNodePropertiesToConfiguration fail`, {
         componentId,
         error: error instanceof Error ? error.message : error
       })
@@ -314,18 +314,18 @@ export class DataFlowManager {
     }
   }
 
-  // ==================== 操作验证 ====================
+  // ==================== Operation verification ====================
 
   /**
-   * 验证用户操作
+   * Verify user actions
    */
   private validateAction(action: UserAction): ActionValidationResult {
-    // 基础验证
+    // Basic verification
     if (!action.type) {
-      return { valid: false, error: '操作类型不能为空' }
+      return { valid: false, error: 'Operation type cannot be empty' }
     }
 
-    // 类型特定验证
+    // type specific validation
     switch (action.type) {
       case 'ADD_NODE':
         return this.validateAddNodeAction(action)
@@ -346,79 +346,79 @@ export class DataFlowManager {
   }
 
   /**
-   * 验证添加节点操作
+   * Verify adding node operation
    */
   private validateAddNodeAction(action: UserAction): ActionValidationResult {
     if (!action.data) {
-      return { valid: false, error: '添加节点操作需要节点数据' }
+      return { valid: false, error: 'Add node operation requires node data' }
     }
 
     const node = action.data as GraphData
     if (!node.id) {
-      return { valid: false, error: '节点必须有ID' }
+      return { valid: false, error: 'The node must haveID' }
     }
 
-    // 检查ID是否已存在
+    // examineIDDoes it already exist?
     const existingNode = this.store.nodes.find(n => n.id === node.id)
     if (existingNode) {
-      return { valid: false, error: `节点ID已存在: ${node.id}` }
+      return { valid: false, error: `nodeIDAlready exists: ${node.id}` }
     }
 
     return { valid: true }
   }
 
   /**
-   * 验证需要目标ID的节点操作
+   * Validation requires targetIDNode operations
    */
   private validateNodeTargetAction(action: UserAction): ActionValidationResult {
     if (!action.targetId) {
-      return { valid: false, error: '操作需要targetId' }
+      return { valid: false, error: 'Operational needstargetId' }
     }
 
-    // 检查节点是否存在
+    // Check if the node exists
     const node = this.store.nodes.find(n => n.id === action.targetId)
     if (!node) {
-      return { valid: false, error: `节点不存在: ${action.targetId}` }
+      return { valid: false, error: `Node does not exist: ${action.targetId}` }
     }
 
     return { valid: true }
   }
 
   /**
-   * 验证配置操作
+   * Verify configuration operations
    */
   private validateConfigurationAction(action: UserAction): ActionValidationResult {
     if (!action.targetId) {
-      return { valid: false, error: '配置操作需要targetId' }
+      return { valid: false, error: 'Configuration operations requiretargetId' }
     }
 
     if (!action.data || !action.data.section) {
-      return { valid: false, error: '配置操作需要section参数' }
+      return { valid: false, error: 'Configuration operations requiresectionparameter' }
     }
 
     const validSections = ['base', 'component', 'dataSource', 'interaction']
     if (!validSections.includes(action.data.section)) {
-      return { valid: false, error: `无效的配置section: ${action.data.section}` }
+      return { valid: false, error: `Invalid configurationsection: ${action.data.section}` }
     }
 
     return { valid: true }
   }
 
   /**
-   * 验证运行时数据操作
+   * Verify runtime data operations
    */
   private validateRuntimeDataAction(action: UserAction): ActionValidationResult {
     if (!action.targetId) {
-      return { valid: false, error: '运行时数据操作需要targetId' }
+      return { valid: false, error: 'Runtime data manipulation requiredtargetId' }
     }
 
     return { valid: true }
   }
 
-  // ==================== 副作用处理 ====================
+  // ==================== Side effects treatment ====================
 
   /**
-   * 触发副作用处理
+   * trigger side effects
    */
   private async triggerSideEffects(action: UserAction): Promise<void> {
     const context: DataFlowContext = {
@@ -428,7 +428,7 @@ export class DataFlowManager {
       timestamp: new Date()
     }
 
-    // 并行执行所有匹配的副作用处理器
+    // Execute all matching side effect handlers in parallel
     const matchingHandlers = this.sideEffectHandlers.filter(handler => handler.condition(action, context))
 
     await Promise.all(
@@ -441,17 +441,17 @@ export class DataFlowManager {
   }
 
   /**
-   * 注册副作用处理器
+   * Register side effect handler
    */
   registerSideEffect(handler: SideEffectHandler): void {
     this.sideEffectHandlers.push(handler)
   }
 
   /**
-   * 注册默认的副作用处理器
+   * Register default side effect handler
    */
   private registerDefaultSideEffects(): void {
-    // 配置自动保存
+    // Configure automatic saving
     this.registerSideEffect({
       name: 'AutoSaveConfiguration',
       condition: action => action.type === 'UPDATE_CONFIGURATION',
@@ -462,22 +462,22 @@ export class DataFlowManager {
       }
     })
 
-    // 数据源变更处理
+    // Data source change processing
     this.registerSideEffect({
       name: 'DataSourceChangeHandler',
       condition: action => action.type === 'UPDATE_CONFIGURATION' && action.data?.section === 'dataSource',
       execute: async (action, context) => {
-        // 清理旧的运行时数据
+        // Clean old runtime data
         if (action.targetId) {
           context.configService.setRuntimeData(action.targetId, null)
         }
 
-        // 触发数据重新获取
-        // TODO: 集成实际的数据获取逻辑
+        // Trigger data retrieval
+        // TODO: Integrate actual data acquisition logic
       }
     })
 
-    // Card2.1组件特殊处理
+    // Card2.1Special handling of components
     this.registerSideEffect({
       name: 'Card2ComponentHandler',
       condition: (action, context) => {
@@ -485,7 +485,7 @@ export class DataFlowManager {
         return context.store.card2Components.has(action.targetId)
       },
       execute: async (action, context) => {
-        // Card2.1特殊的数据绑定处理
+        // Card2.1Special data binding handling
         if (action.type === 'UPDATE_CONFIGURATION' && action.data?.section === 'dataSource') {
           context.store.updateDataBinding(action.targetId!)
         }
@@ -493,10 +493,10 @@ export class DataFlowManager {
     })
   }
 
-  // ==================== 视图更新通知 ====================
+  // ==================== View update notification ====================
 
   /**
-   * 通知视图更新
+   * Notify view updates
    */
   private notifyViewUpdate(action: UserAction): void {
     const event = new CustomEvent('data-flow-update', {
@@ -510,7 +510,7 @@ export class DataFlowManager {
   }
 
   /**
-   * 监听数据流更新事件
+   * Listen to data stream update events
    */
   onDataFlowUpdate(callback: (action: UserAction) => void): () => void {
     const handler = (event: CustomEvent) => {
@@ -524,13 +524,13 @@ export class DataFlowManager {
     }
   }
 
-  // ==================== 错误处理 ====================
+  // ==================== Error handling ====================
 
   /**
-   * 处理错误和恢复
+   * Handling errors and recovery
    */
   private async handleError(action: UserAction, error: Error): Promise<void> {
-    // 触发错误事件
+    // trigger error event
     const errorEvent = new CustomEvent('data-flow-error', {
       detail: {
         action,
@@ -541,12 +541,12 @@ export class DataFlowManager {
 
     this.eventBus.dispatchEvent(errorEvent)
 
-    // TODO: 实现错误恢复逻辑
-    // 例如：回滚状态变更、显示用户友好的错误提示等
+    // TODO: Implement error recovery logic
+    // For example：Rollback status changes、Display user-friendly error prompts, etc.
   }
 
   /**
-   * 监听错误事件
+   * Listen for error events
    */
   onError(callback: (action: UserAction, error: Error) => void): () => void {
     const handler = (event: CustomEvent) => {
@@ -561,12 +561,12 @@ export class DataFlowManager {
   }
 }
 
-// ==================== 单例模式 ====================
+// ==================== Singleton pattern ====================
 
 let dataFlowManagerInstance: DataFlowManager | null = null
 
 /**
- * 获取数据流管理器实例（单例）
+ * Get data flow manager instance（Singleton）
  */
 export function useDataFlowManager(): DataFlowManager {
   if (!dataFlowManagerInstance) {
@@ -577,16 +577,16 @@ export function useDataFlowManager(): DataFlowManager {
 }
 
 /**
- * 重置数据流管理器实例（测试用）
+ * Reset the Data Flow Manager instance（for testing）
  */
 export function resetDataFlowManager(): void {
   dataFlowManagerInstance = null
 }
 
-// ==================== 便捷操作函数 ====================
+// ==================== Convenient operation functions ====================
 
 /**
- * 创建添加节点操作
+ * Create add node operation
  */
 export function createAddNodeAction(node: GraphData): UserAction {
   return {
@@ -596,7 +596,7 @@ export function createAddNodeAction(node: GraphData): UserAction {
 }
 
 /**
- * 创建更新配置操作
+ * Create update configuration action
  */
 export function createUpdateConfigAction(
   widgetId: string,
@@ -611,7 +611,7 @@ export function createUpdateConfigAction(
 }
 
 /**
- * 创建设置运行时数据操作
+ * Create settings runtime data operations
  */
 export function createSetRuntimeDataAction(widgetId: string, data: any): UserAction {
   return {

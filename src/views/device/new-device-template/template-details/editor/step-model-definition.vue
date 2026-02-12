@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 /**
- * 步骤2：模型定义
- * 管理遥测、属性、事件、命令的CRUD操作
+ * step2：Model definition
+ * Manage telemetry、property、event、commandingCRUDoperate
  */
 
 import { computed, reactive, ref, watchEffect } from 'vue'
@@ -50,14 +50,14 @@ const addAndEditModalVisible = ref<boolean>(false)
 const addAndEditTitle = ref<string>($t('device_template.addAndEditTelemetry'))
 
 /**
- * 监听 props.deviceTemplateId 变化
- * 当第一步保存成功后，父组件会更新 deviceTemplateId
+ * monitor props.deviceTemplateId change
+ * When the first step is saved successfully，The parent component will be updated deviceTemplateId
  */
 watchEffect(() => {
   deviceTemplateId.value = props.deviceTemplateId
 })
 
-// 组件映射列表
+// component mapping list
 const comList: { id: string; components: any; title: string }[] = [
   { id: 'telemetry', components: AddEditTest, title: $t('device_template.addAndEditTelemetry') },
   { id: 'attributes', components: AddEditAttributes, title: $t('device_template.addAndEditAttributes') },
@@ -65,7 +65,7 @@ const comList: { id: string; components: any; title: string }[] = [
   { id: 'command', components: AddEditCommands, title: $t('device_template.addAndEditCommand') }
 ]
 
-// 当前编辑组件
+// Current editing component
 const SwitchCom = computed<any>(() => {
   return comList.find(item => {
     if (item.id === tabsCurrent.value) {
@@ -76,7 +76,7 @@ const SwitchCom = computed<any>(() => {
   })?.components
 })
 
-// 查询参数（每个tab独立的分页参数）
+// query parameters（eachtabIndependent paging parameters）
 const queryParams: any = reactive([
   {
     page: 1,
@@ -100,24 +100,24 @@ const queryParams: any = reactive([
   }
 ])
 
-// Tab切换
+// Tabswitch
 const checkedTabs: (value: string | number) => void = value => {
   tabsCurrent.value = value
 }
 
-// 编辑数据项
+// Edit data item
 let objItem = reactive<any>({})
 const edit: (row: any) => void = row => {
   addAndEditModalVisible.value = true
   objItem = row
 }
 
-// 新增或编辑成功后的回调
+// Callback after successful addition or editing
 const determine: () => void = () => {
   getTableData(tabsCurrent.value)
 }
 
-// 删除数据项
+// Delete data item
 const del: (id: string) => void = async id => {
   if (tabsCurrent.value === 'telemetry') {
     await delTelemetry(id)
@@ -131,27 +131,27 @@ const del: (id: string) => void = async id => {
   getTableData(tabsCurrent.value)
 }
 
-// 下一步
+// Next step
 const next: () => void = async () => {
   emit('update:stepCurrent', 3)
 }
 
-// 上一步
+// Previous step
 const back: () => void = async () => {
   emit('update:stepCurrent', 1)
 }
 
-// 取消
+// Cancel
 const cancellation: () => void = () => {
   emit('update:modalVisible', false)
 }
 
-// 关闭编辑弹窗后清空数据
+// Clear data after closing the edit pop-up window
 const cloneaddAndEditVisible: () => void = () => {
   objItem = {}
 }
 
-// 列配置列表
+// Column configuration list
 const columnsList: any = reactive([
   {
     addBtn: () => {
@@ -304,23 +304,23 @@ const columnsList: any = reactive([
 ])
 
 /**
- * 更新属性数据，处理读写标志的国际化
+ * Update attribute data，Handling internationalization of read and write flags
  */
 const updateAttributesData = (data: any) => {
   columnsList[1].data = data?.list ?? []
   columnsList[1].total = Math.ceil(data?.total / 5)
   columnsList[1].data?.forEach((item: any) => {
-    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
       item.read_write_flag = $t('device_template.table_header.readOnly')
-    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
       item.read_write_flag = $t('device_template.table_header.readAndWrite')
     }
   })
 }
 
 /**
- * 处理事件和命令的参数字段
- * 将JSON格式的params转换为逗号分隔的名称列表
+ * Handle parameter fields for events and commands
+ * WillJSONFormattedparamsConvert to comma separated list of names
  */
 const handleParamsOfEventsAndcommands = data => {
   if (!data || !Array.isArray(data)) {
@@ -337,22 +337,22 @@ const handleParamsOfEventsAndcommands = data => {
 }
 
 /**
- * 更新遥测数据，处理读写标志的国际化
+ * Update telemetry data，Handling internationalization of read and write flags
  */
 const updateTelemetryData = (data: any) => {
   columnsList[0].data = data?.list ?? []
   columnsList[0].total = Math.ceil(data?.total / 5)
   columnsList[0].data.forEach((item: any) => {
-    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-只读') {
+    if (item.read_write_flag === 'R' || item.read_write_flag === 'R-read only') {
       item.read_write_flag = $t('device_template.table_header.readOnly')
-    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-读/写') {
+    } else if (item.read_write_flag === 'RW' || item.read_write_flag === 'RW-read/Write') {
       item.read_write_flag = $t('device_template.table_header.readAndWrite')
     }
   })
 }
 
 /**
- * 更新事件数据
+ * Update event data
  */
 const updateEventsData = (data: any) => {
   columnsList[2].data = handleParamsOfEventsAndcommands(data?.list ?? [])
@@ -360,7 +360,7 @@ const updateEventsData = (data: any) => {
 }
 
 /**
- * 更新命令数据
+ * Update command data
  */
 const updateCommandsData = (data: any) => {
   columnsList[3].data = handleParamsOfEventsAndcommands(data?.list ?? [])
@@ -368,14 +368,14 @@ const updateCommandsData = (data: any) => {
 }
 
 /**
- * 获取表格数据
- * @param value - 可选，指定要加载的tab名称，不传则加载所有
+ * Get table data
+ * @param value - Optional，Specify what to loadtabname，If not passed, all will be loaded.
  */
 const getTableData: (value?: string) => Promise<void> = async value => {
   startLoading()
   try {
     if (value) {
-      // 加载单个tab的数据
+      // Load a singletabdata
       if (value === 'telemetry') {
         const { data: data0 }: any = await telemetryApi(queryParams[0])
         updateTelemetryData(data0)
@@ -390,7 +390,7 @@ const getTableData: (value?: string) => Promise<void> = async value => {
         updateCommandsData(data3)
       }
     } else {
-      // 并发加载所有tab的数据
+      // load all concurrentlytabdata
       const [telemetryRes, attributesRes, eventsRes, commandsRes] = await Promise.all([
         telemetryApi(queryParams[0]),
         attributesApi(queryParams[1]),
@@ -410,7 +410,7 @@ const getTableData: (value?: string) => Promise<void> = async value => {
   }
 }
 
-// 初始加载数据
+// Initial load data
 getTableData()
 </script>
 

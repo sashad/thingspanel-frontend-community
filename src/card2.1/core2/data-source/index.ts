@@ -1,5 +1,5 @@
 /**
- * 数据源系统导出
+ * Data source system export
  */
 
 export * from './data-source-mapper'
@@ -10,7 +10,7 @@ export * from './component-schema'
 export * from './data-binding-manager'
 export * from './reactive-data-manager'
 
-// 默认导出数据源映射器实例和管理器
+// Data source mapper instances and managers are exported by default
 export { dataSourceMapper } from './data-source-mapper'
 export { componentSchemaManager } from './component-schema'
 export { dataBindingManager } from './data-binding-manager'

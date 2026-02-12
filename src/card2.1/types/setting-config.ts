@@ -1,182 +1,182 @@
 /**
- * Card2.1 组件设置配置类型定义
- * 实现统一的三文件结构标准和属性绑定机制
- * 支持完整的组件配置系统，包括设置项定义、验证规则和UI渲染控制
- * 整合了原有的灵活配置系统，提供统一的配置类型架构
+ * Card2.1 Component settings configuration type definition
+ * Implement a unified three-file structure standard and attribute binding mechanism
+ * Supports a complete component configuration system，Includes setting definitions、Validation rules andUIRendering controls
+ * Integrated with the original flexible configuration system，Provide a unified configuration type architecture
  */
 
 import type { Component } from 'vue'
 
 /**
- * 支持的控件类型枚举
- * 整合了原有的配置字段类型，提供统一的控件类型系统
+ * Enumeration of supported control types
+ * Integrated original configuration field types，Provide a unified control type system
  */
 export enum SettingControlType {
-  /** 文本输入框 */
+  /** Text input box */
   INPUT = 'input',
-  /** 文本域 */
+  /** text field */
   TEXTAREA = 'textarea',
-  /** 数字输入框 */
+  /** Number input box */
   INPUT_NUMBER = 'input-number',
-  /** 颜色选择器 */
+  /** color picker */
   COLOR_PICKER = 'color-picker',
-  /** 滑块 */
+  /** slider */
   SLIDER = 'slider',
-  /** 开关 */
+  /** switch */
   SWITCH = 'switch',
-  /** 下拉选择 */
+  /** drop down selection */
   SELECT = 'select',
-  /** 多选框 */
+  /** checkbox */
   CHECKBOX = 'checkbox',
-  /** 单选框组 */
+  /** radio button group */
   RADIO_GROUP = 'radio-group',
-  /** 日期选择器 */
+  /** date picker */
   DATE_PICKER = 'date-picker',
-  /** 动态标签 */
+  /** Dynamic tags */
   DYNAMIC_TAGS = 'dynamic-tags',
-  /** Vue组件渲染器（高级功能）*/
+  /** Vuecomponent renderer（Advanced features）*/
   VUE_COMPONENT = 'vue-component'
 }
 
 /**
- * 设置项配置接口
- * 对应组件配置界面的每个设置项，用于生成动态配置表单
+ * Setting item configuration interface
+ * Corresponding to each setting item in the component configuration interface，Used to generate dynamic configuration forms
  * 
- * @template T - 设置项值的类型
+ * @template T - Set the type of item value
  */
 export interface Setting<T = unknown> {
-  /** 控件类型，如 'input', 'color-picker', 'slider', 'vue-component' */
+  /** Control type，like 'input', 'color-picker', 'slider', 'vue-component' */
   type: string
-  /** UI上显示的标签 */
+  /** UIlabels shown on */
   label: string
-  /** 绑定的 customConfig.customize 中的属性路径 */
+  /** bound customConfig.customize property path in */
   field: string
-  /** 设置项分组，用于将相关设置项归类显示 */
+  /** Setting item grouping，Used to categorize and display related setting items */
   group?: string
-  /** 占位符文本 */
+  /** placeholder text */
   placeholder?: string
-  /** 默认值 */
+  /** default value */
   defaultValue?: T
-  /** 最小值（数字类型） */
+  /** minimum value（Numeric type） */
   min?: number
-  /** 最大值（数字类型） */
+  /** maximum value（Numeric type） */
   max?: number
-  /** 步长（数字类型） */
+  /** step size（Numeric type） */
   step?: number
-  /** 下拉选项 */
+  /** drop down options */
   options?: Array<{ label: string; value: T; description?: string }>
-  /** 设置项描述文本 */
+  /** Setting item description text */
   description?: string
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
-  /** 是否禁用 */
+  /** Whether to disable */
   disabled?: boolean
 
-  // ============ Vue组件渲染扩展（从config-types.ts整合） ============
-  /** Vue组件渲染器（当type为'vue-component'时使用） */
+  // ============ VueComponent rendering extension（fromconfig-types.tsIntegrate） ============
+  /** Vuecomponent renderer（whentypefor'vue-component'used when） */
   component?: Component | string
-  /** 传递给Vue组件的Props */
+  /** passed toVuecomponentProps */
   componentProps?: Record<string, unknown>
 
-  /** 控件的其他配置 */
+  /** Other configurations of the control */
   [key: string]: unknown
 }
 
 /**
- * 组件的默认样式、属性和初始行为
- * 对应您提供的 CustomConfig 设计
- * @template T - 组件特有的 customize 对象类型
+ * The default style of the component、Properties and initial behavior
+ * corresponding to the CustomConfig design
+ * @template T - component specific customize Object type
  */
 export interface CustomConfig<T = Record<string, unknown>> {
-  /** 组件的唯一类型标识符 */
+  /** The component's unique type identifier */
   type: string
-  /** 组件根级别的通用变换属性 */
+  /** Common transform properties at the component root level */
   root: {
     transform: {
       rotate: number
       scale: number
     }
   }
-  /** 组件核心的、独特的自定义样式和功能属性 */
+  /** component core、Unique custom styles and functional attributes */
   customize: T
 }
 
 /**
- * 最终由渲染引擎使用的完整组件配置对象
- * 对应您提供的 DataConfig 设计
- * @template T - 组件特有的 customize 对象类型
+ * The complete component configuration object ultimately used by the rendering engine
+ * corresponding to the DataConfig design
+ * @template T - component specific customize Object type
  */
 export interface DataConfig<T = Record<string, unknown>> {
-  /** 组件实例的唯一ID */
+  /** The unique component instanceID */
   id: string
-  /** 组件的显示名称 */
+  /** Display name of the component */
   name: string
-  /** Vue组件名称，源字段 */
+  /** VueComponent name，source field */
   field: string
-  /** 接收联动的目标组件配置 */
+  /** Receive linkage target component configuration */
   components: TargetComponent[]
-  /** 组件的自定义配置 */
+  /** Custom configuration of components */
   customConfig: CustomConfig<T>
 }
 
 /**
- * 联动中的目标组件
- * 对应您提供的 TargetComponent 设计
+ * Target component in linkage
+ * corresponding to the TargetComponent design
  */
 export interface TargetComponent {
-  /** 目标组件的ID */
+  /** target componentID */
   id: string
-  /** 接收联动数据的字段 */
+  /** Fields that receive linkage data */
   field: string
 }
 
 /**
- * 组件设置配置
- * 将 Setting 和 CustomConfig 整合，定义组件的完整配置结构
+ * Component settings configuration
+ * Will Setting and CustomConfig Integrate，Define the complete configuration structure of the component
  */
 export interface ComponentSettingConfig<T = Record<string, unknown>> {
-  /** 组件类型标识符 */
+  /** component type identifier */
   componentType: string
-  /** 设置项列表 */
+  /** Setting list */
   settings: Setting[]
-  /** 默认自定义配置 */
+  /** Default custom configuration */
   customConfig: CustomConfig<T>
 }
 
 /**
- * 支持的控件类型枚举
- * 整合了原有的配置字段类型，提供统一的控件类型系统
+ * Enumeration of supported control types
+ * Integrated original configuration field types，Provide a unified control type system
  */
 export enum SettingControlType {
-  /** 文本输入框 */
+  /** Text input box */
   INPUT = 'input',
-  /** 文本域 */
+  /** text field */
   TEXTAREA = 'textarea',
-  /** 数字输入框 */
+  /** Number input box */
   INPUT_NUMBER = 'input-number',
-  /** 颜色选择器 */
+  /** color picker */
   COLOR_PICKER = 'color-picker',
-  /** 滑块 */
+  /** slider */
   SLIDER = 'slider',
-  /** 开关 */
+  /** switch */
   SWITCH = 'switch',
-  /** 下拉选择 */
+  /** drop down selection */
   SELECT = 'select',
-  /** 多选框 */
+  /** checkbox */
   CHECKBOX = 'checkbox',
-  /** 单选框组 */
+  /** radio button group */
   RADIO_GROUP = 'radio-group',
-  /** 日期选择器 */
+  /** date picker */
   DATE_PICKER = 'date-picker',
-  /** 动态标签 */
+  /** Dynamic tags */
   DYNAMIC_TAGS = 'dynamic-tags',
-  /** Vue组件渲染器（高级功能）*/
+  /** Vuecomponent renderer（Advanced features）*/
   VUE_COMPONENT = 'vue-component'
 }
 
 /**
- * 属性数据类型映射
- * 整合了Vue组件渲染类型
+ * Attribute data type mapping
+ * IntegratedVueComponent rendering type
  */
 export type PropertyDataTypeFromSetting =
   | 'string' // input, textarea, select, radio-group
@@ -188,9 +188,9 @@ export type PropertyDataTypeFromSetting =
   | 'component' // vue-component
 
 /**
- * 根据设置项类型推断属性数据类型
- * @param setting 设置项配置
- * @returns 属性数据类型
+ * Infer attribute data type based on setting item type
+ * @param setting Setting item configuration
+ * @returns Property data type
  */
 export function inferPropertyDataType(setting: Setting): PropertyDataTypeFromSetting {
   switch (setting.type) {
@@ -226,65 +226,65 @@ export function inferPropertyDataType(setting: Setting): PropertyDataTypeFromSet
 }
 
 /**
- * 设置项验证规则
+ * Set item validation rules
  */
 export interface SettingValidationRule {
-  /** 是否必填 */
+  /** Is it required? */
   required?: boolean
-  /** 最小长度/值 */
+  /** minimum length/value */
   min?: number
-  /** 最大长度/值 */
+  /** maximum length/value */
   max?: number
-  /** 正则表达式验证 */
+  /** Regular expression validation */
   pattern?: string
-  /** 自定义验证函数 */
+  /** Custom validation function */
   validator?: (value: unknown) => boolean | string
 }
 
 /**
- * 扩展的设置项配置（包含验证）
+ * Extended settings configuration（Contains validation）
  */
 export interface EnhancedSetting extends Setting {
-  /** 验证规则 */
+  /** Validation rules */
   validation?: SettingValidationRule
-  /** 是否只读 */
+  /** Is it read-only? */
   readonly?: boolean
-  /** 是否可见 */
+  /** visible or not */
   visible?: boolean | ((config: unknown) => boolean)
-  /** 帮助文本 */
+  /** help text */
   helpText?: string
 }
 
-// ============ 配置模式和分组管理（从config-types.ts整合） ============
+// ============ Configuration mode and group management（fromconfig-types.tsIntegrate） ============
 
 /**
- * 配置模式类型
- * 支持不同的配置渲染方式
+ * Configuration mode type
+ * Support different configuration rendering methods
  */
 export type ConfigMode = 'standard' | 'vue-component' | 'hybrid'
 
 /**
- * 配置分组定义
- * 用于组织和展示配置项
+ * Configure group definition
+ * Used to organize and display configuration items
  */
 export interface SettingGroup {
-  /** 分组名称（唯一标识） */
+  /** Group name（unique identifier） */
   name: string
-  /** 分组显示标签 */
+  /** Display labels in groups */
   label: string
-  /** 分组描述 */
+  /** Group description */
   description?: string
-  /** 分组中包含的字段 */
+  /** Fields included in the group */
   fields: string[]
-  /** 分组是否可折叠 */
+  /** Whether the group is collapsible */
   collapsible?: boolean
-  /** 分组默认是否展开 */
+  /** Whether the group is expanded by default */
   defaultExpanded?: boolean
 }
 
 /**
- * TS配置定义（从原config-types.ts整合）
- * 用于纯TypeScript配置模式
+ * TSConfiguration definition（From the originalconfig-types.tsIntegrate）
+ * for pureTypeScriptconfiguration mode
  */
 export interface TSConfig {
   title?: string
@@ -294,62 +294,62 @@ export interface TSConfig {
 }
 
 /**
- * 配置值类型（从原config-types.ts整合）
+ * Configuration value type（From the originalconfig-types.tsIntegrate）
  */
 export interface ConfigValues {
   [key: string]: unknown
 }
 
 /**
- * 扩展的组件设置配置
- * 整合了配置分组和模式管理
+ * Extended component settings configuration
+ * Integrated configuration grouping and schema management
  */
 export interface EnhancedComponentSettingConfig<T = Record<string, unknown>> extends ComponentSettingConfig<T> {
-  /** 配置模式 */
+  /** configuration mode */
   mode?: ConfigMode
-  /** 配置分组定义 */
+  /** Configure group definition */
   groups?: SettingGroup[]
-  /** 配置标题 */
+  /** Configure title */
   title?: string
-  /** 配置描述 */
+  /** Configuration description */
   description?: string
 }
 
 /**
- * 创建设置项的辅助函数
+ * Helper function for creating setting items
  */
 export function createSetting(type: string, label: string, field: string, options: Partial<Setting> = {}): Setting {
   return {
     type,
     label,
     field,
-    group: options.group || '基础设置',
+    group: options.group || 'Basic settings',
     ...options
   }
 }
 
 /**
- * 创建自定义配置的辅助函数
- * 支持多种调用方式以保持向后兼容性
+ * Create custom configuration helper functions
+ * Supports multiple calling methods to maintain backward compatibility
  * 
- * @template T - 自定义配置对象的类型
- * @param typeOrCustomize - 组件类型或自定义配置对象
- * @param customize - 自定义配置对象（当第一个参数是类型时）
- * @param transform - 变换配置（旋转和缩放）
- * @returns 完整的自定义配置对象
+ * @template T - Type of custom configuration object
+ * @param typeOrCustomize - Component type or custom configuration object
+ * @param customize - Custom configuration object（When the first parameter is a type）
+ * @param transform - Transform configuration（Rotate and scale）
+ * @returns Complete custom configuration object
  */
 export function createCustomConfig<T extends Record<string, unknown>>(
   typeOrCustomize: string | T,
   customize?: T,
   transform: { rotate: number; scale: number } = { rotate: 0, scale: 1 }
 ): CustomConfig<T> {
-  // 支持两种调用方式：
+  // Supports two calling methods：
   // 1. createCustomConfig('component-type', { prop: value })
   // 2. createCustomConfig({ type: 'component-type', prop: value })
   if (typeof typeOrCustomize === 'string') {
-    // 第一种方式：类型 + 配置对象
+    // first way：type + Configuration object
     if (!customize) {
-      throw new Error('customize 参数在指定 type 时是必需的')
+      throw new Error('customize Parameters are specified type is required when')
     }
     return {
       type: typeOrCustomize,
@@ -357,12 +357,12 @@ export function createCustomConfig<T extends Record<string, unknown>>(
       customize
     }
   } else {
-    // 第二种方式：单一配置对象（向后兼容）
+    // Second way：single configuration object（backwards compatible）
     const config = typeOrCustomize as T & { type?: string }
     const { type, ...customizeObj } = config
     
     if (!type) {
-      throw new Error('配置对象必须包含 type 字段')
+      throw new Error('The configuration object must contain type Field')
     }
     
     return {

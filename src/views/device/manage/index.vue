@@ -53,15 +53,15 @@ const queryOfServiceIdentifier = ref(route.query.service_identifier)
 const queryOfServiceAccessId = ref(route.query.service_access_id)
 const { cache: query, setCache } = usePageCache()
 
-// 初始化设备状态 WebSocket 管理器
+// Initialize device state WebSocket Manager
 const deviceStatusWS = useDeviceStatusWebSocket()
 
 /**
- * 更新表格中设备状态的函数
+ * Function to update device status in table
  */
 const updateDeviceStatusInTable = (deviceId: string, isOnline: boolean) => {
   try {
-    // 更新表格中的设备状态
+    // Update device status in table
     if (tablePageRef.value?.dataList && Array.isArray(tablePageRef.value.dataList)) {
       const deviceIndex = tablePageRef.value.dataList.findIndex(
         device => device.id === deviceId
@@ -72,22 +72,22 @@ const updateDeviceStatusInTable = (deviceId: string, isOnline: boolean) => {
       }
     }
   } catch (error) {
-    console.error('更新设备状态失败:', error)
+    console.error('Failed to update device status:', error)
   }
 }
 
 /**
- * 订阅当前页面的设备状态
+ * Subscribe to the device status of the current page
  */
 const subscribeDeviceStatus = () => {
-  // 获取当前页面的设备ID列表
+  // Get the device of the current pageIDlist
   const deviceIds = tablePageRef.value?.dataList?.map((device: any) => device.id) || []
   
   if (deviceIds.length > 0) {
-    // 连接并订阅（第一次会建立连接，后续会更新订阅）
+    // Connect and subscribe（A connection will be established for the first time，Subscriptions will be updated later）
     deviceStatusWS.connect(deviceIds, updateDeviceStatusInTable)
   } else {
-    // 没有设备时断开连接
+    // Disconnect when no device is available
     deviceStatusWS.disconnect()
   }
 }
@@ -104,7 +104,7 @@ const setUpId = (dId, cId, dobj) => {
   getFormJson(dId)
 }
 const getDeviceGroupOptions = async () => {
-  // 将原始数据转换为树形结构
+  // Convert raw data into tree structure
   function convertTreeNodeToTarget(treeNode: DeviceManagement.TreeNode): TreeSelectOption {
     const { group, children } = treeNode
     const targetNode: TreeSelectOption = {
@@ -119,7 +119,7 @@ const getDeviceGroupOptions = async () => {
     return targetNode
   }
 
-  // 将 TreeNode 数组转换为目标数据结构的数组
+  // Will TreeNode Convert an array to an array of target data structure
   function convertTreeNodesToTarget(treeNodes: DeviceManagement.TreeNode[]): TreeSelectOption[] {
     return treeNodes.map(convertTreeNodeToTarget)
   }
@@ -400,7 +400,7 @@ const fetchFirstLevelOptions = async () => {
 const fetchSecondLevelOptions = async (firstLevelValue, page = 1) => {
   if (!firstLevelValue) return
   if (page === 1) {
-    // 清空二级选项
+    // Clear secondary options
     secondLevelOptions.value = []
     searchConfigs.value.map((item: any) => {
       if (item.key === 'service_access_id') {
@@ -446,13 +446,13 @@ const paramsUpdateHandle = async params => {
     selectedFirstLevel.value = firstSelected
     const identifierIndex = searchConfigs.value.findIndex(item => item.key === 'service_identifier')
     const accessIndex = searchConfigs.value.findIndex(item => item.key === 'service_access_id')
-    // 重置二级选项
+    // Reset secondary options
     const isService = serviceIds.value.map(item => item.service_identifier).includes(firstSelected)
     if (isService) {
       if (accessIndex === -1) {
         searchConfigs.value.splice(identifierIndex + 1, 0, {
           key: 'service_access_id',
-          label: '选择二级服务',
+          label: 'Choose secondary service',
           type: 'select',
           options: []
         })
@@ -484,14 +484,14 @@ onBeforeMount(async () => {
 })
 
 /**
- * 组件挂载完成后初始化 WebSocket
+ * Initialized after component mounting is complete WebSocket
  */
 onMounted(() => {
-  // 不需要在这里初始化，等待 fetchData 完成后自动订阅
+  // No need to initialize here，wait fetchData Automatically subscribe after completion
 })
 
 /**
- * 组件卸载前清理 WebSocket 连接
+ * Clean up before component uninstallation WebSocket connect
  */
 onUnmounted(() => {
   deviceStatusWS.disconnect()
@@ -581,8 +581,8 @@ const fetchData = async (params: Record<string, any>) => {
   setCache(params)
   const result = await deviceList(params)
   
-  // 数据加载完成后，订阅当前页面的设备状态
-  // 使用 nextTick 确保 tablePageRef.value.dataList 已更新
+  // After data loading is complete，Subscribe to the device status of the current page
+  // use nextTick make sure tablePageRef.value.dataList updated
   setTimeout(() => {
     subscribeDeviceStatus()
   }, 100)

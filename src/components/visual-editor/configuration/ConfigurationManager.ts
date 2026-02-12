@@ -1,8 +1,8 @@
 /**
- * 配置管理器
- * 负责管理所有组件的配置数据，提供配置的CRUD操作和事件监听
+ * configuration manager
+ * Responsible for managing the configuration data of all components，Provide configurationCRUDOperation and event listening
  *
- * Task 1.2 重构：集成配置事件总线，实现解耦合架构
+ * Task 1.2 Refactor：Integrated configuration event bus，Implement a decoupled architecture
  */
 import { reactive, ref, computed } from 'vue'
 
@@ -18,31 +18,31 @@ import type {
   InteractionConfiguration
 } from './types'
 
-// 🔥 导入 SimpleDataBridge 用于清除缓存
+// 🔥 import SimpleDataBridge for clearing cache
 import { simpleDataBridge } from '@/core/data-architecture/SimpleDataBridge'
 
-// 🆕 Task 1.2: 导入配置事件总线
+// 🆕 Task 1.2: Import configuration event bus
 import { configEventBus, type ConfigChangeEvent } from '@/core/data-architecture/ConfigEventBus'
 import { smartDeepClone } from '@/utils/deep-clone'
 
 /**
- * 默认配置工厂
- * 🔧 重构：各层自治原则 - 配置器只提供空结构，由各层自己填充
+ * Default configuration factory
+ * 🔧 Refactor：The principle of autonomy at all levels - Configurator only provides empty structure，Filled by each layer itself
  */
 export const createDefaultConfiguration = (): WidgetConfiguration => ({
-  // 🔧 Base配置：由NodeWrapper层自主管理和定义
+  // 🔧 BaseConfiguration：Depend onNodeWrapperLayer autonomy management and definition
   base: {},
 
-  // 🔧 Component配置：由各Card2.1组件自主管理和定义
+  // 🔧 ComponentConfiguration：by eachCard2.1Autonomous management and definition of components
   component: {},
 
-  // 🔧 DataSource配置：由独立数据源系统管理和定义
+  // 🔧 DataSourceConfiguration：Managed and defined by independent data source systems
   dataSource: {},
 
-  // 🔧 Interaction配置：由独立交互系统管理和定义
+  // 🔧 InteractionConfiguration：Managed and defined by independent interactive systems
   interaction: {},
 
-  // 🔧 元数据：配置器层统一管理
+  // 🔧 metadata：Configurator layer unified management
   metadata: {
     version: '1.0.0',
     createdAt: Date.now(),
@@ -52,35 +52,35 @@ export const createDefaultConfiguration = (): WidgetConfiguration => ({
 })
 
 /**
- * 配置管理器实现
+ * Configuration manager implementation
  */
 export class ConfigurationManager implements IConfigurationManager {
-  // 存储所有组件的配置
+  // Stores the configuration of all components
   private configurations = reactive(new Map<string, WidgetConfiguration>())
 
-  // 配置变化监听器
+  // Configure change listener
   private listeners = new Map<string, Set<(config: WidgetConfiguration) => void>>()
 
-  // 🆕 Task 1.2: 配置变更上下文跟踪
+  // 🆕 Task 1.2: Configuration change context tracking
   private lastUpdatedSection: keyof WidgetConfiguration = 'component'
   private previousConfigs = new Map<string, WidgetConfiguration>()
 
-  // 配置预设
+  // Configure presets
   private presets = ref<ConfigurationPreset[]>([])
 
-  // 配置迁移器
+  // Configure the migrator
   private migrators: ConfigurationMigrator[] = []
 
-  // 🆕 持久化存储键名
+  // 🆕 Persistence storage key name
   /**
-   * 构造函数 - 🔥 已移除localStorage依赖，符合架构原则
+   * Constructor - 🔥 RemovedlocalStoragerely，Comply with architectural principles
    */
   constructor() {
-    // 🔥 配置完全依赖统一配置中心，无需localStorage
+    // 🔥 Configuration completely relies on the unified configuration center，No needlocalStorage
   }
 
   /**
-   * 获取组件配置
+   * Get component configuration
    */
   getConfiguration(widgetId: string): WidgetConfiguration | null {
     const config = this.configurations.get(widgetId)
@@ -88,22 +88,22 @@ export class ConfigurationManager implements IConfigurationManager {
       return null
     }
 
-    // 🔍 [DEBUG-配置仓库] 打印读取到的配置对象
-    // 返回配置的副本，避免外部直接修改
+    // 🔍 [DEBUG-Configure warehouse] Print the read configuration object
+    // Returns a copy of the configuration，Avoid direct external modifications
     return this.deepClone(config)
   }
 
   /**
-   * 设置组件配置
+   * Set component configuration
    */
   setConfiguration(widgetId: string, config: WidgetConfiguration): void {
-    // 验证配置
+    // Verify configuration
     const validationResult = this.validateConfiguration(config)
     if (!validationResult.valid) {
-      throw new Error(`配置验证失败: ${validationResult.errors?.[0]?.message || '未知错误'}`)
+      throw new Error(`Configuration verification failed: ${validationResult.errors?.[0]?.message || 'unknown error'}`)
     }
 
-    // 更新时间戳
+    // Update timestamp
     const updatedConfig = {
       ...config,
       metadata: {
@@ -111,20 +111,20 @@ export class ConfigurationManager implements IConfigurationManager {
         updatedAt: Date.now()
       }
     }
-    // 保存配置
+    // Save configuration
     this.configurations.set(widgetId, updatedConfig)
-    // 🔥 已移除localStorage持久化 - 配置依赖统一配置中心
+    // 🔥 RemovedlocalStoragepersistence - Configuration depends on the unified configuration center
 
-    // 触发监听器
+    // trigger listener
     this.notifyListeners(widgetId, updatedConfig)
   }
 
   /**
-   * 更新配置的某个部分
+   * Update some part of the configuration
    *
-   * 🔥 重要注意：
-   * - 数据源配置使用直接替换，避免 deepMerge 导致的无限循环
-   * - 其他配置使用深度合并，保持向后兼容性
+   * 🔥 Important note：
+   * - Data source configuration uses direct replacement，avoid deepMerge resulting in an infinite loop
+   * - Other configurations use deep merging，Maintain backward compatibility
    */
   updateConfiguration<K extends keyof WidgetConfiguration>(
     widgetId: string,
@@ -137,20 +137,20 @@ export class ConfigurationManager implements IConfigurationManager {
       return this.updateConfiguration(widgetId, section, config)
     }
 
-    // 🆕 Task 1.2: 保存变更前的配置状态
+    // 🆕 Task 1.2: Save the configuration status before changes
     this.previousConfigs.set(widgetId, this.deepClone(currentConfig))
     this.lastUpdatedSection = section
 
-    // 🔥 关键修复：数据源配置使用替换而不是合并，避免无限循环
+    // 🔥 critical fix：Data source configuration uses replace instead of merge，Avoid infinite loops
     const currentSectionValue = currentConfig[section]
     const mergedSectionValue =
       section === 'dataSource'
         ? (() => {
-            return config // 数据源配置直接替换，避免deepMerge导致的循环问题
+            return config // Direct replacement of data source configuration，avoiddeepMergeCirculation problems caused by
           })()
         : currentSectionValue !== null && currentSectionValue !== undefined
           ? this.deepMerge(currentSectionValue, config)
-          : config // 如果当前值是 null 或 undefined，直接使用新配置
+          : config // If the current value is null or undefined，Use the new configuration directly
 
     const updatedConfig = {
       ...currentConfig,
@@ -163,29 +163,29 @@ export class ConfigurationManager implements IConfigurationManager {
 
     this.configurations.set(widgetId, updatedConfig)
 
-    // 🔥 已移除localStorage持久化 - 配置依赖统一配置中心
+    // 🔥 RemovedlocalStoragepersistence - Configuration depends on the unified configuration center
 
-    // 🔥 重要修复：清除组件缓存，确保新配置能被执行
+    // 🔥 Important fixes：Clear component cache，Make sure the new configuration can be executed
     if (section === 'dataSource') {
       simpleDataBridge.clearComponentCache(widgetId)
     }
-    // 🔍 [DEBUG-配置仓库] 打印整个配置对象
-    // 触发监听器
+    // 🔍 [DEBUG-Configure warehouse] Print the entire configuration object
+    // trigger listener
     this.notifyListeners(widgetId, updatedConfig)
   }
 
   /**
-   * 重置配置到默认值
+   * Reset configuration to default
    */
   resetConfiguration(widgetId: string): void {
     const defaultConfig = createDefaultConfiguration()
     this.configurations.set(widgetId, defaultConfig)
-    // 触发监听器
+    // trigger listener
     this.notifyListeners(widgetId, defaultConfig)
   }
 
   /**
-   * 初始化组件配置
+   * Initialize component configuration
    */
   initializeConfiguration(widgetId: string, customDefaults?: Partial<WidgetConfiguration>): void {
     if (this.configurations.has(widgetId)) {
@@ -197,45 +197,45 @@ export class ConfigurationManager implements IConfigurationManager {
 
     this.configurations.set(widgetId, initialConfig)
 
-    // 触发监听器，通知配置已初始化
+    // trigger listener，Notification configuration initialized
     this.notifyListeners(widgetId, initialConfig)
   }
 
   /**
-   * 删除组件配置
+   * Delete component configuration
    */
   removeConfiguration(widgetId: string): boolean {
     const exists = this.configurations.has(widgetId)
     if (exists) {
       this.configurations.delete(widgetId)
 
-      // 清理监听器
+      // Clean up listeners
       this.listeners.delete(widgetId)
     }
     return exists
   }
 
   /**
-   * 验证配置
+   * Verify configuration
    */
   validateConfiguration(config: WidgetConfiguration): ValidationResult {
     const errors: ValidationResult['errors'] = []
     const warnings: ValidationResult['warnings'] = []
 
     try {
-      // 基础配置验证
+      // Basic configuration verification
       if (config.base) {
         if (typeof config.base.showTitle !== 'boolean') {
           errors?.push({
             field: 'base.showTitle',
-            message: 'showTitle 必须是布尔值'
+            message: 'showTitle Must be a boolean value'
           })
         }
 
         if (config.base.title && typeof config.base.title !== 'string') {
           errors?.push({
             field: 'base.title',
-            message: 'title 必须是字符串'
+            message: 'title Must be a string'
           })
         }
 
@@ -245,72 +245,72 @@ export class ConfigurationManager implements IConfigurationManager {
         ) {
           errors?.push({
             field: 'base.opacity',
-            message: 'opacity 必须是0-1之间的数值'
+            message: 'opacity must be0-1value between'
           })
         }
       }
 
-      // 数据源配置验证
+      // Data source configuration verification
       if (config.dataSource) {
         const validTypes = ['static', 'api', 'websocket', 'multi-source', 'data-mapping', 'data-source-bindings', '']
         if (config.dataSource.type && !validTypes.includes(config.dataSource.type)) {
           errors?.push({
             field: 'dataSource.type',
-            message: '无效的数据源类型'
+            message: 'Invalid data source type'
           })
         }
 
-        // 验证多数据源配置
+        // Verify multiple data source configuration
         if (config.dataSource.type === 'multi-source') {
           if (!config.dataSource.sources || !Array.isArray(config.dataSource.sources)) {
             errors?.push({
               field: 'dataSource.sources',
-              message: '多数据源配置必须包含sources数组'
+              message: 'Multiple data source configurations must includesourcesarray'
             })
           }
         }
 
-        // 验证数据映射配置
+        // Verify data mapping configuration
         if (config.dataSource.type === 'data-mapping') {
           if (!config.dataSource.config) {
             errors?.push({
               field: 'dataSource.config',
-              message: '数据映射配置必须包含config对象'
+              message: 'Data mapping configuration must containconfigobject'
             })
           } else {
-            // 检查是否包含必要的映射配置
+            // Check if necessary mapping configuration is included
             const mappingConfig = config.dataSource.config
             if (!mappingConfig.arrayDataSource && !mappingConfig.objectDataSource) {
               warnings?.push({
                 field: 'dataSource.config',
-                message: '建议配置至少一个数据源（数组或对象）'
+                message: 'It is recommended to configure at least one data source（array or object）'
               })
             }
           }
         }
 
-        // 验证数据源绑定配置（简化验证，主要用于演示）
+        // Verify data source binding configuration（Simplify verification，Mainly used for presentations）
         if (config.dataSource.type === 'data-source-bindings') {
           if (!config.dataSource.config) {
-            // 对于演示组件，config 可以为空，只给出警告
+            // For demo components，config Can be empty，only give warning
             warnings?.push({
               field: 'dataSource.config',
-              message: '数据源绑定配置为空，组件将使用默认数据'
+              message: 'Data source binding configuration is empty，The component will use default data'
             })
           } else if (config.dataSource.config.dataSourceBindings) {
-            // 检查绑定配置的基本结构
+            // Examine the basic structure of the binding configuration
             const bindings = config.dataSource.config.dataSourceBindings
             if (typeof bindings !== 'object') {
               warnings?.push({
                 field: 'dataSource.config.dataSourceBindings',
-                message: '数据源绑定应该是一个对象'
+                message: 'The data source binding should be an object'
               })
             }
           }
         }
       }
 
-      // 交互配置验证
+      // Interactive configuration verification
       if (config.interaction) {
         for (const [eventName, eventConfig] of Object.entries(config.interaction)) {
           if (
@@ -322,19 +322,19 @@ export class ConfigurationManager implements IConfigurationManager {
           ) {
             errors?.push({
               field: `interaction.${eventName}.type`,
-              message: `无效的交互类型: ${eventConfig.type}`
+              message: `Invalid interaction type: ${eventConfig.type}`
             })
           }
         }
       }
 
-      // 组件配置验证
+      // Component configuration verification
       if (config.component?.validation?.required) {
         for (const requiredField of config.component.validation.required) {
           if (!config.component.properties[requiredField]) {
             warnings?.push({
               field: `component.properties.${requiredField}`,
-              message: `必需字段缺失: ${requiredField}`
+              message: `Required fields are missing: ${requiredField}`
             })
           }
         }
@@ -342,7 +342,7 @@ export class ConfigurationManager implements IConfigurationManager {
     } catch (error) {
       errors?.push({
         field: 'global',
-        message: `配置验证异常: ${error instanceof Error ? error.message : '未知错误'}`
+        message: `Configuration validation exception: ${error instanceof Error ? error.message : 'unknown error'}`
       })
     }
 
@@ -354,32 +354,33 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 导出配置
+   * Export configuration
    */
   exportConfiguration(widgetId: string): string {
     const config = this.configurations.get(widgetId)
     if (!config) {
-      throw new Error(`配置不存在: ${widgetId}`)
+      throw new Error(`Configuration does not exist: ${widgetId}`)
     }
 
     try {
       return JSON.stringify(config, null, 2)
     } catch (error) {
-      throw new Error(`配置导出失败: ${error instanceof Error ? error.message : '未知错误'}`)
+      throw new Error(`Configuration export failed: ${error instanceof Error ? error.message : 'unknown error'}`)
     }
   }
 
   /**
-   * 导入组件配置
-   * @param componentId - 组件ID
-   * @param configuration - 要导入的配置
+   * Import component configuration
+   * @param componentId - componentsID
+   * @param configuration - Configuration to import
    */
-  public importConfiguration(componentId: string, configuration: Record<string, any>): void {
-    // 在设置新配置之前，遍历即将被替换的旧配置中的所有数据源，并清除它们的缓存
+  public importConfiguration(componentId: string, configuration: Record<string, any>): void {
+
+    // Before setting up a new configuration，Iterate through all data sources in the old configuration that will be replaced，and clear their cache
     const oldConfig = this.configurations[componentId]
     if (oldConfig) {
       for (const key in oldConfig) {
-        // 检查属性是否为数据源类型
+        // Check if the property is of data source type
         if (oldConfig[key] && oldConfig[key].dataType === 'dataSource') {
           this.clearDataSourceCache(componentId, key)
         }
@@ -390,7 +391,7 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 监听配置变化
+   * Listen for configuration changes
    */
   onConfigurationChange(widgetId: string, callback: (config: WidgetConfiguration) => void): () => void {
     if (!this.listeners.has(widgetId)) {
@@ -399,7 +400,7 @@ export class ConfigurationManager implements IConfigurationManager {
 
     this.listeners.get(widgetId)!.add(callback)
 
-    // 返回取消监听的函数
+    // Returns the function to cancel listening
     return () => {
       const listeners = this.listeners.get(widgetId)
       if (listeners) {
@@ -412,14 +413,14 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 获取所有配置
+   * Get all configurations
    */
   getAllConfigurations(): Map<string, WidgetConfiguration> {
     return new Map(this.configurations)
   }
 
   /**
-   * 批量更新配置
+   * Batch update configuration
    */
   batchUpdateConfigurations(updates: Array<{ widgetId: string; config: Partial<WidgetConfiguration> }>): void {
     const timestamp = Date.now()
@@ -439,14 +440,14 @@ export class ConfigurationManager implements IConfigurationManager {
     }
   }
 
-  // 私有方法
+  // private method
 
   /**
-   * 通知监听器
-   * Task 1.2 重构：集成事件总线，实现新旧架构并存
+   * notification listener
+   * Task 1.2 Refactor：Integrated event bus，Realize the coexistence of old and new architectures
    */
   private notifyListeners(widgetId: string, config: WidgetConfiguration): void {
-    // 1. 原有监听器通知（向后兼容）
+    // 1. Original listener notification（backwards compatible）
     const listeners = this.listeners.get(widgetId)
     if (listeners) {
       listeners.forEach(callback => {
@@ -456,12 +457,12 @@ export class ConfigurationManager implements IConfigurationManager {
       })
     }
 
-    // 2. 🆕 Task 1.2: 发送到事件总线（新架构）
+    // 2. 🆕 Task 1.2: Send to event bus（new architecture）
     this.emitToEventBus(widgetId, config)
   }
 
   /**
-   * 🆕 Task 1.2: 向事件总线发送配置变更事件
+   * 🆕 Task 1.2: Send configuration change events to the event bus
    */
   private emitToEventBus(widgetId: string, config: WidgetConfiguration): void {
     try {
@@ -469,32 +470,32 @@ export class ConfigurationManager implements IConfigurationManager {
 
       const event: ConfigChangeEvent = {
         componentId: widgetId,
-        componentType: '', // 这里无法获取组件类型，由监听器负责过滤
+        componentType: '', // Component type cannot be obtained here，The listener is responsible for filtering
         section: this.lastUpdatedSection,
         oldConfig: previousConfig,
         newConfig: config,
         timestamp: Date.now(),
-        source: 'user', // 默认为用户触发
+        source: 'user', // Default is user triggered
         context: {
           triggerComponent: 'ConfigurationManager',
           shouldTriggerExecution: true,
           changedFields: this.getChangedFields(previousConfig, config)
         }
       }
-      // 异步发送事件，避免阻塞当前流程
+      // Send events asynchronously，Avoid blocking the current process
       configEventBus.emitConfigChange(event).catch(error => {})
     } catch (error) {}
   }
 
   /**
-   * 🆕 Task 1.2: 获取变更的字段列表
+   * 🆕 Task 1.2: Get a list of changed fields
    */
   private getChangedFields(oldConfig: WidgetConfiguration | undefined, newConfig: WidgetConfiguration): string[] {
     if (!oldConfig) return []
 
     const changedFields: string[] = []
 
-    // 检查各个配置层级的变更
+    // Check for changes at various configuration levels
     if (JSON.stringify(oldConfig.base) !== JSON.stringify(newConfig.base)) {
       changedFields.push('base')
     }
@@ -512,7 +513,7 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 深度克隆对象
+   * Deep clone object
    */
   private deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== 'object') return obj
@@ -529,7 +530,7 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 深度合并对象
+   * Deep merge objects
    */
   private deepMerge<T>(target: T, source: Partial<T>): T {
     const result = this.deepClone(target)
@@ -560,7 +561,7 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 迁移配置到最新版本
+   * Migrate configuration to the latest version
    */
   private migrateConfiguration(config: WidgetConfiguration): WidgetConfiguration {
     let result = config
@@ -575,21 +576,21 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 注册配置迁移器
+   * Register configuration migrator
    */
   registerMigrator(migrator: ConfigurationMigrator): void {
     this.migrators.push(migrator)
   }
 
   /**
-   * 添加配置预设
+   * Add configuration preset
    */
   addPreset(preset: ConfigurationPreset): void {
     this.presets.value.push(preset)
   }
 
   /**
-   * 获取配置预设
+   * Get configuration presets
    */
   getPresets(componentType?: string): ConfigurationPreset[] {
     if (componentType) {
@@ -601,7 +602,7 @@ export class ConfigurationManager implements IConfigurationManager {
   }
 
   /**
-   * 应用配置预设
+   * Apply configuration presets
    */
   applyPreset(widgetId: string, presetName: string): boolean {
     const preset = this.presets.value.find(p => p.name === presetName)
@@ -621,7 +622,7 @@ export class ConfigurationManager implements IConfigurationManager {
 
 }
 
-// 导出全局配置管理器单例
+// Export global configuration manager singleton
 export const configurationManager = new ConfigurationManager()
 
 export default configurationManager
